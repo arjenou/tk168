@@ -1,0 +1,196 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="inqPageTitle">来店予約 — TK168 Premium Automotive</title>
+  <link rel="stylesheet" href="css/style.css?v=20260417u">
+  <link rel="stylesheet" href="css/inquiry.css?v=20260417u">
+</head>
+
+<body class="inquiry-page no-hero-page">
+  <div data-layout-nav></div>
+
+  <main class="inq-main">
+    <section class="inq-shell">
+      <header class="inq-header">
+        <div>
+          <p class="inq-eyebrow" id="inqEyebrow">TK168 CONTACT FLOW</p>
+          <h1 class="inq-title" id="inqTitle">来店预约信息填写</h1>
+          <p class="inq-subtitle" id="inqSubtitle">通过 5 个步骤填写关键信息，整理完成后继续与顾问确认。</p>
+        </div>
+      </header>
+
+      <ol class="inq-progress" id="inqProgress" aria-label="预约填写步骤">
+        <li><button type="button" data-jump-step="0" id="inqStepAppointment">来店时间</button></li>
+        <li><button type="button" data-jump-step="1" id="inqStepName">姓名</button></li>
+        <li><button type="button" data-jump-step="2" id="inqStepKana">读音</button></li>
+        <li><button type="button" data-jump-step="3" id="inqStepContact">联系方式</button></li>
+        <li><button type="button" data-jump-step="4" id="inqStepConfirm">确认</button></li>
+      </ol>
+
+      <div class="inq-board">
+        <p class="inq-lead" id="inqLeadText">请选择希望到店时间。</p>
+
+        <article class="inq-vehicle">
+          <img src="assets/images/chen001.jpg" alt="目标车辆" class="inq-vehicle-thumb" id="inqVehicleThumb">
+          <div class="inq-vehicle-copy">
+            <p class="inq-vehicle-brand" id="inqVehicleBrand">Lamborghini</p>
+            <p class="inq-vehicle-name" id="inqVehicleName">Urus Performante</p>
+            <p class="inq-vehicle-meta" id="inqVehicleMeta">2023 / 4.0L V8 / 3,200km / 现车</p>
+          </div>
+        </article>
+
+        <div class="inq-table">
+          <section class="inq-row" data-row="appointment">
+            <div class="inq-row-label">
+              <span id="inqRowAppointment">来店希望时间</span>
+              <b class="inq-required">必填</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="inqSummaryAppointment">未填写</span>
+                <button type="button" class="inq-edit" data-jump-row="appointment" id="inqEditAppointment">修改</button>
+              </div>
+              <div class="inq-editor">
+                <div class="inq-inline-grid">
+                  <label>
+                    <span id="inqDateLabel">日期</span>
+                    <input type="date" id="inqDate">
+                  </label>
+                  <label>
+                    <span id="inqTimeLabel">时间</span>
+                    <select id="inqTime">
+                      <option value="" id="inqTimePlaceholder">请选择</option>
+                      <option>10:00</option>
+                      <option>11:00</option>
+                      <option>13:00</option>
+                      <option>15:00</option>
+                      <option>17:00</option>
+                    </select>
+                  </label>
+                </div>
+                <label class="inq-textarea">
+                  <span id="inqNoteLabel">备注（选填）</span>
+                  <textarea id="inqNote" rows="3" placeholder="如有看车偏好、预算范围或其他说明，请在这里填写。"></textarea>
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row" data-row="name">
+            <div class="inq-row-label">
+              <span id="inqRowName">姓名</span>
+              <b class="inq-required">必填</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="inqSummaryName">未填写</span>
+                <button type="button" class="inq-edit" data-jump-row="name" id="inqEditName">修改</button>
+              </div>
+              <div class="inq-editor">
+                <label>
+                  <span id="inqNameLabel">姓名</span>
+                  <input type="text" id="inqName" placeholder="张三">
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row" data-row="kana">
+            <div class="inq-row-label">
+              <span id="inqRowKana">姓名读音</span>
+              <b class="inq-required">必填</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="inqSummaryKana">未填写</span>
+                <button type="button" class="inq-edit" data-jump-row="kana" id="inqEditKana">修改</button>
+              </div>
+              <div class="inq-editor">
+                <label>
+                  <span id="inqKanaLabel">姓名读音</span>
+                  <input type="text" id="inqKana" placeholder="チョウ サン">
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row" data-row="contact">
+            <div class="inq-row-label">
+              <span id="inqRowContact">邮箱 / 电话</span>
+              <b class="inq-required">必填</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="inqSummaryContact">未填写</span>
+                <button type="button" class="inq-edit" data-jump-row="contact" id="inqEditContact">修改</button>
+              </div>
+              <div class="inq-editor">
+                <div class="inq-inline-grid">
+                  <label>
+                    <span id="inqEmailLabel">邮箱地址</span>
+                    <input type="email" id="inqEmail" placeholder="name@example.com">
+                  </label>
+                  <label>
+                    <span id="inqPhoneLabel">电话号码</span>
+                    <input type="tel" id="inqPhone" placeholder="09012345678">
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row" data-row="confirm">
+            <div class="inq-row-label">
+              <span id="inqRowConfirm">内容确认</span>
+              <b class="inq-required">必填</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="inqSummaryConfirm">未确认</span>
+                <button type="button" class="inq-edit" data-jump-row="confirm" id="inqEditConfirm">修改</button>
+              </div>
+              <div class="inq-editor">
+                <label>
+                  <span id="inqPostalLabel">邮编</span>
+                  <input type="text" id="inqPostal" placeholder="1234567">
+                </label>
+                <label class="inq-check">
+                  <input type="checkbox" id="inqConsentNews">
+                  <span id="inqConsentNewsLabel">接收新到库存和活动资讯</span>
+                </label>
+                <label class="inq-check">
+                  <input type="checkbox" id="inqConsentPolicy">
+                  <span id="inqConsentPolicyLabel">同意使用条款与隐私政策</span>
+                </label>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <p class="inq-message" id="inqMessage" aria-live="polite"></p>
+
+        <div class="inq-actions">
+          <button type="button" class="inq-btn inq-btn--ghost" id="inqPrevBtn">上一步</button>
+          <button type="button" class="inq-btn inq-btn--primary" id="inqNextBtn">下一步</button>
+        </div>
+        <p class="inq-counter" id="inqCounter">1 / 5</p>
+      </div>
+    </section>
+  </main>
+
+  <div data-layout-footer></div>
+
+  <script src="js/layout-shell.js?v=20260417v"></script>
+  <script src="js/brand-logo-inventory.js?v=20260417i"></script>
+  <script src="js/brand-library-data.js?v=20260417i"></script>
+  <script src="js/data.js?v=20260417q"></script>
+  <script src="js/i18n.js?v=20260417v"></script>
+  <script src="js/common-links.js?v=20260417r"></script>
+  <script src="js/page-chrome.js?v=20260417i"></script>
+  <script src="js/inquiry.js?v=20260417s"></script>
+</body>
+
+</html>

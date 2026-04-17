@@ -1,0 +1,168 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>厳選ブランド — TK168 Premium Automotive</title>
+  <link rel="stylesheet" href="css/style.css?v=20260417u">
+  <link rel="stylesheet" href="css/brand.css?v=20260417u">
+</head>
+
+<body>
+  <div data-layout-nav></div>
+  <section id="brand-hero">
+    <div class="bh-img-wrap">
+      <img src="assets/images/brand-hero-usercrop.png?v=20260412d" alt="TK168 Brand Hero" class="bh-img" id="brandHeroImage">
+      <div class="bh-overlay"></div>
+    </div>
+    <div class="bh-content">
+      <h1 class="bh-title" id="brandHeroTitle">精选品牌</h1>
+    </div>
+  </section>
+
+  <section id="brand-nav-section">
+    <div class="bn-shell">
+      <button class="bn-control bn-control--prev" id="bnPrev" type="button" aria-label="上一组品牌">
+        <span aria-hidden="true">←</span>
+      </button>
+      <div class="bn-track" id="bnGrid" aria-label="品牌切换导航"></div>
+      <button class="bn-control bn-control--next" id="bnNext" type="button" aria-label="下一组品牌">
+        <span aria-hidden="true">→</span>
+      </button>
+    </div>
+  </section>
+
+  <section id="vehicles" class="brand-vehicles">
+    <div class="compare-panel is-collapsed" id="comparePanel">
+      <div class="compare-toolbar">
+        <label class="compare-search" for="compareSearchInput">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <circle cx="9" cy="9" r="5.5"></circle>
+            <path d="m13.2 13.2 4 4"></path>
+          </svg>
+          <input id="compareSearchInput" type="search" autocomplete="off" />
+        </label>
+        <div class="compare-toolbar-actions">
+          <button type="button" class="compare-toolbar-btn compare-toolbar-btn--primary" id="compareApplyBtn"></button>
+          <button type="button" class="compare-toolbar-btn" id="compareResetBtn"></button>
+        </div>
+      </div>
+
+      <div class="compare-grid-wrap" id="compareGridWrap">
+        <div class="compare-grid" id="compareGrid">
+          <div class="compare-group">
+          <p class="compare-group-title" data-group-title="power"></p>
+          <div class="compare-actions">
+            <button type="button" class="compare-btn is-active" data-group="power" data-value="all"></button>
+            <button type="button" class="compare-btn" data-group="power" data-value="fuel-gas"></button>
+            <button type="button" class="compare-btn" data-group="power" data-value="fuel-hybrid"></button>
+            <button type="button" class="compare-btn" data-group="power" data-value="fuel-ev"></button>
+          </div>
+          </div>
+
+          <div class="compare-group">
+          <p class="compare-group-title" data-group-title="category"></p>
+          <div class="compare-actions">
+            <button type="button" class="compare-btn is-active" data-group="category" data-value="all"></button>
+            <button type="button" class="compare-btn" data-group="category" data-value="suv"></button>
+            <button type="button" class="compare-btn" data-group="category" data-value="sport"></button>
+            <button type="button" class="compare-btn" data-group="category" data-value="sedan"></button>
+          </div>
+          </div>
+
+          <div class="compare-group">
+          <p class="compare-group-title" data-group-title="price"></p>
+          <div class="compare-actions">
+            <button type="button" class="compare-btn is-active" data-group="price" data-value="all"></button>
+            <button type="button" class="compare-btn" data-group="price" data-value="price-low"></button>
+            <button type="button" class="compare-btn" data-group="price" data-value="price-mid"></button>
+            <button type="button" class="compare-btn" data-group="price" data-value="price-high"></button>
+          </div>
+          </div>
+
+          <div class="compare-group">
+          <p class="compare-group-title" data-group-title="year"></p>
+          <div class="compare-actions">
+            <button type="button" class="compare-btn is-active" data-group="year" data-value="all"></button>
+            <button type="button" class="compare-btn" data-group="year" data-value="year-new"></button>
+            <button type="button" class="compare-btn" data-group="year" data-value="year-mid"></button>
+            <button type="button" class="compare-btn" data-group="year" data-value="year-old"></button>
+          </div>
+          </div>
+
+          <div class="compare-group">
+          <p class="compare-group-title" data-group-title="mileage"></p>
+          <div class="compare-actions">
+            <button type="button" class="compare-btn is-active" data-group="mileage" data-value="all"></button>
+            <button type="button" class="compare-btn" data-group="mileage" data-value="mileage-low"></button>
+            <button type="button" class="compare-btn" data-group="mileage" data-value="mileage-mid"></button>
+            <button type="button" class="compare-btn" data-group="mileage" data-value="mileage-high"></button>
+          </div>
+          </div>
+
+          <div class="compare-group">
+          <p class="compare-group-title" data-group-title="displacement"></p>
+          <div class="compare-actions">
+            <button type="button" class="compare-btn is-active" data-group="displacement" data-value="all"></button>
+            <button type="button" class="compare-btn" data-group="displacement" data-value="disp-low"></button>
+            <button type="button" class="compare-btn" data-group="displacement" data-value="disp-mid"></button>
+            <button type="button" class="compare-btn" data-group="displacement" data-value="disp-high"></button>
+          </div>
+          </div>
+
+          <div class="compare-group">
+          <p class="compare-group-title" data-group-title="inspection"></p>
+          <div class="compare-actions">
+            <button type="button" class="compare-btn is-active" data-group="inspection" data-value="all"></button>
+            <button type="button" class="compare-btn" data-group="inspection" data-value="inspection-has"></button>
+            <button type="button" class="compare-btn" data-group="inspection" data-value="inspection-none"></button>
+          </div>
+          </div>
+
+          <div class="compare-group">
+          <p class="compare-group-title" data-group-title="repair"></p>
+          <div class="compare-actions">
+            <button type="button" class="compare-btn is-active" data-group="repair" data-value="all"></button>
+            <button type="button" class="compare-btn" data-group="repair" data-value="repair-none"></button>
+            <button type="button" class="compare-btn" data-group="repair" data-value="repair-has"></button>
+          </div>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="compare-collapse-toggle" id="compareCollapseToggle"></button>
+    </div>
+    <div class="vehicle-grid" id="vehicleGrid"></div>
+
+    <!-- Pagination -->
+    <div class="vehicle-pagination v-pagination" id="vPagination">
+      <button class="vehicle-slider-btn vehicle-slider-btn--prev" id="vpnPrev" aria-label="上一页">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+      <div class="vehicle-slider-dots" id="vpnDots" aria-label="车辆翻页"></div>
+      <button class="vehicle-slider-btn vehicle-slider-btn--next" id="vpnNext" aria-label="下一页">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </button>
+    </div>
+  </section>
+
+  <div data-layout-footer></div>
+
+  <script src="js/layout-shell.js?v=20260417v"></script>
+  <script src="js/brand-logo-inventory.js?v=20260417i"></script>
+  <script src="js/brand-library-data.js?v=20260417i"></script>
+  <script src="js/data.js?v=20260417q"></script>
+  <script src="js/i18n.js?v=20260417v"></script>
+  <script src="js/common-links.js?v=20260417r"></script>
+  <script src="js/page-chrome.js?v=20260417i"></script>
+  <script src="js/inventory-context.js?v=20260417i"></script>
+  <script src="js/renderers.js?v=20260417q"></script>
+  <script src="js/search-ui.js?v=20260417q"></script>
+  <script src="js/brand.js?v=20260417q"></script>
+</body>
+
+</html>

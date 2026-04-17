@@ -1,0 +1,417 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>車両詳細 — TK168 Premium Automotive</title>
+  <link rel="stylesheet" href="css/detail.css?v=20260417u">
+</head>
+
+<body>
+  <div data-layout-nav></div>
+
+  <main class="page-main">
+    <section class="detail-section">
+      <div class="detail-shell">
+
+        <!-- 车型 + 价格 -->
+        <div class="detail-topbar">
+          <div class="detail-title-row">
+            <h1 class="detail-title" id="detailTitle">AUDI R8</h1>
+            <button
+              class="detail-title-favorite"
+              id="detailFavoriteBtn"
+              type="button"
+              aria-pressed="false"
+              aria-label="收藏车辆">
+              <svg class="detail-title-favorite-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3.4c.4 0 .8.2 1 .6l2.1 4.2 4.7.7c.9.1 1.2 1.2.6 1.9l-3.4 3.3.8 4.7c.1.9-.8 1.6-1.6 1.2L12 17.6 7.8 20c-.8.4-1.7-.3-1.6-1.2l.8-4.7-3.4-3.3c-.6-.7-.3-1.8.6-1.9l4.7-.7L11 4c.2-.4.6-.6 1-.6z"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="detail-price">
+            <div class="detail-price-main">
+              <div class="detail-price-label-row">
+                <span class="detail-price-label" data-i18n="price.total">支払総額</span>
+                <span class="detail-price-tax" data-i18n="price.taxIncluded">（含税）</span>
+                <button class="detail-price-help" type="button" data-price-help="total" data-i18n-title="price.helpLabel" aria-label="查看价格说明">?</button>
+              </div>
+              <strong class="detail-price-value" id="detailTotalPriceValue"><span class="detail-price-amount">3,200</span><span class="detail-price-unit">万円</span></strong>
+            </div>
+            <div class="detail-price-sub">
+              <div class="detail-price-label-row is-sub">
+                <span class="detail-price-sub-label" data-i18n="price.baseLong">車両本体価格</span>
+                <span class="detail-price-tax" data-i18n="price.taxIncluded">（含税）</span>
+                <button class="detail-price-help" type="button" data-price-help="base" data-i18n-title="price.helpLabel" aria-label="查看价格说明">?</button>
+              </div>
+              <span class="detail-price-sub-value" id="detailBasePriceValue"><span class="detail-price-amount">2,980</span><span class="detail-price-unit">万円</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 两栏主体 -->
+        <div class="detail-grid">
+
+          <!-- 左：画廊 + 参数 + 概览 -->
+          <div class="detail-main">
+
+            <!-- 画廊卡片 -->
+            <div class="detail-card detail-hero-card">
+              <div class="gallery-main" id="galleryMainTrigger" role="button" tabindex="0" aria-label="查看车辆大图">
+                <button class="gallery-main-nav is-prev" type="button" id="galleryMainPrev" aria-label="上一张图片">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M15 18l-6-6 6-6"></path>
+                  </svg>
+                </button>
+                <img id="detailMainImage" src="assets/images/002.png" alt="奥迪 R8 主图">
+                <button class="gallery-main-nav is-next" type="button" id="galleryMainNext" aria-label="下一张图片">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M9 18l6-6-6-6"></path>
+                  </svg>
+                </button>
+              </div>
+              <div class="thumb-strip">
+                <button class="thumb-nav is-prev" type="button" id="thumbPrev" aria-label="查看上一组图片">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M15 18l-6-6 6-6"></path>
+                  </svg>
+                </button>
+                <div class="thumb-viewport">
+                  <div class="thumb-grid" id="thumbGrid">
+                    <button class="thumb is-active" type="button" data-index="0"
+                      data-image="assets/images/002.png" data-alt="奥迪 R8 整体">
+                      <span class="thumb-shot shot-main" aria-hidden="true"></span>
+                    </button>
+                    <button class="thumb" type="button" data-index="1"
+                      data-image="assets/images/002.png" data-alt="奥迪 R8 前脸">
+                      <span class="thumb-shot shot-front" aria-hidden="true"></span>
+                    </button>
+                    <button class="thumb" type="button" data-index="2"
+                      data-image="assets/images/002.png" data-alt="奥迪 R8 车尾">
+                      <span class="thumb-shot shot-rear" aria-hidden="true"></span>
+                    </button>
+                    <button class="thumb" type="button" data-index="3"
+                      data-image="assets/images/002.png" data-alt="奥迪 R8 车轮">
+                      <span class="thumb-shot shot-wheel" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
+                <button class="thumb-nav is-next" type="button" id="thumbNext" aria-label="查看下一组图片">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M9 18l6-6-6-6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- 参数表 -->
+            <div class="detail-card compact-card">
+              <div class="section-title-wrap">
+                <h2 class="section-title" data-i18n="detail.specsTitle">参数信息</h2>
+              </div>
+              <div class="spec-table" id="specTable">
+                <div class="spec-row">
+                  <span>年式(初度登録年)</span>
+                  <strong>2023 年</strong>
+                </div>
+                <div class="spec-row">
+                  <span>禁烟车</span>
+                  <strong>-</strong>
+                </div>
+                <div class="spec-row">
+                  <span>行驶里程</span>
+                  <strong>90 km</strong>
+                </div>
+                <div class="spec-row">
+                  <span>正规进口车</span>
+                  <strong>-</strong>
+                </div>
+                <div class="spec-row">
+                  <span>修復歴</span>
+                  <strong>-</strong>
+                </div>
+                <div class="spec-row">
+                  <span>店铺质保</span>
+                  <strong>-</strong>
+                </div>
+                <div class="spec-row">
+                  <span>车检</span>
+                  <strong>-</strong>
+                </div>
+                <div class="spec-row">
+                  <span>节能车减税对象车</span>
+                  <strong>-</strong>
+                </div>
+                <div class="spec-row">
+                  <span>法定整备</span>
+                  <strong>-</strong>
+                </div>
+                <div class="spec-row">
+                  <span>一手车主</span>
+                  <strong>-</strong>
+                </div>
+                <div class="spec-row">
+                  <span>定期点检记录簿</span>
+                  <strong>-</strong>
+                </div>
+                <div class="spec-row">
+                  <span>租赁退役车</span>
+                  <strong>-</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- 车辆概览 -->
+            <div class="detail-card overview-card compact-card">
+              <div class="section-title-wrap">
+                <h2 class="section-title" data-i18n="detail.overviewTitle">车型概览</h2>
+              </div>
+              <div id="detailOverview">
+                <p>这台奥迪 R8 保持了低里程与完整保养记录，低伏车身与中置布局让整车始终带着很鲜明的超跑比例。</p>
+                <p>无论是漆面状态、机械质感还是敞篷姿态，都呈现出相当完整的完成度，兼具驾驶乐趣与日常使用的稳定感。</p>
+              </div>
+            </div>
+
+          </div><!-- /detail-main -->
+
+          <!-- 右：侧边栏 -->
+          <aside class="detail-sidebar">
+
+            <!-- 立即咨询 -->
+            <div class="detail-card sidebar-card lead-card">
+              <div class="sidebar-title" data-i18n="detail.contactTitle">联系顾问</div>
+              <div class="action-group">
+                <a class="primary-action" href="#" data-link-key="store-visit" id="detailStoreVisitLink">
+                  <svg class="action-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  <span data-i18n="detail.storeVisit">来店预约</span>
+                </a>
+                <a class="secondary-action" href="mailto:AUTO@tk168.co.jp" id="detailEmailLink">
+                  <svg class="action-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  <span data-i18n="detail.stockConfirm">在库确认</span>
+                </a>
+                <a class="tertiary-action" href="#" id="detailPhoneLink">
+                  <svg class="action-icon" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 3.9 10.71 19.79 19.79 0 0 1 .87 2.18 2 2 0 0 1 2.87 0h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  <span data-i18n="detail.call">致电顾问</span>
+                </a>
+              </div>
+              <div class="advisor-panel" id="detailAdvisorPanel" hidden>
+                <p class="advisor-panel-hours" id="detailAdvisorHours">营业时间 10:00-19:00（日本时间）</p>
+                <div class="advisor-panel-actions">
+                  <a class="advisor-panel-call" href="#" id="detailAdvisorCallNow">
+                    <svg class="action-icon" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 3.9 10.71 19.79 19.79 0 0 1 .87 2.18 2 2 0 0 1 2.87 0h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    <span id="detailAdvisorCallNowText">立即拨打</span>
+                  </a>
+                  <button type="button" class="advisor-panel-copy" id="detailAdvisorCopyBtn">复制号码</button>
+                  <a class="advisor-panel-wa" href="#" id="detailAdvisorWhatsapp" target="_blank" rel="noreferrer">WhatsApp</a>
+                  <a class="advisor-panel-book" href="#" id="detailAdvisorBookLink">回电预约</a>
+                </div>
+                <p class="advisor-panel-feedback" id="detailAdvisorFeedback" aria-live="polite"></p>
+              </div>
+            </div>
+
+            <!-- 附加权益 -->
+            <div class="detail-card sidebar-card benefits-card">
+              <div class="sidebar-title" data-i18n="detail.benefitsTitle">基本规格</div>
+              <div class="benefit-bars" id="benefitBars">
+                <div class="benefit-bar benefit-bar--spec">
+                  <span class="benefit-spec-label">车身类型</span>
+                  <span class="benefit-spec-value">双门跑车</span>
+                </div>
+                <div class="benefit-bar benefit-bar--spec">
+                  <span class="benefit-spec-label">颜色</span>
+                  <span class="benefit-spec-value">曜石黑</span>
+                </div>
+                <div class="benefit-bar benefit-bar--spec">
+                  <span class="benefit-spec-label">发动机种别</span>
+                  <span class="benefit-spec-value">汽油</span>
+                </div>
+                <div class="benefit-bar benefit-bar--spec">
+                  <span class="benefit-spec-label">变速箱</span>
+                  <span class="benefit-spec-value">自动挡</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 亮点配置 -->
+            <div class="detail-card sidebar-card features-card">
+              <div class="sidebar-title" data-i18n="detail.featuresTitle">核心亮点</div>
+              <div class="feature-grid" id="featureGrid">
+                <div class="feature-item">
+                  <span class="feature-icon" aria-hidden="true">
+                    <img src="assets/images/spec-displacement.svg" alt="" loading="lazy" decoding="async">
+                  </span>
+                  <div class="feature-copy">
+                    <span class="feature-label">排气量</span>
+                    <strong class="feature-value">5.2L V10</strong>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-icon" aria-hidden="true">
+                    <img src="assets/images/spec-drivetrain.svg" alt="" loading="lazy" decoding="async">
+                  </span>
+                  <div class="feature-copy">
+                    <span class="feature-label">驱动方式</span>
+                    <strong class="feature-value">四轮驱动</strong>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-icon" aria-hidden="true">
+                    <img src="assets/images/spec-steering-wheel.svg" alt="" loading="lazy" decoding="async">
+                  </span>
+                  <div class="feature-copy">
+                    <span class="feature-label">方向盘</span>
+                    <strong class="feature-value">左舵</strong>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-icon" aria-hidden="true">
+                    <img src="assets/images/spec-seating-capacity.svg" alt="" loading="lazy" decoding="async">
+                  </span>
+                  <div class="feature-copy">
+                    <span class="feature-label">乘车定员</span>
+                    <strong class="feature-value">2 座</strong>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-icon" aria-hidden="true">
+                    <img src="assets/images/spec-door-count.svg" alt="" loading="lazy" decoding="async">
+                  </span>
+                  <div class="feature-copy">
+                    <span class="feature-label">车门数</span>
+                    <strong class="feature-value">2 门</strong>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-icon" aria-hidden="true">
+                    <img src="assets/images/spec-chassis-tail.svg" alt="" loading="lazy" decoding="async">
+                  </span>
+                  <div class="feature-copy">
+                    <span class="feature-label">车台末尾号</span>
+                    <strong class="feature-value">127</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-card sidebar-card staff-card">
+              <div class="staff-card-head">
+                <div class="sidebar-title" data-i18n="detail.staffTitle">员工介绍</div>
+              </div>
+              <div class="staff-card-body">
+                <div class="staff-photo" aria-hidden="true">
+                  <div class="staff-portrait">
+                    <span class="staff-hair"></span>
+                    <span class="staff-head"></span>
+                    <span class="staff-body"></span>
+                    <span class="staff-tie"></span>
+                  </div>
+                  <span class="staff-photo-mark">TK</span>
+                </div>
+                <div class="staff-meta">
+                  <div class="staff-role" data-i18n="detail.staffRole">进口车顾问</div>
+                  <div class="staff-name" data-i18n="detail.staffName">TK168 顾问团队</div>
+                  <p class="staff-bio" data-i18n="detail.staffBio">专注高性能车型与跨境购车沟通，为来店看车、在库确认和方案建议提供更高效的支持。</p>
+                </div>
+              </div>
+            </div>
+
+          </aside><!-- /detail-sidebar -->
+
+        </div><!-- /detail-grid -->
+      </div><!-- /detail-shell -->
+    </section>
+
+    <section class="featured-section">
+      <div class="section-bar">
+        <h2 class="featured-title" data-i18n="detail.featuredTitle">在库推荐</h2>
+        <a class="section-link" href="brand.html" id="detailBackToBrand" data-i18n="detail.moreInventory">查看更多车源</a>
+      </div>
+      <div class="featured-grid" id="featuredGrid"></div>
+    </section>
+
+  </main>
+
+  <div class="gallery-lightbox" id="galleryLightbox" aria-hidden="true">
+    <div class="gallery-lightbox-backdrop" data-lightbox-close></div>
+    <div class="gallery-lightbox-dialog" role="dialog" aria-modal="true" aria-label="车辆大图预览" data-i18n-aria-label="detail.lightbox">
+      <button class="gallery-lightbox-close" type="button" id="galleryLightboxClose" aria-label="关闭大图预览" data-i18n-aria-label="detail.closeLightbox">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18"></path>
+        </svg>
+      </button>
+      <button class="gallery-lightbox-nav is-prev" type="button" id="galleryLightboxPrev" aria-label="上一张">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6"></path>
+        </svg>
+      </button>
+      <figure class="gallery-lightbox-figure">
+        <img id="galleryLightboxImage" src="assets/images/002.png" alt="奥迪 R8 大图">
+        <figcaption class="gallery-lightbox-caption">
+          <span class="gallery-lightbox-title" id="galleryLightboxTitle">奥迪 R8</span>
+          <span class="gallery-lightbox-counter" id="galleryLightboxCounter">1 / 4</span>
+        </figcaption>
+      </figure>
+      <button class="gallery-lightbox-nav is-next" type="button" id="galleryLightboxNext" aria-label="下一张">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 18l6-6-6-6"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="spin-viewer-modal" id="spinViewerModal" aria-hidden="true">
+    <div class="spin-viewer-backdrop" data-spin-viewer-close></div>
+    <div class="spin-viewer-dialog" role="dialog" aria-modal="true" aria-labelledby="spinViewerTitle">
+      <button class="spin-viewer-close" type="button" id="spinViewerClose" aria-label="关闭 360 看车弹窗">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18"></path>
+        </svg>
+      </button>
+      <div class="spin-viewer-stage">
+        <img class="spin-viewer-poster" id="spinViewerPoster" src="assets/images/002.png" alt="360° 看车预留位">
+        <div class="spin-viewer-overlay"></div>
+        <div class="gallery-spin-content spin-viewer-content">
+          <span class="gallery-spin-badge" id="spinViewerBadge">360 LOOK</span>
+          <div class="gallery-spin-ring" aria-hidden="true">
+            <span>360°</span>
+          </div>
+          <div class="gallery-spin-copy">
+            <strong id="spinViewerTitle">360° 看车功能区</strong>
+            <p id="spinViewerText">这里先预留给环拍序列。后续接入素材后，可在弹窗里左右拖动查看整车。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="price-help-modal" id="priceHelpModal" aria-hidden="true">
+    <div class="price-help-modal-backdrop" data-price-help-close></div>
+    <div class="price-help-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="priceHelpModalTitle">
+      <div class="price-help-modal-head">
+        <h3 class="price-help-modal-title" id="priceHelpModalTitle">支払総額について</h3>
+        <button class="price-help-modal-close" type="button" id="priceHelpModalClose" data-i18n-title="price.modalClose" data-i18n-aria-label="price.modalClose" aria-label="关闭说明弹窗">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="price-help-modal-body" id="priceHelpModalBody"></div>
+    </div>
+  </div>
+
+  <div data-layout-footer></div>
+
+  <script src="js/layout-shell.js?v=20260417v"></script>
+  <script src="js/brand-logo-inventory.js?v=20260417i"></script>
+  <script src="js/brand-library-data.js?v=20260417i"></script>
+  <script src="js/data.js?v=20260417q"></script>
+  <script src="js/i18n.js?v=20260417v"></script>
+  <script src="js/common-links.js?v=20260417r"></script>
+  <script src="js/page-chrome.js?v=20260417i"></script>
+  <script src="js/inventory-context.js?v=20260417i"></script>
+  <script src="js/renderers.js?v=20260417q"></script>
+  <script src="js/detail.js?v=20260417q"></script>
+</body>
+
+</html>

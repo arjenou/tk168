@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="riqPageTitle">レンタル相談 — TK168 Premium Automotive</title>
+  <link rel="stylesheet" href="css/style.css?v=20260417u">
+  <link rel="stylesheet" href="css/inquiry.css?v=20260417u">
+  <link rel="stylesheet" href="css/rental-inquiry.css?v=20260417i">
+</head>
+
+<body class="inquiry-page rental-inquiry-page no-hero-page">
+  <div data-layout-nav></div>
+
+  <main class="inq-main">
+    <section class="inq-shell">
+      <header class="inq-header">
+        <div>
+          <p class="inq-eyebrow" id="riqEyebrow">TK168 RENTAL CONSULT</p>
+          <h1 class="inq-title" id="riqTitle">租车咨询单</h1>
+          <p class="inq-subtitle" id="riqSubtitle">按来店预约的 5 步结构整理租车需求，顾问会结合车辆状态、档期和用途回复你。</p>
+        </div>
+      </header>
+
+      <ol class="inq-progress" id="riqProgress" aria-label="租车咨询步骤">
+        <li><button type="button" data-jump-step="0" id="riqStepAppointment">用车时间</button></li>
+        <li><button type="button" data-jump-step="1" id="riqStepPlan">使用计划</button></li>
+        <li><button type="button" data-jump-step="2" id="riqStepName">联系人</button></li>
+        <li><button type="button" data-jump-step="3" id="riqStepContact">联系方式</button></li>
+        <li><button type="button" data-jump-step="4" id="riqStepConfirm">确认</button></li>
+      </ol>
+
+      <div class="inq-board">
+        <p class="inq-lead" id="riqLeadText">先确认希望用车日期、取车时间和预计租期。</p>
+
+        <article class="inq-vehicle riq-vehicle">
+          <img src="assets/images/011.jpg" alt="Rental vehicle" class="inq-vehicle-thumb" id="riqVehicleThumb">
+          <div class="inq-vehicle-copy">
+            <p class="inq-vehicle-brand" id="riqVehicleBrand">Lamborghini</p>
+            <p class="inq-vehicle-name" id="riqVehicleName">Urus</p>
+            <p class="inq-vehicle-meta" id="riqVehicleMeta">2023 / SUV / 3,200km / 当前可租</p>
+            <div class="riq-metric-row">
+              <article class="riq-metric">
+                <span class="riq-metric-label" id="riqRateLabel">日租金</span>
+                <strong class="riq-metric-value" id="riqRateValue">5600元/天</strong>
+              </article>
+              <article class="riq-metric">
+                <span class="riq-metric-label" id="riqDepositLabel">押金</span>
+                <strong class="riq-metric-value" id="riqDepositValue">120000元</strong>
+              </article>
+              <article class="riq-metric">
+                <span class="riq-metric-label" id="riqMinDaysLabel">最短租期</span>
+                <strong class="riq-metric-value" id="riqMinDaysValue">2天</strong>
+              </article>
+            </div>
+          </div>
+        </article>
+
+        <div class="inq-table">
+          <section class="inq-row" data-row="appointment">
+            <div class="inq-row-label">
+              <span id="riqRowAppointment">希望用车时间</span>
+              <b class="inq-required">必填</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="riqSummaryAppointment">未填写</span>
+                <button type="button" class="inq-edit" data-jump-row="appointment" id="riqEditAppointment">修改</button>
+              </div>
+              <div class="inq-editor">
+                <div class="inq-inline-grid riq-inline-grid--triple">
+                  <label>
+                    <span id="riqDateLabel">日期</span>
+                    <input type="date" id="riqDate">
+                  </label>
+                  <label>
+                    <span id="riqTimeLabel">取车时间</span>
+                    <select id="riqTime">
+                      <option value="" id="riqTimePlaceholder">请选择</option>
+                      <option>10:00</option>
+                      <option>11:00</option>
+                      <option>13:00</option>
+                      <option>15:00</option>
+                      <option>17:00</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span id="riqDaysLabel">预计租期</span>
+                    <input type="number" id="riqDays" min="1" step="1" value="1">
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row" data-row="plan">
+            <div class="inq-row-label">
+              <span id="riqRowPlan">使用计划</span>
+              <b class="inq-required">必填</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="riqSummaryPlan">未填写</span>
+                <button type="button" class="inq-edit" data-jump-row="plan" id="riqEditPlan">修改</button>
+              </div>
+              <div class="inq-editor">
+                <div class="inq-inline-grid">
+                  <label>
+                    <span id="riqUsageLabel">主要用途</span>
+                    <select id="riqUsage">
+                      <option value="" id="riqUsagePlaceholder">请选择</option>
+                      <option value="city" id="riqUsageCity">市区代步</option>
+                      <option value="business" id="riqUsageBusiness">商务接待</option>
+                      <option value="trip" id="riqUsageTrip">近郊出行</option>
+                      <option value="cross" id="riqUsageCross">跨地区行程</option>
+                      <option value="shoot" id="riqUsageShoot">拍摄 / 活动</option>
+                      <option value="other" id="riqUsageOther">还不确定，先咨询</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span id="riqRouteLabel">行程范围</span>
+                    <select id="riqRoute">
+                      <option value="" id="riqRoutePlaceholder">请选择</option>
+                      <option value="urban" id="riqRouteUrban">市区内</option>
+                      <option value="suburban" id="riqRouteSuburban">近郊往返</option>
+                      <option value="cross-city" id="riqRouteCrossCity">跨城市</option>
+                      <option value="undecided" id="riqRouteUndecided">还未确定</option>
+                    </select>
+                  </label>
+                </div>
+                <label class="inq-textarea">
+                  <span id="riqPlanNoteLabel">补充说明（选填）</span>
+                  <textarea id="riqPlanNote" rows="3" placeholder="例如：人数、行李、预计路线、是否需要当日往返"></textarea>
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row" data-row="name">
+            <div class="inq-row-label">
+              <span id="riqRowName">联系人信息</span>
+              <b class="inq-required">必填</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="riqSummaryName">未填写</span>
+                <button type="button" class="inq-edit" data-jump-row="name" id="riqEditName">修改</button>
+              </div>
+              <div class="inq-editor">
+                <div class="inq-inline-grid">
+                  <label>
+                    <span id="riqNameLabel">姓名</span>
+                    <input type="text" id="riqName" placeholder="张三">
+                  </label>
+                  <label>
+                    <span id="riqLanguageLabel">偏好语言</span>
+                    <select id="riqLanguage">
+                      <option value="" id="riqLanguagePlaceholder">请选择</option>
+                      <option value="zh" id="riqLanguageZh">中文</option>
+                      <option value="ja" id="riqLanguageJa">日语</option>
+                      <option value="en" id="riqLanguageEn">英语</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row" data-row="contact">
+            <div class="inq-row-label">
+              <span id="riqRowContact">邮箱 / 电话</span>
+              <b class="inq-required">必填</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="riqSummaryContact">未填写</span>
+                <button type="button" class="inq-edit" data-jump-row="contact" id="riqEditContact">修改</button>
+              </div>
+              <div class="inq-editor">
+                <div class="inq-inline-grid">
+                  <label>
+                    <span id="riqEmailLabel">邮箱地址</span>
+                    <input type="email" id="riqEmail" placeholder="name@example.com">
+                  </label>
+                  <label>
+                    <span id="riqPhoneLabel">电话号码</span>
+                    <input type="tel" id="riqPhone" placeholder="09012345678">
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row" data-row="confirm">
+            <div class="inq-row-label">
+              <span id="riqRowConfirm">内容确认</span>
+              <b class="inq-required">必填</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="riqSummaryConfirm">未确认</span>
+                <button type="button" class="inq-edit" data-jump-row="confirm" id="riqEditConfirm">修改</button>
+              </div>
+              <div class="inq-editor">
+                <label>
+                  <span id="riqPickupLabel">取车城市 / 地区</span>
+                  <input type="text" id="riqPickup" placeholder="例如：东京 / 大阪 / 埼玉">
+                </label>
+                <label class="inq-check">
+                  <input type="checkbox" id="riqConsentNews">
+                  <span id="riqConsentNewsLabel">接收档期更新与新车源通知</span>
+                </label>
+                <label class="inq-check">
+                  <input type="checkbox" id="riqConsentPolicy">
+                  <span id="riqConsentPolicyLabel">同意使用条款与隐私政策</span>
+                </label>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <p class="inq-message" id="riqMessage" aria-live="polite"></p>
+
+        <div class="inq-actions">
+          <button type="button" class="inq-btn inq-btn--ghost" id="riqPrevBtn">上一步</button>
+          <button type="button" class="inq-btn inq-btn--primary" id="riqNextBtn">下一步</button>
+        </div>
+        <p class="inq-counter" id="riqCounter">1 / 5</p>
+      </div>
+    </section>
+  </main>
+
+  <div data-layout-footer></div>
+
+  <script src="js/layout-shell.js?v=20260417v"></script>
+  <script src="js/data.js?v=20260417q"></script>
+  <script src="js/i18n.js?v=20260417v"></script>
+  <script src="js/common-links.js?v=20260417r"></script>
+  <script src="js/page-chrome.js?v=20260417i"></script>
+  <script src="js/rental-inquiry.js?v=20260417s"></script>
+</body>
+
+</html>

@@ -1,0 +1,513 @@
+window.TK168Renderers = (() => {
+  const detailFeatureIcons = [
+    'assets/images/spec-displacement.svg',
+    'assets/images/spec-drivetrain.svg',
+    'assets/images/spec-steering-wheel.svg',
+    'assets/images/spec-seating-capacity.svg',
+    'assets/images/spec-door-count.svg',
+    'assets/images/spec-chassis-tail.svg'
+  ];
+  const detailGalleryClasses = ['shot-main', 'shot-front', 'shot-rear', 'shot-wheel'];
+  const BRAND_BADGE_VER = '20260411a';
+  const FAVORITES_STORAGE_KEY = 'tk168_favorites';
+  const FAVORITES_WINDOW_NAME_KEY = 'tk168_favorites=';
+  function t(key, params = {}) {
+    return window.TK168I18N?.t(key, params) || key;
+  }
+
+  function getPriceLabel(key) {
+    return `${t(key)} ${t('price.taxIncluded')}`.trim();
+  }
+
+  function formatCardPriceMarkup(displayPrice = '') {
+    const trimmed = String(displayPrice || '').trim();
+    const match = trimmed.match(/^([\d,.]+)(万円|円|万元|元)$/);
+    if (!match) return trimmed;
+    const [, amount, unit] = match;
+    return `<span class="card-price-amount">${amount}</span><span class="card-price-unit">${unit}</span>`;
+  }
+
+  function resolveVehicleMediaSource(path) {
+    if (typeof window.TK168_DATA?.resolveVehicleMediaSource === 'function') {
+      return window.TK168_DATA.resolveVehicleMediaSource(path);
+    }
+    const rawPath = String(path || '').trim();
+    if (!rawPath) return '';
+    return rawPath.startsWith('assets/') ? rawPath : `assets/images/${rawPath}`;
+  }
+
+  function getPaginationDotIndices(totalCount, activeIndex, maxVisible = 3, isCompact = true) {
+    const safeTotal = Math.max(0, Number(totalCount) || 0);
+    if (!safeTotal) return [];
+
+    const safeActive = Math.max(0, Math.min(safeTotal - 1, Number(activeIndex) || 0));
+    const visibleCount = Math.max(1, Math.min(safeTotal, isCompact ? maxVisible : safeTotal));
+    let start = Math.max(0, safeActive - Math.floor(visibleCount / 2));
+    let end = start + visibleCount;
+
+    if (end > safeTotal) {
+      end = safeTotal;
+      start = Math.max(0, end - visibleCount);
+    }
+
+    return Array.from({ length: end - start }, (_, offset) => start + offset);
+  }
+
+  function renderPaginationDots(container, {
+    totalCount = 0,
+    activeIndex = 0,
+    maxVisible = 3,
+    isCompact = true,
+    dataAttribute = 'data-page-dot',
+    dotClass = 'vehicle-slider-dot',
+    activeClass = 'is-active',
+    ariaLabelBuilder = (index) => `Page ${index + 1}`,
+    onClick
+  } = {}) {
+    if (!container) return;
+
+    const fragment = document.createDocumentFragment();
+    getPaginationDotIndices(totalCount, activeIndex, maxVisible, isCompact).forEach((index) => {
+      const dot = document.createElement('button');
+      const isActive = index === activeIndex;
+      dot.type = 'button';
+      dot.className = `${dotClass}${isActive ? ` ${activeClass}` : ''}`;
+      dot.setAttribute(dataAttribute, String(index));
+      dot.setAttribute('aria-label', ariaLabelBuilder(index));
+      dot.setAttribute('aria-current', isActive ? 'true' : 'false');
+      if (typeof onClick === 'function') {
+        dot.addEventListener('click', () => onClick(index));
+      }
+      fragment.appendChild(dot);
+    });
+
+    container.replaceChildren(fragment);
+  }
+
+  function readFavoriteIds() {
+    try {
+      const raw = window.localStorage?.getItem(FAVORITES_STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(parsed)) return [];
+      return parsed.map((value) => String(value));
+    } catch {
+      // fall through
+    }
+    const nameValue = String(window.name || '');
+    if (nameValue.startsWith(FAVORITES_WINDOW_NAME_KEY)) {
+      const payload = nameValue.slice(FAVORITES_WINDOW_NAME_KEY.length);
+      try {
+        const parsed = JSON.parse(payload);
+        if (Array.isArray(parsed)) return parsed.map((value) => String(value));
+      } catch {
+        // ignore invalid payload
+      }
+    }
+    return [];
+  }
+
+  function writeFavoriteIds(ids) {
+    try {
+      window.localStorage?.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(ids));
+    } catch {
+      // ignore storage failures
+    }
+    try {
+      window.name = `${FAVORITES_WINDOW_NAME_KEY}${JSON.stringify(ids)}`;
+    } catch {
+      // ignore window.name failures
+    }
+  }
+
+  function isVehicleFavorite(vehicleId) {
+    if (vehicleId == null) return false;
+    const set = new Set(readFavoriteIds());
+    return set.has(String(vehicleId));
+  }
+
+  function bindVehicleCardLikes(container) {
+    const scope = container || document;
+    if (!scope || scope.__tk168LikeBound) return;
+    scope.__tk168LikeBound = true;
+    scope.addEventListener('click', (event) => {
+      const btn = event.target.closest('.v-card-like');
+      if (!btn) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const vehicleId = btn.dataset.vehicleId;
+      if (!vehicleId) return;
+      const favorites = new Set(readFavoriteIds());
+      const nextState = !btn.classList.contains('is-active');
+      btn.classList.toggle('is-active', nextState);
+      btn.setAttribute('aria-pressed', nextState ? 'true' : 'false');
+      if (nextState) {
+        favorites.add(String(vehicleId));
+      } else {
+        favorites.delete(String(vehicleId));
+      }
+      writeFavoriteIds(Array.from(favorites));
+      window.dispatchEvent(new CustomEvent('favorites:changed', { detail: { ids: Array.from(favorites) } }));
+    });
+  }
+
+  function getVehicleTotalPrice(vehicle) {
+    return window.TK168_DATA.getVehicleTotalPriceDisplay(vehicle);
+  }
+
+  function getVehicleBasePrice(vehicle) {
+    return window.TK168_DATA.getVehicleBasePriceDisplay(vehicle);
+  }
+
+  function getVehicleName(vehicle) {
+    return window.TK168_DATA.getVehicleName(vehicle);
+  }
+
+  function getVehicleTypeLabel(type) {
+    return window.TK168_DATA.getVehicleTypeLabel(type);
+  }
+
+  function getVehicleFieldLabel(field, value) {
+    return window.TK168_DATA.getVehicleFieldLabel(field, value);
+  }
+
+  function getVehicleOverview(vehicle) {
+    return window.TK168_DATA.getVehicleOverview(vehicle);
+  }
+
+  function getVehicleBenefits(vehicle) {
+    return window.TK168_DATA.getVehicleBenefits(vehicle);
+  }
+
+  function getVehicleFeatures(vehicle) {
+    return window.TK168_DATA.getVehicleFeatures(vehicle);
+  }
+
+  function getVehicleConditionField(vehicle, key) {
+    return window.TK168_DATA.getVehicleConditionField(vehicle, key);
+  }
+
+  function getVehicleListingField(vehicle, key) {
+    return window.TK168_DATA.getVehicleListingField(vehicle, key);
+  }
+
+  function getVehicleHighlightField(vehicle, key) {
+    return window.TK168_DATA.getVehicleHighlightField(vehicle, key);
+  }
+
+  function formatRegistrationYear(year) {
+    return window.TK168_DATA.formatRegistrationYear(year);
+  }
+
+  function resolveVehicleCardBrandIcon(vehicle) {
+    const brand = window.TK168_DATA.getBrandByKey(vehicle.brandKey);
+    if (brand?.file) return `assets/images/brands/logos/${brand.file}`;
+    return 'assets/images/logo_TK168.svg';
+  }
+
+  function resolveVehicleCardBrandBadge(vehicle) {
+    return resolveVehicleCardBrandIcon(vehicle);
+  }
+
+  function buildVehicleCardMarkup(vehicle, detailUrl, variantKey) {
+    const variants = {
+      inventory: {
+        wrapperTag: '',
+        wrapperClass: '',
+        header: 'v-card-header',
+        brandWrap: 'v-brand-icon-wrap',
+        brandIcon: 'v-brand-icon',
+        titleWrap: 'v-header-info',
+        title: 'v-card-name',
+        subtitle: 'v-card-meta',
+        cover: 'v-card-img',
+        content: 'v-card-body',
+        meta: 'v-specs',
+        metaItem: 'v-spec',
+        metaIcon: '',
+        metaValue: '',
+        priceWrap: 'v-price-wrap',
+        priceRow: 'v-price-row',
+        priceLabel: 'v-price-label',
+        priceValue: 'v-price',
+        priceSubLabel: 'v-price-sub-label',
+        priceSubValue: 'v-price-sub',
+        button: 'v-detail-btn'
+      },
+      featured: {
+        wrapperTag: 'article',
+        wrapperClass: 'featured-card',
+        header: 'card-header',
+        brandWrap: 'card-brand-icon',
+        brandIcon: '',
+        titleWrap: 'card-title-wrap',
+        title: 'card-title',
+        subtitle: 'card-subtitle',
+        cover: 'featured-cover',
+        content: 'card-content',
+        meta: 'card-meta',
+        metaItem: 'meta-item',
+        metaIcon: 'meta-icon',
+        metaValue: 'meta-value',
+        priceWrap: 'card-price',
+        priceRow: 'card-price-row',
+        priceLabel: 'card-price-label',
+        priceValue: 'card-price-value',
+        priceSubLabel: 'card-price-sub-label',
+        priceSubValue: 'card-price-sub',
+        button: 'card-button'
+      }
+    };
+
+    const variant = variants[variantKey] || variants.inventory;
+    const totalPrice = getVehicleTotalPrice(vehicle);
+    const basePrice = getVehicleBasePrice(vehicle);
+    const vehicleName = getVehicleName(vehicle);
+    const vehicleBrandIcon = (variant === variants.inventory)
+      ? resolveVehicleCardBrandBadge(vehicle)
+      : resolveVehicleCardBrandIcon(vehicle);
+    const brandWrapClass = (variant === variants.inventory)
+      ? `${variant.brandWrap} v-mini-brand-badge`
+      : variant.brandWrap;
+    const brandIconClass = (() => {
+      const base = variant.brandIcon ? variant.brandIcon : '';
+      if (variant === variants.inventory) {
+        return base ? `${base} v-mini-brand-glyph` : 'v-mini-brand-glyph';
+      }
+      return base;
+    })();
+    const metaItems = [
+      { key: 'mileage', icon: 'v1.svg', alt: 'Mileage', value: `${vehicle.mileage}km` },
+      { key: 'engine', icon: 'v2.svg', alt: 'Engine', value: vehicle.engine },
+      { key: 'fuel', icon: 'v3.svg', alt: 'Fuel', value: getVehicleFieldLabel('fuel', vehicle.fuel) },
+      { key: 'transmission', icon: 'v4.svg', alt: 'Transmission', value: getVehicleFieldLabel('trans', vehicle.trans) }
+    ];
+
+    const metaMarkup = metaItems.map((item) => {
+      const iconClasses = [variant.metaIcon, 'vehicle-spec-icon', `vehicle-spec-icon--${item.key}`]
+        .filter(Boolean)
+        .join(' ');
+      const iconClassAttr = ` class="${iconClasses}"`;
+      const valueClassAttr = variant.metaValue ? ` class="${variant.metaValue}"` : '';
+      return `
+        <div class="${variant.metaItem}">
+          <img${iconClassAttr} src="assets/images/${item.icon}" alt="${item.alt}">
+          <span${valueClassAttr}>${item.value}</span>
+        </div>
+      `;
+    }).join('');
+
+    const brandUrl = window.TK168_DATA?.buildBrandUrl
+      ? window.TK168_DATA.buildBrandUrl(vehicle.brandKey)
+      : 'brand.html';
+    const isFavorite = isVehicleFavorite(vehicle.id);
+    const bodyMarkup = `
+      <div class="${variant.header}">
+        <div class="${brandWrapClass}">
+          <a class="v-mini-brand-link" href="${brandUrl}">
+            <img${brandIconClass ? ` class="${brandIconClass}"` : ''} src="${vehicleBrandIcon}" alt="${vehicleName}">
+          </a>
+        </div>
+        <div class="${variant.titleWrap}">
+          <h3 class="${variant.title}">${vehicleName}</h3>
+          <p class="${variant.subtitle}">${vehicle.year} · ${getVehicleTypeLabel(vehicle.type)}</p>
+        </div>
+        <button class="v-card-like${isFavorite ? ' is-active' : ''}" type="button" aria-pressed="${isFavorite ? 'true' : 'false'}" aria-label="${t('cta.like') || 'Like'}" data-vehicle-id="${vehicle.id}">
+          <svg class="v-card-like-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3.4c.4 0 .8.2 1 .6l2.1 4.2 4.7.7c.9.1 1.2 1.2.6 1.9l-3.4 3.3.8 4.7c.1.9-.8 1.6-1.6 1.2L12 17.6 7.8 20c-.8.4-1.7-.3-1.6-1.2l.8-4.7-3.4-3.3c-.6-.7-.3-1.8.6-1.9l4.7-.7L11 4c.2-.4.6-.6 1-.6z"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="${variant.cover}">
+        <img src="${resolveVehicleMediaSource(vehicle.photo)}" alt="${vehicleName}">
+      </div>
+      <div class="${variant.content}">
+        <div class="${variant.meta}">
+          ${metaMarkup}
+        </div>
+        <div class="${variant.priceWrap}">
+          <div class="${variant.priceRow}">
+            <span class="${variant.priceLabel}">${getPriceLabel('price.total')}</span>
+            <span class="${variant.priceValue}">${formatCardPriceMarkup(totalPrice)}</span>
+          </div>
+          <div class="${variant.priceRow} is-sub">
+            <span class="${variant.priceSubLabel}">${getPriceLabel('price.base')}</span>
+            <span class="${variant.priceSubValue}">${formatCardPriceMarkup(basePrice)}</span>
+          </div>
+        </div>
+        <a class="${variant.button}" href="${detailUrl}">${t('cta.viewDetail')}</a>
+      </div>
+    `;
+
+    if (!variant.wrapperTag) return bodyMarkup;
+    return `<${variant.wrapperTag} class="${variant.wrapperClass}">${bodyMarkup}</${variant.wrapperTag}>`;
+  }
+
+  function buildInventoryCardHTML(vehicle, detailUrl) {
+    return buildVehicleCardMarkup(vehicle, detailUrl, 'inventory');
+  }
+
+  function buildFeaturedCardHTML(vehicle, detailUrl) {
+    return buildVehicleCardMarkup(vehicle, detailUrl, 'featured');
+  }
+
+  function buildDetailGalleryHTML(vehicle) {
+    const detailGalleryLabels = [
+      t('gallery.main'),
+      t('gallery.front'),
+      t('gallery.rear'),
+      t('gallery.wheel')
+    ];
+    const vehicleName = getVehicleName(vehicle);
+    const language = window.TK168I18N?.getLanguage?.() || 'ja';
+    const spinThumbLabel = language === 'en' ? '360° view' : (language === 'ja' ? '360° ビュー' : '360° 看车');
+    const spinThumbHint = language === 'en' ? 'Reserved area' : (language === 'ja' ? '導入準備中' : '预留功能区');
+    const spinThumbMarkup = `
+      <button class="thumb thumb--spin" type="button" data-index="0" data-kind="spin" data-poster="${resolveVehicleMediaSource(vehicle.gallery?.[0] || vehicle.photo)}" data-alt="${vehicleName} ${spinThumbLabel}">
+        <span class="thumb-shot thumb-shot--spin" aria-hidden="true">
+          <span class="thumb-spin-mark">360°</span>
+          <span class="thumb-spin-caption">${spinThumbHint}</span>
+        </span>
+      </button>
+    `;
+    const imageThumbMarkup = vehicle.gallery.map((image, index) => {
+      const imageSrc = resolveVehicleMediaSource(image);
+      return `
+      <button class="thumb" type="button" data-index="${index + 1}" data-kind="image" data-image="${imageSrc}" data-alt="${vehicleName} ${detailGalleryLabels[index] || t('gallery.angle')}">
+        <span class="thumb-shot ${detailGalleryClasses[index] || detailGalleryClasses[0]}" aria-hidden="true" style="background-image: url('${imageSrc}');"></span>
+      </button>
+    `;
+    }).join('');
+    return `${spinThumbMarkup}${imageThumbMarkup}`;
+  }
+
+  function buildDetailSpecsHTML(vehicle) {
+    const language = window.TK168I18N?.getLanguage?.() || 'ja';
+    const emptyValue = '-';
+    const specLabels = language === 'en'
+      ? {
+          year: 'Year (first registration)',
+          mileage: 'Mileage',
+          repair: 'Repair history',
+          inspection: 'Vehicle inspection',
+          legalMaintenance: 'Legal maintenance',
+          inspectionBook: 'Maintenance record book',
+          nonSmoking: 'Non-smoking car',
+          authorizedImport: 'Authorized import',
+          dealerWarranty: 'Dealer warranty',
+          ecoTaxEligible: 'Eco tax eligible',
+          oneOwner: 'One owner',
+          rentalUp: 'Former rental'
+        }
+      : (language === 'ja'
+        ? {
+            year: '年式(初度登録年)',
+            mileage: '走行距',
+            repair: '修復歴',
+            inspection: '車検',
+            legalMaintenance: '法定整備',
+            inspectionBook: '定期点検記録簿',
+            nonSmoking: '禁煙車',
+            authorizedImport: '正規輸入車',
+            dealerWarranty: '販売店保証',
+            ecoTaxEligible: 'エコカー減税対象車',
+            oneOwner: 'ワンオーナー',
+            rentalUp: 'レンタカーアップ'
+          }
+        : {
+            year: '首次上牌年份',
+            mileage: '行驶里程',
+            repair: '修复历史',
+            inspection: '车检',
+            legalMaintenance: '法定整备',
+            inspectionBook: '定期点检记录簿',
+            nonSmoking: '禁烟车',
+            authorizedImport: '正规进口车',
+            dealerWarranty: '店铺质保',
+            ecoTaxEligible: '节能车减税对象车',
+            oneOwner: '一手车主',
+            rentalUp: '租赁退役车'
+          });
+    const leftColumn = [
+      [specLabels.year, formatRegistrationYear(vehicle.year) || `${vehicle.year}${language === 'en' ? '' : (language === 'ja' ? '年' : ' 年')}`],
+      [specLabels.mileage, `${vehicle.mileage} km`],
+      [specLabels.repair, getVehicleListingField(vehicle, 'repairHistory') || emptyValue],
+      [specLabels.inspection, getVehicleListingField(vehicle, 'vehicleInspection') || emptyValue],
+      [specLabels.legalMaintenance, getVehicleListingField(vehicle, 'legalMaintenance') || emptyValue],
+      [specLabels.inspectionBook, getVehicleListingField(vehicle, 'periodicInspectionBook') || emptyValue]
+    ];
+    const rightColumn = [
+      [specLabels.nonSmoking, getVehicleConditionField(vehicle, 'nonSmoking') || emptyValue],
+      [specLabels.authorizedImport, getVehicleConditionField(vehicle, 'authorizedImport') || emptyValue],
+      [specLabels.dealerWarranty, getVehicleConditionField(vehicle, 'dealerWarranty') || emptyValue],
+      [specLabels.ecoTaxEligible, getVehicleConditionField(vehicle, 'ecoTaxEligible') || emptyValue],
+      [specLabels.oneOwner, getVehicleConditionField(vehicle, 'oneOwner') || emptyValue],
+      [specLabels.rentalUp, getVehicleConditionField(vehicle, 'rentalUp') || emptyValue]
+    ];
+    const specs = leftColumn.flatMap((item, index) => [item, rightColumn[index]]);
+
+    return specs.map(([label, value]) => `
+      <div class="spec-row">
+        <span>${label}</span>
+        <strong>${value}</strong>
+      </div>
+    `).join('');
+  }
+
+  function buildDetailOverviewHTML(vehicle) {
+    return getVehicleOverview(vehicle).map((paragraph) => `<p>${paragraph}</p>`).join('');
+  }
+
+  function buildDetailBenefitsHTML(vehicle) {
+    const language = window.TK168I18N?.getLanguage?.() || 'ja';
+    const specs = [
+      [language === 'en' ? 'Body type' : (language === 'ja' ? 'ボディタイプ' : '车身类型'), getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle)],
+      [language === 'en' ? 'Color' : (language === 'ja' ? '色' : '颜色'), getVehicleFieldLabel('bodyColor', vehicle.bodyColor)],
+      [language === 'en' ? 'Engine type' : (language === 'ja' ? 'エンジン種別' : '发动机种别'), getVehicleFieldLabel('fuel', vehicle.fuel)],
+      [language === 'en' ? 'Transmission' : (language === 'ja' ? 'ミッション' : '变速箱'), getVehicleFieldLabel('trans', vehicle.trans)]
+    ];
+
+    return specs.map(([label, value]) => `
+      <div class="benefit-bar benefit-bar--spec">
+        <span class="benefit-spec-label">${label}</span>
+        <span class="benefit-spec-value">${value}</span>
+      </div>
+    `).join('');
+  }
+
+  function buildDetailFeaturesHTML(vehicle) {
+    const language = window.TK168I18N?.getLanguage?.() || 'ja';
+    const items = [
+      [language === 'en' ? 'Displacement' : (language === 'ja' ? '排気量' : '排气量'), getVehicleHighlightField(vehicle, 'displacement')],
+      [language === 'en' ? 'Drive' : (language === 'ja' ? '駆動方式' : '驱动方式'), getVehicleHighlightField(vehicle, 'drive')],
+      [language === 'en' ? 'Steering' : (language === 'ja' ? 'ハンドル' : '方向盘'), getVehicleHighlightField(vehicle, 'steering')],
+      [language === 'en' ? 'Seats' : (language === 'ja' ? '乗車定員' : '乘车定员'), getVehicleHighlightField(vehicle, 'seats')],
+      [language === 'en' ? 'Doors' : (language === 'ja' ? 'ドア数' : '车门数'), getVehicleHighlightField(vehicle, 'doors')],
+      [language === 'en' ? 'Chassis tail' : (language === 'ja' ? '車台末尾番号' : '车台末尾号'), getVehicleHighlightField(vehicle, 'chassisTail')]
+    ];
+
+    return items.map(([label, value], index) => `
+      <div class="feature-item">
+        <span class="feature-icon" aria-hidden="true">
+          <img src="${detailFeatureIcons[index] || detailFeatureIcons[0]}" alt="" loading="lazy" decoding="async">
+        </span>
+        <div class="feature-copy">
+          <span class="feature-label">${label}</span>
+          <strong class="feature-value">${value || '-'}</strong>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  return {
+    buildInventoryCardHTML,
+    buildFeaturedCardHTML,
+    buildDetailGalleryHTML,
+    buildDetailSpecsHTML,
+    buildDetailOverviewHTML,
+    buildDetailBenefitsHTML,
+    buildDetailFeaturesHTML,
+    bindVehicleCardLikes,
+    getFavoriteVehicleIds: readFavoriteIds,
+    renderPaginationDots
+  };
+})();

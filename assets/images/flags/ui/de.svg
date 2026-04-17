@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="de flag">
+  <defs>
+    <clipPath id="clip-de"><rect x="4" y="4" width="56" height="56" rx="14" ry="14"/></clipPath>
+    <clipPath id="window-de"><rect x="8" y="8" width="48" height="48" rx="11" ry="11"/></clipPath>
+    <radialGradient id="gloss-de" cx="28%" cy="18%" r="72%">
+      <stop offset="0%" stop-color="#fff" stop-opacity=".50"/>
+      <stop offset="42%" stop-color="#fff" stop-opacity=".16"/>
+      <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="shade-de" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="74%" stop-color="#000" stop-opacity=".02"/>
+      <stop offset="100%" stop-color="#000" stop-opacity=".24"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="14" ry="14" fill="#dfe3ea"/>
+  <g clip-path="url(#clip-de)">
+    <g clip-path="url(#window-de)">
+    <svg x="8" y="8" width="48" height="48" viewBox="0 0 640 480" preserveAspectRatio="xMidYMid slice">
+
+  <path fill="#fc0" d="M0 320h640v160H0z"/>
+  <path fill="#000001" d="M0 0h640v160H0z"/>
+  <path fill="red" d="M0 160h640v160H0z"/>
+
+    </svg>
+    </g>
+    <rect x="8.5" y="8.5" width="47" height="47" rx="10.5" ry="10.5" fill="none" stroke="#ffffff" stroke-opacity=".34" stroke-width="1"/>
+    <rect x="8.5" y="8.5" width="47" height="47" rx="10.5" ry="10.5" fill="none" stroke="#000000" stroke-opacity=".14" stroke-width=".9"/>
+    <rect x="4" y="4" width="56" height="56" fill="url(#gloss-de)"/>
+    <rect x="4" y="4" width="56" height="56" fill="url(#shade-de)"/>
+  </g>
+  <rect x="4.5" y="4.5" width="55" height="55" rx="13.5" ry="13.5" fill="none" stroke="#ffffff" stroke-opacity=".46" stroke-width="1"/>
+  <rect x="4.5" y="4.5" width="55" height="55" rx="13.5" ry="13.5" fill="none" stroke="#000000" stroke-opacity=".16" stroke-width="1"/>
+</svg>

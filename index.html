@@ -1,0 +1,204 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ホーム — TK168 Premium Automotive</title>
+  <link rel="stylesheet" href="css/style.css?v=20260417u">
+  <link rel="stylesheet" href="css/home-cube.css?v=20260417i">
+</head>
+
+<body data-i18n-page-title="page.landingTitle">
+  <div id="loading-screen">
+    <video id="intro-video" data-src="assets/videos/片头logo时间删减版.mp4" muted playsinline preload="none"></video>
+  </div>
+  <div id="main" class="hidden">
+
+    <!-- ─ 导航栏 ─ -->
+    <div data-layout-nav></div>
+
+    <!-- ─ 第一页：Hero ─ -->
+    <section id="hero">
+      <div class="hero-video-wrap">
+        <video id="hero-video" class="hero-media" data-src="assets/videos/新主视频-web540.mp4" muted loop playsinline preload="none"></video>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <p class="hero-eyebrow">TK168 PREMIUM AUTOMOTIVE</p>
+          <h1 class="hero-title" data-i18n-html="hero.title">探索未来之路</h1>
+          <p class="hero-sub" data-i18n-html="hero.subtitle">安心、省心，也更高效。<br>以专业甄选与一站式服务，帮你找到真正适合的座驾。</p>
+          <a href="brand.html" class="hero-cta">
+            <span class="hero-cta-track" aria-hidden="true">
+              <svg viewBox="0 0 220 56" preserveAspectRatio="none" focusable="false" aria-hidden="true">
+                <path id="hero-cta-track-path" class="hero-cta-track-path" d="M28 1.5H192A26.5 26.5 0 0 1 218.5 28A26.5 26.5 0 0 1 192 54.5H28A26.5 26.5 0 0 1 1.5 28A26.5 26.5 0 0 1 28 1.5Z"></path>
+                <path class="hero-cta-track-line" d="M28 1.5H192A26.5 26.5 0 0 1 218.5 28A26.5 26.5 0 0 1 192 54.5H28A26.5 26.5 0 0 1 1.5 28A26.5 26.5 0 0 1 28 1.5Z"></path>
+              </svg>
+            </span>
+            <span class="hero-cta-label" data-i18n="hero.cta">探索品牌展厅</span>
+            <span class="hero-cta-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20">
+                <path d="M7 4l6 6-6 6"></path>
+              </svg>
+            </span>
+          </a>
+        </div>
+      </div>
+    </section>
+    <!-- ─ 第二页：品牌展示 ─ -->
+    <section id="brands">
+      <div class="lisboa-shell" data-carousel>
+        <div class="lisboa-stage" data-stage></div>
+        <div class="lisboa-gesture-layer" data-gesture aria-hidden="true"></div>
+        <div class="lisboa-mobile-swipe-hint" data-swipe-hint aria-hidden="true">
+          <span class="lisboa-mobile-swipe-hint__arrow">‹</span>
+          <span class="lisboa-mobile-swipe-hint__text">左右滑动</span>
+          <span class="lisboa-mobile-swipe-hint__arrow">›</span>
+        </div>
+        <div class="lisboa-bottom">
+          <button class="lisboa-control lisboa-control--prev" type="button" data-nav="prev" aria-label="上一张">
+            <span aria-hidden="true">←</span>
+          </button>
+          <div class="lisboa-thumbs" data-thumbs aria-label="品牌缩略图列表"></div>
+          <button class="lisboa-control lisboa-control--next" type="button" data-nav="next" aria-label="下一张">
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─ 第三页：车辆搜索展示 ─ -->
+    <section id="vehicles" data-home-grid="paged">
+      <div class="section-header light vehicles-header" style="height: 0; margin: 0; padding: 0; overflow: hidden;">
+        <!-- v1.5 删除标题 -->
+      </div>
+
+      <!-- 统一搜索栏（静态版，与悬浮搜索条完全一致） -->
+      <div class="search-bar-wrap" id="static-search">
+        <div class="fb-desktop static-search-inner">
+          <img src="assets/images/logo_TK168.svg" alt="TK168" class="fb-logo" loading="lazy" decoding="async">
+          <div class="fb-filters">
+            <button class="fb-filter" data-ui-field="makerModel">品牌车型 <svg viewBox="0 0 10 6" fill="none">
+                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg></button>
+            <button class="fb-filter" data-ui-field="price">价格 <svg viewBox="0 0 10 6" fill="none">
+                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg></button>
+            <button class="fb-filter" data-ui-field="type">车身类型 <svg viewBox="0 0 10 6" fill="none">
+                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg></button>
+          </div>
+          <div class="fb-input-wrap">
+            <input type="text" class="fb-input" placeholder="搜索品牌、车型或关键词" data-i18n-placeholder="search.placeholder">
+            <button class="fb-cta" data-i18n="search.cta">搜索车源</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="vehicle-grid" id="vehicleGrid"></div>
+      <div class="vehicle-pagination" id="homeVehiclePagination">
+        <button class="vehicle-slider-btn vehicle-slider-btn--prev" id="homeVehiclePrev" aria-label="上一页">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+        <div class="vehicle-slider-dots" id="homeVehicleDots" aria-label="车辆翻页"></div>
+        <button class="vehicle-slider-btn vehicle-slider-btn--next" id="homeVehicleNext" aria-label="下一页">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ─ 第四页：企业新闻 ─ -->
+    <section id="news">
+      <div class="section-header light">
+        <h2 data-i18n="home.newsTitle">最新资讯</h2>
+        <p data-i18n="home.newsSubtitle">行业观察 · 新车入库 · 品牌动态</p>
+      </div>
+      <div class="news-grid">
+        <div class="news-card news-large">
+          <div class="news-img"><img src="assets/images/f3.webp" alt="新闻封面" loading="lazy" decoding="async" fetchpriority="low"></div>
+          <div class="news-body">
+            <span class="news-tag news-tag--teal">行业动态</span>
+            <h3>2026年最值得期待的超跑：性能进化与设计美学的再一次碰撞</h3>
+            <p>从法拉利到布加迪，2026 年度最受关注的超跑阵容正在成形。TK168 为您提前梳理每一台车型背后的设计语言与性能看点……</p>
+            <div class="news-meta">
+              <span>2026 · 04 · 08</span>
+              <a href="about.html?news=0#about-news" class="news-more" data-i18n="news.more">了解详情</a>
+            </div>
+          </div>
+        </div>
+        <div class="news-side">
+          <div class="news-card news-small">
+            <div class="news-img"><img src="assets/images/f4.webp" alt="新闻封面" loading="lazy" decoding="async" fetchpriority="low"></div>
+            <div class="news-body">
+              <span class="news-tag news-tag--orange">新车到库</span>
+              <h3>全新法拉利 SF90 Spider 正式入库</h3>
+              <div class="news-meta">
+                <span>2026 · 03 · 28</span>
+                <a href="about.html?news=1#about-news" class="news-more" data-i18n="news.more">了解详情</a>
+              </div>
+            </div>
+          </div>
+          <div class="news-card news-small">
+            <div class="news-img"><img src="assets/images/f7.webp" alt="新闻封面" loading="lazy" decoding="async" fetchpriority="low"></div>
+            <div class="news-body">
+              <span class="news-tag news-tag--green">公司活动</span>
+              <h3>TK168 × Monaco 慈善拍卖活动圆满落幕</h3>
+              <div class="news-meta">
+                <span>2026 · 03 · 12</span>
+                <a href="about.html?news=2#about-news" class="news-more" data-i18n="news.more">了解详情</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─ 尾页：Footer ─ -->
+    <div data-layout-footer></div>
+
+  </div><!-- /main -->
+
+  <div id="floating-bar">
+    <!-- 桌面端 -->
+    <div class="fb-desktop">
+      <img src="assets/images/logo_TK168.svg" alt="TK168" class="fb-logo" loading="lazy" decoding="async">
+      <div class="fb-filters">
+        <button class="fb-filter" data-ui-field="makerModel">品牌车型 <svg viewBox="0 0 10 6" fill="none">
+            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg></button>
+        <button class="fb-filter" data-ui-field="price">价格 <svg viewBox="0 0 10 6" fill="none">
+            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg></button>
+        <button class="fb-filter" data-ui-field="type">车身类型 <svg viewBox="0 0 10 6" fill="none">
+            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg></button>
+      </div>
+      <div class="fb-input-wrap">
+        <input type="text" class="fb-input" placeholder="搜索品牌、车型或关键词" data-i18n-placeholder="search.placeholder">
+        <button class="fb-cta" data-i18n="search.cta">搜索车源</button>
+      </div>
+    </div>
+    <!-- 移动端 -->
+    <div class="fb-mobile">
+      <img src="assets/images/logo_TK168.svg" alt="TK168" class="fb-logo" loading="lazy" decoding="async">
+      <button class="fb-cta" data-i18n="search.cta">搜索车源</button>
+    </div>
+  </div>
+
+  <script src="js/layout-shell.js?v=20260417v"></script>
+  <script src="js/brand-logo-inventory.js?v=20260417i"></script>
+  <script src="js/brand-library-data.js?v=20260417i"></script>
+  <script src="js/data.js?v=20260417q"></script>
+  <script src="js/i18n.js?v=20260417v"></script>
+  <script src="js/common-links.js?v=20260417r"></script>
+  <script src="js/page-chrome.js?v=20260417i"></script>
+  <script src="js/renderers.js?v=20260417q"></script>
+  <script src="js/search-ui.js?v=20260417q"></script>
+  <script src="js/script.js?v=20260417i"></script>
+  <script src="js/home-cube.js?v=20260417m"></script>
+</body>
+
+</html>

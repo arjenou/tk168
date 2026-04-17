@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>レンタル — TK168 Premium Automotive</title>
+  <link rel="stylesheet" href="css/style.css?v=20260417u">
+  <link rel="stylesheet" href="css/showcase-template.css?v=20260417u">
+  <link rel="stylesheet" href="css/rental.css?v=20260417u">
+</head>
+
+<body class="rental-page showcase-page">
+  <div data-layout-nav></div>
+
+  <main class="rental-main showcase-main">
+    <section id="rental-hero" class="rental-hero showcase-hero">
+      <div class="showcase-hero-media">
+        <img src="assets/images/rental-hero-008.jpg?v=20260412a" alt="TK168 Rental" loading="eager" decoding="async">
+      </div>
+      <div class="showcase-hero-overlay"></div>
+      <div class="showcase-shell rental-hero-inner showcase-hero-inner">
+        <p class="rental-eyebrow" data-rental-key="hero.eyebrow">TK168 RENTAL</p>
+        <h1 class="rental-hero-title rental-hero-title--solo" data-rental-key="hero.title">在库现车租赁</h1>
+        <p class="rental-hero-sub rental-hero-sub--solo" data-rental-key="hero.subtitle">以在库车辆为主，先确认档期、用途和取车时间，再安排人工确认。</p>
+      </div>
+    </section>
+
+    <section class="rental-section rental-section--overview showcase-section">
+      <div class="showcase-shell">
+        <header class="rental-section-head rental-section-head--overview rental-header showcase-head fade-up">
+          <p class="rental-kicker" data-rental-key="overview.kicker">RENTAL DESK</p>
+          <h2 data-rental-key="overview.title">先确认车和时间，再安排租赁</h2>
+          <p data-rental-key="overview.subtitle">更适合已经有明确用车计划的客户，不做夸张包装。</p>
+        </header>
+
+        <div class="rental-overview-grid">
+          <article class="rental-overview-card rental-overview-card--lead fade-up">
+            <p data-rental-key="overview.text1">这项业务主要基于在库现车。先看车型、可用时间和大致用途，再决定这单怎么安排。</p>
+            <p data-rental-key="overview.text2">如果车辆、时间和条件都合适，再继续确认押金、里程和交付方式。流程不复杂，但都需要人工确认。</p>
+          </article>
+
+          <aside class="rental-overview-card rental-overview-card--stats fade-up">
+            <div class="rental-overview-metric-grid">
+              <article class="rental-overview-metric">
+                <span class="rental-overview-metric-label" data-rental-key="overview.metric1.label">租赁方式</span>
+                <strong class="rental-overview-metric-value" data-rental-key="overview.metric1.value">在库现车</strong>
+              </article>
+              <article class="rental-overview-metric">
+                <span class="rental-overview-metric-label" data-rental-key="overview.metric2.label">确认方式</span>
+                <strong class="rental-overview-metric-value" data-rental-key="overview.metric2.value">人工跟进</strong>
+              </article>
+              <article class="rental-overview-metric">
+                <span class="rental-overview-metric-label" data-rental-key="overview.metric3.label">交付方式</span>
+                <strong class="rental-overview-metric-value" data-rental-key="overview.metric3.value">到店 / 协调交付</strong>
+              </article>
+              <article class="rental-overview-metric">
+                <span class="rental-overview-metric-label" data-rental-key="overview.metric4.label">更适合</span>
+                <strong class="rental-overview-metric-value" data-rental-key="overview.metric4.value">短租 / 指定日程</strong>
+              </article>
+            </div>
+
+            <p class="rental-overview-note" data-rental-key="overview.note">是否可租、具体价格和取车时间，以实际确认结果为准。</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="rental-section showcase-section rental-section--fleet" id="rental-fleet">
+      <div class="showcase-shell">
+        <header class="rental-section-head rental-section-head--fleet rental-header showcase-head fade-up">
+          <p class="rental-kicker" data-rental-key="fleet.kicker">RENTABLE STOCK</p>
+          <h2 data-rental-key="fleet.title">当前可租车辆</h2>
+          <p data-rental-key="fleet.subtitle">先看目前可谈的车，具体档期和条款再人工确认。</p>
+        </header>
+        <div class="rental-fleet-grid vehicle-grid" id="rentalVehicleGrid"></div>
+        <div class="vehicle-pagination rental-fleet-pagination" id="rentalFleetPagination" hidden>
+          <button type="button" class="vehicle-slider-btn vehicle-slider-btn--prev" id="rentalFleetPrev" aria-label="上一页">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+          </button>
+          <div class="vehicle-slider-dots" id="rentalFleetDots" aria-label="车辆翻页"></div>
+          <button type="button" class="vehicle-slider-btn vehicle-slider-btn--next" id="rentalFleetNext" aria-label="下一页">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </button>
+        </div>
+        <p class="rental-fleet-empty" id="rentalFleetEmpty" hidden data-rental-key="fleet.empty">当前暂无可立即租赁车辆，请先联系顾问确认最新状态。</p>
+      </div>
+    </section>
+
+    <section class="rental-section showcase-section rental-section--flow">
+      <div class="showcase-shell">
+        <header class="rental-section-head rental-section-head--flow rental-header showcase-head fade-up">
+          <p class="rental-kicker" data-rental-key="flow.kicker">RENTAL FLOW</p>
+          <h2 data-rental-key="flow.title">租车一般这样安排</h2>
+          <p data-rental-key="flow.subtitle">先确认车辆和时间，再进入交付。</p>
+        </header>
+
+        <div class="rental-flow-layout">
+          <figure class="rental-flow-visual fade-up">
+            <img src="assets/images/011.jpg" alt="Rental vehicle" loading="lazy" decoding="async">
+          </figure>
+
+          <ol class="rental-flow-grid">
+            <li class="rental-flow-card fade-up">
+              <span class="rental-flow-step">01</span>
+              <h3 data-rental-key="flow.step1.title">看车和日期</h3>
+              <p data-rental-key="flow.step1.text">先确认车型、日期和大致用途。</p>
+            </li>
+            <li class="rental-flow-card fade-up">
+              <span class="rental-flow-step">02</span>
+              <h3 data-rental-key="flow.step2.title">确认可用</h3>
+              <p data-rental-key="flow.step2.text">顾问核对车辆状态、档期和基础条件。</p>
+            </li>
+            <li class="rental-flow-card fade-up">
+              <span class="rental-flow-step">03</span>
+              <h3 data-rental-key="flow.step3.title">确认条款</h3>
+              <p data-rental-key="flow.step3.text">押金、里程、取还车方式逐项说明。</p>
+            </li>
+            <li class="rental-flow-card fade-up">
+              <span class="rental-flow-step">04</span>
+              <h3 data-rental-key="flow.step4.title">到店取车</h3>
+              <p data-rental-key="flow.step4.text">确认后安排签约和交付。</p>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="rental-section showcase-section rental-section--notes">
+      <div class="showcase-shell">
+        <header class="rental-section-head rental-section-head--notes rental-header showcase-head fade-up">
+          <p class="rental-kicker" data-rental-key="notes.kicker">BEFORE BOOKING</p>
+          <h2 data-rental-key="notes.title">租前通常会确认这三件事</h2>
+          <p data-rental-key="notes.subtitle">这部分写的是实际会问到的内容，不是模板话术。</p>
+        </header>
+
+        <div class="rental-note-grid">
+          <article class="rental-note-card rental-note-card--availability fade-up">
+            <div class="rental-note-media">
+              <img src="assets/images/export-illustrations/rental-booked.svg" alt="Rental availability" loading="lazy" decoding="async">
+            </div>
+            <div class="rental-note-body">
+              <h3 data-rental-key="notes.card1.title">先看档期</h3>
+              <p data-rental-key="notes.card1.text">同一台车可能同时在展示、整备或待交付，先确认能不能排到你要的时间。</p>
+            </div>
+          </article>
+
+          <article class="rental-note-card rental-note-card--usage fade-up">
+            <div class="rental-note-media">
+              <img src="assets/images/export-illustrations/rental-by-the-road.svg" alt="Rental route scope" loading="lazy" decoding="async">
+            </div>
+            <div class="rental-note-body">
+              <h3 data-rental-key="notes.card2.title">再看行程范围和里程</h3>
+              <p data-rental-key="notes.card2.text">市区代步、近郊往返和跨地区使用，对里程和安排要求会不同，最好在确认前一次说清。</p>
+            </div>
+          </article>
+
+          <article class="rental-note-card rental-note-card--terms fade-up">
+            <div class="rental-note-media">
+              <img src="assets/images/export-illustrations/rental-terms.svg" alt="Rental terms and deposit" loading="lazy" decoding="async">
+            </div>
+            <div class="rental-note-body">
+              <h3 data-rental-key="notes.card3.title">最后确认条款、押金和证件</h3>
+              <p data-rental-key="notes.card3.text">押金、补偿范围、取还车地点和所需证件，会在确认前逐项说明，避免到店后再反复沟通。</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div data-layout-footer></div>
+
+  <script src="js/layout-shell.js?v=20260417v"></script>
+  <script src="js/data.js?v=20260417q"></script>
+  <script src="js/i18n.js?v=20260417v"></script>
+  <script src="js/common-links.js?v=20260417r"></script>
+  <script src="js/page-chrome.js?v=20260417i"></script>
+  <script src="js/renderers.js?v=20260417q"></script>
+  <script src="js/rental.js?v=20260417s"></script>
+</body>
+
+</html>

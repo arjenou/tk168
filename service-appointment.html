@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="svcPageTitle">付加サービス予約 — TK168 Premium Automotive</title>
+  <link rel="stylesheet" href="css/style.css?v=20260417u">
+  <link rel="stylesheet" href="css/inquiry.css?v=20260417u">
+  <link rel="stylesheet" href="css/service-appointment.css?v=20260417i">
+</head>
+
+<body class="inquiry-page service-appointment-page no-hero-page">
+  <div data-layout-nav></div>
+
+  <main class="inq-main">
+    <section class="inq-shell">
+      <header class="inq-header">
+        <div>
+          <p class="inq-eyebrow" id="svcEyebrow">VALUE-ADDED SERVICE DESK</p>
+          <h1 class="inq-title" id="svcTitle">增值服务预约单</h1>
+          <p class="inq-subtitle" id="svcSubtitle">通过 5 个步骤提交服务需求，顾问会按车辆阶段、服务类型和预约方式帮你安排。</p>
+        </div>
+      </header>
+
+      <ol class="inq-progress" id="svcProgress" aria-label="增值服务预约步骤">
+        <li><button type="button" data-jump-step="0" id="svcStepAppointment">预约方式</button></li>
+        <li><button type="button" data-jump-step="1" id="svcStepService">服务内容</button></li>
+        <li><button type="button" data-jump-step="2" id="svcStepName">联系人</button></li>
+        <li><button type="button" data-jump-step="3" id="svcStepContact">联系方式</button></li>
+        <li><button type="button" data-jump-step="4" id="svcStepConfirm">确认</button></li>
+      </ol>
+
+      <div class="inq-board">
+        <p class="inq-lead" id="svcLeadText">先确认希望联系日期、时间和沟通方式。</p>
+
+        <article class="inq-vehicle">
+          <img src="assets/images/service-repair-illustration.svg?v=20260417i" alt="TK168 service desk" class="inq-vehicle-thumb svc-vehicle-thumb" loading="lazy" decoding="async">
+          <div class="inq-vehicle-copy">
+            <p class="inq-vehicle-brand" id="svcCardLabel">Service Coordination</p>
+            <p class="inq-vehicle-name" id="svcCardTitle">TK168 增值服务协同台</p>
+            <p class="inq-vehicle-meta" id="svcCardMeta">购前评估 / 手续资料 / 交付协同 / 维修保养 / 年检续保</p>
+            <div class="svc-tag-row">
+              <span class="svc-tag" data-svc-tag="0">购前评估</span>
+              <span class="svc-tag" data-svc-tag="1">保险说明</span>
+              <span class="svc-tag" data-svc-tag="2">手续资料</span>
+              <span class="svc-tag" data-svc-tag="3">交付前检查</span>
+              <span class="svc-tag" data-svc-tag="4">整备维修</span>
+              <span class="svc-tag" data-svc-tag="5">年检续保</span>
+            </div>
+          </div>
+        </article>
+
+        <div class="inq-table">
+          <section class="inq-row" data-row="appointment">
+            <div class="inq-row-label">
+              <span id="svcRowAppointment">希望联系时间</span>
+              <b class="inq-required">必填</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="svcSummaryAppointment">未填写</span>
+                <button type="button" class="inq-edit" data-jump-row="appointment" id="svcEditAppointment">修改</button>
+              </div>
+              <div class="inq-editor">
+                <div class="inq-inline-grid inq-inline-grid--triple">
+                  <label>
+                    <span id="svcDateLabel">日期</span>
+                    <input type="date" id="svcDate">
+                  </label>
+                  <label>
+                    <span id="svcTimeLabel">时间</span>
+                    <select id="svcTime">
+                      <option value="" id="svcTimePlaceholder">请选择</option>
+                      <option>10:00</option>
+                      <option>11:00</option>
+                      <option>13:00</option>
+                      <option>15:00</option>
+                      <option>17:00</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span id="svcModeLabel">沟通方式</span>
+                    <select id="svcMode">
+                      <option value="" id="svcModePlaceholder">请选择</option>
+                      <option value="visit" id="svcModeVisit">到店面谈</option>
+                      <option value="remote" id="svcModeRemote">电话 / 微信</option>
+                      <option value="video" id="svcModeVideo">视频沟通</option>
+                    </select>
+                  </label>
+                </div>
+                <label class="inq-textarea">
+                  <span id="svcNoteLabel">补充说明（选填）</span>
+                  <textarea id="svcNote" rows="3" placeholder="例如：预计交付时间、异常现象、希望先解决的问题"></textarea>
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row" data-row="service">
+            <div class="inq-row-label">
+              <span id="svcRowService">咨询服务</span>
+              <b class="inq-required">必填</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="svcSummaryService">未填写</span>
+                <button type="button" class="inq-edit" data-jump-row="service" id="svcEditService">修改</button>
+              </div>
+              <div class="inq-editor">
+                <div class="inq-inline-grid">
+                  <label>
+                    <span id="svcCategoryLabel">服务类别</span>
+                    <select id="svcCategory">
+                      <option value="" id="svcCategoryPlaceholder">请选择</option>
+                      <option value="appraisal" id="svcCategoryAppraisal">购前评估</option>
+                      <option value="insurance" id="svcCategoryInsurance">保险说明与协助</option>
+                      <option value="documents" id="svcCategoryDocuments">手续资料协同</option>
+                      <option value="inspection" id="svcCategoryInspection">交付前检查</option>
+                      <option value="maintenance" id="svcCategoryMaintenance">交车整备与维修</option>
+                      <option value="renewal" id="svcCategoryRenewal">年检、续保与后续维护</option>
+                      <option value="unsure" id="svcCategoryUnsure">还不确定，想先沟通</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span id="svcStageLabel">当前阶段</span>
+                    <select id="svcStage">
+                      <option value="" id="svcStagePlaceholder">请选择</option>
+                      <option value="browsing" id="svcStageBrowsing">还在看车比较</option>
+                      <option value="deal" id="svcStageDeal">已经决定成交</option>
+                      <option value="delivery" id="svcStageDelivery">交付准备中</option>
+                      <option value="owned" id="svcStageOwned">已经提车使用中</option>
+                    </select>
+                  </label>
+                </div>
+                <label class="inq-textarea">
+                  <span id="svcVehicleLabel">车辆信息 / 当前问题（选填）</span>
+                  <textarea id="svcVehicle" rows="3" placeholder="例如：车型、车牌、里程、异响、剐蹭、预计交付日期"></textarea>
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row" data-row="name">
+            <div class="inq-row-label">
+              <span id="svcRowName">联系人信息</span>
+              <b class="inq-required">必填</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="svcSummaryName">未填写</span>
+                <button type="button" class="inq-edit" data-jump-row="name" id="svcEditName">修改</button>
+              </div>
+              <div class="inq-editor">
+                <div class="inq-inline-grid">
+                  <label>
+                    <span id="svcNameLabel">联系人姓名</span>
+                    <input type="text" id="svcName" placeholder="例如：张三">
+                  </label>
+                  <label>
+                    <span id="svcLanguageLabel">偏好语言</span>
+                    <select id="svcLanguage">
+                      <option value="" id="svcLanguagePlaceholder">请选择</option>
+                      <option value="zh" id="svcLanguageZh">中文</option>
+                      <option value="ja" id="svcLanguageJa">日语</option>
+                      <option value="en" id="svcLanguageEn">英语</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row" data-row="contact">
+            <div class="inq-row-label">
+              <span id="svcRowContact">邮箱 / 电话</span>
+              <b class="inq-required">必填</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="svcSummaryContact">未填写</span>
+                <button type="button" class="inq-edit" data-jump-row="contact" id="svcEditContact">修改</button>
+              </div>
+              <div class="inq-editor">
+                <div class="inq-inline-grid">
+                  <label>
+                    <span id="svcEmailLabel">邮箱地址</span>
+                    <input type="email" id="svcEmail" placeholder="name@example.com">
+                  </label>
+                  <label>
+                    <span id="svcPhoneLabel">电话号码</span>
+                    <input type="tel" id="svcPhone" placeholder="09012345678">
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row" data-row="confirm">
+            <div class="inq-row-label">
+              <span id="svcRowConfirm">内容确认</span>
+              <b class="inq-required">必填</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="svcSummaryConfirm">未确认</span>
+                <button type="button" class="inq-edit" data-jump-row="confirm" id="svcEditConfirm">修改</button>
+              </div>
+              <div class="inq-editor">
+                <label>
+                  <span id="svcRegionLabel">所在城市 / 地区</span>
+                  <input type="text" id="svcRegion" placeholder="例如：东京 / 大阪 / 香港">
+                </label>
+                <label class="inq-check">
+                  <input type="checkbox" id="svcConsentNews">
+                  <span id="svcConsentNewsLabel">接收服务进度与新到库存资讯</span>
+                </label>
+                <label class="inq-check">
+                  <input type="checkbox" id="svcConsentPolicy">
+                  <span id="svcConsentPolicyLabel">同意使用条款与隐私政策</span>
+                </label>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <p class="inq-message" id="svcMessage" aria-live="polite"></p>
+
+        <div class="inq-actions">
+          <button type="button" class="inq-btn inq-btn--ghost" id="svcPrevBtn">上一步</button>
+          <button type="button" class="inq-btn inq-btn--primary" id="svcNextBtn">下一步</button>
+        </div>
+        <p class="inq-counter" id="svcCounter">1 / 5</p>
+      </div>
+    </section>
+  </main>
+
+  <div data-layout-footer></div>
+
+  <script src="js/layout-shell.js?v=20260417v"></script>
+  <script src="js/data.js?v=20260417q"></script>
+  <script src="js/i18n.js?v=20260417v"></script>
+  <script src="js/common-links.js?v=20260417r"></script>
+  <script src="js/page-chrome.js?v=20260417i"></script>
+  <script src="js/service-appointment.js?v=20260417q"></script>
+</body>
+
+</html>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="gb flag">
+  <defs>
+    <clipPath id="clip-gb"><rect x="4" y="4" width="56" height="56" rx="14" ry="14"/></clipPath>
+    <clipPath id="window-gb"><rect x="8" y="8" width="48" height="48" rx="11" ry="11"/></clipPath>
+    <radialGradient id="gloss-gb" cx="28%" cy="18%" r="72%">
+      <stop offset="0%" stop-color="#fff" stop-opacity=".50"/>
+      <stop offset="42%" stop-color="#fff" stop-opacity=".16"/>
+      <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="shade-gb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="74%" stop-color="#000" stop-opacity=".02"/>
+      <stop offset="100%" stop-color="#000" stop-opacity=".24"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="14" ry="14" fill="#dfe3ea"/>
+  <g clip-path="url(#clip-gb)">
+    <g clip-path="url(#window-gb)">
+    <svg x="8" y="8" width="48" height="48" viewBox="0 0 640 480" preserveAspectRatio="xMidYMid slice">
+
+  <path fill="#012169" d="M0 0h640v480H0z"/>
+  <path fill="#FFF" d="m75 0 244 181L562 0h78v62L400 241l240 178v61h-80L320 301 81 480H0v-60l239-178L0 64V0z"/>
+  <path fill="#C8102E" d="m424 281 216 159v40L369 281zm-184 20 6 35L54 480H0zM640 0v3L391 191l2-44L590 0zM0 0l239 176h-60L0 42z"/>
+  <path fill="#FFF" d="M241 0v480h160V0zM0 160v160h640V160z"/>
+  <path fill="#C8102E" d="M0 193v96h640v-96zM273 0v480h96V0z"/>
+
+    </svg>
+    </g>
+    <rect x="8.5" y="8.5" width="47" height="47" rx="10.5" ry="10.5" fill="none" stroke="#ffffff" stroke-opacity=".34" stroke-width="1"/>
+    <rect x="8.5" y="8.5" width="47" height="47" rx="10.5" ry="10.5" fill="none" stroke="#000000" stroke-opacity=".14" stroke-width=".9"/>
+    <rect x="4" y="4" width="56" height="56" fill="url(#gloss-gb)"/>
+    <rect x="4" y="4" width="56" height="56" fill="url(#shade-gb)"/>
+  </g>
+  <rect x="4.5" y="4.5" width="55" height="55" rx="13.5" ry="13.5" fill="none" stroke="#ffffff" stroke-opacity=".46" stroke-width="1"/>
+  <rect x="4.5" y="4.5" width="55" height="55" rx="13.5" ry="13.5" fill="none" stroke="#000000" stroke-opacity=".16" stroke-width="1"/>
+</svg>

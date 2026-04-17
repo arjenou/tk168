@@ -1,0 +1,184 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>在庫確認内容の入力 — TK168 Premium Automotive</title>
+  <link rel="stylesheet" href="css/style.css?v=20260417u">
+  <link rel="stylesheet" href="css/inquiry.css?v=20260417u">
+</head>
+
+<body class="inquiry-page no-hero-page">
+  <div data-layout-nav></div>
+
+  <main class="inq-main">
+    <section class="inq-shell">
+      <header class="inq-header">
+        <div>
+          <p class="inq-eyebrow">TK168 STOCK CHECK FLOW</p>
+          <h1 class="inq-title" id="scPageTitle">在庫確認内容の入力</h1>
+          <p class="inq-subtitle" id="scPageSubtitle">5ステップで必要な情報を入力し、在庫状況と見積りを確認します。</p>
+        </div>
+      </header>
+
+      <ol class="inq-progress" id="scProgress" aria-label="入力ステップ">
+        <li><button type="button" data-jump-step="0" id="scStepBtn0">確認内容</button></li>
+        <li><button type="button" data-jump-step="1" id="scStepBtn1">氏名</button></li>
+        <li><button type="button" data-jump-step="2" id="scStepBtn2">フリガナ</button></li>
+        <li><button type="button" data-jump-step="3" id="scStepBtn3">連絡先</button></li>
+        <li><button type="button" data-jump-step="4" id="scStepBtn4">確認</button></li>
+      </ol>
+
+      <div class="inq-board">
+        <p class="inq-lead" id="scLeadText">在庫確認の内容を選択してください。</p>
+
+        <article class="inq-vehicle">
+          <img src="assets/images/002.png" alt="対象車両" class="inq-vehicle-thumb" id="scVehicleThumb">
+          <div class="inq-vehicle-copy">
+            <p class="inq-vehicle-brand" id="scVehicleBrand">BRAND</p>
+            <p class="inq-vehicle-name" id="scVehicleName">Model</p>
+            <p class="inq-vehicle-meta" id="scVehicleMeta">2023 / 4.0L / 3,200km</p>
+          </div>
+        </article>
+
+        <div class="inq-table">
+          <section class="inq-row" data-row="request">
+            <div class="inq-row-label">
+              <span id="scLabelRequest">確認内容</span>
+              <b id="scRequiredText1">必須</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="scSummaryRequest">未入力</span>
+                <button type="button" class="inq-edit" data-jump-row="request" id="scEditRequest">修正する</button>
+              </div>
+              <div class="inq-editor">
+                <label>
+                  <span id="scFieldRequestType">確認種別</span>
+                  <select id="scRequestType">
+                    <option value="">選択してください</option>
+                    <option value="stock">在庫状況を確認したい</option>
+                    <option value="quote">支払総額の見積りを確認したい</option>
+                    <option value="spec">装備・仕様を確認したい</option>
+                  </select>
+                </label>
+                <label class="inq-textarea">
+                  <span id="scFieldRequestNote">確認メモ（任意）</span>
+                  <textarea id="scRequestNote" rows="3" placeholder="希望条件や確認したいポイントを入力してください"></textarea>
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row" data-row="name">
+            <div class="inq-row-label">
+              <span id="scLabelName">氏名</span>
+              <b id="scRequiredText2">必須</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="scSummaryName">未入力</span>
+                <button type="button" class="inq-edit" data-jump-row="name" id="scEditName">修正する</button>
+              </div>
+              <div class="inq-editor">
+                <label>
+                  <span id="scFieldName">氏名</span>
+                  <input type="text" id="scName" placeholder="山田 太郎">
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row" data-row="kana">
+            <div class="inq-row-label">
+              <span id="scLabelKana">フリガナ</span>
+              <b id="scRequiredText3">必須</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="scSummaryKana">未入力</span>
+                <button type="button" class="inq-edit" data-jump-row="kana" id="scEditKana">修正する</button>
+              </div>
+              <div class="inq-editor">
+                <label>
+                  <span id="scFieldKana">フリガナ</span>
+                  <input type="text" id="scKana" placeholder="ヤマダ タロウ">
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row" data-row="contact">
+            <div class="inq-row-label">
+              <span id="scLabelContact">メール・電話</span>
+              <b id="scRequiredText4">必須</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="scSummaryContact">未入力</span>
+                <button type="button" class="inq-edit" data-jump-row="contact" id="scEditContact">修正する</button>
+              </div>
+              <div class="inq-editor">
+                <div class="inq-inline-grid">
+                  <label>
+                    <span id="scFieldEmail">メールアドレス</span>
+                    <input type="email" id="scEmail" placeholder="name@example.com">
+                  </label>
+                  <label>
+                    <span id="scFieldPhone">電話番号</span>
+                    <input type="tel" id="scPhone" placeholder="09012345678">
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row" data-row="confirm">
+            <div class="inq-row-label">
+              <span id="scLabelConfirm">内容確認</span>
+              <b id="scRequiredText5">必須</b>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span id="scSummaryConfirm">未確認</span>
+                <button type="button" class="inq-edit" data-jump-row="confirm" id="scEditConfirm">修正する</button>
+              </div>
+              <div class="inq-editor">
+                <label class="inq-check">
+                  <input type="checkbox" id="scConsentNews">
+                  <span id="scConsentNewsText">新着在庫・キャンペーン情報を受け取る</span>
+                </label>
+                <label class="inq-check">
+                  <input type="checkbox" id="scConsentPolicy">
+                  <span id="scConsentPolicyText">利用規約とプライバシーポリシーに同意する</span>
+                </label>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <p class="inq-message" id="scMessage" aria-live="polite"></p>
+
+        <div class="inq-actions">
+          <button type="button" class="inq-btn inq-btn--ghost" id="scPrevBtn">戻る</button>
+          <button type="button" class="inq-btn inq-btn--primary" id="scNextBtn">次へ</button>
+        </div>
+        <p class="inq-counter" id="scCounter">1 / 5</p>
+      </div>
+    </section>
+  </main>
+
+  <div data-layout-footer></div>
+
+  <script src="js/layout-shell.js?v=20260417v"></script>
+  <script src="js/brand-logo-inventory.js?v=20260417i"></script>
+  <script src="js/brand-library-data.js?v=20260417i"></script>
+  <script src="js/data.js?v=20260417q"></script>
+  <script src="js/i18n.js?v=20260417v"></script>
+  <script src="js/common-links.js?v=20260417r"></script>
+  <script src="js/page-chrome.js?v=20260417i"></script>
+  <script src="js/stock-confirm.js?v=20260417s"></script>
+</body>
+
+</html>
