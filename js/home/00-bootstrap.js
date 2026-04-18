@@ -48,6 +48,8 @@ window.TK168RuntimeProfile = Object.freeze({
 });
 document.documentElement.classList.toggle('tk168-lite-mode', shouldUseLiteExperience);
 const SKIP_INTRO_ONCE_KEY = 'tk168_skip_intro_once';
+/** 同标签页会话内已播放过片头则不再播放（避免从子页返回首页反复观看） */
+const INTRO_SEEN_SESSION_KEY = 'tk168_landing_intro_seen';
 const HERO_VIDEO_DEFER_MS = 3600;
 const INTRO_SKIP_UNLOCK_MS = 900;
 const INTRO_ENABLED = true;
@@ -153,6 +155,22 @@ function shouldSkipIntroOnce() {
   }
 }
 
+function hasIntroBeenSeenThisSession() {
+  try {
+    return window.sessionStorage.getItem(INTRO_SEEN_SESSION_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function markIntroSeenThisSession() {
+  try {
+    window.sessionStorage.setItem(INTRO_SEEN_SESSION_KEY, '1');
+  } catch {
+    /* ignore quota / private mode */
+  }
+}
+
 let isMainShown = false;
 function showMain({ immediate = false } = {}) {
   if (isMainShown) return;
@@ -172,6 +190,7 @@ function showMain({ immediate = false } = {}) {
 }
 
 function completeIntro() {
+  markIntroSeenThisSession();
   showMain();
 }
 
@@ -186,7 +205,7 @@ function requestIntroDismiss() {
 
 enforceHomeInitialScroll();
 
-if (shouldSkipIntroOnce()) {
+if (shouldSkipIntroOnce() || hasIntroBeenSeenThisSession()) {
   introVideo?.pause();
   showMain({ immediate: true });
 } else if (!INTRO_ENABLED) {
@@ -198,7 +217,10 @@ if (shouldSkipIntroOnce()) {
   introVideo?.addEventListener('ended', completeIntro);
   loadingScreen?.addEventListener('click', requestIntroDismiss);
   setTimeout(completeIntro, 4000);
-  introVideo?.play().catch(() => showMain({ immediate: true }));
+  introVideo?.play().catch(() => {
+    markIntroSeenThisSession();
+    showMain({ immediate: true });
+  });
 }
 
 if (heroSection && heroVideo) {

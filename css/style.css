@@ -38,6 +38,8 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -47,12 +49,11 @@ body {
   overflow-x: hidden;
 }
 
-/* Global component scale: keep fullscreen media/background untouched. */
+/* Global component scale: keep fullscreen media/background untouched.
+   搜索条不使用 CSS zoom，避免与 iOS 聚焦放大 / 双指缩放合成层冲突导致卡顿或缩放残留。 */
 .hero-content,
 .bh-content,
 .about-hero-inner,
-.search-bar-wrap,
-#floating-bar,
 .vehicle-grid,
 .v-pagination,
 .bn-shell,
@@ -1607,7 +1608,9 @@ body.contact-popover-open {
   background: transparent;
   outline: none;
   width: 100%;
-  font-size: 13.5px;
+  /* ≥16px：避免 iOS Safari 聚焦输入框时整页自动放大，返回主页后缩放/手势异常 */
+  font-size: 16px;
+  line-height: 1.35;
   color: #333;
 }
 
@@ -1796,42 +1799,6 @@ body.contact-popover-open {
   gap: 12px;
   padding: 4px 4px 10px;
   min-height: 64px;
-}
-
-.v-card-like {
-  margin-left: auto;
-  width: 42px;
-  height: 42px;
-  border-radius: 0;
-  border: none;
-  background: transparent;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #b0b0b0;
-  cursor: pointer;
-  transition: transform 0.2s ease, color 0.2s ease, opacity 0.2s ease;
-}
-
-.v-card-like-icon {
-  width: 30px;
-  height: 30px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.5;
-}
-
-.v-card-like:hover {
-  transform: scale(1.05);
-}
-
-.v-card-like.is-active {
-  color: #f25a5a;
-  opacity: 0.95;
-}
-
-.v-card-like.is-active .v-card-like-icon {
-  fill: currentColor;
 }
 
 .v-brand-icon-wrap {
@@ -3458,7 +3425,7 @@ html:lang(en) .footer-newsletter h4 {
   #static-search .fb-input {
     display: block;
     min-width: 0;
-    font-size: 12px;
+    font-size: 16px;
   }
   #static-search .fb-cta {
     min-width: 88px;

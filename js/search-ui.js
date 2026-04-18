@@ -74,14 +74,25 @@ window.TK168SearchUI = (() => {
 
     function closeMenu() {
       if (!openMenuState) return;
-      openMenuState.button.classList.remove('is-open');
-      openMenuState.button.setAttribute('aria-expanded', 'false');
-      openMenuState.menu.remove();
+      const { button, menu } = openMenuState;
       openMenuState = null;
+      try {
+        if (button?.isConnected) {
+          button.classList.remove('is-open');
+          button.setAttribute('aria-expanded', 'false');
+        }
+        if (menu?.isConnected) menu.remove();
+      } catch {
+        /* ignore DOM edge cases */
+      }
     }
 
     function handleViewportScroll(event) {
       if (!openMenuState) return;
+      if (!openMenuState.menu?.isConnected) {
+        closeMenu();
+        return;
+      }
       if (event.target instanceof Element && openMenuState.menu.contains(event.target)) return;
       closeMenu();
     }
@@ -347,6 +358,7 @@ window.TK168SearchUI = (() => {
     }
 
     function reset(shouldSubmit = false) {
+      closeMenu();
       Object.assign(state, createEmptyState());
       updateAll();
       if (shouldSubmit) submit();
@@ -407,16 +419,32 @@ window.TK168SearchUI = (() => {
 
     document.addEventListener('click', (event) => {
       if (!openMenuState) return;
-      if (openMenuState.root.contains(event.target)) {
-        const clickedButton = event.target.closest('.fb-filter');
-        const clickedMenu = event.target.closest('.fb-filter-menu');
-        if (clickedButton === openMenuState.button || clickedMenu) return;
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const { root, button, menu } = openMenuState;
+      if (!menu?.isConnected) {
+        closeMenu();
+        return;
       }
+
+      if (menu.contains(target)) return;
+
+      if (root.contains(target)) {
+        const clickedButton = target.closest('.fb-filter');
+        const clickedMenu = target.closest('.fb-filter-menu');
+        if (clickedButton === button || (clickedMenu && clickedMenu === menu)) return;
+      }
+
       closeMenu();
     });
 
     window.addEventListener('resize', closeMenu);
     window.addEventListener('scroll', handleViewportScroll, true);
+    window.addEventListener('pagehide', closeMenu);
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) closeMenu();
+    });
     window.addEventListener('tk168:languagechange', () => {
       closeMenu();
       desktopRoots.forEach((root) => {

@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>車両詳細 — TK168 Premium Automotive</title>
-  <link rel="stylesheet" href="css/detail.css?v=20260417u">
+  <link rel="stylesheet" href="css/detail.css?v=20260418b">
 </head>
 
 <body>
@@ -24,7 +24,7 @@
               id="detailFavoriteBtn"
               type="button"
               aria-pressed="false"
-              aria-label="收藏车辆">
+              aria-label="お気に入り">
               <svg class="detail-title-favorite-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 3.4c.4 0 .8.2 1 .6l2.1 4.2 4.7.7c.9.1 1.2 1.2.6 1.9l-3.4 3.3.8 4.7c.1.9-.8 1.6-1.6 1.2L12 17.6 7.8 20c-.8.4-1.7-.3-1.6-1.2l.8-4.7-3.4-3.3c-.6-.7-.3-1.8.6-1.9l4.7-.7L11 4c.2-.4.6-.6 1-.6z"></path>
               </svg>
@@ -34,16 +34,16 @@
             <div class="detail-price-main">
               <div class="detail-price-label-row">
                 <span class="detail-price-label" data-i18n="price.total">支払総額</span>
-                <span class="detail-price-tax" data-i18n="price.taxIncluded">（含税）</span>
-                <button class="detail-price-help" type="button" data-price-help="total" data-i18n-title="price.helpLabel" aria-label="查看价格说明">?</button>
+                <span class="detail-price-tax" data-i18n="price.taxIncluded">（税込）</span>
+                <button class="detail-price-help" type="button" data-price-help="total" data-i18n-title="price.helpLabel" aria-label="価格の説明を見る">?</button>
               </div>
               <strong class="detail-price-value" id="detailTotalPriceValue"><span class="detail-price-amount">3,200</span><span class="detail-price-unit">万円</span></strong>
             </div>
             <div class="detail-price-sub">
               <div class="detail-price-label-row is-sub">
                 <span class="detail-price-sub-label" data-i18n="price.baseLong">車両本体価格</span>
-                <span class="detail-price-tax" data-i18n="price.taxIncluded">（含税）</span>
-                <button class="detail-price-help" type="button" data-price-help="base" data-i18n-title="price.helpLabel" aria-label="查看价格说明">?</button>
+                <span class="detail-price-tax" data-i18n="price.taxIncluded">（税込）</span>
+                <button class="detail-price-help" type="button" data-price-help="base" data-i18n-title="price.helpLabel" aria-label="価格の説明を見る">?</button>
               </div>
               <span class="detail-price-sub-value" id="detailBasePriceValue"><span class="detail-price-amount">2,980</span><span class="detail-price-unit">万円</span></span>
             </div>
@@ -108,7 +108,7 @@
             <!-- 参数表 -->
             <div class="detail-card compact-card">
               <div class="section-title-wrap">
-                <h2 class="section-title" data-i18n="detail.specsTitle">参数信息</h2>
+                <h2 class="section-title" data-i18n="detail.specsTitle">車両情報</h2>
               </div>
               <div class="spec-table" id="specTable">
                 <div class="spec-row">
@@ -165,7 +165,7 @@
             <!-- 车辆概览 -->
             <div class="detail-card overview-card compact-card">
               <div class="section-title-wrap">
-                <h2 class="section-title" data-i18n="detail.overviewTitle">车型概览</h2>
+                <h2 class="section-title" data-i18n="detail.overviewTitle">車両概要</h2>
               </div>
               <div id="detailOverview">
                 <p>这台奥迪 R8 保持了低里程与完整保养记录，低伏车身与中置布局让整车始终带着很鲜明的超跑比例。</p>
@@ -180,19 +180,19 @@
 
             <!-- 立即咨询 -->
             <div class="detail-card sidebar-card lead-card">
-              <div class="sidebar-title" data-i18n="detail.contactTitle">联系顾问</div>
+              <div class="sidebar-title" data-i18n="detail.contactTitle">お問い合わせ</div>
               <div class="action-group">
                 <a class="primary-action" href="#" data-link-key="store-visit" id="detailStoreVisitLink">
                   <svg class="action-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                  <span data-i18n="detail.storeVisit">来店预约</span>
+                  <span data-i18n="detail.storeVisit">来店予約</span>
                 </a>
                 <a class="secondary-action" href="mailto:AUTO@tk168.co.jp" id="detailEmailLink">
                   <svg class="action-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                  <span data-i18n="detail.stockConfirm">在库确认</span>
+                  <span data-i18n="detail.stockConfirm">在庫確認</span>
                 </a>
                 <a class="tertiary-action" href="#" id="detailPhoneLink">
                   <svg class="action-icon" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 3.9 10.71 19.79 19.79 0 0 1 .87 2.18 2 2 0 0 1 2.87 0h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                  <span data-i18n="detail.call">致电顾问</span>
+                  <span data-i18n="detail.call">お電話で相談</span>
                 </a>
               </div>
               <div class="advisor-panel" id="detailAdvisorPanel" hidden>
@@ -212,7 +212,7 @@
 
             <!-- 附加权益 -->
             <div class="detail-card sidebar-card benefits-card">
-              <div class="sidebar-title" data-i18n="detail.benefitsTitle">基本规格</div>
+              <div class="sidebar-title" data-i18n="detail.benefitsTitle">基本スペック</div>
               <div class="benefit-bars" id="benefitBars">
                 <div class="benefit-bar benefit-bar--spec">
                   <span class="benefit-spec-label">车身类型</span>
@@ -235,7 +235,7 @@
 
             <!-- 亮点配置 -->
             <div class="detail-card sidebar-card features-card">
-              <div class="sidebar-title" data-i18n="detail.featuresTitle">核心亮点</div>
+              <div class="sidebar-title" data-i18n="detail.featuresTitle">注目ポイント</div>
               <div class="feature-grid" id="featureGrid">
                 <div class="feature-item">
                   <span class="feature-icon" aria-hidden="true">
@@ -296,7 +296,7 @@
 
             <div class="detail-card sidebar-card staff-card">
               <div class="staff-card-head">
-                <div class="sidebar-title" data-i18n="detail.staffTitle">员工介绍</div>
+                <div class="sidebar-title" data-i18n="detail.staffTitle">スタッフ紹介</div>
               </div>
               <div class="staff-card-body">
                 <div class="staff-photo" aria-hidden="true">
@@ -309,9 +309,9 @@
                   <span class="staff-photo-mark">TK</span>
                 </div>
                 <div class="staff-meta">
-                  <div class="staff-role" data-i18n="detail.staffRole">进口车顾问</div>
-                  <div class="staff-name" data-i18n="detail.staffName">TK168 顾问团队</div>
-                  <p class="staff-bio" data-i18n="detail.staffBio">专注高性能车型与跨境购车沟通，为来店看车、在库确认和方案建议提供更高效的支持。</p>
+                  <div class="staff-role" data-i18n="detail.staffRole">輸入車アドバイザー</div>
+                  <div class="staff-name" data-i18n="detail.staffName">TK168 セールスチーム</div>
+                  <p class="staff-bio" data-i18n="detail.staffBio">スーパーカーとハイパフォーマンスモデルを中心に、在庫案内から来店相談まで丁寧にサポートします。</p>
                 </div>
               </div>
             </div>
@@ -324,8 +324,8 @@
 
     <section class="featured-section">
       <div class="section-bar">
-        <h2 class="featured-title" data-i18n="detail.featuredTitle">在库推荐</h2>
-        <a class="section-link" href="brand.html" id="detailBackToBrand" data-i18n="detail.moreInventory">查看更多车源</a>
+        <h2 class="featured-title" data-i18n="detail.featuredTitle">おすすめ在庫</h2>
+        <a class="section-link" href="brand.html" id="detailBackToBrand" data-i18n="detail.moreInventory">在庫をもっと見る</a>
       </div>
       <div class="featured-grid" id="featuredGrid"></div>
     </section>
@@ -334,8 +334,8 @@
 
   <div class="gallery-lightbox" id="galleryLightbox" aria-hidden="true">
     <div class="gallery-lightbox-backdrop" data-lightbox-close></div>
-    <div class="gallery-lightbox-dialog" role="dialog" aria-modal="true" aria-label="车辆大图预览" data-i18n-aria-label="detail.lightbox">
-      <button class="gallery-lightbox-close" type="button" id="galleryLightboxClose" aria-label="关闭大图预览" data-i18n-aria-label="detail.closeLightbox">
+    <div class="gallery-lightbox-dialog" role="dialog" aria-modal="true" aria-label="車両画像プレビュー" data-i18n-aria-label="detail.lightbox">
+      <button class="gallery-lightbox-close" type="button" id="galleryLightboxClose" aria-label="画像プレビューを閉じる" data-i18n-aria-label="detail.closeLightbox">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M6 6l12 12M18 6L6 18"></path>
         </svg>
@@ -390,7 +390,7 @@
     <div class="price-help-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="priceHelpModalTitle">
       <div class="price-help-modal-head">
         <h3 class="price-help-modal-title" id="priceHelpModalTitle">支払総額について</h3>
-        <button class="price-help-modal-close" type="button" id="priceHelpModalClose" data-i18n-title="price.modalClose" data-i18n-aria-label="price.modalClose" aria-label="关闭说明弹窗">
+        <button class="price-help-modal-close" type="button" id="priceHelpModalClose" data-i18n-title="price.modalClose" data-i18n-aria-label="price.modalClose" aria-label="説明ポップアップを閉じる">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M6 6l12 12M18 6L6 18"></path>
           </svg>
@@ -406,12 +406,12 @@
   <script src="js/brand-logo-inventory.js?v=20260417i"></script>
   <script src="js/brand-library-data.js?v=20260417i"></script>
   <script src="js/data.js?v=20260417q"></script>
-  <script src="js/i18n.js?v=20260417v"></script>
+  <script src="js/i18n.js?v=20260418c"></script>
   <script src="js/common-links.js?v=20260417r"></script>
   <script src="js/page-chrome.js?v=20260417i"></script>
   <script src="js/inventory-context.js?v=20260417i"></script>
-  <script src="js/renderers.js?v=20260417q"></script>
-  <script src="js/detail.js?v=20260417q"></script>
+  <script src="js/renderers.js?v=20260418b"></script>
+  <script src="js/detail.js?v=20260418c"></script>
 </body>
 
 </html>

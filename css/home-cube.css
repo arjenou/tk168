@@ -656,9 +656,10 @@
     min-height: var(--mobile-frame-height);
     padding-bottom: calc(var(--mobile-bottom-safe) + 5.5rem);
   }
+  /* pan-y：保留纵向跟页滚动；横向划动由脚本在确认水平拖动手势后 preventDefault */
   #brands .lisboa-stage {
     min-height: var(--mobile-frame-height);
-    touch-action: none;
+    touch-action: pan-y;
   }
   #brands .lisboa-gesture-layer {
     display: block;
@@ -669,7 +670,7 @@
     bottom: calc(var(--mobile-bottom-safe) + 6.4rem);
     z-index: 8;
     pointer-events: auto;
-    touch-action: none;
+    touch-action: pan-y;
     background: transparent;
   }
   #brands .lisboa-slide__copy {

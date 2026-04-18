@@ -975,13 +975,13 @@ function ensureFeaturedSliderNav() {
   nav.className = 'featured-slider-nav';
   nav.setAttribute('aria-hidden', 'true');
   nav.innerHTML = `
-    <button type="button" class="featured-slider-btn featured-slider-btn--prev" data-featured-nav="prev" aria-label="上一辆">
+    <button type="button" class="featured-slider-btn featured-slider-btn--prev" data-featured-nav="prev" aria-label="前の車両">
       <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
         <path d="M12.5 4 7 10l5.5 6"></path>
       </svg>
     </button>
-    <div class="featured-slider-dots" aria-label="车辆翻页"></div>
-    <button type="button" class="featured-slider-btn featured-slider-btn--next" data-featured-nav="next" aria-label="下一辆">
+    <div class="featured-slider-dots" aria-label="ページ送り"></div>
+    <button type="button" class="featured-slider-btn featured-slider-btn--next" data-featured-nav="next" aria-label="次の車両">
       <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
         <path d="m7.5 4 5.5 6-5.5 6"></path>
       </svg>

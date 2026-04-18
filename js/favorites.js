@@ -184,10 +184,6 @@ function renderPage() {
     });
   });
 
-  grid.querySelectorAll('.v-card-like').forEach((btn) => {
-    btn.classList.add('is-active');
-    btn.setAttribute('aria-pressed', 'true');
-  });
   window.TK168CommonLinks?.enhanceClickableCards(grid);
   favoriteRenderMode = renderMode;
   updatePagination();

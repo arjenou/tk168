@@ -119,35 +119,8 @@ window.TK168Renderers = (() => {
     }
   }
 
-  function isVehicleFavorite(vehicleId) {
-    if (vehicleId == null) return false;
-    const set = new Set(readFavoriteIds());
-    return set.has(String(vehicleId));
-  }
-
-  function bindVehicleCardLikes(container) {
-    const scope = container || document;
-    if (!scope || scope.__tk168LikeBound) return;
-    scope.__tk168LikeBound = true;
-    scope.addEventListener('click', (event) => {
-      const btn = event.target.closest('.v-card-like');
-      if (!btn) return;
-      event.preventDefault();
-      event.stopPropagation();
-      const vehicleId = btn.dataset.vehicleId;
-      if (!vehicleId) return;
-      const favorites = new Set(readFavoriteIds());
-      const nextState = !btn.classList.contains('is-active');
-      btn.classList.toggle('is-active', nextState);
-      btn.setAttribute('aria-pressed', nextState ? 'true' : 'false');
-      if (nextState) {
-        favorites.add(String(vehicleId));
-      } else {
-        favorites.delete(String(vehicleId));
-      }
-      writeFavoriteIds(Array.from(favorites));
-      window.dispatchEvent(new CustomEvent('favorites:changed', { detail: { ids: Array.from(favorites) } }));
-    });
+  function bindVehicleCardLikes() {
+    /* 列表卡片已移除收藏星，保留空实现供各页兼容调用 */
   }
 
   function getVehicleTotalPrice(vehicle) {
@@ -299,7 +272,6 @@ window.TK168Renderers = (() => {
     const brandUrl = window.TK168_DATA?.buildBrandUrl
       ? window.TK168_DATA.buildBrandUrl(vehicle.brandKey)
       : 'brand.html';
-    const isFavorite = isVehicleFavorite(vehicle.id);
     const bodyMarkup = `
       <div class="${variant.header}">
         <div class="${brandWrapClass}">
@@ -311,11 +283,6 @@ window.TK168Renderers = (() => {
           <h3 class="${variant.title}">${vehicleName}</h3>
           <p class="${variant.subtitle}">${vehicle.year} · ${getVehicleTypeLabel(vehicle.type)}</p>
         </div>
-        <button class="v-card-like${isFavorite ? ' is-active' : ''}" type="button" aria-pressed="${isFavorite ? 'true' : 'false'}" aria-label="${t('cta.like') || 'Like'}" data-vehicle-id="${vehicle.id}">
-          <svg class="v-card-like-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 3.4c.4 0 .8.2 1 .6l2.1 4.2 4.7.7c.9.1 1.2 1.2.6 1.9l-3.4 3.3.8 4.7c.1.9-.8 1.6-1.6 1.2L12 17.6 7.8 20c-.8.4-1.7-.3-1.6-1.2l.8-4.7-3.4-3.3c-.6-.7-.3-1.8.6-1.9l4.7-.7L11 4c.2-.4.6-.6 1-.6z"></path>
-          </svg>
-        </button>
       </div>
       <div class="${variant.cover}">
         <img src="${resolveVehicleMediaSource(vehicle.photo)}" alt="${vehicleName}">

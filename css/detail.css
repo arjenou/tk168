@@ -2121,43 +2121,6 @@ body.price-help-open {
   min-height: 64px;
 }
 
-/* Unified favorite star style (same standard as home inventory cards). */
-.v-card-like {
-  margin-left: auto;
-  width: 42px;
-  height: 42px;
-  border-radius: 0;
-  border: none;
-  background: transparent;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #b0b0b0;
-  cursor: pointer;
-  transition: transform 0.2s ease, color 0.2s ease, opacity 0.2s ease;
-}
-
-.v-card-like-icon {
-  width: 30px;
-  height: 30px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.5;
-}
-
-.v-card-like:hover {
-  transform: scale(1.05);
-}
-
-.v-card-like.is-active {
-  color: #f25a5a;
-  opacity: 0.95;
-}
-
-.v-card-like.is-active .v-card-like-icon {
-  fill: currentColor;
-}
-
 .card-brand-icon {
   width: 44px;
   height: 44px;

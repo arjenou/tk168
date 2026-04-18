@@ -274,7 +274,7 @@ window.TK168PageChrome?.applyPageChrome({
 });
 
 function getBrandHeroDefaultTitle() {
-  return window.TK168I18N?.t('brand.defaultTitle') || '精选品牌';
+  return window.TK168I18N?.t('brand.defaultTitle') || '厳選ブランド';
 }
 
 function getBrandNavItemByKey(key) {
@@ -666,13 +666,13 @@ function ensureBrandVehicleSliderNav() {
   nav.className = 'vehicle-slider-nav';
   nav.setAttribute('aria-hidden', 'true');
   nav.innerHTML = `
-    <button type="button" class="vehicle-slider-btn vehicle-slider-btn--prev" data-brand-vehicle-nav="prev" aria-label="上一辆">
+    <button type="button" class="vehicle-slider-btn vehicle-slider-btn--prev" data-brand-vehicle-nav="prev" aria-label="前の車両">
       <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
         <path d="M12.5 4 7 10l5.5 6"></path>
       </svg>
     </button>
-    <div class="vehicle-slider-dots" aria-label="车辆翻页"></div>
-    <button type="button" class="vehicle-slider-btn vehicle-slider-btn--next" data-brand-vehicle-nav="next" aria-label="下一辆">
+    <div class="vehicle-slider-dots" aria-label="ページ送り"></div>
+    <button type="button" class="vehicle-slider-btn vehicle-slider-btn--next" data-brand-vehicle-nav="next" aria-label="次の車両">
       <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
         <path d="m7.5 4 5.5 6-5.5 6"></path>
       </svg>

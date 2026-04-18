@@ -378,6 +378,14 @@
   }
 
   function preloadCarouselAssets() {
+    if (isMobileViewport()) {
+      const active = slides[activeIndex];
+      if (active) {
+        preloadSlideAsset(getHeroLogo(active));
+        preloadSlideAsset(getFlagLogo(active));
+      }
+      return;
+    }
     slides.forEach((item) => {
       preloadSlideAsset(getHeroLogo(item));
       preloadSlideAsset(getFlagLogo(item));
@@ -441,15 +449,15 @@
           class="lisboa-slide__hero-logo"
           src="${getHeroLogo(item)}"
           alt=""
-          loading="eager"
-          fetchpriority="${index === activeIndex ? 'high' : 'auto'}"
+          loading="${index === activeIndex ? 'eager' : 'lazy'}"
+          fetchpriority="${index === activeIndex ? 'high' : 'low'}"
           decoding="async"
         >
       </div>
       <div class="lisboa-slide__copy">
         <div class="slide-panel-meta">
           <span class="slide-panel-flag" aria-hidden="true">
-            <img class="slide-panel-flag-icon" src="${getFlagLogo(item)}" alt="">
+            <img class="slide-panel-flag-icon" src="${getFlagLogo(item)}" alt="" loading="lazy" decoding="async">
           </span>
           <p class="slide-panel-country">${getLocalizedText(item.country, language)}</p>
         </div>
@@ -966,7 +974,6 @@
   window.addEventListener('pointermove', handlePointerMove);
   window.addEventListener('pointerup', (event) => finishPointer(event));
   window.addEventListener('pointercancel', (event) => finishPointer(event, true));
-  window.addEventListener('touchmove', handleTouchMove, { passive: false });
   window.addEventListener('touchend', handleTouchEnd, { passive: true });
   window.addEventListener('touchcancel', handleTouchCancel, { passive: true });
   shell.addEventListener('touchstart', handleMobileThumbTouchStart, { passive: true });

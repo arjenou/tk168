@@ -563,7 +563,11 @@ window.TK168I18N = (() => {
     });
   }
 
+  let didInit = false;
+
   function init() {
+    if (didInit) return;
+    didInit = true;
     applyTranslations(document);
     bindSwitchers();
     let rafId = 0;
@@ -584,8 +588,5 @@ window.TK168I18N = (() => {
   };
 })();
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => window.TK168I18N.init(), { once: true });
-} else {
-  window.TK168I18N.init();
-}
+/* 在脚本加载当下立即套用语言（不等到 DOMContentLoaded），避免后续脚本与首屏之间出现中文占位再切换的闪烁 */
+window.TK168I18N.init();

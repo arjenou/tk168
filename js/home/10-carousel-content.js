@@ -214,8 +214,12 @@ function renderHomeNews() {
 function initHomeSearch() {
   window.TK168SearchUI.createInventorySearchUI({
     roots: [
-      document.querySelector('#static-search .fb-desktop')
-    ],
+      document.querySelector('#static-search .fb-desktop'),
+      document.querySelector('#floating-bar .fb-desktop')
+    ].filter(Boolean),
+    mobileButtons: [
+      document.querySelector('#floating-bar .fb-mobile .fb-cta')
+    ].filter(Boolean),
     initialState: homeSearchState,
     onSubmit: (filters) => {
       window.location.href = buildInventoryUrl(filters);
