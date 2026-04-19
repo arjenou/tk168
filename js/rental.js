@@ -324,7 +324,12 @@ function hydrateRentalVehicleCard(card, vehicle, language) {
     card.addEventListener('click', (event) => {
       if (event.target.closest('a,button')) return;
       const targetUrl = card.dataset.detailUrl;
-      if (targetUrl) window.location.href = targetUrl;
+      if (!targetUrl) return;
+      if (window.TK168LayoutShell?.navigate) {
+        window.TK168LayoutShell.navigate(targetUrl);
+      } else {
+        window.location.href = targetUrl;
+      }
     });
   }
 

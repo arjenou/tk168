@@ -482,7 +482,12 @@ function initHomeSearch() {
     ].filter(Boolean),
     initialState: homeSearchState,
     onSubmit: (filters) => {
-      window.location.href = buildInventoryUrl(filters);
+      const target = buildInventoryUrl(filters);
+      if (window.TK168LayoutShell?.navigate) {
+        window.TK168LayoutShell.navigate(target);
+      } else {
+        window.location.href = target;
+      }
     }
   });
 }

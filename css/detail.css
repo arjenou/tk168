@@ -3018,3 +3018,80 @@ body.price-help-open {
     gap: 6px;
   }
 }
+
+/* ─────────────────────────────────────────────
+   Page transition (与 style.css 同步：详情页独立样式）
+   ───────────────────────────────────────────── */
+@view-transition {
+  navigation: auto;
+}
+
+@keyframes tk168PageFadeIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+body {
+  animation: tk168PageFadeIn 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
+}
+
+html.is-page-navigating body {
+  opacity: 0;
+  transform: translate3d(0, -6px, 0);
+  transition: opacity 260ms cubic-bezier(0.4, 0, 0.2, 1),
+              transform 260ms cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  animation: none;
+}
+
+html.is-page-restored body {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+::view-transition-old(root) {
+  animation: tk168ViewFadeOut 240ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+::view-transition-new(root) {
+  animation: tk168ViewFadeIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes tk168ViewFadeOut {
+  to {
+    opacity: 0;
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+@keyframes tk168ViewFadeIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    animation: none;
+  }
+  html.is-page-navigating body {
+    transition: opacity 120ms linear;
+    transform: none;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 120ms;
+  }
+}

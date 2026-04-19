@@ -66,7 +66,11 @@ window.TK168CommonLinks = (() => {
       if (logo.dataset.homeLogoBound === '1') return;
       logo.dataset.homeLogoBound = '1';
       logo.addEventListener('click', () => {
-        window.location.href = 'index.html';
+        if (window.TK168LayoutShell?.navigate) {
+          window.TK168LayoutShell.navigate('index.html');
+        } else {
+          window.location.href = 'index.html';
+        }
       });
     });
   }
@@ -83,7 +87,11 @@ window.TK168CommonLinks = (() => {
   function triggerPrimaryLink(card, linkSelector) {
     const primaryLink = card.querySelector(linkSelector);
     if (!primaryLink?.href) return;
-    window.location.href = primaryLink.href;
+    if (window.TK168LayoutShell?.navigate) {
+      window.TK168LayoutShell.navigate(primaryLink.href);
+    } else {
+      window.location.href = primaryLink.href;
+    }
   }
 
   function enhanceClickableCards(root = document) {

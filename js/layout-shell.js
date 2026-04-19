@@ -101,7 +101,140 @@
     document.addEventListener('DOMContentLoaded', inject, { once: true });
   }
 
+  /* ───────────────────────────────────────────────
+     全站统一页面转场（Page Transition）
+     - 拦截同源 <a> 点击，先淡出再跳转
+     - 支持修饰键 / 新标签页 / 锚点 / 下载 / 非 http(s) 协议的放行
+     - 兼容 bfcache（pageshow persisted）恢复，避免白屏停留
+     - 与 CSS 中的 .is-page-navigating / .is-page-restored 联动
+     ─────────────────────────────────────────────── */
+  const PageTransition = (() => {
+    const TRANSITION_MS = 280;
+    const NAV_SAFETY_MS = 900;
+    const root = document.documentElement;
+    const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+
+    let isNavigating = false;
+    let safetyTimer = 0;
+
+    function isModifiedEvent(event) {
+      return event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0;
+    }
+
+    function isSameOriginHttpUrl(url) {
+      if (!url) return false;
+      const protocol = (url.protocol || '').toLowerCase();
+      if (protocol !== 'http:' && protocol !== 'https:') return false;
+      return url.origin === window.location.origin;
+    }
+
+    function isSamePagePath(url) {
+      return url.pathname === window.location.pathname && url.search === window.location.search;
+    }
+
+    function shouldSkipAnchor(anchor) {
+      if (!anchor || !anchor.href) return true;
+      if (anchor.hasAttribute('download')) return true;
+      if (anchor.dataset?.noTransition === '1') return true;
+
+      const rawHref = anchor.getAttribute('href') || '';
+      if (!rawHref || rawHref.startsWith('#')) return true;
+
+      const target = (anchor.getAttribute('target') || '').toLowerCase();
+      if (target && target !== '_self') return true;
+
+      const rel = (anchor.getAttribute('rel') || '').toLowerCase();
+      if (rel.includes('external')) return true;
+
+      return false;
+    }
+
+    function runFadeOut(nextHref, replace) {
+      if (isNavigating) return;
+      isNavigating = true;
+      root.classList.add('is-page-navigating');
+
+      const reducedMotion = prefersReducedMotion?.matches;
+      const delay = reducedMotion ? 120 : TRANSITION_MS;
+
+      const go = () => {
+        if (replace) {
+          window.location.replace(nextHref);
+        } else {
+          window.location.href = nextHref;
+        }
+      };
+
+      window.setTimeout(go, delay);
+      safetyTimer = window.setTimeout(() => {
+        root.classList.remove('is-page-navigating');
+        isNavigating = false;
+      }, NAV_SAFETY_MS);
+    }
+
+    function handleClick(event) {
+      if (event.defaultPrevented) return;
+      if (isModifiedEvent(event)) return;
+
+      const anchor = event.target?.closest?.('a[href]');
+      if (!anchor || shouldSkipAnchor(anchor)) return;
+
+      let url;
+      try {
+        url = new URL(anchor.href, window.location.href);
+      } catch {
+        return;
+      }
+
+      if (!isSameOriginHttpUrl(url)) return;
+
+      if (isSamePagePath(url)) {
+        if (url.hash && url.hash !== window.location.hash) return;
+        return;
+      }
+
+      event.preventDefault();
+      runFadeOut(url.href, false);
+    }
+
+    function bindClickInterceptor() {
+      if (root.dataset.pageTransitionBound === '1') return;
+      root.dataset.pageTransitionBound = '1';
+      document.addEventListener('click', handleClick, false);
+    }
+
+    function handlePageShow(event) {
+      if (safetyTimer) {
+        window.clearTimeout(safetyTimer);
+        safetyTimer = 0;
+      }
+      isNavigating = false;
+      root.classList.remove('is-page-navigating');
+
+      if (event.persisted) {
+        root.classList.add('is-page-restored');
+        window.setTimeout(() => root.classList.remove('is-page-restored'), 50);
+      }
+    }
+
+    function handlePageHide() {
+      root.classList.remove('is-page-navigating');
+    }
+
+    bindClickInterceptor();
+    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener('pagehide', handlePageHide);
+
+    return {
+      navigate(href, { replace = false } = {}) {
+        if (!href) return;
+        runFadeOut(href, replace);
+      }
+    };
+  })();
+
   return {
-    inject
+    inject,
+    navigate: PageTransition.navigate
   };
 })();
