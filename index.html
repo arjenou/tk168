@@ -4,201 +4,586 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ホーム — TK168 Premium Automotive</title>
-  <link rel="stylesheet" href="css/style.css?v=20260419a">
-  <link rel="stylesheet" href="css/home-cube.css?v=20260418a">
+  <meta name="robots" content="noindex, nofollow">
+  <title>メンテナンス中 — TK168 Premium Automotive</title>
+  <link rel="icon" href="assets/images/logo_TK168.svg" type="image/svg+xml">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --cyan: #F2FA5A;
+      --cyan-dim: rgba(242, 250, 90, 0.12);
+      --cyan-border: rgba(242, 250, 90, 0.28);
+      --cyan-glow: 0 0 48px rgba(242, 250, 90, 0.35), 0 0 120px rgba(242, 250, 90, 0.18);
+      --navy: #0E0E10;
+      --navy-mid: #17171A;
+      --navy-light: #222226;
+      --text: #ffffff;
+      --text-dim: rgba(255, 255, 255, 0.64);
+      --text-muted: rgba(255, 255, 255, 0.42);
+      --border: rgba(255, 255, 255, 0.12);
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, sans-serif;
+      --font-ja: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Yu Gothic UI', 'Meiryo', sans-serif;
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: var(--navy);
+      color: var(--text);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow: hidden;
+    }
+
+    html:lang(ja) body {
+      font-family: var(--font-ja);
+    }
+
+    body {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      animation: bodyFadeIn 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes bodyFadeIn {
+      from {
+        opacity: 0;
+        transform: translate3d(0, 10px, 0);
+      }
+      to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+      }
+    }
+
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(0deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(circle at 50% 46%, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0) 72%);
+      -webkit-mask-image: radial-gradient(circle at 50% 46%, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0) 72%);
+      opacity: 0.75;
+    }
+
+    .bg-glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      will-change: transform;
+    }
+
+    .bg-glow--a {
+      width: 620px;
+      height: 620px;
+      background: radial-gradient(circle, rgba(242, 250, 90, 0.34) 0%, rgba(242, 250, 90, 0) 70%);
+      top: -160px;
+      left: 50%;
+      transform: translate(-50%, 0);
+      animation: floatA 14s ease-in-out infinite;
+    }
+
+    .bg-glow--b {
+      width: 480px;
+      height: 480px;
+      background: radial-gradient(circle, rgba(102, 189, 255, 0.22) 0%, rgba(102, 189, 255, 0) 70%);
+      bottom: -160px;
+      right: -120px;
+      animation: floatB 18s ease-in-out infinite;
+    }
+
+    .bg-glow--c {
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, rgba(242, 250, 90, 0.18) 0%, rgba(242, 250, 90, 0) 70%);
+      bottom: -60px;
+      left: -120px;
+      animation: floatC 20s ease-in-out infinite;
+    }
+
+    @keyframes floatA {
+      0%, 100% { transform: translate(-50%, 0) scale(1); }
+      50% { transform: translate(-50%, 40px) scale(1.08); }
+    }
+
+    @keyframes floatB {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-40px, -32px) scale(1.1); }
+    }
+
+    @keyframes floatC {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(40px, -20px) scale(1.12); }
+    }
+
+    .top-bar {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 48px;
+    }
+
+    .top-bar__brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .top-bar__logo {
+      width: 44px;
+      height: 44px;
+      display: block;
+    }
+
+    .top-bar__wordmark {
+      font-size: 11px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .lang-switcher {
+      display: inline-flex;
+      padding: 4px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .lang-option {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      font: inherit;
+      font-size: 11.5px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      padding: 7px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: color 200ms ease, background 200ms ease, color 200ms ease;
+    }
+
+    .lang-option:hover {
+      color: var(--text);
+    }
+
+    .lang-option.is-active {
+      background: var(--cyan);
+      color: #111;
+    }
+
+    .stage {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 48px 40px;
+    }
+
+    .card {
+      position: relative;
+      width: min(720px, 100%);
+      text-align: center;
+      padding: 8px 0 0;
+    }
+
+    .pulse {
+      --size: 150px;
+      position: relative;
+      width: var(--size);
+      height: var(--size);
+      margin: 0 auto 36px;
+    }
+
+    .pulse__ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1px solid var(--cyan-border);
+      box-shadow: var(--cyan-glow);
+      animation: ringPulse 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    .pulse__ring--delayed {
+      animation-delay: 1.4s;
+    }
+
+    .pulse__core {
+      position: absolute;
+      inset: 30px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 28%, #FDFFB6 0%, var(--cyan) 45%, #A7B21C 100%);
+      box-shadow:
+        inset 0 0 28px rgba(255, 255, 255, 0.5),
+        0 0 40px rgba(242, 250, 90, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: coreBreathe 3.2s ease-in-out infinite;
+    }
+
+    .pulse__core svg {
+      width: 42%;
+      height: 42%;
+      color: #111;
+      animation: gearSpin 6s linear infinite;
+    }
+
+    @keyframes ringPulse {
+      0% {
+        transform: scale(0.78);
+        opacity: 0.85;
+      }
+      80% {
+        transform: scale(1.35);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1.35);
+        opacity: 0;
+      }
+    }
+
+    @keyframes coreBreathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes gearSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11.5px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      padding: 7px 14px;
+      border: 1px solid var(--cyan-border);
+      background: var(--cyan-dim);
+      border-radius: 999px;
+      margin-bottom: 22px;
+    }
+
+    .eyebrow__dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 12px var(--cyan);
+      animation: dotBlink 1.8s ease-in-out infinite;
+    }
+
+    @keyframes dotBlink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .title {
+      font-size: clamp(36px, 6.2vw, 64px);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.14;
+      margin-bottom: 18px;
+    }
+
+    html:lang(ja) .title {
+      letter-spacing: 0.01em;
+    }
+
+    .subtitle {
+      font-size: clamp(14px, 1.4vw, 17px);
+      line-height: 1.75;
+      color: var(--text-dim);
+      max-width: 560px;
+      margin: 0 auto 36px;
+    }
+
+    .divider {
+      width: 48px;
+      height: 1px;
+      background: var(--border);
+      margin: 0 auto 28px;
+    }
+
+    .contacts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
+    .contact {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13px;
+      letter-spacing: 0.02em;
+      background: rgba(255, 255, 255, 0.02);
+      transition: border-color 220ms ease, color 220ms ease, background 220ms ease, transform 220ms ease;
+    }
+
+    .contact:hover {
+      border-color: var(--cyan-border);
+      color: var(--cyan);
+      background: var(--cyan-dim);
+      transform: translateY(-1px);
+    }
+
+    .contact svg {
+      width: 15px;
+      height: 15px;
+      flex: none;
+    }
+
+    .footer {
+      position: relative;
+      z-index: 3;
+      text-align: center;
+      padding: 18px 48px 28px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 640px) {
+      .top-bar {
+        padding: 20px 20px;
+      }
+      .top-bar__wordmark {
+        display: none;
+      }
+      .stage {
+        padding: 10px 20px 28px;
+      }
+      .pulse {
+        --size: 118px;
+        margin-bottom: 28px;
+      }
+      .eyebrow {
+        margin-bottom: 18px;
+        font-size: 10.5px;
+      }
+      .subtitle {
+        margin-bottom: 28px;
+      }
+      .contact {
+        padding: 11px 16px;
+        font-size: 12px;
+      }
+      .footer {
+        padding: 12px 20px 22px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body {
+        animation: none;
+      }
+      .bg-glow--a,
+      .bg-glow--b,
+      .bg-glow--c,
+      .pulse__ring,
+      .pulse__core,
+      .pulse__core svg,
+      .eyebrow__dot {
+        animation: none;
+      }
+    }
+  </style>
 </head>
 
-<body data-i18n-page-title="page.landingTitle">
-  <div id="loading-screen">
-    <video id="intro-video" data-src="assets/videos/片头logo时间删减版.mp4" muted playsinline preload="none"></video>
-  </div>
-  <div id="main" class="hidden">
-
-    <!-- ─ 导航栏 ─ -->
-    <div data-layout-nav></div>
-
-    <!-- ─ 第一页：Hero ─ -->
-    <section id="hero">
-      <div class="hero-video-wrap">
-        <video id="hero-video" class="hero-media" data-src="assets/videos/新主视频-web540.mp4" muted loop playsinline preload="none"></video>
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-          <p class="hero-eyebrow">TK168 PREMIUM AUTOMOTIVE</p>
-          <h1 class="hero-title" data-i18n-html="hero.title">未来への道を探る</h1>
-          <p class="hero-sub" data-i18n-html="hero.subtitle">安心感と効率を両立しながら、<br>理想の一台に出会うための上質な導線を整えます。</p>
-          <a href="brand.html" class="hero-cta">
-            <span class="hero-cta-track" aria-hidden="true">
-              <svg viewBox="0 0 220 56" preserveAspectRatio="none" focusable="false" aria-hidden="true">
-                <path id="hero-cta-track-path" class="hero-cta-track-path" d="M28 1.5H192A26.5 26.5 0 0 1 218.5 28A26.5 26.5 0 0 1 192 54.5H28A26.5 26.5 0 0 1 1.5 28A26.5 26.5 0 0 1 28 1.5Z"></path>
-                <path class="hero-cta-track-line" d="M28 1.5H192A26.5 26.5 0 0 1 218.5 28A26.5 26.5 0 0 1 192 54.5H28A26.5 26.5 0 0 1 1.5 28A26.5 26.5 0 0 1 28 1.5Z"></path>
-              </svg>
-            </span>
-            <span class="hero-cta-label" data-i18n="hero.cta">ブランドを探索</span>
-            <span class="hero-cta-icon" aria-hidden="true">
-              <svg viewBox="0 0 20 20">
-                <path d="M7 4l6 6-6 6"></path>
-              </svg>
-            </span>
-          </a>
-        </div>
-      </div>
-    </section>
-    <!-- ─ 第二页：品牌展示 ─ -->
-    <section id="brands">
-      <div class="lisboa-shell" data-carousel>
-        <div class="lisboa-stage" data-stage></div>
-        <div class="lisboa-gesture-layer" data-gesture aria-hidden="true"></div>
-        <div class="lisboa-mobile-swipe-hint" data-swipe-hint aria-hidden="true">
-          <span class="lisboa-mobile-swipe-hint__arrow">‹</span>
-          <span class="lisboa-mobile-swipe-hint__text">左右滑动</span>
-          <span class="lisboa-mobile-swipe-hint__arrow">›</span>
-        </div>
-        <div class="lisboa-bottom">
-          <button class="lisboa-control lisboa-control--prev" type="button" data-nav="prev" aria-label="上一张">
-            <span aria-hidden="true">←</span>
-          </button>
-          <div class="lisboa-thumbs" data-thumbs aria-label="品牌缩略图列表"></div>
-          <button class="lisboa-control lisboa-control--next" type="button" data-nav="next" aria-label="下一张">
-            <span aria-hidden="true">→</span>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ─ 第三页：车辆搜索展示 ─ -->
-    <section id="vehicles" data-home-grid="paged">
-      <div class="section-header light vehicles-header" style="height: 0; margin: 0; padding: 0; overflow: hidden;">
-        <!-- v1.5 删除标题 -->
-      </div>
-
-      <!-- 统一搜索栏（静态版，与悬浮搜索条完全一致） -->
-      <div class="search-bar-wrap" id="static-search">
-        <div class="fb-desktop static-search-inner">
-          <img src="assets/images/logo_TK168.svg" alt="TK168" class="fb-logo" loading="lazy" decoding="async">
-          <div class="fb-filters">
-            <button class="fb-filter" data-ui-field="makerModel">メーカー車名 <svg viewBox="0 0 10 6" fill="none">
-                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-              </svg></button>
-            <button class="fb-filter" data-ui-field="price">価格 <svg viewBox="0 0 10 6" fill="none">
-                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-              </svg></button>
-            <button class="fb-filter" data-ui-field="type">ボディタイプ <svg viewBox="0 0 10 6" fill="none">
-                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-              </svg></button>
-          </div>
-          <div class="fb-input-wrap">
-            <input type="text" class="fb-input" placeholder="例: フェラーリ 458" data-i18n-placeholder="search.placeholder">
-            <button class="fb-cta" data-i18n="search.cta">検索する</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="vehicle-grid" id="vehicleGrid"></div>
-      <div class="vehicle-pagination" id="homeVehiclePagination">
-        <button class="vehicle-slider-btn vehicle-slider-btn--prev" id="homeVehiclePrev" aria-label="前のページ">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M15 18l-6-6 6-6"/>
-          </svg>
-        </button>
-        <div class="vehicle-slider-dots" id="homeVehicleDots" aria-label="ページ送り"></div>
-        <button class="vehicle-slider-btn vehicle-slider-btn--next" id="homeVehicleNext" aria-label="次のページ">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 18l6-6-6-6"/>
-          </svg>
-        </button>
-      </div>
-    </section>
-
-    <!-- ─ 第四页：企业新闻 ─ -->
-    <section id="news">
-      <div class="section-header light">
-        <h2 data-i18n="home.newsTitle">最新情報</h2>
-        <p data-i18n="home.newsSubtitle">マーケット情報 ・ 新規入庫 ・ ブランドトピックス</p>
-      </div>
-      <div class="news-grid">
-        <div class="news-card news-large">
-          <div class="news-img"><img src="assets/images/f3.webp" alt="新闻封面" loading="lazy" decoding="async" fetchpriority="low"></div>
-          <div class="news-body">
-            <span class="news-tag news-tag--teal">行业动态</span>
-            <h3>2026年最值得期待的超跑：性能进化与设计美学的再一次碰撞</h3>
-            <p>从法拉利到布加迪，2026 年度最受关注的超跑阵容正在成形。TK168 为您提前梳理每一台车型背后的设计语言与性能看点……</p>
-            <div class="news-meta">
-              <span>2026 · 04 · 08</span>
-              <a href="about.html?news=0#about-news" class="news-more" data-i18n="news.more">詳細を見る</a>
-            </div>
-          </div>
-        </div>
-        <div class="news-side">
-          <div class="news-card news-small">
-            <div class="news-img"><img src="assets/images/f4.webp" alt="新闻封面" loading="lazy" decoding="async" fetchpriority="low"></div>
-            <div class="news-body">
-              <span class="news-tag news-tag--orange">新车到库</span>
-              <h3>全新法拉利 SF90 Spider 正式入库</h3>
-              <div class="news-meta">
-                <span>2026 · 03 · 28</span>
-                <a href="about.html?news=1#about-news" class="news-more" data-i18n="news.more">詳細を見る</a>
-              </div>
-            </div>
-          </div>
-          <div class="news-card news-small">
-            <div class="news-img"><img src="assets/images/f7.webp" alt="新闻封面" loading="lazy" decoding="async" fetchpriority="low"></div>
-            <div class="news-body">
-              <span class="news-tag news-tag--green">公司活动</span>
-              <h3>TK168 × Monaco 慈善拍卖活动圆满落幕</h3>
-              <div class="news-meta">
-                <span>2026 · 03 · 12</span>
-                <a href="about.html?news=2#about-news" class="news-more" data-i18n="news.more">詳細を見る</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ─ 尾页：Footer ─ -->
-    <div data-layout-footer></div>
-
-  </div><!-- /main -->
-
-  <div id="floating-bar">
-    <!-- 桌面端 -->
-    <div class="fb-desktop">
-      <img src="assets/images/logo_TK168.svg" alt="TK168" class="fb-logo" loading="lazy" decoding="async">
-      <div class="fb-filters">
-        <button class="fb-filter" data-ui-field="makerModel">メーカー車名 <svg viewBox="0 0 10 6" fill="none">
-            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-          </svg></button>
-        <button class="fb-filter" data-ui-field="price">価格 <svg viewBox="0 0 10 6" fill="none">
-            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-          </svg></button>
-        <button class="fb-filter" data-ui-field="type">ボディタイプ <svg viewBox="0 0 10 6" fill="none">
-            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-          </svg></button>
-      </div>
-      <div class="fb-input-wrap">
-        <input type="text" class="fb-input" placeholder="例: フェラーリ 458" data-i18n-placeholder="search.placeholder">
-        <button class="fb-cta" data-i18n="search.cta">検索する</button>
-      </div>
-    </div>
-    <!-- 移动端 -->
-    <div class="fb-mobile">
-      <img src="assets/images/logo_TK168.svg" alt="TK168" class="fb-logo" loading="lazy" decoding="async">
-      <button class="fb-cta" data-i18n="search.cta">検索する</button>
-    </div>
+<body>
+  <div class="bg-layer" aria-hidden="true">
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow--a"></div>
+    <div class="bg-glow bg-glow--b"></div>
+    <div class="bg-glow bg-glow--c"></div>
   </div>
 
-  <script src="js/layout-shell.js?v=20260419a"></script>
-  <script src="js/brand-logo-inventory.js?v=20260417i"></script>
-  <script src="js/brand-library-data.js?v=20260417i"></script>
-  <script src="js/data.js?v=20260417q"></script>
-  <script src="js/i18n.js?v=20260418c"></script>
-  <script src="js/common-links.js?v=20260419a"></script>
-  <script src="js/page-chrome.js?v=20260417i"></script>
-  <script src="js/renderers.js?v=20260418b"></script>
-  <script src="js/search-ui.js?v=20260418e"></script>
-  <script src="js/script.js?v=20260419a"></script>
-  <script src="js/home-cube.js?v=20260418a"></script>
+  <header class="top-bar">
+    <div class="top-bar__brand">
+      <img src="assets/images/logo_TK168.svg" alt="TK168" class="top-bar__logo">
+      <span class="top-bar__wordmark">TK168 PREMIUM AUTOMOTIVE</span>
+    </div>
+    <div class="lang-switcher" role="tablist" aria-label="Language">
+      <button type="button" class="lang-option" data-lang="ja" role="tab" aria-selected="true">JA</button>
+      <button type="button" class="lang-option" data-lang="zh" role="tab" aria-selected="false">ZH</button>
+      <button type="button" class="lang-option" data-lang="en" role="tab" aria-selected="false">EN</button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <div class="card">
+      <div class="pulse" aria-hidden="true">
+        <span class="pulse__ring"></span>
+        <span class="pulse__ring pulse__ring--delayed"></span>
+        <span class="pulse__core">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M19.14 12.936a7.49 7.49 0 0 0 .05-.936 7.49 7.49 0 0 0-.05-.936l2.036-1.582a.5.5 0 0 0 .12-.64l-1.927-3.338a.5.5 0 0 0-.607-.22l-2.4.96a7.51 7.51 0 0 0-1.62-.94l-.36-2.546A.5.5 0 0 0 13.89 2h-3.78a.5.5 0 0 0-.494.42l-.36 2.546a7.51 7.51 0 0 0-1.62.94l-2.4-.96a.5.5 0 0 0-.607.22L2.7 8.504a.5.5 0 0 0 .12.64l2.037 1.582a7.49 7.49 0 0 0 0 1.872L2.82 14.18a.5.5 0 0 0-.12.64l1.927 3.338a.5.5 0 0 0 .607.22l2.4-.96c.5.384 1.043.7 1.62.94l.36 2.546a.5.5 0 0 0 .494.42h3.78a.5.5 0 0 0 .494-.42l.36-2.546a7.51 7.51 0 0 0 1.62-.94l2.4.96a.5.5 0 0 0 .607-.22l1.927-3.338a.5.5 0 0 0-.12-.64l-2.036-1.58ZM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5Z"></path>
+          </svg>
+        </span>
+      </div>
+
+      <span class="eyebrow" data-i18n="eyebrow">
+        <span class="eyebrow__dot"></span>
+        <span data-i18n-text="eyebrow">システム更新中</span>
+      </span>
+
+      <h1 class="title" data-i18n-text="title">ただいまメンテナンス中です</h1>
+      <p class="subtitle" data-i18n-html="subtitle">
+        より快適な体験をお届けするため、<br>
+        サイトを一時的に調整しています。<br>
+        まもなく再開いたしますので、少々お待ちください。
+      </p>
+
+      <div class="divider"></div>
+
+      <div class="contacts">
+        <a href="tel:+819012220168" class="contact">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.86 19.86 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.1 9.9a16 16 0 0 0 6 6l1.26-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+          </svg>
+          <span>+81 090-1222-0168</span>
+        </a>
+        <a href="mailto:AUTO@tk168.co.jp" class="contact">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          </svg>
+          <span>AUTO@tk168.co.jp</span>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <span data-i18n-text="copyright">© 2026 TK168. All rights reserved.</span>
+  </footer>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = 'tk168_lang';
+      const DEFAULT_LANG = 'ja';
+      const SUPPORTED = ['ja', 'zh', 'en'];
+
+      const dictionary = {
+        ja: {
+          eyebrow: 'システム更新中',
+          title: 'ただいまメンテナンス中です',
+          subtitle: 'より快適な体験をお届けするため、<br>サイトを一時的に調整しています。<br>まもなく再開いたしますので、少々お待ちください。',
+          copyright: '© 2026 TK168. All rights reserved.',
+          pageTitle: 'メンテナンス中 — TK168 Premium Automotive'
+        },
+        zh: {
+          eyebrow: '系统升级中',
+          title: '网站正在维护中',
+          subtitle: '为了带来更流畅的浏览体验，<br>我们正在对网站进行优化。<br>我们将尽快恢复，请稍候。',
+          copyright: '© 2026 TK168 保留所有权利。',
+          pageTitle: '维护中 — TK168 Premium Automotive'
+        },
+        en: {
+          eyebrow: 'System upgrade',
+          title: 'We\u2019ll be back shortly',
+          subtitle: 'We\u2019re making a few refinements<br>to bring you a smoother experience.<br>Thank you for your patience.',
+          copyright: '\u00A9 2026 TK168. All rights reserved.',
+          pageTitle: 'Under maintenance — TK168 Premium Automotive'
+        }
+      };
+
+      function readStoredLang() {
+        try {
+          const saved = window.localStorage?.getItem(STORAGE_KEY);
+          if (saved && SUPPORTED.includes(saved)) return saved;
+        } catch (_) { /* ignore */ }
+        const browser = (navigator.language || '').toLowerCase();
+        if (browser.startsWith('zh')) return 'zh';
+        if (browser.startsWith('en')) return 'en';
+        return DEFAULT_LANG;
+      }
+
+      function writeStoredLang(lang) {
+        try { window.localStorage?.setItem(STORAGE_KEY, lang); } catch (_) { /* ignore */ }
+      }
+
+      function applyLanguage(lang) {
+        const dict = dictionary[lang] || dictionary[DEFAULT_LANG];
+        document.documentElement.setAttribute('lang', lang === 'zh' ? 'zh-CN' : lang);
+        document.title = dict.pageTitle;
+
+        document.querySelectorAll('[data-i18n-text]').forEach((el) => {
+          const key = el.getAttribute('data-i18n-text');
+          if (dict[key]) el.textContent = dict[key];
+        });
+        document.querySelectorAll('[data-i18n-html]').forEach((el) => {
+          const key = el.getAttribute('data-i18n-html');
+          if (dict[key]) el.innerHTML = dict[key];
+        });
+
+        document.querySelectorAll('.lang-option').forEach((btn) => {
+          const isActive = btn.getAttribute('data-lang') === lang;
+          btn.classList.toggle('is-active', isActive);
+          btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+      }
+
+      const initialLang = readStoredLang();
+      applyLanguage(initialLang);
+
+      document.querySelectorAll('.lang-option').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const lang = btn.getAttribute('data-lang');
+          if (!SUPPORTED.includes(lang)) return;
+          writeStoredLang(lang);
+          applyLanguage(lang);
+        });
+      });
+
+      /* Dev bypass: 访问 index.html?preview=1 可查看原站点备份 (home.html) */
+      try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('preview') === '1') {
+          window.location.replace('home.html');
+        }
+      } catch (_) { /* ignore */ }
+    })();
+  </script>
 </body>
 
 </html>
