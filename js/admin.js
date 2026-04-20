@@ -1,21 +1,173 @@
 // TK168 admin SPA — talks to /api/* endpoints served by the worker.
 // No framework; vanilla DOM + fetch.  All endpoints use cookie-based auth
 // (the server sets an HttpOnly `tk168_admin` cookie on login).
+//
+// The admin exposes two independent inventories:
+//   * "vehicles"  -> /api/admin/vehicles  (homepage / detail page)
+//   * "rentals"   -> /api/admin/rentals   (rental.html fleet)
+// They share most of the editor shell but expose different field sets.
 
 const API_BASE = "/api";
 const ROOT = document.getElementById("adminRoot");
 
+// Resource descriptors drive the list + editor UIs so we keep a single
+// code path for the two inventories.
+const RESOURCES = {
+  vehicles: {
+    key: "vehicles",
+    label: "首页车辆",
+    apiList: "/admin/vehicles",
+    apiItem: (id) => `/admin/vehicles/${encodeURIComponent(id)}`,
+    apiImages: (id) => `/admin/vehicles/${encodeURIComponent(id)}/images`,
+    apiImage: (id, imgId) =>
+      `/admin/vehicles/${encodeURIComponent(id)}/images/${imgId}`,
+    listKey: "vehicles",
+    itemKey: "vehicle",
+    duplicateCode: "vehicle_id_taken",
+    headerLabel: "首页车辆管理",
+    emptyLabel: "暂无车辆",
+    priceColumn: { key: "totalPrice", label: "总价" },
+    fields: [
+      ["id", "车辆 ID（英文，唯一）"],
+      ["brandKey", "品牌 Key（如 lamborghini）"],
+      ["name", "车型名称（中文）"],
+      ["year", "年份"],
+      ["type", "车型分类（如 高性能SUV）"],
+      ["icon", "图标文件名（如 b1.svg）"],
+      ["mileage", "里程（如 3,200）"],
+      ["engine", "发动机（如 4.0L V8）"],
+      ["fuel", "燃料"],
+      ["trans", "变速箱"],
+      ["totalPrice", "支付总额（如 ¥ 1,980,000）"],
+      ["basePrice", "车辆本体价格"],
+      ["bodyStyle", "车身类型"],
+      ["drive", "驱动方式"],
+      ["bodyColor", "车身颜色"],
+      ["interiorColor", "内饰颜色"],
+      ["seats", "座位（如 5 座）"],
+      ["serviceRecord", "保养记录"],
+      ["origin", "产地（如 意大利进口）"],
+    ],
+    presets: [
+      ["condNonSmoking", "禁烟车"],
+      ["condAuthorizedImport", "正规进口"],
+      ["condDealerWarranty", "店铺质保"],
+      ["condEcoTaxEligible", "节能减税"],
+      ["condOneOwner", "一手车主"],
+      ["condRentalUp", "租赁退役"],
+      ["listingRepairHistory", "修复历"],
+      ["listingVehicleInspection", "车检"],
+      ["listingLegalMaintenance", "法定整备"],
+      ["listingPeriodicBook", "点检记录簿"],
+      ["highlightSteering", "方向盘"],
+      ["highlightChassisTail", "车台末尾号"],
+    ],
+    emptyDraft: () => ({
+      id: "", brandKey: "", name: "", year: "", type: "", icon: "b1.svg",
+      mileage: "", engine: "", fuel: "汽油", trans: "自动挡",
+      totalPrice: "", basePrice: "",
+      bodyStyle: "", drive: "", bodyColor: "", interiorColor: "", seats: "",
+      serviceRecord: "完整在册", origin: "",
+      overviewZh: [""], overviewJa: [""], overviewEn: null,
+      benefits: null, features: null,
+      condNonSmoking: { zh: "", ja: "" },
+      condAuthorizedImport: { zh: "", ja: "" },
+      condDealerWarranty: { zh: "", ja: "" },
+      condEcoTaxEligible: { zh: "", ja: "" },
+      condOneOwner: { zh: "", ja: "" },
+      condRentalUp: { zh: "", ja: "" },
+      listingRepairHistory: { zh: "", ja: "" },
+      listingVehicleInspection: { zh: "", ja: "" },
+      listingLegalMaintenance: { zh: "", ja: "" },
+      listingPeriodicBook: { zh: "", ja: "" },
+      highlightSteering: { zh: "", ja: "" },
+      highlightChassisTail: { zh: "", ja: "" },
+      displayOrder: 0, isPublished: true, images: [],
+    }),
+  },
+
+  rentals: {
+    key: "rentals",
+    label: "レンタル车辆",
+    apiList: "/admin/rentals",
+    apiItem: (id) => `/admin/rentals/${encodeURIComponent(id)}`,
+    apiImages: (id) => `/admin/rentals/${encodeURIComponent(id)}/images`,
+    apiImage: (id, imgId) =>
+      `/admin/rentals/${encodeURIComponent(id)}/images/${imgId}`,
+    listKey: "rentals",
+    itemKey: "rental",
+    duplicateCode: "rental_id_taken",
+    headerLabel: "レンタル车辆管理",
+    emptyLabel: "暂无租赁车辆",
+    priceColumn: { key: "dailyRate", label: "日租金(¥)" },
+    extraColumns: [
+      { key: "rentalStatus", label: "状态", render: (v) => statusLabel(v) },
+    ],
+    fields: [
+      ["id", "租赁车 ID（英文，唯一）"],
+      ["brandKey", "品牌 Key（如 lamborghini）"],
+      ["name", "车型名称（中文）"],
+      ["year", "年份"],
+      ["type", "车型分类"],
+      ["icon", "图标文件名（如 b1.svg）"],
+      ["mileage", "里程"],
+      ["engine", "发动机"],
+      ["fuel", "燃料"],
+      ["trans", "变速箱"],
+      ["bodyStyle", "车身类型"],
+      ["drive", "驱动方式"],
+      ["bodyColor", "车身颜色"],
+      ["interiorColor", "内饰颜色"],
+      ["seats", "座位"],
+      ["origin", "产地"],
+      ["dailyRate", "日租金（JPY / 整数）", "number"],
+      ["deposit", "押金（JPY / 整数）", "number"],
+      ["minDays", "最短租期（天）", "number"],
+      ["rentalStatus", "档期状态 (available / reserved / rented / unavailable)"],
+    ],
+    presets: [],
+    emptyDraft: () => ({
+      id: "", brandKey: "", name: "", year: "", type: "", icon: "b1.svg",
+      mileage: "", engine: "", fuel: "汽油", trans: "自动挡",
+      bodyStyle: "", drive: "", bodyColor: "", interiorColor: "",
+      seats: "2 座", origin: "",
+      dailyRate: 0, deposit: 0, minDays: 1, rentalStatus: "available",
+      overviewZh: [""], overviewJa: [""], overviewEn: null,
+      benefits: null, features: null,
+      displayOrder: 0, isPublished: true, images: [],
+    }),
+  },
+};
+
+function statusLabel(status) {
+  return (
+    { available: "可租", reserved: "已预订", rented: "出租中", unavailable: "不可租" }[
+      status
+    ] || status || "—"
+  );
+}
+
+// -------------------- App state --------------------
+
 const state = {
   user: null,
-  view: "login",          // 'login' | 'vehicles' | 'editor' | 'users'
-  vehicles: [],
+  // "login" | "list" | "editor" | "users"
+  view: "login",
+  // "vehicles" | "rentals" — which inventory is currently active
+  resource: "vehicles",
+  // per-resource caches, keyed by resource name
+  items: { vehicles: [], rentals: [] },
   users: [],
-  editingId: null,        // vehicle id when editing
-  editingDraft: null,     // working copy of the vehicle
+  editingId: null,
+  editingDraft: null,
   filter: "",
   loading: false,
   toast: null,
 };
+
+function currentResource() {
+  return RESOURCES[state.resource];
+}
 
 // -------------------- API helpers --------------------
 
@@ -71,8 +223,8 @@ async function boot() {
   try {
     const res = await api("/auth/me");
     state.user = res.user;
-    state.view = "vehicles";
-    await refreshVehicles();
+    state.view = "list";
+    await refreshItems();
   } catch (err) {
     state.user = null;
     state.view = "login";
@@ -82,14 +234,15 @@ async function boot() {
 
 // -------------------- Data loading --------------------
 
-async function refreshVehicles() {
+async function refreshItems() {
+  const r = currentResource();
   state.loading = true;
   render();
   try {
-    const res = await api("/admin/vehicles");
-    state.vehicles = res.vehicles;
+    const res = await api(r.apiList);
+    state.items[r.key] = res[r.listKey] || [];
   } catch (err) {
-    showToast(`载入车辆失败：${err.message}`, "error");
+    showToast(`载入${r.label}失败：${err.message}`, "error");
   } finally {
     state.loading = false;
     render();
@@ -139,8 +292,9 @@ function renderLogin() {
     try {
       const res = await api("/auth/login", { method: "POST", body: { username, password } });
       state.user = res.user;
-      state.view = "vehicles";
-      await refreshVehicles();
+      state.view = "list";
+      state.resource = "vehicles";
+      await refreshItems();
       render();
     } catch (err) {
       msg.innerHTML = `<div class="admin-message is-error">${
@@ -153,14 +307,31 @@ function renderLogin() {
 // -------------------- Sidebar --------------------
 
 function navHtml() {
+  const onList = state.view === "list" || state.view === "editor";
   const items = [
-    { id: "vehicles", label: "车辆管理" },
-    { id: "users",    label: "管理员" },
+    {
+      id: "nav-vehicles",
+      label: "🏠 " + RESOURCES.vehicles.label,
+      active: onList && state.resource === "vehicles",
+      onClick: "vehicles-list",
+    },
+    {
+      id: "nav-rentals",
+      label: "🚗 " + RESOURCES.rentals.label,
+      active: onList && state.resource === "rentals",
+      onClick: "rentals-list",
+    },
+    {
+      id: "nav-users",
+      label: "👤 管理员",
+      active: state.view === "users",
+      onClick: "users",
+    },
   ];
   return items
     .map(
       (item) => `
-      <button class="admin-nav-item ${state.view === item.id || (item.id === "vehicles" && state.view === "editor") ? "is-active" : ""}" data-nav="${item.id}">
+      <button class="admin-nav-item ${item.active ? "is-active" : ""}" data-nav="${item.onClick}">
         ${item.label}
       </button>`,
     )
@@ -188,10 +359,21 @@ function bindShell() {
   document.querySelectorAll("[data-nav]").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const target = btn.dataset.nav;
-      state.view = target;
       state.editingId = null;
-      if (target === "users") await refreshUsers();
-      if (target === "vehicles") await refreshVehicles();
+      state.editingDraft = null;
+      state.filter = "";
+      if (target === "vehicles-list") {
+        state.resource = "vehicles";
+        state.view = "list";
+        await refreshItems();
+      } else if (target === "rentals-list") {
+        state.resource = "rentals";
+        state.view = "list";
+        await refreshItems();
+      } else if (target === "users") {
+        state.view = "users";
+        await refreshUsers();
+      }
       render();
     });
   });
@@ -205,33 +387,41 @@ function bindShell() {
   });
 }
 
-// -------------------- Vehicle list view --------------------
+// -------------------- List view --------------------
 
-function filterVehicles() {
+function filteredItems() {
+  const items = state.items[state.resource] || [];
   const q = state.filter.trim().toLowerCase();
-  if (!q) return state.vehicles;
-  return state.vehicles.filter((v) =>
+  if (!q) return items;
+  return items.filter((v) =>
     [v.id, v.name, v.brandKey, v.type, v.year].some((field) =>
       String(field || "").toLowerCase().includes(q),
     ),
   );
 }
 
-function renderVehicleList() {
-  const rows = filterVehicles();
+function renderList() {
+  const r = currentResource();
+  const rows = filteredItems();
+  const items = state.items[r.key] || [];
+
+  const extraHeadCells = (r.extraColumns || [])
+    .map((c) => `<th>${escapeHtml(c.label)}</th>`)
+    .join("");
+
   const inner = `
     <div class="admin-page-head">
-      <h1>车辆管理 <span style="color:var(--admin-text-dim);font-size:14px;font-weight:400;">（${state.vehicles.length} 台）</span></h1>
+      <h1>${escapeHtml(r.headerLabel)} <span style="color:var(--admin-text-dim);font-size:14px;font-weight:400;">（${items.length} 台）</span></h1>
       <div class="admin-toolbar">
-        <input id="vehicleSearch" class="admin-input admin-search" type="search" placeholder="搜索 ID / 名称 / 品牌" value="${escapeHtml(state.filter)}">
-        <button class="admin-btn admin-btn-primary" id="newVehicleBtn">+ 新增车辆</button>
+        <input id="itemSearch" class="admin-input admin-search" type="search" placeholder="搜索 ID / 名称 / 品牌" value="${escapeHtml(state.filter)}">
+        <button class="admin-btn admin-btn-primary" id="newItemBtn">+ 新增${r.label}</button>
       </div>
     </div>
     <div class="admin-table-wrap">
       ${state.loading
         ? '<div class="admin-loading">加载中…</div>'
         : rows.length === 0
-        ? '<div class="admin-empty">未找到匹配的车辆。</div>'
+        ? `<div class="admin-empty">${escapeHtml(r.emptyLabel)}</div>`
         : `<table class="admin-table">
             <thead>
               <tr>
@@ -239,14 +429,15 @@ function renderVehicleList() {
                 <th>名称 / ID</th>
                 <th>品牌</th>
                 <th>年份</th>
-                <th>总价</th>
+                <th>${escapeHtml(r.priceColumn.label)}</th>
+                ${extraHeadCells}
                 <th>图片</th>
                 <th>状态</th>
                 <th style="text-align:right;">操作</th>
               </tr>
             </thead>
             <tbody>
-              ${rows.map(vehicleRow).join("")}
+              ${rows.map((row) => itemRow(row, r)).join("")}
             </tbody>
           </table>`}
     </div>
@@ -254,17 +445,19 @@ function renderVehicleList() {
   ROOT.innerHTML = appShell(inner);
   bindShell();
 
-  const searchInput = document.getElementById("vehicleSearch");
+  const searchInput = document.getElementById("itemSearch");
   searchInput?.addEventListener("input", (event) => {
     state.filter = event.target.value;
     const tbody = document.querySelector(".admin-table tbody");
-    if (tbody) tbody.innerHTML = filterVehicles().map(vehicleRow).join("");
+    if (tbody) tbody.innerHTML = filteredItems().map((row) => itemRow(row, r)).join("");
     bindRowActions();
   });
 
-  document.getElementById("newVehicleBtn")?.addEventListener("click", () => {
+  document.getElementById("newItemBtn")?.addEventListener("click", () => {
     state.editingId = "__new__";
-    state.editingDraft = emptyVehicle();
+    const draft = r.emptyDraft();
+    draft.displayOrder = (state.items[r.key] || []).length;
+    state.editingDraft = draft;
     state.view = "editor";
     render();
   });
@@ -272,52 +465,11 @@ function renderVehicleList() {
   bindRowActions();
 }
 
-function bindRowActions() {
-  document.querySelectorAll("[data-edit]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.edit;
-      const vehicle = state.vehicles.find((v) => v.id === id);
-      if (!vehicle) return;
-      state.editingId = id;
-      state.editingDraft = { ...vehicle, images: [...(vehicle.images || [])] };
-      state.view = "editor";
-      render();
-    });
-  });
-  document.querySelectorAll("[data-delete]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const id = btn.dataset.delete;
-      if (!confirm(`确认删除车辆 ${id}？将同时删除其所有图片。`)) return;
-      try {
-        await api(`/admin/vehicles/${encodeURIComponent(id)}`, { method: "DELETE" });
-        showToast("已删除");
-        await refreshVehicles();
-      } catch (err) {
-        showToast(`删除失败：${err.message}`, "error");
-      }
-    });
-  });
-  document.querySelectorAll("[data-toggle-pub]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const id = btn.dataset.togglePub;
-      const v = state.vehicles.find((x) => x.id === id);
-      if (!v) return;
-      try {
-        await api(`/admin/vehicles/${encodeURIComponent(id)}`, {
-          method: "PATCH",
-          body: { isPublished: !v.isPublished },
-        });
-        showToast(v.isPublished ? "已下架" : "已发布");
-        await refreshVehicles();
-      } catch (err) {
-        showToast(`切换失败：${err.message}`, "error");
-      }
-    });
-  });
-}
-
-function vehicleRow(v) {
+function itemRow(v, r) {
   const cover = v.images?.[0]?.url || "";
+  const extraCells = (r.extraColumns || [])
+    .map((c) => `<td>${escapeHtml(c.render ? c.render(v[c.key]) : v[c.key] ?? "")}</td>`)
+    .join("");
   return `
     <tr>
       <td>${cover ? `<img class="admin-thumb" src="${escapeAttr(cover)}" alt="">` : '<div class="admin-thumb"></div>'}</td>
@@ -327,7 +479,8 @@ function vehicleRow(v) {
       </td>
       <td>${escapeHtml(v.brandKey || "")}</td>
       <td>${escapeHtml(v.year || "")}</td>
-      <td>${escapeHtml(v.totalPrice || "")}</td>
+      <td>${escapeHtml(v[r.priceColumn.key] ?? "")}</td>
+      ${extraCells}
       <td>${(v.images || []).length}</td>
       <td>
         <button class="admin-badge ${v.isPublished ? "is-on" : "is-off"}" data-toggle-pub="${escapeAttr(v.id)}" title="点击切换发布状态">
@@ -344,119 +497,97 @@ function vehicleRow(v) {
   `;
 }
 
-function emptyVehicle() {
-  return {
-    id: "",
-    brandKey: "",
-    name: "",
-    year: "",
-    type: "",
-    icon: "b1.svg",
-    mileage: "",
-    engine: "",
-    fuel: "汽油",
-    trans: "自动挡",
-    totalPrice: "",
-    basePrice: "",
-    bodyStyle: "",
-    drive: "",
-    bodyColor: "",
-    interiorColor: "",
-    seats: "",
-    serviceRecord: "完整在册",
-    origin: "",
-    overviewZh: [""],
-    overviewJa: [""],
-    overviewEn: null,
-    benefits: null,
-    features: null,
-    condNonSmoking: { zh: "", ja: "" },
-    condAuthorizedImport: { zh: "", ja: "" },
-    condDealerWarranty: { zh: "", ja: "" },
-    condEcoTaxEligible: { zh: "", ja: "" },
-    condOneOwner: { zh: "", ja: "" },
-    condRentalUp: { zh: "", ja: "" },
-    listingRepairHistory: { zh: "", ja: "" },
-    listingVehicleInspection: { zh: "", ja: "" },
-    listingLegalMaintenance: { zh: "", ja: "" },
-    listingPeriodicBook: { zh: "", ja: "" },
-    highlightSteering: { zh: "", ja: "" },
-    highlightChassisTail: { zh: "", ja: "" },
-    displayOrder: state.vehicles.length,
-    isPublished: true,
-    images: [],
-  };
+function bindRowActions() {
+  const r = currentResource();
+  document.querySelectorAll("[data-edit]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.edit;
+      const item = (state.items[r.key] || []).find((v) => v.id === id);
+      if (!item) return;
+      state.editingId = id;
+      state.editingDraft = { ...item, images: [...(item.images || [])] };
+      state.view = "editor";
+      render();
+    });
+  });
+  document.querySelectorAll("[data-delete]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.delete;
+      if (!confirm(`确认删除 ${id}？将同时删除其所有图片。`)) return;
+      try {
+        await api(r.apiItem(id), { method: "DELETE" });
+        showToast("已删除");
+        await refreshItems();
+      } catch (err) {
+        showToast(`删除失败：${err.message}`, "error");
+      }
+    });
+  });
+  document.querySelectorAll("[data-toggle-pub]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.togglePub;
+      const v = (state.items[r.key] || []).find((x) => x.id === id);
+      if (!v) return;
+      try {
+        await api(r.apiItem(id), {
+          method: "PATCH",
+          body: { isPublished: !v.isPublished },
+        });
+        showToast(v.isPublished ? "已下架" : "已发布");
+        await refreshItems();
+      } catch (err) {
+        showToast(`切换失败：${err.message}`, "error");
+      }
+    });
+  });
 }
 
 // -------------------- Editor --------------------
 
-const FIELD_ROWS = [
-  // [key, label, kind?]
-  ["id", "车辆 ID（英文，唯一）"],
-  ["brandKey", "品牌 Key（如 lamborghini）"],
-  ["name", "车型名称（中文）"],
-  ["year", "年份"],
-  ["type", "车型分类（如 高性能SUV）"],
-  ["icon", "图标文件名（如 b1.svg）"],
-  ["mileage", "里程（如 3,200）"],
-  ["engine", "发动机（如 4.0L V8）"],
-  ["fuel", "燃料"],
-  ["trans", "变速箱"],
-  ["totalPrice", "支付总额（如 ¥ 1,980,000）"],
-  ["basePrice", "车辆本体价格"],
-  ["bodyStyle", "车身类型"],
-  ["drive", "驱动方式"],
-  ["bodyColor", "车身颜色"],
-  ["interiorColor", "内饰颜色"],
-  ["seats", "座位（如 5 座）"],
-  ["serviceRecord", "保养记录"],
-  ["origin", "产地（如 意大利进口）"],
-];
-
-const PRESET_ROWS = [
-  ["condNonSmoking", "禁烟车"],
-  ["condAuthorizedImport", "正规进口"],
-  ["condDealerWarranty", "店铺质保"],
-  ["condEcoTaxEligible", "节能减税"],
-  ["condOneOwner", "一手车主"],
-  ["condRentalUp", "租赁退役"],
-  ["listingRepairHistory", "修复历"],
-  ["listingVehicleInspection", "车检"],
-  ["listingLegalMaintenance", "法定整备"],
-  ["listingPeriodicBook", "点检记录簿"],
-  ["highlightSteering", "方向盘"],
-  ["highlightChassisTail", "车台末尾号"],
-];
-
 function renderEditor() {
+  const r = currentResource();
   const draft = state.editingDraft;
   const isNew = state.editingId === "__new__";
 
-  const mainFields = FIELD_ROWS.map(([key, label]) => `
-    <div class="admin-field">
-      <label>${label}</label>
-      <input class="admin-input" data-draft="${key}" value="${escapeAttr(draft[key] ?? "")}" ${
-        key === "id" && !isNew ? "readonly" : ""
-      }>
-    </div>`).join("");
+  const mainFields = r.fields.map(([key, label, inputType]) => {
+    const value = draft[key];
+    const isNumber = inputType === "number";
+    return `
+      <div class="admin-field">
+        <label>${label}</label>
+        <input class="admin-input" type="${isNumber ? "number" : "text"}"
+               data-draft="${key}"
+               value="${escapeAttr(value ?? (isNumber ? 0 : ""))}"
+               ${key === "id" && !isNew ? "readonly" : ""}>
+      </div>`;
+  }).join("");
 
   const overviewZh = Array.isArray(draft.overviewZh) ? draft.overviewZh.join("\n\n") : (draft.overviewZh || "");
   const overviewJa = Array.isArray(draft.overviewJa) ? draft.overviewJa.join("\n\n") : (draft.overviewJa || "");
   const overviewEn = Array.isArray(draft.overviewEn) ? draft.overviewEn.join("\n\n") : (draft.overviewEn || "");
 
-  const presetFields = PRESET_ROWS.map(([key, label]) => {
-    const v = draft[key] || {};
-    return `
-      <div class="admin-grid" style="margin-bottom:6px;">
-        <div class="admin-field admin-grid-col-1" style="grid-column:span 2;margin-bottom:-4px;"><label style="text-transform:none;font-weight:600;color:var(--admin-text);font-size:13px;letter-spacing:0;">${label}</label></div>
-        <div class="admin-field"><label>中文</label><input class="admin-input" data-preset="${key}.zh" value="${escapeAttr(v.zh ?? "")}"></div>
-        <div class="admin-field"><label>日文</label><input class="admin-input" data-preset="${key}.ja" value="${escapeAttr(v.ja ?? "")}"></div>
-      </div>`;
-  }).join("");
+  const presetFields = r.presets
+    .map(([key, label]) => {
+      const v = draft[key] || {};
+      return `
+        <div class="admin-grid" style="margin-bottom:6px;">
+          <div class="admin-field admin-grid-col-1" style="grid-column:span 2;margin-bottom:-4px;"><label style="text-transform:none;font-weight:600;color:var(--admin-text);font-size:13px;letter-spacing:0;">${label}</label></div>
+          <div class="admin-field"><label>中文</label><input class="admin-input" data-preset="${key}.zh" value="${escapeAttr(v.zh ?? "")}"></div>
+          <div class="admin-field"><label>日文</label><input class="admin-input" data-preset="${key}.ja" value="${escapeAttr(v.ja ?? "")}"></div>
+        </div>`;
+    })
+    .join("");
+
+  const presetSection = r.presets.length
+    ? `<section class="admin-card">
+         <h2>参数 / 规格</h2>
+         ${presetFields}
+       </section>`
+    : "";
 
   const inner = `
     <div class="admin-page-head">
-      <h1>${isNew ? "新增车辆" : `编辑：${escapeHtml(draft.name || draft.id)}`}</h1>
+      <h1>${isNew ? `新增${r.label}` : `编辑：${escapeHtml(draft.name || draft.id)}`}</h1>
       <div class="admin-toolbar">
         <button class="admin-btn" id="cancelEdit">返回列表</button>
         <button class="admin-btn admin-btn-primary" id="saveEdit">保存</button>
@@ -496,10 +627,7 @@ function renderEditor() {
           </div>
         </section>
 
-        <section class="admin-card">
-          <h2>参数 / 规格</h2>
-          ${presetFields}
-        </section>
+        ${presetSection}
       </div>
 
       <div>
@@ -513,7 +641,7 @@ function renderEditor() {
             <label for="imageUpload">选择图片上传（可多选）</label>
             <div style="margin-top:8px;color:var(--admin-text-dim);font-size:12px;">支持 JPG / PNG / WEBP / AVIF，单张建议 5MB 以内</div>
           </div>
-          ${isNew ? '<div class="admin-message" style="margin-top:12px;color:var(--admin-text-dim);">请先保存车辆，再上传图片。</div>' : ""}
+          ${isNew ? '<div class="admin-message" style="margin-top:12px;color:var(--admin-text-dim);">请先保存，再上传图片。</div>' : ""}
         </section>
       </div>
     </div>
@@ -535,8 +663,9 @@ function imageTile(img) {
 }
 
 function bindEditor() {
+  const r = currentResource();
   document.getElementById("cancelEdit").addEventListener("click", () => {
-    state.view = "vehicles";
+    state.view = "list";
     state.editingId = null;
     state.editingDraft = null;
     render();
@@ -574,26 +703,22 @@ function bindEditor() {
     });
   });
 
-  document.getElementById("saveEdit").addEventListener("click", saveVehicle);
+  document.getElementById("saveEdit").addEventListener("click", saveItem);
 
   document.getElementById("imageUpload")?.addEventListener("change", async (event) => {
     const files = Array.from(event.target.files || []);
     event.target.value = "";
     if (files.length === 0) return;
     if (state.editingId === "__new__") {
-      showToast("请先保存车辆再上传图片", "error");
+      showToast("请先保存再上传图片", "error");
       return;
     }
     try {
       const form = new FormData();
       for (const file of files) form.append("file", file);
-      const res = await api(
-        `/admin/vehicles/${encodeURIComponent(state.editingId)}/images`,
-        { method: "POST", body: form },
-      );
+      const res = await api(r.apiImages(state.editingId), { method: "POST", body: form });
       state.editingDraft.images = [...(state.editingDraft.images || []), ...res.images];
-      // also update the cached vehicle
-      const cached = state.vehicles.find((v) => v.id === state.editingId);
+      const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
       if (cached) cached.images = state.editingDraft.images;
       renderEditor();
       showToast(`已上传 ${res.images.length} 张图片`);
@@ -607,14 +732,10 @@ function bindEditor() {
       const imageId = Number(btn.dataset.removeImage);
       if (!confirm("删除这张图片？")) return;
       try {
-        await api(
-          `/admin/vehicles/${encodeURIComponent(state.editingId)}/images/${imageId}`,
-          { method: "DELETE" },
-        );
+        await api(r.apiImage(state.editingId, imageId), { method: "DELETE" });
         state.editingDraft.images = state.editingDraft.images.filter((i) => i.id !== imageId);
-        // re-compute primary flag
         state.editingDraft.images.forEach((i, idx) => (i.isPrimary = idx === 0));
-        const cached = state.vehicles.find((v) => v.id === state.editingId);
+        const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
         if (cached) cached.images = state.editingDraft.images;
         renderEditor();
         showToast("已删除图片");
@@ -625,7 +746,8 @@ function bindEditor() {
   });
 }
 
-async function saveVehicle() {
+async function saveItem() {
+  const r = currentResource();
   const draft = state.editingDraft;
   if (!draft.id || !draft.brandKey || !draft.name) {
     showToast("ID / 品牌 / 名称 为必填项", "error");
@@ -634,7 +756,7 @@ async function saveVehicle() {
 
   // Strip empty preset objects so they persist as NULL instead of {zh:"",ja:""}
   const payload = { ...draft };
-  PRESET_ROWS.forEach(([key]) => {
+  r.presets.forEach(([key]) => {
     const v = payload[key];
     if (v && typeof v === "object" && !v.zh && !v.ja && !v.en) payload[key] = null;
   });
@@ -642,22 +764,27 @@ async function saveVehicle() {
 
   try {
     if (state.editingId === "__new__") {
-      const res = await api("/admin/vehicles", { method: "POST", body: payload });
-      state.editingId = res.vehicle.id;
-      state.editingDraft = { ...res.vehicle, images: res.vehicle.images || [] };
-      showToast("车辆已创建。现在可以上传图片。");
+      const res = await api(r.apiList, { method: "POST", body: payload });
+      const created = res[r.itemKey];
+      state.editingId = created.id;
+      state.editingDraft = { ...created, images: created.images || [] };
+      showToast("已创建。现在可以上传图片。");
     } else {
-      const res = await api(`/admin/vehicles/${encodeURIComponent(state.editingId)}`, {
+      const res = await api(r.apiItem(state.editingId), {
         method: "PUT",
         body: payload,
       });
-      state.editingDraft = { ...res.vehicle, images: res.vehicle.images || state.editingDraft.images };
+      const updated = res[r.itemKey];
+      state.editingDraft = {
+        ...updated,
+        images: updated.images || state.editingDraft.images,
+      };
       showToast("已保存");
     }
-    await refreshVehicles();
+    await refreshItems();
     renderEditor();
   } catch (err) {
-    if (err.code === "vehicle_id_taken") {
+    if (err.code === r.duplicateCode) {
       showToast("该 ID 已存在，请换一个。", "error");
     } else {
       showToast(`保存失败：${err.message}`, "error");
@@ -780,7 +907,7 @@ function render() {
   if (!state.user) return renderLogin();
   if (state.view === "editor" && state.editingDraft) return renderEditor();
   if (state.view === "users") return renderUsers();
-  return renderVehicleList();
+  return renderList();
 }
 
 // -------------------- Utils --------------------

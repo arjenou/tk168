@@ -895,19 +895,26 @@ window.TK168_DATA = (() => {
     return { ...base, ...pickDefined(override) };
   }
 
+  // When the backend has published vehicles we treat it as the source of
+  // truth: the homepage / brand pages show exactly what the admin manages
+  // under the 首页车辆 板块, and the legacy brand-library-data.js is kept
+  // only as a catalog of brand logos / filters (no synthesized cards).
+  //
+  // If the API is unreachable we fall back to the old behaviour so file://
+  // previews and offline dev don't end up with an empty site.
   let seedVehicles;
+  let includeBrandLibraryCards = false;
   if (apiVehicles && apiVehicles.length) {
     const baseById = new Map(baseVehicles.map((v) => [v.id, v]));
-    const merged = apiVehicles.map((apiV) => mergeVehicleData(baseById.get(apiV.id), apiV));
-    const mergedIds = new Set(merged.map((v) => v.id));
-    // Preserve static-only vehicles that the admin hasn't created yet so
-    // pages that hard-code specific IDs keep working during the transition.
-    const extras = baseVehicles.filter((v) => !mergedIds.has(v.id));
-    seedVehicles = [...merged, ...extras];
+    seedVehicles = apiVehicles.map((apiV) => mergeVehicleData(baseById.get(apiV.id), apiV));
   } else {
     seedVehicles = baseVehicles;
+    includeBrandLibraryCards = true;
   }
-  const vehicles = appendBrandLibraryVehicles(seedVehicles, brandLibraryItems)
+  const rawVehicleList = includeBrandLibraryCards
+    ? appendBrandLibraryVehicles(seedVehicles, brandLibraryItems)
+    : seedVehicles;
+  const vehicles = rawVehicleList
     .map((vehicle) => {
       const canonicalBrandKey = resolveCanonicalBrandKey(vehicle.brandKey);
       return canonicalBrandKey
@@ -1746,6 +1753,21 @@ window.TK168_DATA = (() => {
     'lamborghini-gallardo': { rentable: true, rentalStatus: 'available', dailyRate: 4300, deposit: 90000, minDays: 2 }
   };
 
+  // Rentals live in a separate API-backed inventory
+  // (`window.TK168_API_RENTALS` populated by js/api-hydrate.js).  We keep
+  // the legacy `rentalProfiles` object as a last-resort fallback so the
+  // site still renders if the API is unreachable.
+  function getApiRentals() {
+    const list = window.TK168_API_RENTALS;
+    return Array.isArray(list) ? list : null;
+  }
+
+  function getApiRentalById(id) {
+    const list = getApiRentals();
+    if (!list || !id) return null;
+    return list.find((r) => r && r.id === id) || null;
+  }
+
   function getVehicleRentalProfile(vehicleOrId) {
     const vehicleId = typeof vehicleOrId === 'string' ? vehicleOrId : vehicleOrId?.id;
     if (!vehicleId) {
@@ -1755,6 +1777,17 @@ window.TK168_DATA = (() => {
         dailyRate: 0,
         deposit: 0,
         minDays: 1
+      };
+    }
+
+    const apiRental = getApiRentalById(vehicleId);
+    if (apiRental) {
+      return {
+        rentable: true,
+        rentalStatus: apiRental.rentalStatus || 'available',
+        dailyRate: Number(apiRental.dailyRate) || 0,
+        deposit: Number(apiRental.deposit) || 0,
+        minDays: Number(apiRental.minDays) || 1
       };
     }
 
@@ -1779,7 +1812,49 @@ window.TK168_DATA = (() => {
     return profile.rentable && profile.rentalStatus === 'available';
   }
 
+  // When the API has rentals, build the rental fleet directly from that
+  // list so the rental page shows exactly what the admin manages under
+  // the レンタル板块 — independent from the on-sale `vehicles` inventory.
+  // Each rental is adapted into the shape vehicle cards expect.
+  function buildRentalVehicleRecord(rental) {
+    const fallback = {
+      id: rental.id,
+      brandKey: rental.brandKey || '',
+      name: rental.name || rental.id,
+      year: rental.year || '',
+      type: rental.type || '',
+      icon: rental.icon || 'b1.svg',
+      mileage: rental.mileage || '',
+      engine: rental.engine || '',
+      fuel: rental.fuel || '',
+      trans: rental.trans || '',
+      bodyStyle: rental.bodyStyle || '',
+      drive: rental.drive || '',
+      bodyColor: rental.bodyColor || '',
+      interiorColor: rental.interiorColor || '',
+      seats: rental.seats || '',
+      origin: rental.origin || '',
+      totalPrice: '',
+      basePrice: '',
+      overview: rental.overview || rental.overviewZh || [],
+      overviewZh: rental.overviewZh || [],
+      overviewJa: rental.overviewJa || [],
+      overviewEn: rental.overviewEn || null,
+      benefits: rental.benefits || defaultBenefits,
+      features: rental.features || defaultFeatures,
+      photo: rental.photo || '',
+      gallery: Array.isArray(rental.gallery) ? rental.gallery : [],
+    };
+    return fallback;
+  }
+
   function getRentableVehicles() {
+    const apiRentals = getApiRentals();
+    if (apiRentals && apiRentals.length) {
+      return apiRentals
+        .filter((r) => (r.rentalStatus || 'available') === 'available')
+        .map(buildRentalVehicleRecord);
+    }
     return vehicles.filter((vehicle) => isVehicleRentable(vehicle));
   }
 

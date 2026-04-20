@@ -17,6 +17,16 @@ import {
   deleteVehicleImage,
   reorderVehicleImages,
 } from "./vehicles.js";
+import {
+  listRentals,
+  getRental,
+  createRental,
+  updateRental,
+  deleteRental,
+  uploadRentalImage,
+  deleteRentalImage,
+  reorderRentalImages,
+} from "./rentals.js";
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
 
@@ -125,6 +135,16 @@ async function handleApi(request, env, url) {
     const vehicle = await getVehicle(env, id);
     if (!vehicle || !vehicle.isPublished) return error(404, "not_found");
     return json({ vehicle });
+  }
+  if (path === "/rentals" && method === "GET") {
+    const rentals = await listRentals(env, { includeUnpublished: false });
+    return json({ rentals });
+  }
+  if (path.startsWith("/rentals/") && method === "GET" && path.split("/").length === 3) {
+    const id = decodeURIComponent(path.split("/")[2]);
+    const rental = await getRental(env, id);
+    if (!rental || !rental.isPublished) return error(404, "not_found");
+    return json({ rental });
   }
   if (path.startsWith("/media/") && method === "GET") {
     const key = decodeURIComponent(path.slice("/media/".length));
@@ -256,6 +276,72 @@ async function handleApi(request, env, url) {
       const vehicleId = decodeURIComponent(delMatch[1]);
       const imageId = Number(delMatch[2]);
       await deleteVehicleImage(env, vehicleId, imageId);
+      return json({ ok: true });
+    }
+  }
+
+  // Rentals (parallel to vehicles but a distinct inventory)
+  if (path === "/admin/rentals" && method === "GET") {
+    return json({ rentals: await listRentals(env, { includeUnpublished: true }) });
+  }
+  if (path === "/admin/rentals" && method === "POST") {
+    const body = await readJson(request);
+    const rental = await createRental(env, body);
+    return json({ rental }, 201);
+  }
+  {
+    const match = /^\/admin\/rentals\/([^/]+)$/.exec(path);
+    if (match) {
+      const id = decodeURIComponent(match[1]);
+      if (method === "GET") {
+        const rental = await getRental(env, id);
+        if (!rental) return error(404, "not_found");
+        return json({ rental });
+      }
+      if (method === "PUT" || method === "PATCH") {
+        const body = await readJson(request);
+        const rental = await updateRental(env, id, body);
+        return json({ rental });
+      }
+      if (method === "DELETE") {
+        const ok = await deleteRental(env, id);
+        if (!ok) return error(404, "not_found");
+        return json({ ok: true });
+      }
+    }
+  }
+  {
+    const match = /^\/admin\/rentals\/([^/]+)\/images$/.exec(path);
+    if (match && method === "POST") {
+      const rentalId = decodeURIComponent(match[1]);
+      const form = await request.formData();
+      const files = form.getAll("file");
+      if (files.length === 0) return error(400, "no_file");
+      const alts = form.getAll("alt");
+      const uploaded = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (!(file instanceof File)) continue;
+        uploaded.push(
+          await uploadRentalImage(env, rentalId, file, {
+            alt: alts[i] ? String(alts[i]) : "",
+          }),
+        );
+      }
+      return json({ images: uploaded }, 201);
+    }
+    const reorderMatch = /^\/admin\/rentals\/([^/]+)\/images\/reorder$/.exec(path);
+    if (reorderMatch && method === "POST") {
+      const rentalId = decodeURIComponent(reorderMatch[1]);
+      const { order } = await readJson(request);
+      await reorderRentalImages(env, rentalId, order);
+      return json({ ok: true });
+    }
+    const delMatch = /^\/admin\/rentals\/([^/]+)\/images\/(\d+)$/.exec(path);
+    if (delMatch && method === "DELETE") {
+      const rentalId = decodeURIComponent(delMatch[1]);
+      const imageId = Number(delMatch[2]);
+      await deleteRentalImage(env, rentalId, imageId);
       return json({ ok: true });
     }
   }

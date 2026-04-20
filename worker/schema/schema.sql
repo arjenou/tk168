@@ -71,6 +71,61 @@ CREATE TABLE IF NOT EXISTS vehicle_images (
 
 CREATE INDEX IF NOT EXISTS idx_images_vehicle ON vehicle_images(vehicle_id, position);
 
+-- Rental inventory (leaselike / short-term rentals).  Kept as a separate
+-- table from `vehicles` because the admin treats the two lists as
+-- independent stock rooms (a unit is either sold or rented, and the fields
+-- that matter - daily_rate, deposit, min_days, rental_status - only apply
+-- here).  `rental_images` mirrors vehicle_images.
+CREATE TABLE IF NOT EXISTS rentals (
+  id              TEXT PRIMARY KEY,
+  brand_key       TEXT NOT NULL,
+  name            TEXT NOT NULL,
+  year            TEXT,
+  type            TEXT,
+  icon            TEXT,
+  mileage         TEXT,
+  engine          TEXT,
+  fuel            TEXT,
+  trans           TEXT,
+  body_style      TEXT,
+  drive           TEXT,
+  body_color      TEXT,
+  interior_color  TEXT,
+  seats           TEXT,
+  origin          TEXT,
+  daily_rate      INTEGER NOT NULL DEFAULT 0,   -- JPY per day
+  deposit         INTEGER NOT NULL DEFAULT 0,   -- JPY
+  min_days        INTEGER NOT NULL DEFAULT 1,
+  rental_status   TEXT NOT NULL DEFAULT 'available', -- available | reserved | rented | unavailable
+  overview_zh     TEXT,
+  overview_ja     TEXT,
+  overview_en     TEXT,
+  benefits        TEXT,
+  features        TEXT,
+  display_order   INTEGER NOT NULL DEFAULT 0,
+  is_published    INTEGER NOT NULL DEFAULT 1,
+  created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_rentals_brand ON rentals(brand_key);
+CREATE INDEX IF NOT EXISTS idx_rentals_order ON rentals(display_order);
+CREATE INDEX IF NOT EXISTS idx_rentals_status ON rentals(rental_status);
+
+CREATE TABLE IF NOT EXISTS rental_images (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  rental_id   TEXT NOT NULL,
+  r2_key      TEXT NOT NULL,
+  url         TEXT NOT NULL,
+  alt         TEXT,
+  is_primary  INTEGER NOT NULL DEFAULT 0,
+  position    INTEGER NOT NULL DEFAULT 0,
+  created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+  FOREIGN KEY (rental_id) REFERENCES rentals(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_rental_images ON rental_images(rental_id, position);
+
 CREATE TABLE IF NOT EXISTS sessions (
   token       TEXT PRIMARY KEY,
   user_id     INTEGER NOT NULL,
