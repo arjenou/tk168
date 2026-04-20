@@ -2,6 +2,11 @@ name = "tk168-api"
 main = "src/index.js"
 compatibility_date = "2025-09-01"
 compatibility_flags = ["nodejs_compat"]
+# Keep the default *.workers.dev URL enabled as a fallback access point so
+# we can still reach the admin + API when local DNS cannot resolve the
+# custom domain (api.tk168.co.jp).  Safe to leave on — both URLs serve the
+# same Worker.
+workers_dev = true
 
 # Admin SPA + API served from the same worker via the ASSETS binding.  The
 # static site (admin.html + supporting assets) is uploaded from the workspace

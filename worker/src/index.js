@@ -372,8 +372,18 @@ export default {
       return withCors(response, request, env);
     }
 
-    // Everything else: serve static assets (admin.html, etc.).  These are
-    // same-origin with the admin SPA so no CORS headers are needed.
+    // Root of the API host shows a short info page — the admin is now
+    // served by Vercel at https://www.tk168.co.jp/admin, so we don't want
+    // api.tk168.co.jp/ to look like a real UI.
+    if (url.pathname === "/" || url.pathname === "") {
+      return new Response(
+        "TK168 API — use https://www.tk168.co.jp/admin to manage content.",
+        { status: 200, headers: { "content-type": "text/plain; charset=utf-8" } },
+      );
+    }
+    // Static assets (admin.html and friends) are still reachable via the
+    // ASSETS binding as an emergency fallback.  Regular users should hit
+    // www.tk168.co.jp/admin instead.
     if (env.ASSETS) return env.ASSETS.fetch(request);
     return new Response("Not found", { status: 404 });
   },

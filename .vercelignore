@@ -4,9 +4,7 @@ node_modules
 .wrangler
 .assetsignore
 
-# Admin interface is served exclusively from the Cloudflare Worker at
-# api.tk168.co.jp/admin.  The www.tk168.co.jp/admin path is redirected there
-# via vercel.json, so these source files don't need to ship to Vercel.
-admin.html
-js/admin.js
-css/admin.css
+# NOTE: admin.html / js/admin.js / css/admin.css ARE shipped to Vercel so
+# the admin lives at https://www.tk168.co.jp/admin (same origin as the
+# marketing site, no cross-domain redirect).  The admin talks to the API
+# cross-origin via https://api.tk168.co.jp/api/* using credentialed fetch.

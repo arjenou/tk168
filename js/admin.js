@@ -7,7 +7,21 @@
 //   * "rentals"   -> /api/admin/rentals   (rental.html fleet)
 // They share most of the editor shell but expose different field sets.
 
-const API_BASE = "/api";
+// The admin is served from https://www.tk168.co.jp/admin (Vercel) but the
+// data + image APIs live on https://api.tk168.co.jp (Cloudflare Worker).
+// When the page is served by the Worker itself (e.g. a preview deploy at
+// api.tk168.co.jp/admin, or local `wrangler dev`) we fall back to the
+// same-origin /api path so the admin keeps working there too.
+const SAME_ORIGIN_API_HOSTS = new Set([
+  "api.tk168.co.jp",
+  "tk168-api.wangyunjie1101.workers.dev",
+  "localhost",
+  "127.0.0.1",
+]);
+const API_BASE = SAME_ORIGIN_API_HOSTS.has(location.hostname)
+  ? "/api"
+  : "https://api.tk168.co.jp/api";
+
 const ROOT = document.getElementById("adminRoot");
 
 // Shared preset value sets.  The admin stores the underlying zh/ja string
