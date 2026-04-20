@@ -10,6 +10,16 @@
 const API_BASE = "/api";
 const ROOT = document.getElementById("adminRoot");
 
+// Shared preset value sets.  The admin stores the underlying zh/ja string
+// pair directly (matches the shape the public pages already consume), so a
+// dropdown really just picks a prewritten pair by display label.  An empty
+// label is rendered as the placeholder row "未填" and persisted as null.
+const YES_NO_DASH = [
+  { label: "是 / あり", zh: "是", ja: "あり" },
+  { label: "否 / なし", zh: "否", ja: "なし" },
+  { label: "— / ―", zh: "—", ja: "―" },
+];
+
 // Resource descriptors drive the list + editor UIs so we keep a single
 // code path for the two inventories.
 const RESOURCES = {
@@ -48,17 +58,25 @@ const RESOURCES = {
       ["serviceRecord", "保养记录"],
       ["origin", "产地（如 意大利进口）"],
     ],
+    // Preset rows:
+    //   [key, label]                   -> free-text input (zh/ja)
+    //   [key, label, "select", options] -> dropdown; options is an array of
+    //                                       { label, zh, ja } used for BOTH
+    //                                       zh and ja select pickers.
+    // Dropdowns are used for the 10 boilerplate status-style fields so
+    // operators can't miskey them; the free-text inputs remain for the two
+    // per-vehicle description fields (steering / chassis tail).
     presets: [
-      ["condNonSmoking", "禁烟车"],
-      ["condAuthorizedImport", "正规进口"],
-      ["condDealerWarranty", "店铺质保"],
-      ["condEcoTaxEligible", "节能减税"],
-      ["condOneOwner", "一手车主"],
-      ["condRentalUp", "租赁退役"],
-      ["listingRepairHistory", "修复历"],
-      ["listingVehicleInspection", "车检"],
-      ["listingLegalMaintenance", "法定整备"],
-      ["listingPeriodicBook", "点检记录簿"],
+      ["condNonSmoking", "禁烟车", "select", YES_NO_DASH],
+      ["condAuthorizedImport", "正规进口", "select", YES_NO_DASH],
+      ["condDealerWarranty", "店铺质保", "select", YES_NO_DASH],
+      ["condEcoTaxEligible", "节能减税", "select", YES_NO_DASH],
+      ["condOneOwner", "一手车主", "select", YES_NO_DASH],
+      ["condRentalUp", "租赁退役", "select", YES_NO_DASH],
+      ["listingRepairHistory", "修复历", "select", YES_NO_DASH],
+      ["listingVehicleInspection", "车检", "select", YES_NO_DASH],
+      ["listingLegalMaintenance", "法定整备", "select", YES_NO_DASH],
+      ["listingPeriodicBook", "点检记录簿", "select", YES_NO_DASH],
       ["highlightSteering", "方向盘"],
       ["highlightChassisTail", "车台末尾号"],
     ],
@@ -567,8 +585,32 @@ function renderEditor() {
   const overviewEn = Array.isArray(draft.overviewEn) ? draft.overviewEn.join("\n\n") : (draft.overviewEn || "");
 
   const presetFields = r.presets
-    .map(([key, label]) => {
+    .map((row) => {
+      const [key, label, kind, options] = row;
       const v = draft[key] || {};
+
+      if (kind === "select") {
+        // Dropdown: each option is a prewritten {zh, ja} pair.  The
+        // current value is matched by (zh, ja) exactly so legacy data
+        // lands on the right row; unmatched data falls into "未填".
+        const currentIdx = (options || []).findIndex(
+          (opt) => opt.zh === v.zh && opt.ja === v.ja,
+        );
+        const optionsHtml = [
+          `<option value="" ${currentIdx === -1 ? "selected" : ""}>未填</option>`,
+          ...(options || []).map(
+            (opt, idx) =>
+              `<option value="${idx}" ${idx === currentIdx ? "selected" : ""}>${escapeHtml(opt.label)}</option>`,
+          ),
+        ].join("");
+        return `
+          <div class="admin-field" style="margin-bottom:10px;">
+            <label style="text-transform:none;font-weight:600;color:var(--admin-text);font-size:13px;letter-spacing:0;">${label}</label>
+            <select class="admin-input" data-preset-select="${key}">${optionsHtml}</select>
+          </div>`;
+      }
+
+      // Free-text fallback (两个输入框：中文 / 日文)
       return `
         <div class="admin-grid" style="margin-bottom:6px;">
           <div class="admin-field admin-grid-col-1" style="grid-column:span 2;margin-bottom:-4px;"><label style="text-transform:none;font-weight:600;color:var(--admin-text);font-size:13px;letter-spacing:0;">${label}</label></div>
@@ -685,6 +727,24 @@ function bindEditor() {
       const [key, lang] = input.dataset.preset.split(".");
       const current = state.editingDraft[key] || {};
       state.editingDraft[key] = { ...current, [lang]: input.value };
+    });
+  });
+
+  // Paired dropdown: selecting an option writes {zh, ja} together; the
+  // blank row sets the draft back to {zh:"",ja:""} which saveItem will
+  // persist as NULL so the field is cleanly "unset" in the DB.
+  document.querySelectorAll("[data-preset-select]").forEach((select) => {
+    select.addEventListener("change", () => {
+      const key = select.dataset.presetSelect;
+      const presetRow = currentResource().presets.find((p) => p[0] === key);
+      const options = (presetRow && presetRow[3]) || [];
+      const idx = select.value === "" ? -1 : Number(select.value);
+      if (idx >= 0 && options[idx]) {
+        const opt = options[idx];
+        state.editingDraft[key] = { zh: opt.zh, ja: opt.ja };
+      } else {
+        state.editingDraft[key] = { zh: "", ja: "" };
+      }
     });
   });
 
