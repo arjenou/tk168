@@ -862,7 +862,18 @@ window.TK168_DATA = (() => {
     }
   ];
 
-  const vehicles = appendBrandLibraryVehicles(baseVehicles, brandLibraryItems)
+  // If the API hydrate script (js/api-hydrate.js) populated live vehicles
+  // from the admin backend, prefer them over the static baseVehicles.  This
+  // lets the admin console drive the site without an async refactor.
+  const apiVehicles = Array.isArray(window.TK168_API_VEHICLES)
+    ? window.TK168_API_VEHICLES
+    : null;
+  const apiPresets = (window.TK168_API_PRESETS && typeof window.TK168_API_PRESETS === "object")
+    ? window.TK168_API_PRESETS
+    : null;
+
+  const seedVehicles = apiVehicles && apiVehicles.length ? apiVehicles : baseVehicles;
+  const vehicles = appendBrandLibraryVehicles(seedVehicles, brandLibraryItems)
     .map((vehicle) => {
       const canonicalBrandKey = resolveCanonicalBrandKey(vehicle.brandKey);
       return canonicalBrandKey
@@ -870,6 +881,7 @@ window.TK168_DATA = (() => {
         : { ...vehicle };
     })
     .filter((vehicle) => activeBrandKeySet.has(vehicle.brandKey));
+
 
   const news = [
     {
@@ -1564,7 +1576,8 @@ window.TK168_DATA = (() => {
   }
 
   function getVehicleConditionField(vehicle, key, language = getCurrentLanguage()) {
-    const preset = vehicleConditionPresets[vehicle?.id]?.[key];
+    const apiPreset = apiPresets?.condition?.[vehicle?.id]?.[key];
+    const preset = apiPreset ?? vehicleConditionPresets[vehicle?.id]?.[key];
     if (!preset) return '';
     if (typeof preset === 'string') return language === 'en' ? translatePresetValueToEnglish(key, preset) : preset;
     if (language === 'en') return preset.en || translatePresetValueToEnglish(key, preset.zh || preset.ja || '');
@@ -1573,7 +1586,8 @@ window.TK168_DATA = (() => {
   }
 
   function getVehicleListingField(vehicle, key, language = getCurrentLanguage()) {
-    const preset = vehicleListingPresets[vehicle?.id]?.[key];
+    const apiPreset = apiPresets?.listing?.[vehicle?.id]?.[key];
+    const preset = apiPreset ?? vehicleListingPresets[vehicle?.id]?.[key];
     if (!preset) return '';
     if (typeof preset === 'string') return language === 'en' ? translatePresetValueToEnglish(key, preset) : preset;
     if (language === 'en') return preset.en || translatePresetValueToEnglish(key, preset.zh || preset.ja || '');
@@ -1596,7 +1610,8 @@ window.TK168_DATA = (() => {
       return language === 'ja' ? `${doorCount}ドア` : `${doorCount} 门`;
     }
 
-    const preset = vehicleHighlightPresets[vehicle.id]?.[key];
+    const apiPreset = apiPresets?.highlight?.[vehicle.id]?.[key];
+    const preset = apiPreset ?? vehicleHighlightPresets[vehicle.id]?.[key];
     if (!preset) return '';
     if (typeof preset === 'string') return language === 'en' ? translatePresetValueToEnglish(key, preset) : preset;
     if (language === 'en') return preset.en || translatePresetValueToEnglish(key, preset.zh || preset.ja || '');

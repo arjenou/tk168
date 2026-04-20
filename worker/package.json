@@ -1,0 +1,13 @@
+{
+  "name": "tk168-admin-worker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TK168 admin backend: auth, vehicle CRUD, image upload (D1 + R2)",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:apply:local": "wrangler d1 execute tk168 --local --file=schema/schema.sql",
+    "db:apply:remote": "wrangler d1 execute tk168 --remote --file=schema/schema.sql",
+    "db:seed:remote": "wrangler d1 execute tk168 --remote --file=schema/seed.sql"
+  }
+}

@@ -1,0 +1,12 @@
+.git
+worker
+node_modules
+.wrangler
+.assetsignore
+
+# Admin interface is served exclusively from the Cloudflare Worker at
+# api.tk168.co.jp/admin.  The www.tk168.co.jp/admin path is redirected there
+# via vercel.json, so these source files don't need to ship to Vercel.
+admin.html
+js/admin.js
+css/admin.css

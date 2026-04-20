@@ -1,0 +1,7 @@
+.git/**
+.gitignore
+.DS_Store
+worker/**
+admin-notes.md
+*.md
+node_modules/**
