@@ -130,15 +130,21 @@ baseVehicles.forEach((v, index) => {
   lines.push(insert);
 
   (v.gallery || [v.photo]).forEach((img, i) => {
-    // Seed images reference the existing assets/images/<file>.  We store
-    // them as relative URLs so the frontend keeps working immediately.
-    const url = img.startsWith("assets/") || /^https?:/.test(img)
-      ? img
-      : `assets/images/${img}`;
+    let url;
+    let r2Key;
+    if (img.startsWith("assets/") || /^https?:/.test(img)) {
+      url = img;
+      r2Key = `seed:${v.id}:${i}`;
+    } else {
+      const file = String(img).replace(/^.*\//, "");
+      const storageKey = `vehicles/seed/${file}`;
+      url = `/api/media/${storageKey}`;
+      r2Key = `seed:${storageKey}`;
+    }
     lines.push(
       `INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES (${esc(
         v.id
-      )}, ${esc("seed:" + v.id + ":" + i)}, ${esc(url)}, ${esc(v.name)}, ${i === 0 ? 1 : 0}, ${i});`
+      )}, ${esc(r2Key)}, ${esc(url)}, ${esc(v.name)}, ${i === 0 ? 1 : 0}, ${i});`
     );
   });
 });

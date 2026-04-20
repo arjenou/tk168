@@ -127,13 +127,14 @@ for (const r of rows) {
     return sqlString(v);
   });
   out.push(`INSERT INTO rentals (${cols.join(", ")}) VALUES (${values.join(", ")});`);
-  // Seed one placeholder image row per legacy photo filename, pointing at
-  // the static asset under /assets/images/ so the rental list is not
-  // empty until the admin uploads proper photos.  These rows use an
-  // `r2_key` beginning with "seed:" so deleteRentalImage skips R2.
+  // Seed image rows: URL points at Worker /api/media/vehicles/seed/<file>;
+  // binary must exist in R2 at that key (see upload-seed-vehicle-images.sh).
+  // r2_key uses the `seed:` prefix so cascading deletes skip R2 removal.
   (r._legacyPhotoFilenames || []).forEach((filename, idx) => {
-    const url = `assets/images/${filename}`;
-    const r2Key = `seed:${filename}`;
+    const file = String(filename).replace(/^.*\//, "");
+    const storageKey = `vehicles/seed/${file}`;
+    const url = `/api/media/${storageKey}`;
+    const r2Key = `seed:${storageKey}`;
     out.push(
       `INSERT INTO rental_images (rental_id, r2_key, url, alt, is_primary, position) VALUES (${sqlString(r.id)}, ${sqlString(r2Key)}, ${sqlString(url)}, '', ${idx === 0 ? 1 : 0}, ${idx});`,
     );

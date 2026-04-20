@@ -26,10 +26,10 @@ INSERT INTO vehicles (
     '{"zh":"右舵","ja":"右ハンドル"}', '{"zh":"381","ja":"381"}',
     0, 1
   );
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus', 'seed:lamborghini-urus:0', 'assets/images/001.png', '兰博基尼 Urus', 1, 0);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus', 'seed:lamborghini-urus:1', 'assets/images/001.png', '兰博基尼 Urus', 0, 1);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus', 'seed:lamborghini-urus:2', 'assets/images/001.png', '兰博基尼 Urus', 0, 2);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus', 'seed:lamborghini-urus:3', 'assets/images/001.png', '兰博基尼 Urus', 0, 3);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Urus', 1, 0);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Urus', 0, 1);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Urus', 0, 2);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Urus', 0, 3);
 INSERT INTO vehicles (
     id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
@@ -54,10 +54,10 @@ INSERT INTO vehicles (
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"127","ja":"127"}',
     1, 1
   );
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('audi-r8-spyder', 'seed:audi-r8-spyder:0', 'assets/images/002.png', '奥迪 R8 Spyder', 1, 0);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('audi-r8-spyder', 'seed:audi-r8-spyder:1', 'assets/images/002.png', '奥迪 R8 Spyder', 0, 1);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('audi-r8-spyder', 'seed:audi-r8-spyder:2', 'assets/images/002.png', '奥迪 R8 Spyder', 0, 2);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('audi-r8-spyder', 'seed:audi-r8-spyder:3', 'assets/images/002.png', '奥迪 R8 Spyder', 0, 3);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('audi-r8-spyder', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '奥迪 R8 Spyder', 1, 0);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('audi-r8-spyder', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '奥迪 R8 Spyder', 0, 1);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('audi-r8-spyder', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '奥迪 R8 Spyder', 0, 2);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('audi-r8-spyder', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '奥迪 R8 Spyder', 0, 3);
 INSERT INTO vehicles (
     id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
@@ -82,10 +82,10 @@ INSERT INTO vehicles (
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"458","ja":"458"}',
     2, 1
   );
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-458-italia', 'seed:ferrari-458-italia:0', 'assets/images/003.png', '法拉利 458 Italia', 1, 0);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-458-italia', 'seed:ferrari-458-italia:1', 'assets/images/003.png', '法拉利 458 Italia', 0, 1);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-458-italia', 'seed:ferrari-458-italia:2', 'assets/images/003.png', '法拉利 458 Italia', 0, 2);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-458-italia', 'seed:ferrari-458-italia:3', 'assets/images/003.png', '法拉利 458 Italia', 0, 3);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-458-italia', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '法拉利 458 Italia', 1, 0);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-458-italia', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '法拉利 458 Italia', 0, 1);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-458-italia', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '法拉利 458 Italia', 0, 2);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-458-italia', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '法拉利 458 Italia', 0, 3);
 INSERT INTO vehicles (
     id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
@@ -110,10 +110,10 @@ INSERT INTO vehicles (
     '{"zh":"右舵","ja":"右ハンドル"}', '{"zh":"642","ja":"642"}',
     3, 1
   );
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('bmw-x6-m', 'seed:bmw-x6-m:0', 'assets/images/004.png', '宝马 X6 M', 1, 0);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('bmw-x6-m', 'seed:bmw-x6-m:1', 'assets/images/004.png', '宝马 X6 M', 0, 1);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('bmw-x6-m', 'seed:bmw-x6-m:2', 'assets/images/004.png', '宝马 X6 M', 0, 2);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('bmw-x6-m', 'seed:bmw-x6-m:3', 'assets/images/004.png', '宝马 X6 M', 0, 3);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('bmw-x6-m', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '宝马 X6 M', 1, 0);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('bmw-x6-m', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '宝马 X6 M', 0, 1);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('bmw-x6-m', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '宝马 X6 M', 0, 2);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('bmw-x6-m', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '宝马 X6 M', 0, 3);
 INSERT INTO vehicles (
     id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
@@ -138,10 +138,10 @@ INSERT INTO vehicles (
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"488","ja":"488"}',
     4, 1
   );
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-488-gtb', 'seed:ferrari-488-gtb:0', 'assets/images/005.png', '法拉利 488 GTB', 1, 0);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-488-gtb', 'seed:ferrari-488-gtb:1', 'assets/images/005.png', '法拉利 488 GTB', 0, 1);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-488-gtb', 'seed:ferrari-488-gtb:2', 'assets/images/005.png', '法拉利 488 GTB', 0, 2);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-488-gtb', 'seed:ferrari-488-gtb:3', 'assets/images/005.png', '法拉利 488 GTB', 0, 3);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-488-gtb', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '法拉利 488 GTB', 1, 0);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-488-gtb', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '法拉利 488 GTB', 0, 1);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-488-gtb', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '法拉利 488 GTB', 0, 2);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-488-gtb', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '法拉利 488 GTB', 0, 3);
 INSERT INTO vehicles (
     id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
@@ -166,10 +166,10 @@ INSERT INTO vehicles (
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"770","ja":"770"}',
     5, 1
   );
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-aventador', 'seed:lamborghini-aventador:0', 'assets/images/006.png', '兰博基尼 Aventador', 1, 0);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-aventador', 'seed:lamborghini-aventador:1', 'assets/images/006.png', '兰博基尼 Aventador', 0, 1);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-aventador', 'seed:lamborghini-aventador:2', 'assets/images/006.png', '兰博基尼 Aventador', 0, 2);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-aventador', 'seed:lamborghini-aventador:3', 'assets/images/006.png', '兰博基尼 Aventador', 0, 3);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-aventador', 'seed:vehicles/seed/006.png', '/api/media/vehicles/seed/006.png', '兰博基尼 Aventador', 1, 0);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-aventador', 'seed:vehicles/seed/006.png', '/api/media/vehicles/seed/006.png', '兰博基尼 Aventador', 0, 1);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-aventador', 'seed:vehicles/seed/006.png', '/api/media/vehicles/seed/006.png', '兰博基尼 Aventador', 0, 2);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-aventador', 'seed:vehicles/seed/006.png', '/api/media/vehicles/seed/006.png', '兰博基尼 Aventador', 0, 3);
 INSERT INTO vehicles (
     id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
@@ -194,10 +194,10 @@ INSERT INTO vehicles (
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"613","ja":"613"}',
     6, 1
   );
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo', 'seed:lamborghini-huracan-evo:0', 'assets/images/003.png', '兰博基尼 Huracan EVO', 1, 0);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo', 'seed:lamborghini-huracan-evo:1', 'assets/images/003.png', '兰博基尼 Huracan EVO', 0, 1);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo', 'seed:lamborghini-huracan-evo:2', 'assets/images/003.png', '兰博基尼 Huracan EVO', 0, 2);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo', 'seed:lamborghini-huracan-evo:3', 'assets/images/003.png', '兰博基尼 Huracan EVO', 0, 3);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '兰博基尼 Huracan EVO', 1, 0);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '兰博基尼 Huracan EVO', 0, 1);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '兰博基尼 Huracan EVO', 0, 2);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '兰博基尼 Huracan EVO', 0, 3);
 INSERT INTO vehicles (
     id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
@@ -222,10 +222,10 @@ INSERT INTO vehicles (
     '{"zh":"右舵","ja":"右ハンドル"}', '{"zh":"524","ja":"524"}',
     7, 1
   );
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-s', 'seed:lamborghini-urus-s:0', 'assets/images/004.png', '兰博基尼 Urus S', 1, 0);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-s', 'seed:lamborghini-urus-s:1', 'assets/images/004.png', '兰博基尼 Urus S', 0, 1);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-s', 'seed:lamborghini-urus-s:2', 'assets/images/004.png', '兰博基尼 Urus S', 0, 2);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-s', 'seed:lamborghini-urus-s:3', 'assets/images/004.png', '兰博基尼 Urus S', 0, 3);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-s', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus S', 1, 0);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-s', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus S', 0, 1);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-s', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus S', 0, 2);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-s', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus S', 0, 3);
 INSERT INTO vehicles (
     id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
@@ -250,10 +250,10 @@ INSERT INTO vehicles (
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"912","ja":"912"}',
     8, 1
   );
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-sto', 'seed:lamborghini-huracan-sto:0', 'assets/images/005.png', '兰博基尼 Huracan STO', 1, 0);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-sto', 'seed:lamborghini-huracan-sto:1', 'assets/images/005.png', '兰博基尼 Huracan STO', 0, 1);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-sto', 'seed:lamborghini-huracan-sto:2', 'assets/images/005.png', '兰博基尼 Huracan STO', 0, 2);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-sto', 'seed:lamborghini-huracan-sto:3', 'assets/images/005.png', '兰博基尼 Huracan STO', 0, 3);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-sto', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan STO', 1, 0);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-sto', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan STO', 0, 1);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-sto', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan STO', 0, 2);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-sto', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan STO', 0, 3);
 INSERT INTO vehicles (
     id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
@@ -278,10 +278,10 @@ INSERT INTO vehicles (
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"305","ja":"305"}',
     9, 1
   );
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-gallardo', 'seed:lamborghini-gallardo:0', 'assets/images/002.png', '兰博基尼 Gallardo', 1, 0);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-gallardo', 'seed:lamborghini-gallardo:1', 'assets/images/002.png', '兰博基尼 Gallardo', 0, 1);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-gallardo', 'seed:lamborghini-gallardo:2', 'assets/images/002.png', '兰博基尼 Gallardo', 0, 2);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-gallardo', 'seed:lamborghini-gallardo:3', 'assets/images/002.png', '兰博基尼 Gallardo', 0, 3);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-gallardo', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '兰博基尼 Gallardo', 1, 0);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-gallardo', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '兰博基尼 Gallardo', 0, 1);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-gallardo', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '兰博基尼 Gallardo', 0, 2);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-gallardo', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '兰博基尼 Gallardo', 0, 3);
 INSERT INTO vehicles (
     id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
@@ -306,10 +306,10 @@ INSERT INTO vehicles (
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"037","ja":"037"}',
     10, 1
   );
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-sian-fkp-37', 'seed:lamborghini-sian-fkp-37:0', 'assets/images/001.png', '兰博基尼 Sian FKP 37', 1, 0);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-sian-fkp-37', 'seed:lamborghini-sian-fkp-37:1', 'assets/images/001.png', '兰博基尼 Sian FKP 37', 0, 1);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-sian-fkp-37', 'seed:lamborghini-sian-fkp-37:2', 'assets/images/001.png', '兰博基尼 Sian FKP 37', 0, 2);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-sian-fkp-37', 'seed:lamborghini-sian-fkp-37:3', 'assets/images/001.png', '兰博基尼 Sian FKP 37', 0, 3);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-sian-fkp-37', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Sian FKP 37', 1, 0);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-sian-fkp-37', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Sian FKP 37', 0, 1);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-sian-fkp-37', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Sian FKP 37', 0, 2);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-sian-fkp-37', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Sian FKP 37', 0, 3);
 INSERT INTO vehicles (
     id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
@@ -334,10 +334,10 @@ INSERT INTO vehicles (
     '{"zh":"右舵","ja":"右ハンドル"}', '{"zh":"801","ja":"801"}',
     11, 1
   );
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-performante', 'seed:lamborghini-urus-performante:0', 'assets/images/004.png', '兰博基尼 Urus Performante', 1, 0);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-performante', 'seed:lamborghini-urus-performante:1', 'assets/images/004.png', '兰博基尼 Urus Performante', 0, 1);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-performante', 'seed:lamborghini-urus-performante:2', 'assets/images/004.png', '兰博基尼 Urus Performante', 0, 2);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-performante', 'seed:lamborghini-urus-performante:3', 'assets/images/004.png', '兰博基尼 Urus Performante', 0, 3);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-performante', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus Performante', 1, 0);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-performante', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus Performante', 0, 1);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-performante', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus Performante', 0, 2);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-performante', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus Performante', 0, 3);
 INSERT INTO vehicles (
     id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
@@ -362,7 +362,7 @@ INSERT INTO vehicles (
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"274","ja":"274"}',
     12, 1
   );
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo-rwd', 'seed:lamborghini-huracan-evo-rwd:0', 'assets/images/005.png', '兰博基尼 Huracan EVO RWD', 1, 0);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo-rwd', 'seed:lamborghini-huracan-evo-rwd:1', 'assets/images/005.png', '兰博基尼 Huracan EVO RWD', 0, 1);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo-rwd', 'seed:lamborghini-huracan-evo-rwd:2', 'assets/images/005.png', '兰博基尼 Huracan EVO RWD', 0, 2);
-INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo-rwd', 'seed:lamborghini-huracan-evo-rwd:3', 'assets/images/005.png', '兰博基尼 Huracan EVO RWD', 0, 3);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo-rwd', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan EVO RWD', 1, 0);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo-rwd', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan EVO RWD', 0, 1);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo-rwd', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan EVO RWD', 0, 2);
+INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo-rwd', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan EVO RWD', 0, 3);

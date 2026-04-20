@@ -84,10 +84,22 @@ function enforceHomeInitialScroll() {
   window.setTimeout(forceHomeScrollTop, 0);
 }
 
+function resolveWorkerMediaUrl(path) {
+  const raw = String(path || '').trim();
+  if (!raw) return '';
+  if (/^(?:https?:)?\/\//.test(raw)) return raw.startsWith('//') ? `https:${raw}` : raw;
+  if (!raw.startsWith('/api/')) return raw;
+  const apiBase = (typeof window.TK168_API_BASE === 'string' && window.TK168_API_BASE.trim())
+    ? window.TK168_API_BASE
+    : 'https://api.tk168.co.jp';
+  const sameOrigin = typeof location !== 'undefined' && apiBase.startsWith(location.origin);
+  return sameOrigin || !apiBase ? raw : `${apiBase.replace(/\/+$/, '')}${raw}`;
+}
+
 function hydrateIntroVideoSource() {
   if (!introVideo) return;
   if (introVideo.currentSrc || introVideo.getAttribute('src')) return;
-  const source = introVideo.dataset.src;
+  const source = resolveWorkerMediaUrl(introVideo.dataset.src);
   if (!source) return;
   introVideo.src = source;
   introVideo.load();
@@ -95,7 +107,7 @@ function hydrateIntroVideoSource() {
 
 function hydrateHeroVideoSource() {
   if (!heroVideo || heroVideoSourceReady) return;
-  const source = heroVideo.dataset.src;
+  const source = resolveWorkerMediaUrl(heroVideo.dataset.src);
   if (!source) return;
   heroVideo.src = source;
   heroVideo.load();

@@ -37,13 +37,30 @@ function parseAllowedOrigins(env) {
     .filter(Boolean);
 }
 
+// Browsers send Origin: http://localhost:<port> (or 127.0.0.1) when the SPA
+// is served from a local dev server while calling the production API host.
+// That origin cannot be guessed ahead of time in wrangler.toml, so we allow
+// loopback hosts explicitly (only these origins can be sent for same-site
+// policy — a random https site cannot spoof localhost).
+function isLoopbackDevOrigin(origin) {
+  if (!origin) return false;
+  try {
+    const u = new URL(origin);
+    if (u.protocol !== "http:" && u.protocol !== "https:") return false;
+    return u.hostname === "localhost" || u.hostname === "127.0.0.1";
+  } catch {
+    return false;
+  }
+}
+
 // Build the CORS headers for a given request/env pair.  The allow-list is
 // sourced from CORS_ALLOWED_ORIGINS; we echo the origin only when it matches
 // so credentialed fetches work and unknown sites are rejected.
 function corsHeaders(request, env) {
   const origin = request.headers.get("origin") || "";
   const allowed = parseAllowedOrigins(env);
-  const isAllowed = origin && allowed.includes(origin);
+  const isAllowed =
+    Boolean(origin && allowed.includes(origin)) || isLoopbackDevOrigin(origin);
   const headers = { vary: "Origin" };
   if (isAllowed) {
     headers["access-control-allow-origin"] = origin;

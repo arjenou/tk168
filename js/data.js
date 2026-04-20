@@ -1493,19 +1493,21 @@ window.TK168_DATA = (() => {
     if (/^(?:https?:)?\/\//.test(rawPath) || rawPath.startsWith('data:') || rawPath.startsWith('blob:') || rawPath.startsWith('assets/')) {
       return rawPath;
     }
-    // Admin-uploaded media is served from the Cloudflare worker at
-    // /api/media/<key>.  When we're running from a different origin (the
-    // Vercel-hosted www.tk168.co.jp) we have to rewrite the leading slash
-    // into the full API host, otherwise the browser will look for the file
-    // under the Vercel domain and get a 404.
-    if (rawPath.startsWith('/api/')) {
-      const apiBase = (typeof window !== 'undefined' && typeof window.TK168_API_BASE === 'string')
-        ? window.TK168_API_BASE
-        : 'https://api.tk168.co.jp';
-      const sameOrigin = typeof location !== 'undefined' && apiBase && apiBase.startsWith(location.origin);
-      return sameOrigin || !apiBase ? rawPath : `${apiBase.replace(/\/+$/, '')}${rawPath}`;
+    // Legacy numeric filenames (001.png … 006.png) are stored in R2 under
+    // vehicles/seed/ and listed in D1; resolve to the Worker media route.
+    let apiPath = rawPath;
+    if (!rawPath.startsWith('/api/')) {
+      if (/^00[1-6]\.png$/i.test(rawPath)) {
+        apiPath = `/api/media/vehicles/seed/${rawPath}`;
+      } else {
+        return `assets/images/${rawPath}`;
+      }
     }
-    return `assets/images/${rawPath}`;
+    const apiBase = (typeof window !== 'undefined' && typeof window.TK168_API_BASE === 'string')
+      ? window.TK168_API_BASE
+      : 'https://api.tk168.co.jp';
+    const sameOrigin = typeof location !== 'undefined' && apiBase && apiBase.startsWith(location.origin);
+    return sameOrigin || !apiBase ? apiPath : `${apiBase.replace(/\/+$/, '')}${apiPath}`;
   }
 
   function getCurrentLanguage() {
