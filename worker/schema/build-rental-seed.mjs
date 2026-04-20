@@ -71,6 +71,8 @@ for (const [id, profile] of Object.entries(rentalProfiles)) {
     id,
     brand_key: v.brandKey || v.brand_key || "",
     name: v.name || id,
+    name_ja: v.nameJa ?? null,
+    name_en: v.nameEn ?? null,
     year: v.year || "",
     type: v.type || "",
     icon: v.icon || "b1.svg",
@@ -108,7 +110,7 @@ out.push("DELETE FROM rentals;");
 out.push("DELETE FROM rental_images;");
 for (const r of rows) {
   const cols = [
-    "id", "brand_key", "name", "year", "type", "icon",
+    "id", "brand_key", "name", "name_ja", "name_en", "year", "type", "icon",
     "mileage", "engine", "fuel", "trans",
     "body_style", "drive", "body_color", "interior_color", "seats", "origin",
     "daily_rate", "deposit", "min_days", "rental_status",

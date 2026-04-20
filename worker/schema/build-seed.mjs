@@ -104,7 +104,7 @@ baseVehicles.forEach((v, index) => {
   const highlight = vehicleHighlightPresets[v.id] || {};
 
   const insert = `INSERT INTO vehicles (
-    id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
@@ -114,7 +114,7 @@ baseVehicles.forEach((v, index) => {
     highlight_steering, highlight_chassis_tail,
     display_order, is_published
   ) VALUES (
-    ${esc(v.id)}, ${esc(v.brandKey)}, ${esc(v.name)}, ${esc(v.year)}, ${esc(v.type)},
+    ${esc(v.id)}, ${esc(v.brandKey)}, ${esc(v.name)}, ${esc(v.nameJa)}, ${esc(v.nameEn)}, ${esc(v.year)}, ${esc(v.type)},
     ${esc(v.icon)}, ${esc(v.mileage)}, ${esc(v.engine)}, ${esc(v.fuel)}, ${esc(v.trans)},
     ${esc(v.totalPrice)}, ${esc(v.basePrice)}, ${esc(v.bodyStyle)}, ${esc(v.drive)},
     ${esc(v.bodyColor)}, ${esc(v.interiorColor)}, ${esc(v.seats)}, ${esc(v.serviceRecord)}, ${esc(v.origin)},

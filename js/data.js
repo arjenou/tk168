@@ -1531,7 +1531,9 @@ window.TK168_DATA = (() => {
 
   function getVehicleName(vehicle, language = getCurrentLanguage()) {
     if (!vehicle) return '';
-    if (language === 'zh') return vehicle.name;
+    if (language === 'zh') return vehicle.name || '';
+    if (language === 'ja' && String(vehicle.nameJa || '').trim()) return String(vehicle.nameJa).trim();
+    if (language === 'en' && String(vehicle.nameEn || '').trim()) return String(vehicle.nameEn).trim();
     return `${getBrandLabel(vehicle.brandKey, language)} ${getVehicleModelName(vehicle)}`.trim();
   }
 
@@ -1823,6 +1825,8 @@ window.TK168_DATA = (() => {
       id: rental.id,
       brandKey: rental.brandKey || '',
       name: rental.name || rental.id,
+      nameJa: rental.nameJa,
+      nameEn: rental.nameEn,
       year: rental.year || '',
       type: rental.type || '',
       icon: rental.icon || 'b1.svg',

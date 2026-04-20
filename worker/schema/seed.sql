@@ -3,7 +3,7 @@
 DELETE FROM vehicle_images;
 DELETE FROM vehicles;
 INSERT INTO vehicles (
-    id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
@@ -13,7 +13,7 @@ INSERT INTO vehicles (
     highlight_steering, highlight_chassis_tail,
     display_order, is_published
   ) VALUES (
-    'lamborghini-urus', 'lamborghini', '兰博基尼 Urus', '2022', '高性能SUV',
+    'lamborghini-urus', 'lamborghini', '兰博基尼 Urus', NULL, NULL, '2022', '高性能SUV',
     'b1.svg', '3,200', '4.0L V8', '汽油', '自动挡',
     '¥ 1,980,000', '¥ 1,860,000', '高性能 SUV', '四轮驱动',
     '曜石黑', '黑色真皮', '5 座', '完整在册', '意大利进口',
@@ -31,7 +31,7 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Urus', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Urus', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
@@ -41,7 +41,7 @@ INSERT INTO vehicles (
     highlight_steering, highlight_chassis_tail,
     display_order, is_published
   ) VALUES (
-    'audi-r8-spyder', 'audi', '奥迪 R8 Spyder', '2023', '敞篷跑车',
+    'audi-r8-spyder', 'audi', '奥迪 R8 Spyder', NULL, NULL, '2023', '敞篷跑车',
     'b2.svg', '90', '5.2L V10', '汽油', '自动挡',
     '¥ 1,600,000', '¥ 1,490,000', '双门跑车', '四轮驱动',
     '曜石黑', '棕色真皮', '2 座', '完整在册', '德国进口',
@@ -59,7 +59,7 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('audi-r8-spyder', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '奥迪 R8 Spyder', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('audi-r8-spyder', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '奥迪 R8 Spyder', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
@@ -69,7 +69,7 @@ INSERT INTO vehicles (
     highlight_steering, highlight_chassis_tail,
     display_order, is_published
   ) VALUES (
-    'ferrari-458-italia', 'ferrari', '法拉利 458 Italia', '2019', '中置跑车',
+    'ferrari-458-italia', 'ferrari', '法拉利 458 Italia', NULL, NULL, '2019', '中置跑车',
     'b3.svg', '15,200', '4.5L V8', '汽油', '自动挡',
     '¥ 1,750,000', '¥ 1,640,000', '双门跑车', '后轮驱动',
     '竞技红', '黑红拼色真皮', '2 座', '完整在册', '意大利进口',
@@ -87,7 +87,7 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-458-italia', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '法拉利 458 Italia', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-458-italia', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '法拉利 458 Italia', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
@@ -97,7 +97,7 @@ INSERT INTO vehicles (
     highlight_steering, highlight_chassis_tail,
     display_order, is_published
   ) VALUES (
-    'bmw-x6-m', 'bmw', '宝马 X6 M', '2024', '轿跑SUV',
+    'bmw-x6-m', 'bmw', '宝马 X6 M', NULL, NULL, '2024', '轿跑SUV',
     'b4.svg', '120', '4.4L V8', '汽油', '自动挡',
     '¥ 750,000', '¥ 698,000', '高性能 SUV', '四轮驱动',
     '矿石白', '黑色真皮', '5 座', '完整在册', '德国进口',
@@ -115,7 +115,7 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('bmw-x6-m', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '宝马 X6 M', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('bmw-x6-m', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '宝马 X6 M', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
@@ -125,7 +125,7 @@ INSERT INTO vehicles (
     highlight_steering, highlight_chassis_tail,
     display_order, is_published
   ) VALUES (
-    'ferrari-488-gtb', 'ferrari', '法拉利 488 GTB', '2021', '中置跑车',
+    'ferrari-488-gtb', 'ferrari', '法拉利 488 GTB', NULL, NULL, '2021', '中置跑车',
     'b5.svg', '8,700', '3.9L V8', '汽油', '自动挡',
     '¥ 2,250,000', '¥ 2,120,000', '双门跑车', '后轮驱动',
     '亮银灰', '深棕真皮', '2 座', '完整在册', '意大利进口',
@@ -143,7 +143,7 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-488-gtb', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '法拉利 488 GTB', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-488-gtb', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '法拉利 488 GTB', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
@@ -153,7 +153,7 @@ INSERT INTO vehicles (
     highlight_steering, highlight_chassis_tail,
     display_order, is_published
   ) VALUES (
-    'lamborghini-aventador', 'lamborghini', '兰博基尼 Aventador', '2022', 'V12超跑',
+    'lamborghini-aventador', 'lamborghini', '兰博基尼 Aventador', NULL, NULL, '2022', 'V12超跑',
     'b6.svg', '12,500', '6.5L V12', '汽油', '自动挡',
     '¥ 4,000,000', '¥ 3,780,000', '双门跑车', '四轮驱动',
     '珍珠白', '黑色 Alcantara', '2 座', '完整在册', '意大利进口',
@@ -171,7 +171,7 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-aventador', 'seed:vehicles/seed/006.png', '/api/media/vehicles/seed/006.png', '兰博基尼 Aventador', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-aventador', 'seed:vehicles/seed/006.png', '/api/media/vehicles/seed/006.png', '兰博基尼 Aventador', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
@@ -181,7 +181,7 @@ INSERT INTO vehicles (
     highlight_steering, highlight_chassis_tail,
     display_order, is_published
   ) VALUES (
-    'lamborghini-huracan-evo', 'lamborghini', '兰博基尼 Huracan EVO', '2023', '中置跑车',
+    'lamborghini-huracan-evo', 'lamborghini', '兰博基尼 Huracan EVO', NULL, NULL, '2023', '中置跑车',
     'b1.svg', '800', '5.2L V10', '汽油', '自动挡',
     '¥ 2,680,000', '¥ 2,520,000', '双门跑车', '四轮驱动',
     '珍珠黄', '黑黄拼色', '2 座', '完整在册', '意大利进口',
@@ -199,7 +199,7 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '兰博基尼 Huracan EVO', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '兰博基尼 Huracan EVO', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
@@ -209,7 +209,7 @@ INSERT INTO vehicles (
     highlight_steering, highlight_chassis_tail,
     display_order, is_published
   ) VALUES (
-    'lamborghini-urus-s', 'lamborghini', '兰博基尼 Urus S', '2024', '高性能SUV',
+    'lamborghini-urus-s', 'lamborghini', '兰博基尼 Urus S', NULL, NULL, '2024', '高性能SUV',
     'b1.svg', '120', '4.0L V8', '汽油', '自动挡',
     '¥ 2,280,000', '¥ 2,140,000', '高性能 SUV', '四轮驱动',
     '石墨灰', '黑橙拼色', '5 座', '完整在册', '意大利进口',
@@ -227,7 +227,7 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-s', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus S', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-s', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus S', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
@@ -237,7 +237,7 @@ INSERT INTO vehicles (
     highlight_steering, highlight_chassis_tail,
     display_order, is_published
   ) VALUES (
-    'lamborghini-huracan-sto', 'lamborghini', '兰博基尼 Huracan STO', '2022', '中置跑车',
+    'lamborghini-huracan-sto', 'lamborghini', '兰博基尼 Huracan STO', NULL, NULL, '2022', '中置跑车',
     'b1.svg', '5,400', '5.2L V10', '汽油', '自动挡',
     '¥ 3,150,000', '¥ 2,960,000', '双门跑车', '后轮驱动',
     '赛道灰', '黑色 Alcantara', '2 座', '完整在册', '意大利进口',
@@ -255,7 +255,7 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-sto', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan STO', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-sto', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan STO', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
@@ -265,7 +265,7 @@ INSERT INTO vehicles (
     highlight_steering, highlight_chassis_tail,
     display_order, is_published
   ) VALUES (
-    'lamborghini-gallardo', 'lamborghini', '兰博基尼 Gallardo', '2019', '中置跑车',
+    'lamborghini-gallardo', 'lamborghini', '兰博基尼 Gallardo', NULL, NULL, '2019', '中置跑车',
     'b1.svg', '28,000', '5.0L V10', '汽油', '自动挡',
     '¥ 1,480,000', '¥ 1,360,000', '双门跑车', '四轮驱动',
     '黑曜石', '黑色真皮', '2 座', '完整在册', '意大利进口',
@@ -283,7 +283,7 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-gallardo', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '兰博基尼 Gallardo', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-gallardo', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '兰博基尼 Gallardo', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
@@ -293,7 +293,7 @@ INSERT INTO vehicles (
     highlight_steering, highlight_chassis_tail,
     display_order, is_published
   ) VALUES (
-    'lamborghini-sian-fkp-37', 'lamborghini', '兰博基尼 Sian FKP 37', '2021', '混动超跑',
+    'lamborghini-sian-fkp-37', 'lamborghini', '兰博基尼 Sian FKP 37', NULL, NULL, '2021', '混动超跑',
     'b1.svg', '2,100', '6.5L V12', 'Hybrid', '自动挡',
     '¥ 8,800,000', '¥ 8,320,000', '双门跑车', '四轮驱动',
     '金属绿', '黑金拼色', '2 座', '完整在册', '意大利进口',
@@ -311,7 +311,7 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-sian-fkp-37', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Sian FKP 37', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-sian-fkp-37', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Sian FKP 37', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
@@ -321,7 +321,7 @@ INSERT INTO vehicles (
     highlight_steering, highlight_chassis_tail,
     display_order, is_published
   ) VALUES (
-    'lamborghini-urus-performante', 'lamborghini', '兰博基尼 Urus Performante', '2023', '高性能SUV',
+    'lamborghini-urus-performante', 'lamborghini', '兰博基尼 Urus Performante', NULL, NULL, '2023', '高性能SUV',
     'b1.svg', '360', '4.0L V8', '汽油', '自动挡',
     '¥ 2,650,000', '¥ 2,490,000', '高性能 SUV', '四轮驱动',
     '哑光灰', '黑红拼色', '5 座', '完整在册', '意大利进口',
@@ -339,7 +339,7 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-performante', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus Performante', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-performante', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus Performante', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
@@ -349,7 +349,7 @@ INSERT INTO vehicles (
     highlight_steering, highlight_chassis_tail,
     display_order, is_published
   ) VALUES (
-    'lamborghini-huracan-evo-rwd', 'lamborghini', '兰博基尼 Huracan EVO RWD', '2020', '中置跑车',
+    'lamborghini-huracan-evo-rwd', 'lamborghini', '兰博基尼 Huracan EVO RWD', NULL, NULL, '2020', '中置跑车',
     'b1.svg', '9,200', '5.2L V10', '汽油', '自动挡',
     '¥ 2,100,000', '¥ 1,960,000', '双门跑车', '后轮驱动',
     '珍珠白', '黑色真皮', '2 座', '完整在册', '意大利进口',

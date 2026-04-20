@@ -6,7 +6,7 @@
 import { createResource } from "./resource.js";
 
 const RENTAL_COLUMNS = [
-  "id", "brand_key", "name", "year", "type", "icon",
+  "id", "brand_key", "name", "name_ja", "name_en", "year", "type", "icon",
   "mileage", "engine", "fuel", "trans",
   "body_style", "drive", "body_color", "interior_color", "seats", "origin",
   "daily_rate", "deposit", "min_days", "rental_status",
@@ -26,6 +26,8 @@ const RENTAL_FIELD_MAP = {
   id: "id",
   brandKey: "brand_key",
   name: "name",
+  nameJa: "name_ja",
+  nameEn: "name_en",
   year: "year",
   type: "type",
   icon: "icon",

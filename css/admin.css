@@ -358,6 +358,16 @@ button { font: inherit; cursor: pointer; }
 }
 .admin-grid-col-1 { grid-column: span 2; }
 
+.admin-preset-lang-row {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 6px;
+}
+@media (max-width: 900px) {
+  .admin-preset-lang-row { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 680px) {
   .admin-grid { grid-template-columns: 1fr; }
   .admin-grid-col-1 { grid-column: auto; }

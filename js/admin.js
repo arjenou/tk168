@@ -49,14 +49,12 @@ function resolveMediaUrlForImg(url) {
 
 const ROOT = document.getElementById("adminRoot");
 
-// Shared preset value sets.  The admin stores the underlying zh/ja string
-// pair directly (matches the shape the public pages already consume), so a
-// dropdown really just picks a prewritten pair by display label.  An empty
-// label is rendered as the placeholder row "未填" and persisted as null.
+// Shared preset value sets.  Stored as JSON { zh, ja, en }; dropdown options
+// set all three.  An empty selection persists as null.
 const YES_NO_DASH = [
-  { label: "是 / あり", zh: "是", ja: "あり" },
-  { label: "否 / なし", zh: "否", ja: "なし" },
-  { label: "— / ―", zh: "—", ja: "―" },
+  { label: "是 / あり / Yes", zh: "是", ja: "あり", en: "Yes" },
+  { label: "否 / なし / No", zh: "否", ja: "なし", en: "No" },
+  { label: "— / ― / —", zh: "—", ja: "―", en: "—" },
 ];
 
 // Resource descriptors drive the list + editor UIs so we keep a single
@@ -79,7 +77,9 @@ const RESOURCES = {
     fields: [
       ["id", "车辆 ID（英文，唯一）"],
       ["brandKey", "品牌 Key（如 lamborghini）"],
-      ["name", "车型名称（中文）"],
+      ["name", "车型名称（中文，必填）"],
+      ["nameJa", "车型名称（日文，可空；空则前台日文用品牌+中文名推断）"],
+      ["nameEn", "车型名称（英文，可空；空则前台英文用品牌+中文名推断）"],
       ["year", "年份"],
       ["type", "车型分类（如 高性能SUV）"],
       ["icon", "图标文件名（如 b1.svg）"],
@@ -98,10 +98,8 @@ const RESOURCES = {
       ["origin", "产地（如 意大利进口）"],
     ],
     // Preset rows:
-    //   [key, label]                   -> free-text input (zh/ja)
-    //   [key, label, "select", options] -> dropdown; options is an array of
-    //                                       { label, zh, ja } used for BOTH
-    //                                       zh and ja select pickers.
+    //   [key, label]                   -> free-text zh / ja / en
+    //   [key, label, "select", options] -> dropdown; options are { label, zh, ja, en }
     // Dropdowns are used for the 10 boilerplate status-style fields so
     // operators can't miskey them; the free-text inputs remain for the two
     // per-vehicle description fields (steering / chassis tail).
@@ -120,25 +118,25 @@ const RESOURCES = {
       ["highlightChassisTail", "车台末尾号"],
     ],
     emptyDraft: () => ({
-      id: "", brandKey: "", name: "", year: "", type: "", icon: "b1.svg",
+      id: "", brandKey: "", name: "", nameJa: "", nameEn: "", year: "", type: "", icon: "b1.svg",
       mileage: "", engine: "", fuel: "汽油", trans: "自动挡",
       totalPrice: "", basePrice: "",
       bodyStyle: "", drive: "", bodyColor: "", interiorColor: "", seats: "",
       serviceRecord: "完整在册", origin: "",
       overviewZh: [""], overviewJa: [""], overviewEn: null,
       benefits: null, features: null,
-      condNonSmoking: { zh: "", ja: "" },
-      condAuthorizedImport: { zh: "", ja: "" },
-      condDealerWarranty: { zh: "", ja: "" },
-      condEcoTaxEligible: { zh: "", ja: "" },
-      condOneOwner: { zh: "", ja: "" },
-      condRentalUp: { zh: "", ja: "" },
-      listingRepairHistory: { zh: "", ja: "" },
-      listingVehicleInspection: { zh: "", ja: "" },
-      listingLegalMaintenance: { zh: "", ja: "" },
-      listingPeriodicBook: { zh: "", ja: "" },
-      highlightSteering: { zh: "", ja: "" },
-      highlightChassisTail: { zh: "", ja: "" },
+      condNonSmoking: { zh: "", ja: "", en: "" },
+      condAuthorizedImport: { zh: "", ja: "", en: "" },
+      condDealerWarranty: { zh: "", ja: "", en: "" },
+      condEcoTaxEligible: { zh: "", ja: "", en: "" },
+      condOneOwner: { zh: "", ja: "", en: "" },
+      condRentalUp: { zh: "", ja: "", en: "" },
+      listingRepairHistory: { zh: "", ja: "", en: "" },
+      listingVehicleInspection: { zh: "", ja: "", en: "" },
+      listingLegalMaintenance: { zh: "", ja: "", en: "" },
+      listingPeriodicBook: { zh: "", ja: "", en: "" },
+      highlightSteering: { zh: "", ja: "", en: "" },
+      highlightChassisTail: { zh: "", ja: "", en: "" },
       displayOrder: 0, isPublished: true, images: [],
     }),
   },
@@ -163,7 +161,9 @@ const RESOURCES = {
     fields: [
       ["id", "租赁车 ID（英文，唯一）"],
       ["brandKey", "品牌 Key（如 lamborghini）"],
-      ["name", "车型名称（中文）"],
+      ["name", "车型名称（中文，必填）"],
+      ["nameJa", "车型名称（日文，可空）"],
+      ["nameEn", "车型名称（英文，可空）"],
       ["year", "年份"],
       ["type", "车型分类"],
       ["icon", "图标文件名（如 b1.svg）"],
@@ -184,7 +184,7 @@ const RESOURCES = {
     ],
     presets: [],
     emptyDraft: () => ({
-      id: "", brandKey: "", name: "", year: "", type: "", icon: "b1.svg",
+      id: "", brandKey: "", name: "", nameJa: "", nameEn: "", year: "", type: "", icon: "b1.svg",
       mileage: "", engine: "", fuel: "汽油", trans: "自动挡",
       bodyStyle: "", drive: "", bodyColor: "", interiorColor: "",
       seats: "2 座", origin: "",
@@ -451,7 +451,7 @@ function filteredItems() {
   const q = state.filter.trim().toLowerCase();
   if (!q) return items;
   return items.filter((v) =>
-    [v.id, v.name, v.brandKey, v.type, v.year].some((field) =>
+    [v.id, v.name, v.nameJa, v.nameEn, v.brandKey, v.type, v.year].some((field) =>
       String(field || "").toLowerCase().includes(q),
     ),
   );
@@ -629,9 +629,7 @@ function renderEditor() {
       const v = draft[key] || {};
 
       if (kind === "select") {
-        // Dropdown: each option is a prewritten {zh, ja} pair.  The
-        // current value is matched by (zh, ja) exactly so legacy data
-        // lands on the right row; unmatched data falls into "未填".
+        // Match legacy rows that only stored { zh, ja }.
         const currentIdx = (options || []).findIndex(
           (opt) => opt.zh === v.zh && opt.ja === v.ja,
         );
@@ -649,19 +647,22 @@ function renderEditor() {
           </div>`;
       }
 
-      // Free-text fallback (两个输入框：中文 / 日文)
       return `
-        <div class="admin-grid" style="margin-bottom:6px;">
-          <div class="admin-field admin-grid-col-1" style="grid-column:span 2;margin-bottom:-4px;"><label style="text-transform:none;font-weight:600;color:var(--admin-text);font-size:13px;letter-spacing:0;">${label}</label></div>
-          <div class="admin-field"><label>中文</label><input class="admin-input" data-preset="${key}.zh" value="${escapeAttr(v.zh ?? "")}"></div>
-          <div class="admin-field"><label>日文</label><input class="admin-input" data-preset="${key}.ja" value="${escapeAttr(v.ja ?? "")}"></div>
+        <div style="margin-bottom:10px;">
+          <div style="font-weight:600;color:var(--admin-text);font-size:13px;letter-spacing:0;margin-bottom:8px;">${escapeHtml(label)}</div>
+          <div class="admin-preset-lang-row">
+            <div class="admin-field"><label>中文</label><input class="admin-input" data-preset="${key}.zh" value="${escapeAttr(v.zh ?? "")}"></div>
+            <div class="admin-field"><label>日文</label><input class="admin-input" data-preset="${key}.ja" value="${escapeAttr(v.ja ?? "")}"></div>
+            <div class="admin-field"><label>英文</label><input class="admin-input" data-preset="${key}.en" value="${escapeAttr(v.en ?? "")}"></div>
+          </div>
+          <div style="font-size:11px;color:var(--admin-text-dim);margin-top:4px;">数字或符号三语相同时，可在三栏填相同内容。</div>
         </div>`;
     })
     .join("");
 
   const presetSection = r.presets.length
     ? `<section class="admin-card">
-         <h2>参数 / 规格</h2>
+         <h2>参数 / 规格（中日英）</h2>
          ${presetFields}
        </section>`
     : "";
@@ -769,9 +770,6 @@ function bindEditor() {
     });
   });
 
-  // Paired dropdown: selecting an option writes {zh, ja} together; the
-  // blank row sets the draft back to {zh:"",ja:""} which saveItem will
-  // persist as NULL so the field is cleanly "unset" in the DB.
   document.querySelectorAll("[data-preset-select]").forEach((select) => {
     select.addEventListener("change", () => {
       const key = select.dataset.presetSelect;
@@ -780,9 +778,9 @@ function bindEditor() {
       const idx = select.value === "" ? -1 : Number(select.value);
       if (idx >= 0 && options[idx]) {
         const opt = options[idx];
-        state.editingDraft[key] = { zh: opt.zh, ja: opt.ja };
+        state.editingDraft[key] = { zh: opt.zh, ja: opt.ja, en: opt.en ?? "" };
       } else {
-        state.editingDraft[key] = { zh: "", ja: "" };
+        state.editingDraft[key] = { zh: "", ja: "", en: "" };
       }
     });
   });
