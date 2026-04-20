@@ -349,6 +349,32 @@ button { font: inherit; cursor: pointer; }
   letter-spacing: 0.02em;
 }
 
+.admin-card-h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--admin-text);
+  margin: 18px 0 10px;
+  letter-spacing: 0.02em;
+}
+
+.admin-card-h3:first-of-type {
+  margin-top: 0;
+}
+
+.admin-card-lead {
+  font-size: 12px;
+  color: var(--admin-text-dim);
+  line-height: 1.5;
+  margin: -8px 0 16px;
+}
+
+.admin-card-hint {
+  font-size: 11px;
+  color: var(--admin-text-dim);
+  line-height: 1.45;
+  margin: 0 0 8px;
+}
+
 .admin-card + .admin-card { margin-top: 20px; }
 
 .admin-grid {

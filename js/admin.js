@@ -601,23 +601,39 @@ function bindRowActions() {
 
 // -------------------- Editor --------------------
 
+/** Vehicle / rental fields that are edited as zh + ja + en in the i18n card (not the mono card). */
+const I18N_NAME_FIELD_KEYS = new Set(["name", "nameJa", "nameEn"]);
+
 function renderEditor() {
   const r = currentResource();
   const draft = state.editingDraft;
   const isNew = state.editingId === "__new__";
 
-  const mainFields = r.fields.map(([key, label, inputType]) => {
+  const monoFieldRows = r.fields.filter(([key]) => !I18N_NAME_FIELD_KEYS.has(key));
+  const monoFields = monoFieldRows.map(([key, label, inputType]) => {
     const value = draft[key];
     const isNumber = inputType === "number";
     return `
       <div class="admin-field">
-        <label>${label}</label>
+        <label>${escapeHtml(label)}</label>
         <input class="admin-input" type="${isNumber ? "number" : "text"}"
                data-draft="${key}"
                value="${escapeAttr(value ?? (isNumber ? 0 : ""))}"
                ${key === "id" && !isNew ? "readonly" : ""}>
       </div>`;
   }).join("");
+
+  const hasNameI18n = r.fields.some(([key]) => key === "name");
+  const nameI18nBlock = hasNameI18n
+    ? `
+        <h3 class="admin-card-h3">车型名称</h3>
+        <p class="admin-card-hint">中文必填；日文、英文可空时，前台会按品牌与中文名推断展示。</p>
+        <div class="admin-preset-lang-row">
+          <div class="admin-field"><label>中文（必填）</label><input class="admin-input" data-draft="name" value="${escapeAttr(draft.name ?? "")}"></div>
+          <div class="admin-field"><label>日文</label><input class="admin-input" data-draft="nameJa" value="${escapeAttr(draft.nameJa ?? "")}"></div>
+          <div class="admin-field"><label>英文</label><input class="admin-input" data-draft="nameEn" value="${escapeAttr(draft.nameEn ?? "")}"></div>
+        </div>`
+    : "";
 
   const overviewZh = Array.isArray(draft.overviewZh) ? draft.overviewZh.join("\n\n") : (draft.overviewZh || "");
   const overviewJa = Array.isArray(draft.overviewJa) ? draft.overviewJa.join("\n\n") : (draft.overviewJa || "");
@@ -655,17 +671,37 @@ function renderEditor() {
             <div class="admin-field"><label>日文</label><input class="admin-input" data-preset="${key}.ja" value="${escapeAttr(v.ja ?? "")}"></div>
             <div class="admin-field"><label>英文</label><input class="admin-input" data-preset="${key}.en" value="${escapeAttr(v.en ?? "")}"></div>
           </div>
-          <div style="font-size:11px;color:var(--admin-text-dim);margin-top:4px;">数字或符号三语相同时，可在三栏填相同内容。</div>
         </div>`;
     })
     .join("");
 
-  const presetSection = r.presets.length
-    ? `<section class="admin-card">
-         <h2>参数 / 规格（中日英）</h2>
-         ${presetFields}
-       </section>`
+  const presetBlock = r.presets.length
+    ? `
+        <h3 class="admin-card-h3">参数 / 规格</h3>
+        <p class="admin-card-hint">与语言无关的数字或符号，可在中 / 日 / 英三栏填写相同内容。</p>
+        ${presetFields}`
     : "";
+
+  const i18nSection = `
+        <section class="admin-card admin-card-i18n">
+          <h2>多语言内容（中 / 日 / 英）</h2>
+          <p class="admin-card-lead">本卡片内每项需区分语言；单行基础信息请在左侧上一张卡片填写。</p>
+          ${nameI18nBlock}
+          <h3 class="admin-card-h3">车辆概述</h3>
+          <div class="admin-field">
+            <label>中文概述（段落以空行分隔）</label>
+            <textarea class="admin-textarea" data-overview="zh">${escapeHtml(overviewZh)}</textarea>
+          </div>
+          <div class="admin-field">
+            <label>日文概述</label>
+            <textarea class="admin-textarea" data-overview="ja">${escapeHtml(overviewJa)}</textarea>
+          </div>
+          <div class="admin-field">
+            <label>英文概述（可留空，留空时前台自动生成）</label>
+            <textarea class="admin-textarea" data-overview="en">${escapeHtml(overviewEn)}</textarea>
+          </div>
+          ${presetBlock}
+        </section>`;
 
   const inner = `
     <div class="admin-page-head">
@@ -679,8 +715,9 @@ function renderEditor() {
     <div class="admin-editor">
       <div>
         <section class="admin-card">
-          <h2>基础信息</h2>
-          <div class="admin-grid">${mainFields}</div>
+          <h2>基础信息（单行）</h2>
+          <p class="admin-card-lead">ID、价格、里程、颜色等通常各语言共用一份即可。</p>
+          <div class="admin-grid">${monoFields}</div>
           <div style="margin-top:14px;">
             <label class="admin-checkbox">
               <input type="checkbox" data-draft="isPublished" ${draft.isPublished ? "checked" : ""}>
@@ -693,23 +730,7 @@ function renderEditor() {
           </div>
         </section>
 
-        <section class="admin-card">
-          <h2>车辆概述</h2>
-          <div class="admin-field">
-            <label>中文概述（段落以空行分隔）</label>
-            <textarea class="admin-textarea" data-overview="zh">${escapeHtml(overviewZh)}</textarea>
-          </div>
-          <div class="admin-field">
-            <label>日文概述</label>
-            <textarea class="admin-textarea" data-overview="ja">${escapeHtml(overviewJa)}</textarea>
-          </div>
-          <div class="admin-field">
-            <label>英文概述（可留空，留空时自动生成）</label>
-            <textarea class="admin-textarea" data-overview="en">${escapeHtml(overviewEn)}</textarea>
-          </div>
-        </section>
-
-        ${presetSection}
+        ${i18nSection}
       </div>
 
       <div>
