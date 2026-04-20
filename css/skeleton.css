@@ -1,4 +1,6 @@
-/* TK168 global page skeleton (shimmer placeholders until first paint is ready). */
+/* TK168 global page skeleton — neutral greys, per-page layouts.
+   The overlay is injected synchronously in <head> (see js/skeleton-boot.js)
+   so the next page never shows a blank flash before shimmering.          */
 
 @keyframes tk168-sk-wave {
   0% {
@@ -13,29 +15,52 @@
   position: fixed;
   inset: 0;
   z-index: 10050;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(16px, 3vw, 28px);
-  padding: clamp(12px, 2.5vw, 24px) clamp(16px, 4vw, 48px);
-  padding-top: calc(65px + clamp(12px, 2vw, 20px));
-  background: linear-gradient(180deg, #0e0e10 0%, #171717 45%, #141414 100%);
+  padding: calc(65px + 20px) clamp(16px, 4vw, 48px) 40px;
+  background: #F6F3EE;
+  color: rgba(23, 23, 23, 0.06);
   pointer-events: none;
-  transition: opacity 0.45s ease, visibility 0.45s ease;
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity 0.42s ease;
+}
+
+/* Dark-themed pages (home, detail, admin) — show a matching dark panel. */
+html[data-skeleton-theme="dark"] .tk168-skeleton-overlay {
+  background: #141414;
+  color: rgba(255, 255, 255, 0.05);
 }
 
 .tk168-skeleton-overlay.is-done {
   opacity: 0;
-  visibility: hidden;
 }
 
-.tk168-sk-shimmer {
+.tk168-sk-row,
+.tk168-sk-col,
+.tk168-sk-grid,
+.tk168-sk-shell {
+  width: 100%;
+  max-width: var(--page-shell-max, 1344px);
+  margin: 0 auto;
+}
+
+.tk168-sk-col {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2vw, 22px);
+}
+
+.tk168-sk-block {
   position: relative;
   overflow: hidden;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.055);
+  border-radius: 14px;
+  background: rgba(17, 17, 17, 0.08);
 }
 
-.tk168-sk-shimmer::after {
+html[data-skeleton-theme="dark"] .tk168-sk-block {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.tk168-sk-block::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -43,13 +68,24 @@
   background: linear-gradient(
     100deg,
     transparent 0%,
-    rgba(242, 250, 90, 0.07) 45%,
+    rgba(0, 0, 0, 0.06) 45%,
     transparent 90%
   );
   background-size: 200% 100%;
-  animation: tk168-sk-wave 1.35s ease-in-out infinite;
+  animation: tk168-sk-wave 1.4s ease-in-out infinite;
 }
 
+html[data-skeleton-theme="dark"] .tk168-sk-block::after {
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.07) 45%,
+    transparent 90%
+  );
+  background-size: 200% 100%;
+}
+
+/* ------ top navbar placeholder ---------------------------------------- */
 .tk168-sk-nav {
   position: fixed;
   top: 0;
@@ -57,18 +93,19 @@
   right: 0;
   height: 65px;
   border-radius: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(23, 23, 23, 0.92);
+  background: #23211F;
 }
 
+/* ------ Hero block (large image area at top of a showcase page) -------- */
 .tk168-sk-hero {
   width: 100%;
   max-width: var(--page-shell-max, 1344px);
   margin: 0 auto;
-  height: clamp(180px, 28vh, 360px);
-  border-radius: 18px;
+  height: clamp(220px, 38vh, 420px);
+  border-radius: 20px;
 }
 
+/* ------ Text line placeholders ---------------------------------------- */
 .tk168-sk-lines {
   width: min(560px, 88vw);
   margin: 0 auto;
@@ -77,60 +114,208 @@
   gap: 12px;
 }
 
-.tk168-sk-lines span {
-  display: block;
+.tk168-sk-lines .tk168-sk-block {
   height: 14px;
   border-radius: 8px;
 }
 
-.tk168-sk-lines span:nth-child(1) {
-  width: 72%;
+.tk168-sk-lines .tk168-sk-block:nth-child(1) {
+  width: 62%;
 }
 
-.tk168-sk-lines span:nth-child(2) {
+.tk168-sk-lines .tk168-sk-block:nth-child(2) {
   width: 92%;
 }
 
-.tk168-sk-lines span:nth-child(3) {
-  width: 48%;
+.tk168-sk-lines .tk168-sk-block:nth-child(3) {
+  width: 46%;
 }
 
+/* ------ Card grid (vehicles, brand, favorites, rental) ---------------- */
 .tk168-sk-grid {
-  width: 100%;
-  max-width: var(--page-shell-max, 1344px);
-  margin: 8px auto 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 14px;
 }
 
 @media (min-width: 760px) {
   .tk168-sk-grid {
     grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
   }
 }
 
-.tk168-sk-grid span {
-  display: block;
+.tk168-sk-grid .tk168-sk-block {
   aspect-ratio: 16 / 11;
+  border-radius: 14px;
+}
+
+/* ------ Inquiry / form layout ----------------------------------------- */
+.tk168-sk-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  max-width: 720px;
+  margin: 20px auto 0;
+}
+
+.tk168-sk-form .tk168-sk-block {
+  height: 44px;
+  border-radius: 10px;
+}
+
+.tk168-sk-form .tk168-sk-block.is-tall {
+  height: 120px;
+}
+
+/* ------ Detail (split: gallery | info) --------------------------------- */
+.tk168-sk-detail {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin-top: 12px;
+}
+
+@media (min-width: 900px) {
+  .tk168-sk-detail {
+    grid-template-columns: 1.2fr 1fr;
+  }
+}
+
+.tk168-sk-detail .tk168-sk-gallery {
+  aspect-ratio: 4 / 3;
+  border-radius: 16px;
+}
+
+.tk168-sk-detail .tk168-sk-spec {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tk168-sk-detail .tk168-sk-spec .tk168-sk-block {
+  height: 18px;
+  border-radius: 6px;
+}
+
+.tk168-sk-detail .tk168-sk-spec .tk168-sk-block:nth-child(1) {
+  width: 60%;
+  height: 34px;
+}
+
+.tk168-sk-detail .tk168-sk-spec .tk168-sk-block:nth-child(2) {
+  width: 40%;
+  height: 28px;
+}
+
+.tk168-sk-detail .tk168-sk-spec .tk168-sk-block:nth-child(3) {
+  width: 90%;
+}
+
+.tk168-sk-detail .tk168-sk-spec .tk168-sk-block:nth-child(4) {
+  width: 84%;
+}
+
+.tk168-sk-detail .tk168-sk-spec .tk168-sk-block:nth-child(5) {
+  width: 70%;
+}
+
+/* ------ Brand navigation row ------------------------------------------ */
+.tk168-sk-brandnav {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.tk168-sk-brandnav .tk168-sk-block {
+  height: 54px;
   border-radius: 12px;
+}
+
+@media (max-width: 760px) {
+  .tk168-sk-brandnav {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ------ When skeleton is active, hide underlying body ----------------- */
+html.tk168-skeleton-active body {
+  opacity: 0 !important;
+  animation: none !important;
 }
 
 html.tk168-skeleton-active {
   overflow: hidden;
 }
 
-html.tk168-skeleton-ready {
-  overflow: unset;
+@media (prefers-reduced-motion: reduce) {
+  .tk168-sk-block::after {
+    animation: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Top progress bar (shown on outgoing page while the next doc loads).
+   Only used on engines without cross-document View Transitions.
+   ───────────────────────────────────────────────────────────────────── */
+.tk168-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 10060;
+  background: transparent;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.tk168-progress-bar.is-active {
+  opacity: 1;
+}
+
+.tk168-progress-bar > span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.7) 40%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 255, 255, 0.7) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: tk168-progress-slide 1.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+html[data-skeleton-theme="dark"] .tk168-progress-bar > span,
+.about-page .tk168-progress-bar > span,
+.showcase-page .tk168-progress-bar > span {
+  background: linear-gradient(
+    90deg,
+    rgba(23, 23, 23, 0) 0%,
+    rgba(23, 23, 23, 0.55) 40%,
+    rgba(23, 23, 23, 0.85) 50%,
+    rgba(23, 23, 23, 0.55) 60%,
+    rgba(23, 23, 23, 0) 100%
+  );
+}
+
+@keyframes tk168-progress-slide {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tk168-sk-shimmer::after {
+  .tk168-progress-bar > span {
     animation: none;
-  }
-
-  .tk168-sk-shimmer,
-  .tk168-sk-nav {
-    background: rgba(255, 255, 255, 0.07);
+    width: 100%;
+    opacity: 0.5;
   }
 }

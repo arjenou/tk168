@@ -109,7 +109,11 @@
      - 与 CSS 中的 .is-page-navigating / .is-page-restored 联动
      ─────────────────────────────────────────────── */
   const PageTransition = (() => {
-    const TRANSITION_MS = 280;
+    // Native cross-document View Transitions (Chromium) and skeleton-boot.js
+    // handle the visual transition entirely. We no longer intercept link
+    // clicks here — the browser's own navigation is the smoothest path and
+    // adding a setTimeout just adds latency.
+    const TRANSITION_MS = 0;
     const NAV_SAFETY_MS = 900;
     const root = document.documentElement;
     const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
@@ -150,57 +154,23 @@
     }
 
     function runFadeOut(nextHref, replace) {
+      // Kept for the public navigate() API. Performs an immediate navigation;
+      // the browser's native transition does the actual visual crossfade.
       if (isNavigating) return;
       isNavigating = true;
-      root.classList.add('is-page-navigating');
-
-      const reducedMotion = prefersReducedMotion?.matches;
-      const delay = reducedMotion ? 120 : TRANSITION_MS;
-
-      const go = () => {
-        if (replace) {
-          window.location.replace(nextHref);
-        } else {
-          window.location.href = nextHref;
-        }
-      };
-
-      window.setTimeout(go, delay);
+      if (replace) {
+        window.location.replace(nextHref);
+      } else {
+        window.location.href = nextHref;
+      }
       safetyTimer = window.setTimeout(() => {
-        root.classList.remove('is-page-navigating');
         isNavigating = false;
       }, NAV_SAFETY_MS);
     }
 
-    function handleClick(event) {
-      if (event.defaultPrevented) return;
-      if (isModifiedEvent(event)) return;
-
-      const anchor = event.target?.closest?.('a[href]');
-      if (!anchor || shouldSkipAnchor(anchor)) return;
-
-      let url;
-      try {
-        url = new URL(anchor.href, window.location.href);
-      } catch {
-        return;
-      }
-
-      if (!isSameOriginHttpUrl(url)) return;
-
-      if (isSamePagePath(url)) {
-        if (url.hash && url.hash !== window.location.hash) return;
-        return;
-      }
-
-      event.preventDefault();
-      runFadeOut(url.href, false);
-    }
-
     function bindClickInterceptor() {
-      if (root.dataset.pageTransitionBound === '1') return;
-      root.dataset.pageTransitionBound = '1';
-      document.addEventListener('click', handleClick, false);
+      // Intentionally no-op: we let the browser handle navigation natively
+      // so cross-document View Transitions (Chromium) can crossfade pages.
     }
 
     function handlePageShow(event) {

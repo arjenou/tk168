@@ -94,20 +94,20 @@ body {
 }
 
 /* ─────────────────────────────────────────────
-   Page transition (全站统一跳转过渡)
-   - 进入：首次渲染淡入 + 轻微上滑
-   - 离开：JS 给 <html> 加 is-page-navigating 触发淡出
-   - 支持 bfcache（pageshow 时恢复）
-   - 跨文档 View Transitions 在 Chromium 上也会平滑过渡
+   Page transition (Google 风格柔滑跳转)
+   - Chromium: 原生跨文档 View Transitions 做 crossfade
+     (旧页面保持在屏幕上，新页面 fade-in 覆盖，没有白屏中间态)
+   - Safari/Firefox: skeleton overlay + body 绝不 fade-out
    ───────────────────────────────────────────── */
 @view-transition {
   navigation: auto;
 }
 
+/* 首次进入页面的淡入：轻微上滑 + 渐显，与跳转过渡风格一致 */
 @keyframes tk168PageFadeIn {
   from {
     opacity: 0;
-    transform: translate3d(0, 8px, 0);
+    transform: translate3d(0, 6px, 0);
   }
   to {
     opacity: 1;
@@ -116,45 +116,47 @@ body {
 }
 
 body {
-  animation: tk168PageFadeIn 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: tk168PageFadeIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
   will-change: opacity, transform;
 }
 
-html.is-page-navigating body {
-  opacity: 0;
-  transform: translate3d(0, -6px, 0);
-  transition: opacity 260ms cubic-bezier(0.4, 0, 0.2, 1),
-              transform 260ms cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
-  animation: none;
+/* Body skeleton-active 时不触发淡入动画 —— overlay 会接管过渡，
+   等到 overlay 淡出时 body 以静默的 opacity:1 状态出现，不会再闪一次 */
+html.tk168-skeleton-active body {
+  animation: none !important;
 }
 
-/* 返回（bfcache / history 恢复）时立即显示，避免残留 0 透明度 */
+html.is-page-navigating body {
+  pointer-events: none;
+}
+
 html.is-page-restored body {
   animation: none;
   opacity: 1;
   transform: none;
 }
 
-/* Chromium 跨文档视图过渡：用更顺滑的淡入淡出替代默认动画 */
+/* View Transitions — Google 式 crossfade:
+   旧页面保持不透明底 (opacity 1 → 1), 新页面从 0 渐显
+   这样切换期间屏幕上始终有内容, 杜绝白屏 */
 ::view-transition-old(root) {
-  animation: tk168ViewFadeOut 240ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: tk168ViewHold 420ms linear both;
+  z-index: 1;
 }
 ::view-transition-new(root) {
-  animation: tk168ViewFadeIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: tk168ViewCrossIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  z-index: 2;
 }
 
-@keyframes tk168ViewFadeOut {
-  to {
-    opacity: 0;
-    transform: translate3d(0, -6px, 0);
-  }
+@keyframes tk168ViewHold {
+  from { opacity: 1; }
+  to   { opacity: 1; }
 }
 
-@keyframes tk168ViewFadeIn {
+@keyframes tk168ViewCrossIn {
   from {
     opacity: 0;
-    transform: translate3d(0, 8px, 0);
+    transform: translate3d(0, 6px, 0);
   }
   to {
     opacity: 1;
@@ -166,13 +168,11 @@ html.is-page-restored body {
   body {
     animation: none;
   }
-  html.is-page-navigating body {
-    transition: opacity 120ms linear;
-    transform: none;
+  ::view-transition-old(root) {
+    animation: none;
   }
-  ::view-transition-old(root),
   ::view-transition-new(root) {
-    animation-duration: 120ms;
+    animation: tk168ViewCrossIn 140ms linear both;
   }
 }
 @media (max-width: 820px) {
