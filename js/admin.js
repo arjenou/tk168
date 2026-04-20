@@ -22,6 +22,31 @@ const API_BASE = SAME_ORIGIN_API_HOSTS.has(location.hostname)
   ? "/api"
   : "https://api.tk168.co.jp/api";
 
+/** Origin that serves `/api/*` (Worker). Used so `<img src>` hits the API host when the admin HTML is on www (Vercel). */
+function apiOrigin() {
+  try {
+    if (API_BASE.startsWith("http")) return new URL(API_BASE).origin;
+    return new URL(API_BASE, location.origin).origin;
+  } catch {
+    return location.origin;
+  }
+}
+
+/** DB stores `/api/media/...`; resolve against the Worker origin when the page is not on that host. */
+function resolveMediaUrlForImg(url) {
+  if (!url) return "";
+  const s = String(url).trim();
+  if (/^https?:\/\//i.test(s)) return s;
+  if (s.startsWith("/api/")) {
+    try {
+      return new URL(s, apiOrigin()).href;
+    } catch {
+      return s;
+    }
+  }
+  return s;
+}
+
 const ROOT = document.getElementById("adminRoot");
 
 // Shared preset value sets.  The admin stores the underlying zh/ja string
@@ -498,7 +523,7 @@ function renderList() {
 }
 
 function itemRow(v, r) {
-  const cover = v.images?.[0]?.url || "";
+  const cover = resolveMediaUrlForImg(v.images?.[0]?.url || "");
   const extraCells = (r.extraColumns || [])
     .map((c) => `<td>${escapeHtml(c.render ? c.render(v[c.key]) : v[c.key] ?? "")}</td>`)
     .join("");
@@ -711,7 +736,7 @@ function renderEditor() {
 function imageTile(img) {
   return `
     <div class="admin-image-tile" data-image="${img.id}">
-      <img src="${escapeAttr(img.url)}" alt="${escapeAttr(img.alt || "")}">
+      <img src="${escapeAttr(resolveMediaUrlForImg(img.url))}" alt="${escapeAttr(img.alt || "")}">
       ${img.isPrimary ? '<span class="primary-flag">封面</span>' : ""}
       <button class="remove" title="删除图片" data-remove-image="${img.id}">×</button>
     </div>
