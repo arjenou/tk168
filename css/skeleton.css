@@ -1,0 +1,136 @@
+/* TK168 global page skeleton (shimmer placeholders until first paint is ready). */
+
+@keyframes tk168-sk-wave {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.tk168-skeleton-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 3vw, 28px);
+  padding: clamp(12px, 2.5vw, 24px) clamp(16px, 4vw, 48px);
+  padding-top: calc(65px + clamp(12px, 2vw, 20px));
+  background: linear-gradient(180deg, #0e0e10 0%, #171717 45%, #141414 100%);
+  pointer-events: none;
+  transition: opacity 0.45s ease, visibility 0.45s ease;
+}
+
+.tk168-skeleton-overlay.is-done {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.tk168-sk-shimmer {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.tk168-sk-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(242, 250, 90, 0.07) 45%,
+    transparent 90%
+  );
+  background-size: 200% 100%;
+  animation: tk168-sk-wave 1.35s ease-in-out infinite;
+}
+
+.tk168-sk-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 65px;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(23, 23, 23, 0.92);
+}
+
+.tk168-sk-hero {
+  width: 100%;
+  max-width: var(--page-shell-max, 1344px);
+  margin: 0 auto;
+  height: clamp(180px, 28vh, 360px);
+  border-radius: 18px;
+}
+
+.tk168-sk-lines {
+  width: min(560px, 88vw);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tk168-sk-lines span {
+  display: block;
+  height: 14px;
+  border-radius: 8px;
+}
+
+.tk168-sk-lines span:nth-child(1) {
+  width: 72%;
+}
+
+.tk168-sk-lines span:nth-child(2) {
+  width: 92%;
+}
+
+.tk168-sk-lines span:nth-child(3) {
+  width: 48%;
+}
+
+.tk168-sk-grid {
+  width: 100%;
+  max-width: var(--page-shell-max, 1344px);
+  margin: 8px auto 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+}
+
+@media (min-width: 760px) {
+  .tk168-sk-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.tk168-sk-grid span {
+  display: block;
+  aspect-ratio: 16 / 11;
+  border-radius: 12px;
+}
+
+html.tk168-skeleton-active {
+  overflow: hidden;
+}
+
+html.tk168-skeleton-ready {
+  overflow: unset;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tk168-sk-shimmer::after {
+    animation: none;
+  }
+
+  .tk168-sk-shimmer,
+  .tk168-sk-nav {
+    background: rgba(255, 255, 255, 0.07);
+  }
+}
