@@ -47,6 +47,17 @@ function resolveMediaUrlForImg(url) {
   return s;
 }
 
+/** Internal vehicle/rental primary key; not shown in admin UI. Prefix v / r + random a-z0-9. */
+function generateInventoryId(resourceKey) {
+  const prefix = resourceKey === "rentals" ? "r" : "v";
+  const alphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
+  const buf = new Uint8Array(14);
+  crypto.getRandomValues(buf);
+  let tail = "";
+  for (let i = 0; i < buf.length; i++) tail += alphabet[buf[i] % alphabet.length];
+  return prefix + tail;
+}
+
 const ROOT = document.getElementById("adminRoot");
 
 // Shared preset value sets.  Stored as JSON { zh, ja, en }; dropdown options
@@ -75,7 +86,6 @@ const RESOURCES = {
     emptyLabel: "暂无车辆",
     priceColumn: { key: "totalPrice", label: "总价" },
     fields: [
-      ["id", "车辆 ID（英文，唯一）"],
       ["brandKey", "品牌 Key（如 lamborghini）"],
       ["name", "车型名称（中文，必填）"],
       ["nameJa", "车型名称（日文，可空；空则前台日文用品牌+中文名推断）"],
@@ -159,7 +169,6 @@ const RESOURCES = {
       { key: "rentalStatus", label: "状态", render: (v) => statusLabel(v) },
     ],
     fields: [
-      ["id", "租赁车 ID（英文，唯一）"],
       ["brandKey", "品牌 Key（如 lamborghini）"],
       ["name", "车型名称（中文，必填）"],
       ["nameJa", "车型名称（日文，可空）"],
@@ -470,7 +479,7 @@ function renderList() {
     <div class="admin-page-head">
       <h1>${escapeHtml(r.headerLabel)} <span style="color:var(--admin-text-dim);font-size:14px;font-weight:400;">（${items.length} 台）</span></h1>
       <div class="admin-toolbar">
-        <input id="itemSearch" class="admin-input admin-search" type="search" placeholder="搜索 ID / 名称 / 品牌" value="${escapeHtml(state.filter)}">
+        <input id="itemSearch" class="admin-input admin-search" type="search" placeholder="搜索 名称 / 品牌" value="${escapeHtml(state.filter)}">
         <button class="admin-btn admin-btn-primary" id="newItemBtn">+ 新增${r.label}</button>
       </div>
     </div>
@@ -483,7 +492,7 @@ function renderList() {
             <thead>
               <tr>
                 <th style="width:84px;">封面</th>
-                <th>名称 / ID</th>
+                <th>名称</th>
                 <th>品牌</th>
                 <th>年份</th>
                 <th>${escapeHtml(r.priceColumn.label)}</th>
@@ -532,7 +541,6 @@ function itemRow(v, r) {
       <td>${cover ? `<img class="admin-thumb" src="${escapeAttr(cover)}" alt="">` : '<div class="admin-thumb"></div>'}</td>
       <td>
         <div style="font-weight:600;">${escapeHtml(v.name)}</div>
-        <div style="font-size:11px;color:var(--admin-text-muted);">${escapeHtml(v.id)}</div>
       </td>
       <td>${escapeHtml(v.brandKey || "")}</td>
       <td>${escapeHtml(v.year || "")}</td>
@@ -570,7 +578,9 @@ function bindRowActions() {
   document.querySelectorAll("[data-delete]").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const id = btn.dataset.delete;
-      if (!confirm(`确认删除 ${id}？将同时删除其所有图片。`)) return;
+      const row = (state.items[r.key] || []).find((x) => x.id === id);
+      const label = row?.name || id;
+      if (!confirm(`确认删除「${label}」？将同时删除其所有图片。`)) return;
       try {
         await api(r.apiItem(id), { method: "DELETE" });
         showToast("已删除");
@@ -618,8 +628,7 @@ function renderEditor() {
         <label>${escapeHtml(label)}</label>
         <input class="admin-input" type="${isNumber ? "number" : "text"}"
                data-draft="${key}"
-               value="${escapeAttr(value ?? (isNumber ? 0 : ""))}"
-               ${key === "id" && !isNew ? "readonly" : ""}>
+               value="${escapeAttr(value ?? (isNumber ? 0 : ""))}">
       </div>`;
   }).join("");
 
@@ -716,7 +725,7 @@ function renderEditor() {
       <div>
         <section class="admin-card">
           <h2>基础信息（单行）</h2>
-          <p class="admin-card-lead">ID、价格、里程、颜色等通常各语言共用一份即可。</p>
+          <p class="admin-card-lead">系统会在保存时自动生成内部车辆标识（不在界面显示）。价格、里程、颜色等通常各语言共用一份即可。</p>
           <div class="admin-grid">${monoFields}</div>
           <div style="margin-top:14px;">
             <label class="admin-checkbox">
@@ -867,8 +876,8 @@ function bindEditor() {
 async function saveItem() {
   const r = currentResource();
   const draft = state.editingDraft;
-  if (!draft.id || !draft.brandKey || !draft.name) {
-    showToast("ID / 品牌 / 名称 为必填项", "error");
+  if (!draft.brandKey || !draft.name) {
+    showToast("品牌与中文车型名称为必填项", "error");
     return;
   }
 
@@ -882,8 +891,26 @@ async function saveItem() {
 
   try {
     if (state.editingId === "__new__") {
-      const res = await api(r.apiList, { method: "POST", body: payload });
-      const created = res[r.itemKey];
+      let created = null;
+      let lastDup = null;
+      for (let attempt = 0; attempt < 12; attempt++) {
+        payload.id = generateInventoryId(r.key);
+        try {
+          const res = await api(r.apiList, { method: "POST", body: payload });
+          created = res[r.itemKey];
+          break;
+        } catch (err) {
+          if (err.code === r.duplicateCode) {
+            lastDup = err;
+            continue;
+          }
+          throw err;
+        }
+      }
+      if (!created) {
+        showToast(lastDup ? "创建失败：ID 冲突，请稍后再试" : "创建失败", "error");
+        return;
+      }
       state.editingId = created.id;
       state.editingDraft = { ...created, images: created.images || [] };
       showToast("已创建。现在可以上传图片。");
@@ -903,7 +930,7 @@ async function saveItem() {
     renderEditor();
   } catch (err) {
     if (err.code === r.duplicateCode) {
-      showToast("该 ID 已存在，请换一个。", "error");
+      showToast("保存失败：记录标识冲突。", "error");
     } else {
       showToast(`保存失败：${err.message}`, "error");
     }
