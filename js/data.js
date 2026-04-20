@@ -863,8 +863,11 @@ window.TK168_DATA = (() => {
   ];
 
   // If the API hydrate script (js/api-hydrate.js) populated live vehicles
-  // from the admin backend, prefer them over the static baseVehicles.  This
-  // lets the admin console drive the site without an async refactor.
+  // from the admin backend, merge them onto the static baseVehicles so the
+  // admin console drives the site while fields the admin does not manage
+  // (richly localised `specs`, `highlights`, `description`, etc.) keep
+  // falling back to the built-in defaults.  If the API has never been
+  // reached we behave exactly like before.
   const apiVehicles = Array.isArray(window.TK168_API_VEHICLES)
     ? window.TK168_API_VEHICLES
     : null;
@@ -872,7 +875,38 @@ window.TK168_DATA = (() => {
     ? window.TK168_API_PRESETS
     : null;
 
-  const seedVehicles = apiVehicles && apiVehicles.length ? apiVehicles : baseVehicles;
+  // Keep only values the admin actually set; an empty string or null means
+  // "fall back to whatever baseVehicles has for this field".
+  function pickDefined(src) {
+    const out = {};
+    if (!src || typeof src !== "object") return out;
+    for (const [key, value] of Object.entries(src)) {
+      if (value === null || value === undefined) continue;
+      if (typeof value === "string" && value.trim() === "") continue;
+      if (Array.isArray(value) && value.length === 0) continue;
+      out[key] = value;
+    }
+    return out;
+  }
+
+  function mergeVehicleData(base, override) {
+    if (!base) return { ...override };
+    if (!override) return { ...base };
+    return { ...base, ...pickDefined(override) };
+  }
+
+  let seedVehicles;
+  if (apiVehicles && apiVehicles.length) {
+    const baseById = new Map(baseVehicles.map((v) => [v.id, v]));
+    const merged = apiVehicles.map((apiV) => mergeVehicleData(baseById.get(apiV.id), apiV));
+    const mergedIds = new Set(merged.map((v) => v.id));
+    // Preserve static-only vehicles that the admin hasn't created yet so
+    // pages that hard-code specific IDs keep working during the transition.
+    const extras = baseVehicles.filter((v) => !mergedIds.has(v.id));
+    seedVehicles = [...merged, ...extras];
+  } else {
+    seedVehicles = baseVehicles;
+  }
   const vehicles = appendBrandLibraryVehicles(seedVehicles, brandLibraryItems)
     .map((vehicle) => {
       const canonicalBrandKey = resolveCanonicalBrandKey(vehicle.brandKey);
@@ -1452,6 +1486,18 @@ window.TK168_DATA = (() => {
     if (/^(?:https?:)?\/\//.test(rawPath) || rawPath.startsWith('data:') || rawPath.startsWith('blob:') || rawPath.startsWith('assets/')) {
       return rawPath;
     }
+    // Admin-uploaded media is served from the Cloudflare worker at
+    // /api/media/<key>.  When we're running from a different origin (the
+    // Vercel-hosted www.tk168.co.jp) we have to rewrite the leading slash
+    // into the full API host, otherwise the browser will look for the file
+    // under the Vercel domain and get a 404.
+    if (rawPath.startsWith('/api/')) {
+      const apiBase = (typeof window !== 'undefined' && typeof window.TK168_API_BASE === 'string')
+        ? window.TK168_API_BASE
+        : 'https://api.tk168.co.jp';
+      const sameOrigin = typeof location !== 'undefined' && apiBase && apiBase.startsWith(location.origin);
+      return sameOrigin || !apiBase ? rawPath : `${apiBase.replace(/\/+$/, '')}${rawPath}`;
+    }
     return `assets/images/${rawPath}`;
   }
 
@@ -1558,7 +1604,10 @@ window.TK168_DATA = (() => {
     if (language === 'en' && Array.isArray(vehicle.overviewEn)) return vehicle.overviewEn;
     if (language === 'ja' && Array.isArray(vehicle.overviewJa)) return vehicle.overviewJa;
     if (language === 'en') return buildVehicleOverviewEn(vehicle);
-    return vehicle.overview || vehicle.overviewJa || [];
+    // The admin API surfaces the Chinese copy as `overviewZh`; the legacy
+    // static shape used the unsuffixed `overview`.  Accept both so data
+    // edited from the admin panel is rendered here.
+    return vehicle.overviewZh || vehicle.overview || vehicle.overviewJa || [];
   }
 
   function getVehicleBenefits(vehicle, language = getCurrentLanguage()) {

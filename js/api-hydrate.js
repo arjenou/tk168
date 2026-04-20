@@ -49,45 +49,70 @@
     } catch {}
   }
 
-  // Convert the API payload into the shape baseVehicles in data.js expects.
-  function adaptVehicle(v) {
-    const gallery = Array.isArray(v.images) && v.images.length
-      ? v.images.map((img) => img.url)
-      : v.gallery || (v.photo ? [v.photo] : []);
-    const photo = gallery[0] || v.photo || "";
+  // Turn a /api/media/<key> path into a fully qualified URL pointing at the
+  // Cloudflare Worker.  Leaves absolute URLs and bare filenames alone so the
+  // legacy static gallery (assets/images/001.png shorthands) still works.
+  function toAbsoluteMedia(raw) {
+    const s = String(raw || "").trim();
+    if (!s) return "";
+    if (/^(?:https?:)?\/\//.test(s) || s.startsWith("data:") || s.startsWith("blob:")) return s;
+    if (s.startsWith("/api/") && API_BASE) return `${API_BASE}${s}`;
+    return s;
+  }
 
-    // data.js `resolveVehicleMediaSource` accepts either a full URL or a bare
-    // filename (prefixed with assets/images/).  We pass through whatever the
-    // API returned so both seed data (relative assets/) and R2-served URLs
-    // (e.g. /api/media/…) work.
-    const out = {
+  // Return `value` if it looks like the admin actually wrote something, or
+  // `undefined` so data.js's merge can keep the static default.
+  function keepMeaningful(value) {
+    if (value === null || value === undefined) return undefined;
+    if (typeof value === "string" && value.trim() === "") return undefined;
+    if (Array.isArray(value) && value.length === 0) return undefined;
+    return value;
+  }
+
+  // Convert the API payload into the shape baseVehicles in data.js expects.
+  // We only emit keys that have actual values so data.js can merge this on
+  // top of the built-in defaults (empty / missing fields fall back).
+  function adaptVehicle(v) {
+    const apiGallery = Array.isArray(v.images) && v.images.length
+      ? v.images.map((img) => toAbsoluteMedia(img.url)).filter(Boolean)
+      : null;
+    const apiPhoto = apiGallery && apiGallery.length ? apiGallery[0] : undefined;
+
+    const raw = {
       id: v.id,
-      brandKey: v.brandKey,
-      name: v.name,
-      year: v.year || "",
-      type: v.type || "",
-      icon: v.icon || "b1.svg",
-      photo,
-      gallery,
-      mileage: v.mileage || "",
-      engine: v.engine || "",
-      fuel: v.fuel || "",
-      trans: v.trans || "",
-      totalPrice: v.totalPrice || "",
-      basePrice: v.basePrice || v.totalPrice || "",
-      bodyStyle: v.bodyStyle || "",
-      drive: v.drive || "",
-      bodyColor: v.bodyColor || "",
-      interiorColor: v.interiorColor || "",
-      seats: v.seats || "",
-      serviceRecord: v.serviceRecord || "",
-      origin: v.origin || "",
-      overview: Array.isArray(v.overviewZh) ? v.overviewZh : [],
-      overviewJa: Array.isArray(v.overviewJa) ? v.overviewJa : [],
-      overviewEn: Array.isArray(v.overviewEn) ? v.overviewEn : undefined,
-      benefits: v.benefits || undefined,
-      features: v.features || undefined,
+      brandKey: keepMeaningful(v.brandKey),
+      name: keepMeaningful(v.name),
+      year: keepMeaningful(v.year),
+      type: keepMeaningful(v.type),
+      icon: keepMeaningful(v.icon),
+      photo: apiPhoto,
+      gallery: apiGallery && apiGallery.length ? apiGallery : undefined,
+      mileage: keepMeaningful(v.mileage),
+      engine: keepMeaningful(v.engine),
+      fuel: keepMeaningful(v.fuel),
+      trans: keepMeaningful(v.trans),
+      totalPrice: keepMeaningful(v.totalPrice),
+      basePrice: keepMeaningful(v.basePrice),
+      bodyStyle: keepMeaningful(v.bodyStyle),
+      drive: keepMeaningful(v.drive),
+      bodyColor: keepMeaningful(v.bodyColor),
+      interiorColor: keepMeaningful(v.interiorColor),
+      seats: keepMeaningful(v.seats),
+      serviceRecord: keepMeaningful(v.serviceRecord),
+      origin: keepMeaningful(v.origin),
+      // `overview` is the zh copy in data.js's legacy shape; API uses `overviewZh`.
+      overview: keepMeaningful(v.overviewZh),
+      overviewZh: keepMeaningful(v.overviewZh),
+      overviewJa: keepMeaningful(v.overviewJa),
+      overviewEn: keepMeaningful(v.overviewEn),
+      benefits: keepMeaningful(v.benefits),
+      features: keepMeaningful(v.features),
     };
+
+    const out = {};
+    for (const [k, val] of Object.entries(raw)) {
+      if (val !== undefined) out[k] = val;
+    }
 
     // Preset maps (condition / listing / highlight) piggy-back via window
     // globals so data.js can expose them through its getters.
@@ -156,6 +181,7 @@
     const sameOrigin = !API_BASE || endpoint.startsWith(location.origin);
     fetch(endpoint, {
       credentials: sameOrigin ? "same-origin" : "omit",
+      cache: "no-store",
     })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
@@ -168,6 +194,19 @@
           document.dispatchEvent(
             new CustomEvent("tk168:data-updated", { detail: { vehicles: data.vehicles } }),
           );
+          // The rest of the site (detail.html, brand.html, home.html, …)
+          // reads vehicles synchronously from data.js at startup, so simply
+          // reloading is the most reliable way to surface the fresh copy.
+          // Only reload on the first in-session divergence to avoid loops
+          // when the API response keeps flipping during editing.
+          if (!window.__TK168_HYDRATED_ONCE__) {
+            window.__TK168_HYDRATED_ONCE__ = true;
+            if (cached) {
+              // We had stale cached data already rendered; swap to the new
+              // payload and let the user see fresh content immediately.
+              location.reload();
+            }
+          }
         }
       })
       .catch(() => {
