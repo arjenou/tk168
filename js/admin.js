@@ -9,18 +9,33 @@
 
 // The admin is served from https://www.tk168.co.jp/admin (Vercel) but the
 // data + image APIs live on https://api.tk168.co.jp (Cloudflare Worker).
-// When the page is served by the Worker itself (e.g. a preview deploy at
-// api.tk168.co.jp/admin, or local `wrangler dev`) we fall back to the
-// same-origin /api path so the admin keeps working there too.
-const SAME_ORIGIN_API_HOSTS = new Set([
-  "api.tk168.co.jp",
-  "tk168-api.wangyunjie1101.workers.dev",
-  "localhost",
-  "127.0.0.1",
-]);
-const API_BASE = SAME_ORIGIN_API_HOSTS.has(location.hostname)
-  ? "/api"
-  : "https://api.tk168.co.jp/api";
+// Same-origin `/api` is only correct when the page is served by the Worker
+// (api.tk168.co.jp, *.workers.dev) or by `wrangler dev` on its default port(s).
+// A plain static server on http://localhost:3000 has no /api proxy — use the
+// public API host (CORS allows loopback origins on the Worker).
+// Override: set window.TK168_ADMIN_API_BASE = "https://…" before loading this script.
+const ADMIN_HOST = (typeof location !== "undefined" && location.hostname
+  ? location.hostname
+  : ""
+).toLowerCase();
+
+const WRANGLER_DEV_PORTS = new Set(["8787", "8788"]);
+
+function computeAdminApiBase() {
+  if (typeof window !== "undefined" && typeof window.TK168_ADMIN_API_BASE === "string") {
+    const t = window.TK168_ADMIN_API_BASE.trim().replace(/\/+$/, "");
+    if (t) return t.endsWith("/api") ? t : `${t}/api`;
+  }
+  if (ADMIN_HOST === "api.tk168.co.jp" || ADMIN_HOST.endsWith(".workers.dev")) return "/api";
+  if (ADMIN_HOST === "localhost" || ADMIN_HOST === "127.0.0.1") {
+    const p = String(location.port || "");
+    if (WRANGLER_DEV_PORTS.has(p)) return "/api";
+    return "https://api.tk168.co.jp/api";
+  }
+  return "https://api.tk168.co.jp/api";
+}
+
+const API_BASE = computeAdminApiBase();
 
 /** Origin that serves `/api/*` (Worker). Used so `<img src>` hits the API host when the admin HTML is on www (Vercel). */
 function apiOrigin() {
@@ -85,27 +100,38 @@ const RESOURCES = {
     headerLabel: "首页车辆管理",
     emptyLabel: "暂无车辆",
     priceColumn: { key: "totalPrice", label: "总价" },
-    fields: [
-      ["brandKey", "品牌 Key（如 lamborghini）"],
-      ["name", "车型名称（中文，必填）"],
-      ["nameJa", "车型名称（日文，可空；空则前台日文用品牌+中文名推断）"],
-      ["nameEn", "车型名称（英文，可空；空则前台英文用品牌+中文名推断）"],
-      ["year", "年份"],
-      ["type", "车型分类（如 高性能SUV）"],
-      ["icon", "图标文件名（如 b1.svg）"],
-      ["mileage", "里程（如 3,200）"],
-      ["engine", "发动机（如 4.0L V8）"],
-      ["fuel", "燃料"],
-      ["trans", "变速箱"],
-      ["totalPrice", "支付总额（如 ¥ 1,980,000）"],
-      ["basePrice", "车辆本体价格"],
-      ["bodyStyle", "车身类型"],
-      ["drive", "驱动方式"],
-      ["bodyColor", "车身颜色"],
-      ["interiorColor", "内饰颜色"],
-      ["seats", "座位（如 5 座）"],
-      ["serviceRecord", "保养记录"],
-      ["origin", "产地（如 意大利进口）"],
+    // Editor form groups (new tabbed layout). Each field may declare:
+    //   label / placeholder / hint / span (12-col grid): 3|4|6|12
+    fieldGroups: [
+      {
+        id: "basic",
+        label: "基本信息",
+        fields: [
+          { key: "brandKey", label: "品牌 Key", placeholder: "lamborghini", span: 4, required: true },
+          { key: "year", label: "年份", placeholder: "2022", span: 4 },
+          { key: "type", label: "车型分类", placeholder: "高性能 SUV", span: 4 },
+          { key: "icon", label: "图标文件名", placeholder: "b1.svg", hint: "素材文件夹里的小图标", span: 4 },
+          { key: "bodyStyle", label: "车身类型", placeholder: "高性能 SUV", span: 4 },
+          { key: "drive", label: "驱动方式", placeholder: "四轮驱动", span: 4 },
+          { key: "bodyColor", label: "车身颜色", placeholder: "曜石黑", span: 4 },
+          { key: "interiorColor", label: "内饰颜色", placeholder: "黑色真皮", span: 4 },
+          { key: "seats", label: "座位", placeholder: "5 座", span: 4 },
+          { key: "origin", label: "产地", placeholder: "意大利进口", span: 4 },
+          { key: "serviceRecord", label: "保养记录", placeholder: "完整在册", span: 4 },
+        ],
+      },
+      {
+        id: "power",
+        label: "动力与价格",
+        fields: [
+          { key: "engine", label: "发动机", placeholder: "4.0L V8", span: 6 },
+          { key: "mileage", label: "里程 (km)", placeholder: "3,200", span: 3 },
+          { key: "fuel", label: "燃料", placeholder: "汽油", span: 3 },
+          { key: "trans", label: "变速箱", placeholder: "自动挡", span: 4 },
+          { key: "totalPrice", label: "支付总额", placeholder: "¥ 1,980,000", hint: "含手续费的显示总价", span: 4 },
+          { key: "basePrice", label: "车辆本体价格", placeholder: "¥ 1,860,000", span: 4 },
+        ],
+      },
     ],
     // Preset rows:
     //   [key, label]                   -> free-text zh / ja / en
@@ -168,28 +194,54 @@ const RESOURCES = {
     extraColumns: [
       { key: "rentalStatus", label: "状态", render: (v) => statusLabel(v) },
     ],
-    fields: [
-      ["brandKey", "品牌 Key（如 lamborghini）"],
-      ["name", "车型名称（中文，必填）"],
-      ["nameJa", "车型名称（日文，可空）"],
-      ["nameEn", "车型名称（英文，可空）"],
-      ["year", "年份"],
-      ["type", "车型分类"],
-      ["icon", "图标文件名（如 b1.svg）"],
-      ["mileage", "里程"],
-      ["engine", "发动机"],
-      ["fuel", "燃料"],
-      ["trans", "变速箱"],
-      ["bodyStyle", "车身类型"],
-      ["drive", "驱动方式"],
-      ["bodyColor", "车身颜色"],
-      ["interiorColor", "内饰颜色"],
-      ["seats", "座位"],
-      ["origin", "产地"],
-      ["dailyRate", "日租金（JPY / 整数）", "number"],
-      ["deposit", "押金（JPY / 整数）", "number"],
-      ["minDays", "最短租期（天）", "number"],
-      ["rentalStatus", "档期状态 (available / reserved / rented / unavailable)"],
+    fieldGroups: [
+      {
+        id: "basic",
+        label: "基本信息",
+        fields: [
+          { key: "brandKey", label: "品牌 Key", placeholder: "lamborghini", span: 4, required: true },
+          { key: "year", label: "年份", placeholder: "2022", span: 4 },
+          { key: "type", label: "车型分类", placeholder: "高性能 SUV", span: 4 },
+          { key: "icon", label: "图标文件名", placeholder: "b1.svg", span: 4 },
+          { key: "bodyStyle", label: "车身类型", placeholder: "高性能 SUV", span: 4 },
+          { key: "drive", label: "驱动方式", placeholder: "四轮驱动", span: 4 },
+          { key: "bodyColor", label: "车身颜色", placeholder: "曜石黑", span: 4 },
+          { key: "interiorColor", label: "内饰颜色", placeholder: "黑色真皮", span: 4 },
+          { key: "seats", label: "座位", placeholder: "2 座", span: 4 },
+          { key: "origin", label: "产地", placeholder: "德国进口", span: 4 },
+        ],
+      },
+      {
+        id: "power",
+        label: "动力",
+        fields: [
+          { key: "engine", label: "发动机", placeholder: "4.0L V8", span: 6 },
+          { key: "mileage", label: "里程 (km)", placeholder: "3,200", span: 3 },
+          { key: "fuel", label: "燃料", placeholder: "汽油", span: 3 },
+          { key: "trans", label: "变速箱", placeholder: "自动挡", span: 3 },
+        ],
+      },
+      {
+        id: "rental",
+        label: "租赁条件",
+        fields: [
+          {
+            key: "rentalStatus",
+            label: "档期状态",
+            type: "select",
+            options: [
+              { value: "available", label: "可租 (available)" },
+              { value: "reserved", label: "已预订 (reserved)" },
+              { value: "rented", label: "出租中 (rented)" },
+              { value: "unavailable", label: "不可租 (unavailable)" },
+            ],
+            span: 12,
+          },
+          { key: "dailyRate", label: "日租金 (¥)", type: "number", placeholder: "5600", span: 4 },
+          { key: "deposit", label: "押金 (¥)", type: "number", placeholder: "120000", span: 4 },
+          { key: "minDays", label: "最短租期 (天)", type: "number", placeholder: "2", span: 4 },
+        ],
+      },
     ],
     presets: [],
     emptyDraft: () => ({
@@ -221,6 +273,8 @@ const state = {
   view: "login",
   // "vehicles" | "rentals" — which inventory is currently active
   resource: "vehicles",
+  // "content" | "specs" | "media" — active editor tab
+  editorTab: "content",
   // per-resource caches, keyed by resource name
   items: { vehicles: [], rentals: [] },
   users: [],
@@ -247,7 +301,11 @@ async function api(path, options = {}) {
   const ct = res.headers.get("content-type") || "";
   const data = ct.includes("application/json") ? await res.json() : null;
   if (!res.ok) {
-    const err = new Error((data && (data.message || data.error)) || `HTTP ${res.status}`);
+    const fallback =
+      res.status === 404
+        ? "HTTP 404：当前域名下没有该接口（常见于向 www 请求了 /api/…）。请刷新重试，或使用 https://api.tk168.co.jp/admin 登录。"
+        : `HTTP ${res.status}`;
+    const err = new Error((data && (data.message || data.error)) || fallback);
     err.status = res.status;
     err.code = data?.error || null;
     throw err;
@@ -611,151 +669,271 @@ function bindRowActions() {
 
 // -------------------- Editor --------------------
 
-/** Vehicle / rental fields that are edited as zh + ja + en in the i18n card (not the mono card). */
-const I18N_NAME_FIELD_KEYS = new Set(["name", "nameJa", "nameEn"]);
+// Editor tabs shown at the top of the left column. "specs" only rendered
+// when the resource has preset rows (vehicles).
+const EDITOR_TABS = [
+  { id: "content", label: "内容" },
+  { id: "specs", label: "规格 / 选项", requiresPresets: true },
+  { id: "publish", label: "发布设置" },
+];
+
+function renderEditorField(field, draft) {
+  const key = field.key;
+  const span = field.span || 6;
+  const value = draft[key];
+  const hint = field.hint
+    ? `<div class="admin-field-hint">${escapeHtml(field.hint)}</div>`
+    : "";
+  const requiredMark = field.required
+    ? ' <span class="admin-required">*</span>'
+    : "";
+
+  let control;
+  if (field.type === "select") {
+    const opts = (field.options || [])
+      .map(
+        (opt) =>
+          `<option value="${escapeAttr(opt.value)}" ${opt.value === value ? "selected" : ""}>${escapeHtml(opt.label)}</option>`,
+      )
+      .join("");
+    control = `<select class="admin-input" data-draft="${key}">${opts}</select>`;
+  } else if (field.type === "number") {
+    control = `<input class="admin-input" type="number" data-draft="${key}" value="${escapeAttr(value ?? 0)}" placeholder="${escapeAttr(field.placeholder || "")}">`;
+  } else {
+    control = `<input class="admin-input" type="text" data-draft="${key}" value="${escapeAttr(value ?? "")}" placeholder="${escapeAttr(field.placeholder || "")}">`;
+  }
+
+  return `
+    <div class="admin-field admin-col-${span}">
+      <label>${escapeHtml(field.label)}${requiredMark}</label>
+      ${control}
+      ${hint}
+    </div>`;
+}
+
+function renderEditorGroup(group, draft) {
+  const fieldsHtml = group.fields.map((f) => renderEditorField(f, draft)).join("");
+  return `
+    <section class="admin-section">
+      <div class="admin-section-head">
+        <h3>${escapeHtml(group.label)}</h3>
+        ${group.hint ? `<p>${escapeHtml(group.hint)}</p>` : ""}
+      </div>
+      <div class="admin-grid-12">${fieldsHtml}</div>
+    </section>`;
+}
+
+function renderContentTab(r, draft) {
+  const groupsHtml = (r.fieldGroups || [])
+    .map((g) => renderEditorGroup(g, draft))
+    .join("");
+
+  const overviewZh = Array.isArray(draft.overviewZh) ? draft.overviewZh.join("\n\n") : (draft.overviewZh || "");
+  const overviewJa = Array.isArray(draft.overviewJa) ? draft.overviewJa.join("\n\n") : (draft.overviewJa || "");
+  const overviewEn = Array.isArray(draft.overviewEn) ? draft.overviewEn.join("\n\n") : (draft.overviewEn || "");
+
+  return `
+    <section class="admin-section">
+      <div class="admin-section-head">
+        <h3>车型名称</h3>
+        <p>中文必填；日文 / 英文可空，前台会按品牌 + 中文名推断展示。</p>
+      </div>
+      <div class="admin-grid-12">
+        <div class="admin-field admin-col-4">
+          <label>中文 <span class="admin-required">*</span></label>
+          <input class="admin-input" data-draft="name" value="${escapeAttr(draft.name ?? "")}" placeholder="Urus S">
+        </div>
+        <div class="admin-field admin-col-4">
+          <label>日文</label>
+          <input class="admin-input" data-draft="nameJa" value="${escapeAttr(draft.nameJa ?? "")}" placeholder="ウルス S">
+        </div>
+        <div class="admin-field admin-col-4">
+          <label>英文</label>
+          <input class="admin-input" data-draft="nameEn" value="${escapeAttr(draft.nameEn ?? "")}" placeholder="Urus S">
+        </div>
+      </div>
+    </section>
+
+    ${groupsHtml}
+
+    <section class="admin-section">
+      <div class="admin-section-head">
+        <h3>车辆概述</h3>
+        <p>段落之间用空行分隔。英文可留空，前台会自动生成。</p>
+      </div>
+      <div class="admin-lang-tabs" data-lang-tabs>
+        <button type="button" class="admin-lang-tab is-active" data-lang="zh">中文</button>
+        <button type="button" class="admin-lang-tab" data-lang="ja">日文</button>
+        <button type="button" class="admin-lang-tab" data-lang="en">英文</button>
+      </div>
+      <div class="admin-lang-pane is-active" data-lang-pane="zh">
+        <textarea class="admin-textarea" data-overview="zh" placeholder="先写中文，是前台中文页面的默认展示文字。">${escapeHtml(overviewZh)}</textarea>
+      </div>
+      <div class="admin-lang-pane" data-lang-pane="ja">
+        <textarea class="admin-textarea" data-overview="ja" placeholder="日本語のオーバービュー。">${escapeHtml(overviewJa)}</textarea>
+      </div>
+      <div class="admin-lang-pane" data-lang-pane="en">
+        <textarea class="admin-textarea" data-overview="en" placeholder="English overview (optional).">${escapeHtml(overviewEn)}</textarea>
+      </div>
+    </section>
+  `;
+}
+
+function renderSpecsTab(r, draft) {
+  const selectRows = r.presets.filter((p) => p[2] === "select");
+  const textRows = r.presets.filter((p) => p[2] !== "select");
+
+  const selectHtml = selectRows.map(([key, label, _kind, options]) => {
+    const v = draft[key] || {};
+    const currentIdx = (options || []).findIndex(
+      (opt) => opt.zh === v.zh && opt.ja === v.ja,
+    );
+    const optionsHtml = [
+      `<option value="" ${currentIdx === -1 ? "selected" : ""}>未填</option>`,
+      ...(options || []).map(
+        (opt, idx) =>
+          `<option value="${idx}" ${idx === currentIdx ? "selected" : ""}>${escapeHtml(opt.label)}</option>`,
+      ),
+    ].join("");
+    return `
+      <div class="admin-field admin-col-6">
+        <label>${escapeHtml(label)}</label>
+        <select class="admin-input" data-preset-select="${key}">${optionsHtml}</select>
+      </div>`;
+  }).join("");
+
+  const textHtml = textRows.map(([key, label]) => {
+    const v = draft[key] || {};
+    return `
+      <div class="admin-preset-text">
+        <div class="admin-preset-text-label">${escapeHtml(label)}</div>
+        <div class="admin-grid-12">
+          <div class="admin-field admin-col-4">
+            <label>中文</label>
+            <input class="admin-input" data-preset="${key}.zh" value="${escapeAttr(v.zh ?? "")}">
+          </div>
+          <div class="admin-field admin-col-4">
+            <label>日文</label>
+            <input class="admin-input" data-preset="${key}.ja" value="${escapeAttr(v.ja ?? "")}">
+          </div>
+          <div class="admin-field admin-col-4">
+            <label>英文</label>
+            <input class="admin-input" data-preset="${key}.en" value="${escapeAttr(v.en ?? "")}">
+          </div>
+        </div>
+      </div>`;
+  }).join("");
+
+  return `
+    <section class="admin-section">
+      <div class="admin-section-head">
+        <h3>状态选项</h3>
+        <p>下拉选择预设好的中 / 日 / 英文案，不会手误。</p>
+      </div>
+      <div class="admin-grid-12">${selectHtml}</div>
+    </section>
+
+    ${textRows.length ? `
+    <section class="admin-section">
+      <div class="admin-section-head">
+        <h3>自由文本</h3>
+        <p>每项在中 / 日 / 英分别填写即可。</p>
+      </div>
+      ${textHtml}
+    </section>` : ""}
+  `;
+}
+
+function renderPublishTab(r, draft, isNew) {
+  return `
+    <section class="admin-section">
+      <div class="admin-section-head">
+        <h3>发布与排序</h3>
+        <p>系统会在保存时自动生成内部${escapeHtml(r.label)}标识（不在界面显示）。</p>
+      </div>
+      <div class="admin-grid-12">
+        <div class="admin-field admin-col-6">
+          <label>前台可见</label>
+          <label class="admin-switch">
+            <input type="checkbox" data-draft="isPublished" ${draft.isPublished ? "checked" : ""}>
+            <span>${draft.isPublished ? "已发布" : "已下架"}</span>
+          </label>
+          <div class="admin-field-hint">关闭后仅你能在后台看到，该车不会出现在前台列表。</div>
+        </div>
+        <div class="admin-field admin-col-6">
+          <label>排序</label>
+          <input class="admin-input" type="number" data-draft="displayOrder" value="${Number(draft.displayOrder ?? 0)}">
+          <div class="admin-field-hint">数字越小越靠前，相同数字按更新时间排序。</div>
+        </div>
+      </div>
+      ${isNew ? '<div class="admin-message" style="margin-top:14px;">新车辆保存后再回来上传图片。</div>' : ""}
+    </section>
+  `;
+}
 
 function renderEditor() {
   const r = currentResource();
   const draft = state.editingDraft;
   const isNew = state.editingId === "__new__";
 
-  const monoFieldRows = r.fields.filter(([key]) => !I18N_NAME_FIELD_KEYS.has(key));
-  const monoFields = monoFieldRows.map(([key, label, inputType]) => {
-    const value = draft[key];
-    const isNumber = inputType === "number";
-    return `
-      <div class="admin-field">
-        <label>${escapeHtml(label)}</label>
-        <input class="admin-input" type="${isNumber ? "number" : "text"}"
-               data-draft="${key}"
-               value="${escapeAttr(value ?? (isNumber ? 0 : ""))}">
-      </div>`;
-  }).join("");
+  const availableTabs = EDITOR_TABS.filter(
+    (t) => !t.requiresPresets || (r.presets && r.presets.length > 0),
+  );
+  if (!availableTabs.some((t) => t.id === state.editorTab)) {
+    state.editorTab = availableTabs[0].id;
+  }
 
-  const hasNameI18n = r.fields.some(([key]) => key === "name");
-  const nameI18nBlock = hasNameI18n
-    ? `
-        <h3 class="admin-card-h3">车型名称</h3>
-        <p class="admin-card-hint">中文必填；日文、英文可空时，前台会按品牌与中文名推断展示。</p>
-        <div class="admin-preset-lang-row">
-          <div class="admin-field"><label>中文（必填）</label><input class="admin-input" data-draft="name" value="${escapeAttr(draft.name ?? "")}"></div>
-          <div class="admin-field"><label>日文</label><input class="admin-input" data-draft="nameJa" value="${escapeAttr(draft.nameJa ?? "")}"></div>
-          <div class="admin-field"><label>英文</label><input class="admin-input" data-draft="nameEn" value="${escapeAttr(draft.nameEn ?? "")}"></div>
-        </div>`
-    : "";
-
-  const overviewZh = Array.isArray(draft.overviewZh) ? draft.overviewZh.join("\n\n") : (draft.overviewZh || "");
-  const overviewJa = Array.isArray(draft.overviewJa) ? draft.overviewJa.join("\n\n") : (draft.overviewJa || "");
-  const overviewEn = Array.isArray(draft.overviewEn) ? draft.overviewEn.join("\n\n") : (draft.overviewEn || "");
-
-  const presetFields = r.presets
-    .map((row) => {
-      const [key, label, kind, options] = row;
-      const v = draft[key] || {};
-
-      if (kind === "select") {
-        // Match legacy rows that only stored { zh, ja }.
-        const currentIdx = (options || []).findIndex(
-          (opt) => opt.zh === v.zh && opt.ja === v.ja,
-        );
-        const optionsHtml = [
-          `<option value="" ${currentIdx === -1 ? "selected" : ""}>未填</option>`,
-          ...(options || []).map(
-            (opt, idx) =>
-              `<option value="${idx}" ${idx === currentIdx ? "selected" : ""}>${escapeHtml(opt.label)}</option>`,
-          ),
-        ].join("");
-        return `
-          <div class="admin-field" style="margin-bottom:10px;">
-            <label style="text-transform:none;font-weight:600;color:var(--admin-text);font-size:13px;letter-spacing:0;">${label}</label>
-            <select class="admin-input" data-preset-select="${key}">${optionsHtml}</select>
-          </div>`;
-      }
-
-      return `
-        <div style="margin-bottom:10px;">
-          <div style="font-weight:600;color:var(--admin-text);font-size:13px;letter-spacing:0;margin-bottom:8px;">${escapeHtml(label)}</div>
-          <div class="admin-preset-lang-row">
-            <div class="admin-field"><label>中文</label><input class="admin-input" data-preset="${key}.zh" value="${escapeAttr(v.zh ?? "")}"></div>
-            <div class="admin-field"><label>日文</label><input class="admin-input" data-preset="${key}.ja" value="${escapeAttr(v.ja ?? "")}"></div>
-            <div class="admin-field"><label>英文</label><input class="admin-input" data-preset="${key}.en" value="${escapeAttr(v.en ?? "")}"></div>
-          </div>
-        </div>`;
-    })
+  const tabsHtml = availableTabs
+    .map(
+      (t) =>
+        `<button type="button" class="admin-tab ${state.editorTab === t.id ? "is-active" : ""}" data-editor-tab="${t.id}">${escapeHtml(t.label)}</button>`,
+    )
     .join("");
 
-  const presetBlock = r.presets.length
-    ? `
-        <h3 class="admin-card-h3">参数 / 规格</h3>
-        <p class="admin-card-hint">与语言无关的数字或符号，可在中 / 日 / 英三栏填写相同内容。</p>
-        ${presetFields}`
-    : "";
+  let tabBody = "";
+  if (state.editorTab === "content") tabBody = renderContentTab(r, draft);
+  else if (state.editorTab === "specs") tabBody = renderSpecsTab(r, draft);
+  else if (state.editorTab === "publish") tabBody = renderPublishTab(r, draft, isNew);
 
-  const i18nSection = `
-        <section class="admin-card admin-card-i18n">
-          <h2>多语言内容（中 / 日 / 英）</h2>
-          <p class="admin-card-lead">本卡片内每项需区分语言；单行基础信息请在左侧上一张卡片填写。</p>
-          ${nameI18nBlock}
-          <h3 class="admin-card-h3">车辆概述</h3>
-          <div class="admin-field">
-            <label>中文概述（段落以空行分隔）</label>
-            <textarea class="admin-textarea" data-overview="zh">${escapeHtml(overviewZh)}</textarea>
-          </div>
-          <div class="admin-field">
-            <label>日文概述</label>
-            <textarea class="admin-textarea" data-overview="ja">${escapeHtml(overviewJa)}</textarea>
-          </div>
-          <div class="admin-field">
-            <label>英文概述（可留空，留空时前台自动生成）</label>
-            <textarea class="admin-textarea" data-overview="en">${escapeHtml(overviewEn)}</textarea>
-          </div>
-          ${presetBlock}
-        </section>`;
+  const primaryImage = (draft.images || []).find((i) => i.isPrimary) || (draft.images || [])[0];
+  const imageCount = (draft.images || []).length;
 
   const inner = `
     <div class="admin-page-head">
-      <h1>${isNew ? `新增${r.label}` : `编辑：${escapeHtml(draft.name || draft.id)}`}</h1>
+      <div>
+        <div class="admin-crumb"><button class="admin-btn admin-btn-ghost admin-btn-sm" id="cancelEdit">← 返回列表</button></div>
+        <h1>${isNew ? `新增${escapeHtml(r.label)}` : escapeHtml(draft.name || draft.nameJa || draft.nameEn || "未命名")}</h1>
+        ${!isNew && (draft.brandKey || draft.year) ? `<div class="admin-subtle">${[draft.brandKey, draft.year].filter(Boolean).map(escapeHtml).join(" · ")}</div>` : ""}
+      </div>
       <div class="admin-toolbar">
-        <button class="admin-btn" id="cancelEdit">返回列表</button>
+        <span class="admin-badge ${draft.isPublished ? "is-on" : "is-off"}">${draft.isPublished ? "已发布" : "已下架"}</span>
         <button class="admin-btn admin-btn-primary" id="saveEdit">保存</button>
       </div>
     </div>
 
     <div class="admin-editor">
-      <div>
-        <section class="admin-card">
-          <h2>基础信息（单行）</h2>
-          <p class="admin-card-lead">系统会在保存时自动生成内部车辆标识（不在界面显示）。价格、里程、颜色等通常各语言共用一份即可。</p>
-          <div class="admin-grid">${monoFields}</div>
-          <div style="margin-top:14px;">
-            <label class="admin-checkbox">
-              <input type="checkbox" data-draft="isPublished" ${draft.isPublished ? "checked" : ""}>
-              <span>在前台发布</span>
-            </label>
-          </div>
-          <div class="admin-field" style="margin-top:14px;">
-            <label>排序（越小越靠前）</label>
-            <input class="admin-input" type="number" data-draft="displayOrder" value="${Number(draft.displayOrder ?? 0)}">
-          </div>
-        </section>
-
-        ${i18nSection}
+      <div class="admin-editor-main">
+        <div class="admin-tabs">${tabsHtml}</div>
+        <div class="admin-tab-body">${tabBody}</div>
       </div>
 
-      <div>
+      <aside class="admin-editor-aside">
         <section class="admin-card">
-          <h2>图片（第一张自动作为封面）</h2>
+          <h2>封面与图片</h2>
+          ${primaryImage
+            ? `<div class="admin-cover-preview"><img src="${escapeAttr(resolveMediaUrlForImg(primaryImage.url))}" alt="${escapeAttr(primaryImage.alt || "")}"></div>`
+            : `<div class="admin-cover-preview admin-cover-empty">暂未上传图片</div>`}
+          <div class="admin-cover-meta">共 ${imageCount} 张图片 · 第一张自动作为封面</div>
           <div class="admin-images" id="imagesGrid">
-            ${(draft.images || []).map(imageTile).join("") || '<div class="admin-empty" style="padding:24px;">暂无图片</div>'}
+            ${(draft.images || []).map(imageTile).join("") || ""}
           </div>
           <div class="admin-upload">
-            <input id="imageUpload" type="file" accept="image/*" multiple>
-            <label for="imageUpload">选择图片上传（可多选）</label>
-            <div style="margin-top:8px;color:var(--admin-text-dim);font-size:12px;">支持 JPG / PNG / WEBP / AVIF，单张建议 5MB 以内</div>
+            <input id="imageUpload" type="file" accept="image/*" multiple ${isNew ? "disabled" : ""}>
+            <label for="imageUpload">${isNew ? "保存后可上传" : "选择图片上传（可多选）"}</label>
+            <div style="margin-top:8px;color:var(--admin-text-dim);font-size:12px;">JPG / PNG / WEBP / AVIF，单张建议 5MB 以内</div>
           </div>
-          ${isNew ? '<div class="admin-message" style="margin-top:12px;color:var(--admin-text-dim);">请先保存，再上传图片。</div>' : ""}
         </section>
-      </div>
+      </aside>
     </div>
   `;
 
@@ -780,15 +958,46 @@ function bindEditor() {
     state.view = "list";
     state.editingId = null;
     state.editingDraft = null;
+    state.editorTab = "content";
     render();
   });
 
+  document.querySelectorAll("[data-editor-tab]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.editorTab = btn.dataset.editorTab;
+      renderEditor();
+    });
+  });
+
+  document.querySelectorAll("[data-lang-tabs]").forEach((wrap) => {
+    wrap.querySelectorAll("[data-lang]").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const lang = tab.dataset.lang;
+        wrap.querySelectorAll("[data-lang]").forEach((t) =>
+          t.classList.toggle("is-active", t === tab),
+        );
+        const container = wrap.parentElement;
+        container.querySelectorAll("[data-lang-pane]").forEach((pane) => {
+          pane.classList.toggle("is-active", pane.dataset.langPane === lang);
+        });
+      });
+    });
+  });
+
+  const applyDraftInput = (input) => {
+    const key = input.dataset.draft;
+    if (input.type === "checkbox") state.editingDraft[key] = input.checked;
+    else if (input.type === "number") state.editingDraft[key] = Number(input.value);
+    else state.editingDraft[key] = input.value;
+  };
   document.querySelectorAll("[data-draft]").forEach((input) => {
-    input.addEventListener("input", () => {
-      const key = input.dataset.draft;
-      if (input.type === "checkbox") state.editingDraft[key] = input.checked;
-      else if (input.type === "number") state.editingDraft[key] = Number(input.value);
-      else state.editingDraft[key] = input.value;
+    const evt = input.tagName === "SELECT" || input.type === "checkbox" ? "change" : "input";
+    input.addEventListener(evt, () => {
+      applyDraftInput(input);
+      if (input.dataset.draft === "isPublished") {
+        // Re-render so the header badge + switch label stay in sync.
+        renderEditor();
+      }
     });
   });
 
