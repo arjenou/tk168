@@ -241,9 +241,12 @@
     if (!diverged) return;
     if (window.__TK168_HYDRATED_ONCE__) return;
     window.__TK168_HYDRATED_ONCE__ = true;
-    // Only reload when we had cached data already rendered; on a first
-    // visit (no cache) the globals are fresh and the page will render
-    // correctly without reloading.
-    if (cachedVehicles || cachedRentals) location.reload();
+    // We intentionally do NOT reload here.  Reloading right after the
+    // first API fetch completes interrupts the hero/intro videos on the
+    // home page (they're kicked off by script.js as soon as the page
+    // boots, and their network load races with this fetch).  The cache
+    // has just been populated, so the *next* page navigation will pick
+    // up the API data synchronously, and individual pages can listen
+    // to the `tk168:data-updated` event for live refreshes.
   });
 })();
