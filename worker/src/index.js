@@ -139,7 +139,8 @@ async function readJson(request) {
 }
 
 async function handleApi(request, env, url) {
-  const path = url.pathname.replace(/^\/api\/?/, "/");
+  let path = url.pathname.replace(/^\/api\/?/, "/");
+  if (path.length > 1) path = path.replace(/\/+$/, "") || "/";
   const method = request.method.toUpperCase();
 
   // ---------- Public ----------
