@@ -249,4 +249,35 @@
     // up the API data synchronously, and individual pages can listen
     // to the `tk168:data-updated` event for live refreshes.
   });
+
+  function vehicleApiRowToSiteFlat(v) {
+    const a = adaptVehicle(v);
+    return a.vehicle;
+  }
+
+  async function fetchPublishedVehicleById(id) {
+    const rawId = String(id || "").trim();
+    if (!rawId) return null;
+    if (!/^https?:$/.test(location.protocol)) return null;
+    const sameOrigin = !API_BASE || location.origin === API_BASE;
+    const base = API_BASE || "";
+    try {
+      const endpoint = `${base}/api/vehicles/${encodeURIComponent(rawId)}`;
+      const res = await fetch(endpoint, {
+        credentials: sameOrigin ? "same-origin" : "omit",
+        cache: "no-store",
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (!data || !data.vehicle) return null;
+      return vehicleApiRowToSiteFlat(data.vehicle);
+    } catch {
+      return null;
+    }
+  }
+
+  window.TK168ApiHydrate = {
+    fetchPublishedVehicleById,
+    vehicleApiRowToSiteFlat,
+  };
 })();

@@ -2082,6 +2082,26 @@ window.TK168_DATA = (() => {
     return buildInventoryUrl({ brand: brandKey });
   }
 
+  /**
+   * 在 clean URL 环境下（路径为 /home、/detail 等无 .html 后缀），若仍链到
+   * `detail.html?id=…`，部分服务器会 301 到 `/detail` 并丢掉查询串，详情页读不到 id。
+   * 此时改为生成同目录下的 `/detail?…`（或子路径前缀 + /detail）。
+   */
+  function resolveDetailHref(queryString) {
+    if (typeof window === 'undefined' || !/^https?:$/i.test(String(window.location.protocol || ''))) {
+      return `detail.html?${queryString}`;
+    }
+    const path = window.location.pathname || '/';
+    const segments = path.split('/').filter(Boolean);
+    const leaf = segments.length ? segments[segments.length - 1] : '';
+    if (leaf.includes('.')) {
+      return `detail.html?${queryString}`;
+    }
+    const lastSlash = path.lastIndexOf('/');
+    const dir = lastSlash > 0 ? path.slice(0, lastSlash) : '';
+    return `${dir}/detail?${queryString}`.replace(/\/{2,}/g, '/');
+  }
+
   function buildDetailUrl(vehicleId, filters = {}) {
     const params = new URLSearchParams();
     params.set('id', vehicleId);
@@ -2100,7 +2120,13 @@ window.TK168_DATA = (() => {
       if (value) params.set(key, value);
     });
 
-    return `detail.html?${params.toString()}`;
+    return resolveDetailHref(params.toString());
+  }
+
+  function mergeApiVehicleWithBase(apiFlat) {
+    if (!apiFlat || !apiFlat.id) return null;
+    const base = getVehicleById(apiFlat.id);
+    return mergeVehicleData(base, apiFlat);
   }
 
   return {
@@ -2145,6 +2171,7 @@ window.TK168_DATA = (() => {
     countActiveFilters,
     buildFilterSummary,
     buildBrandUrl,
-    buildDetailUrl
+    buildDetailUrl,
+    mergeApiVehicleWithBase
   };
 })();

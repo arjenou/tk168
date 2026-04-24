@@ -10,16 +10,12 @@ window.TK168CommonLinks?.applyCommonLinks();
 
 const detailContext = window.TK168InventoryContext.createDetailContext(window.location.search);
 const requestedVehicleId = detailContext.requestedVehicleId;
-const currentVehicle = detailContext.currentVehicle;
+let currentVehicle = detailContext.currentVehicle;
 const currentBrand = detailContext.currentBrand;
 const currentFilters = detailContext.filters;
 const hasActiveFilters = detailContext.hasActiveFilters;
 const activeFilterCount = detailContext.activeFilterCount;
 const inventoryHref = detailContext.inventoryHref;
-
-if (requestedVehicleId !== currentVehicle.id) {
-  window.history.replaceState({}, '', detailContext.canonicalDetailUrl);
-}
 
 window.TK168PageChrome?.applyPageChrome({
   pageKey: 'detail',
@@ -1064,14 +1060,34 @@ function syncFeaturedSlider() {
   updateFeaturedSliderNavState();
 }
 
-renderVehicleHeader();
-renderGallery();
-renderSpecs();
-renderOverview();
-renderBenefits();
-renderFeatures();
-syncLinks();
-renderFeaturedCars();
+async function bootstrapDetailPage() {
+  const tryLive =
+    /^https?:$/.test(location.protocol) &&
+    requestedVehicleId &&
+    !String(requestedVehicleId).endsWith('-catalog');
+  if (tryLive) {
+    const flat = await window.TK168ApiHydrate?.fetchPublishedVehicleById?.(requestedVehicleId);
+    const merged = flat && window.TK168_DATA.mergeApiVehicleWithBase?.(flat);
+    if (merged) currentVehicle = merged;
+  }
+  if (requestedVehicleId && currentVehicle.id !== requestedVehicleId) {
+    window.history.replaceState(
+      {},
+      '',
+      window.TK168_DATA.buildDetailUrl(currentVehicle.id, currentFilters)
+    );
+  }
+  renderVehicleHeader();
+  renderGallery();
+  renderSpecs();
+  renderOverview();
+  renderBenefits();
+  renderFeatures();
+  syncLinks();
+  renderFeaturedCars();
+}
+
+bootstrapDetailPage();
 
 window.addEventListener('tk168:languagechange', () => {
   renderVehicleHeader();

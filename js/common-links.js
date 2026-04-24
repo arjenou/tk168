@@ -87,6 +87,7 @@ window.TK168CommonLinks = (() => {
   function triggerPrimaryLink(card, linkSelector) {
     const primaryLink = card.querySelector(linkSelector);
     if (!primaryLink?.href) return;
+    window.TK168HomeScrollRestore?.notifyHomeDetailNavigationFromCard?.(card, primaryLink.href);
     if (window.TK168LayoutShell?.navigate) {
       window.TK168LayoutShell.navigate(primaryLink.href);
     } else {

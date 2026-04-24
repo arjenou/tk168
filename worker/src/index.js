@@ -53,6 +53,34 @@ function isLoopbackDevOrigin(origin) {
   }
 }
 
+// LAN dev servers (e.g. http://10.x / 192.168.x) are not in wrangler.toml
+// and are not "loopback". Without this, browsers block credentialed fetch
+// to the production API host with no visible CORS error body ("Failed to fetch").
+// Restrict to http: + RFC1918 IPv4 only (same rough trust as local network).
+function isPrivateLanHttpOrigin(origin) {
+  if (!origin) return false;
+  try {
+    const u = new URL(origin);
+    if (u.protocol !== "http:") return false;
+    const h = u.hostname;
+    if (h === "localhost" || h === "127.0.0.1") return false;
+    const m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(h);
+    if (!m) return false;
+    const o = (i) => Number(m[i]);
+    const a = o(1);
+    const b = o(2);
+    const c = o(3);
+    const d = o(4);
+    if ([a, b, c, d].some((n) => !Number.isInteger(n) || n < 0 || n > 255)) return false;
+    if (a === 10) return true;
+    if (a === 172 && b >= 16 && b <= 31) return true;
+    if (a === 192 && b === 168) return true;
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 // Build the CORS headers for a given request/env pair.  The allow-list is
 // sourced from CORS_ALLOWED_ORIGINS; we echo the origin only when it matches
 // so credentialed fetches work and unknown sites are rejected.
@@ -60,7 +88,9 @@ function corsHeaders(request, env) {
   const origin = request.headers.get("origin") || "";
   const allowed = parseAllowedOrigins(env);
   const isAllowed =
-    Boolean(origin && allowed.includes(origin)) || isLoopbackDevOrigin(origin);
+    Boolean(origin && allowed.includes(origin)) ||
+    isLoopbackDevOrigin(origin) ||
+    isPrivateLanHttpOrigin(origin);
   const headers = { vary: "Origin" };
   if (isAllowed) {
     headers["access-control-allow-origin"] = origin;

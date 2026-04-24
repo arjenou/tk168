@@ -16,6 +16,8 @@ window.TK168PageChrome?.applyPageChrome({
   inventoryHref: 'brand.html'
 });
 
+const pendingHomeScrollRestore = window.TK168HomeScrollRestore?.consumePendingRestore?.() ?? null;
+
 const loadingScreen = document.getElementById('loading-screen');
 const introVideo = document.getElementById('intro-video');
 const mainContent = document.getElementById('main');
@@ -70,13 +72,14 @@ function hasExplicitHomeHashTarget() {
 
 function forceHomeScrollTop() {
   if (hasExplicitHomeHashTarget()) return;
+  if (pendingHomeScrollRestore) return;
   window.scrollTo(0, 0);
   document.documentElement.scrollTop = 0;
   document.body.scrollTop = 0;
 }
 
 function enforceHomeInitialScroll() {
-  if (!hasExplicitHomeHashTarget() && 'scrollRestoration' in window.history) {
+  if (!hasExplicitHomeHashTarget() && !pendingHomeScrollRestore && 'scrollRestoration' in window.history) {
     window.history.scrollRestoration = 'manual';
   }
   forceHomeScrollTop();
@@ -260,13 +263,11 @@ if (heroSection && heroVideo) {
 }
 
 window.addEventListener('pageshow', (event) => {
-  if (event.persisted) {
-    enforceHomeInitialScroll();
-    const ae = document.activeElement;
-    if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) {
-      const inHomeSearch = ae.closest?.('#static-search, #floating-bar');
-      if (inHomeSearch) ae.blur();
-    }
+  if (!event.persisted) return;
+  const ae = document.activeElement;
+  if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) {
+    const inHomeSearch = ae.closest?.('#static-search, #floating-bar');
+    if (inHomeSearch) ae.blur();
   }
 });
 
@@ -281,7 +282,6 @@ const {
   parseInventoryFilters
 } = homeDataApi;
 
-const HOME_VEHICLE_POOL_SIZE = 18;
 const HOME_VEHICLES_PER_PAGE = 6;
 
 const homeVehicleGrid = document.getElementById('vehicleGrid');
@@ -296,27 +296,16 @@ const homeSearchState = typeof parseInventoryFilters === 'function'
   ? parseInventoryFilters(window.location.search)
   : {};
 
-let currentHomeVehiclePage = 0;
+let currentHomeVehiclePage = pendingHomeScrollRestore
+  ? pendingHomeScrollRestore.page
+  : 0;
 let currentHomeVehicleColumns = getHomeVehicleColumns();
 let homeVehicleResizeFrame = 0;
-const randomizedHomeVehicles = createRandomVehiclePool(vehicles, HOME_VEHICLE_POOL_SIZE);
+/** 与后台 `display_order` 一致（经 `/api/vehicles` 排序后的全量列表） */
+const homeVehicles = Array.isArray(vehicles) ? vehicles : [];
 
 function translate(key, params = {}) {
   return window.TK168I18N?.t(key, params) || key;
-}
-
-function shuffleItems(items) {
-  const next = [...items];
-  for (let index = next.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
-    [next[index], next[swapIndex]] = [next[swapIndex], next[index]];
-  }
-  return next;
-}
-
-function createRandomVehiclePool(source, limit) {
-  if (!Array.isArray(source) || source.length === 0) return [];
-  return shuffleItems(source).slice(0, Math.min(limit, source.length));
 }
 
 function getHomeVehiclesPerPage() {
@@ -339,16 +328,17 @@ function chunkHomeVehicles(items, chunkSize) {
 }
 
 function getHomeVehicleTotalPages() {
-  return Math.max(1, Math.ceil(randomizedHomeVehicles.length / getHomeVehiclesPerPage()));
+  return Math.max(1, Math.ceil(homeVehicles.length / getHomeVehiclesPerPage()));
 }
 
 function renderHomeVehiclePages() {
   if (!homeVehicleGrid) return;
 
-  const pages = chunkHomeVehicles(randomizedHomeVehicles, getHomeVehiclesPerPage());
+  const pages = chunkHomeVehicles(homeVehicles, getHomeVehiclesPerPage());
   const totalPages = Math.max(1, pages.length);
   currentHomeVehiclePage = Math.max(0, Math.min(totalPages - 1, currentHomeVehiclePage));
   currentHomeVehicleColumns = getHomeVehicleColumns();
+  homeVehicleGrid.dataset.homeVehiclePage = String(currentHomeVehiclePage);
   homeVehicleGrid.innerHTML = '';
   homeVehicleGrid.style.setProperty('--home-vehicle-columns', String(currentHomeVehicleColumns));
 
@@ -513,6 +503,18 @@ bindHomeVehiclePagination();
 bindHomeVehicleResizeSync();
 renderHomeContent();
 initHomeSearch();
+
+if (pendingHomeScrollRestore) {
+  const y = pendingHomeScrollRestore.y;
+  const applyY = () => {
+    const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    window.scrollTo(0, Math.min(Math.max(0, y), maxY));
+  };
+  requestAnimationFrame(() => {
+    requestAnimationFrame(applyY);
+  });
+  window.setTimeout(applyY, 0);
+}
 
 window.addEventListener('tk168:languagechange', () => {
   renderHomeContent();
