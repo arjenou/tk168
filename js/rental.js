@@ -589,4 +589,10 @@ window.addEventListener('tk168:languagechange', (event) => {
   renderRentableVehicles(language);
 });
 
+document.addEventListener('tk168:data-updated', (event) => {
+  if (event.detail?.rentals) {
+    renderRentableVehicles(getLanguage());
+  }
+});
+
 initRentalPage();

@@ -473,6 +473,11 @@ body.mobile-nav-open {
   margin: 0 auto;
 }
 
+/* 避免 detail.html 内静态占位（示例 R8）在 JS 首帧渲染前闪现 */
+.detail-shell.detail-shell--hydrating {
+  visibility: hidden;
+}
+
 /* 车型名 + 价格 横排 */
 .detail-topbar {
   display: grid;

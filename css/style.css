@@ -1734,12 +1734,32 @@ body.contact-popover-open {
 }
 
 .vehicle-pagination {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
+  column-gap: 12px;
+  row-gap: 8px;
+  width: 100%;
+  max-width: var(--vehicles-shell-max, 1344px);
+  margin-left: auto;
+  margin-right: auto;
   margin-top: 20px;
   padding-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.vehicle-pagination .vehicle-slider-btn--prev {
+  justify-self: start;
+}
+
+.vehicle-pagination .vehicle-slider-dots {
+  justify-self: center;
+  grid-column: 2;
+}
+
+.vehicle-pagination .vehicle-slider-btn--next {
+  justify-self: end;
+  grid-column: 3;
 }
 
 .vehicle-pagination .vehicle-slider-btn {
@@ -2406,6 +2426,7 @@ body.contact-popover-open {
 #vehicles[data-home-grid=paged] .vehicle-pagination {
   margin-top: 80px;
   padding-bottom: 0;
+  max-width: min(var(--vehicles-shell-max, 1332px), 100%);
 }
 
 @media (max-width: 1180px) {

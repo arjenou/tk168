@@ -22,6 +22,9 @@ window.TK168PageChrome?.applyPageChrome({
   inventoryHref
 });
 
+const detailShell = document.querySelector('.detail-shell');
+detailShell?.classList.add('detail-shell--hydrating');
+
 const thumbGrid = document.getElementById('thumbGrid');
 const detailMainImage = document.getElementById('detailMainImage');
 const spinViewerModal = document.getElementById('spinViewerModal');
@@ -1065,29 +1068,57 @@ async function bootstrapDetailPage() {
     /^https?:$/.test(location.protocol) &&
     requestedVehicleId &&
     !String(requestedVehicleId).endsWith('-catalog');
+
+  const hasLocalMatch =
+    Boolean(requestedVehicleId) && currentVehicle?.id === requestedVehicleId;
+
+  function applyCanonicalUrl() {
+    if (requestedVehicleId && currentVehicle.id !== requestedVehicleId) {
+      window.history.replaceState(
+        {},
+        '',
+        window.TK168_DATA.buildDetailUrl(currentVehicle.id, currentFilters)
+      );
+    }
+  }
+
+  function renderAll() {
+    try {
+      applyCanonicalUrl();
+      renderVehicleHeader();
+      renderGallery();
+      renderSpecs();
+      renderOverview();
+      renderBenefits();
+      renderFeatures();
+      syncLinks();
+      renderFeaturedCars();
+    } finally {
+      detailShell?.classList.remove('detail-shell--hydrating');
+    }
+  }
+
+  if (hasLocalMatch) {
+    renderAll();
+  }
+
   if (tryLive) {
     const flat = await window.TK168ApiHydrate?.fetchPublishedVehicleById?.(requestedVehicleId);
     const merged = flat && window.TK168_DATA.mergeApiVehicleWithBase?.(flat);
-    if (merged) currentVehicle = merged;
+    if (merged) {
+      currentVehicle = merged;
+      renderAll();
+    } else if (!hasLocalMatch) {
+      renderAll();
+    }
+  } else if (!hasLocalMatch) {
+    renderAll();
   }
-  if (requestedVehicleId && currentVehicle.id !== requestedVehicleId) {
-    window.history.replaceState(
-      {},
-      '',
-      window.TK168_DATA.buildDetailUrl(currentVehicle.id, currentFilters)
-    );
-  }
-  renderVehicleHeader();
-  renderGallery();
-  renderSpecs();
-  renderOverview();
-  renderBenefits();
-  renderFeatures();
-  syncLinks();
-  renderFeaturedCars();
 }
 
-bootstrapDetailPage();
+bootstrapDetailPage().catch(() => {
+  detailShell?.classList.remove('detail-shell--hydrating');
+});
 
 window.addEventListener('tk168:languagechange', () => {
   renderVehicleHeader();

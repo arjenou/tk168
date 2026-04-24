@@ -519,6 +519,12 @@ if (pendingHomeScrollRestore) {
 window.addEventListener('tk168:languagechange', () => {
   renderHomeContent();
 });
+
+document.addEventListener('tk168:data-updated', (event) => {
+  if (!event.detail?.vehicles) return;
+  window.TK168_DATA?.refreshVehiclesFromApiHydrate?.();
+  renderHomeContent();
+});
 })();
 
 const staticSearch = document.getElementById('static-search');

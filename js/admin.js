@@ -100,6 +100,10 @@ const RESOURCES = {
     headerLabel: "首页车辆管理",
     emptyLabel: "暂无车辆",
     priceColumn: { key: "totalPrice", label: "总价" },
+    /** 列表内拖拽调整 displayOrder，与前台首页排序一致 */
+    homeDragSort: true,
+    homeDragSortHint:
+      "拖拽左侧手柄可调整首页展示顺序（保存后立即生效）。搜索时会暂时隐藏手柄。",
     // Editor form groups (new tabbed layout). Each field may declare:
     //   label / placeholder / hint / span (12-col grid): 3|4|6|12
     fieldGroups: [
@@ -190,6 +194,10 @@ const RESOURCES = {
     duplicateCode: "rental_id_taken",
     headerLabel: "レンタル车辆管理",
     emptyLabel: "暂无租赁车辆",
+    /** 与 rental.html 车队顺序一致（display_order） */
+    homeDragSort: true,
+    homeDragSortHint:
+      "拖拽左侧手柄可调整租赁页（rental.html）车辆展示顺序（保存后立即生效）。搜索时会暂时隐藏手柄。",
     priceColumn: { key: "dailyRate", label: "日租金(¥)" },
     extraColumns: [
       { key: "rentalStatus", label: "状态", render: (v) => statusLabel(v) },
@@ -353,6 +361,7 @@ async function boot() {
     state.user = null;
     state.view = "login";
   }
+  ensureHomeInventoryDragDelegate();
   render();
 }
 
@@ -533,9 +542,22 @@ function renderList() {
     .map((c) => `<th>${escapeHtml(c.label)}</th>`)
     .join("");
 
+  const dragHint =
+    r.homeDragSort && !state.filter.trim()
+      ? `<p class="admin-drag-hint">${escapeHtml(
+          r.homeDragSortHint ||
+            "拖拽左侧手柄可调整展示顺序（保存后立即生效）。搜索时会暂时隐藏手柄。",
+        )}</p>`
+      : "";
+  const dragHead =
+    r.homeDragSort && !state.filter.trim()
+      ? `<th class="admin-th-drag" scope="col" title="拖拽排序">顺序</th>`
+      : "";
+
   const inner = `
     <div class="admin-page-head">
       <h1>${escapeHtml(r.headerLabel)} <span style="color:var(--admin-text-dim);font-size:14px;font-weight:400;">（${items.length} 台）</span></h1>
+      ${dragHint}
       <div class="admin-toolbar">
         <input id="itemSearch" class="admin-input admin-search" type="search" placeholder="搜索 名称 / 品牌" value="${escapeHtml(state.filter)}">
         <button class="admin-btn admin-btn-primary" id="newItemBtn">+ 新增${r.label}</button>
@@ -549,6 +571,7 @@ function renderList() {
         : `<table class="admin-table">
             <thead>
               <tr>
+                ${dragHead}
                 <th style="width:84px;">封面</th>
                 <th>名称</th>
                 <th>品牌</th>
@@ -589,13 +612,115 @@ function renderList() {
   bindRowActions();
 }
 
+async function persistHomeDisplayOrderAfterDrop(fromId, toId) {
+  const r = currentResource();
+  if (!r.homeDragSort) return;
+  const list = [...(state.items[r.key] || [])];
+  const fromIdx = list.findIndex((v) => v.id === fromId);
+  const toIdx = list.findIndex((v) => v.id === toId);
+  if (fromIdx < 0 || toIdx < 0) return;
+  const [removed] = list.splice(fromIdx, 1);
+  list.splice(toIdx, 0, removed);
+  try {
+    await Promise.all(
+      list.map((v, i) =>
+        api(`${r.apiList}/${encodeURIComponent(v.id)}`, {
+          method: "PATCH",
+          body: { displayOrder: i },
+        }),
+      ),
+    );
+    list.forEach((v, i) => {
+      v.displayOrder = i;
+    });
+    state.items[r.key] = list;
+    showToast(r.key === "rentals" ? "租赁页展示顺序已保存" : "首页展示顺序已保存");
+    render();
+  } catch (err) {
+    showToast(`保存顺序失败：${err.message}`, "error");
+    await refreshItems();
+    render();
+  }
+}
+
+/** 在 #adminRoot 上委托一次，避免每次 render 重复绑定 tbody */
+function ensureHomeInventoryDragDelegate() {
+  if (ROOT.dataset.tk168HomeInventoryDrag === "1") return;
+  ROOT.dataset.tk168HomeInventoryDrag = "1";
+
+  let dragSourceId = null;
+  let lastOverTr = null;
+
+  const clearOver = () => {
+    ROOT.querySelectorAll(".admin-table tbody tr.is-drag-over").forEach((row) =>
+      row.classList.remove("is-drag-over"),
+    );
+    lastOverTr = null;
+  };
+
+  const dragActive = () => {
+    const r = currentResource();
+    return Boolean(r.homeDragSort && !state.filter.trim());
+  };
+
+  ROOT.addEventListener("dragstart", (event) => {
+    if (!dragActive()) return;
+    const handle = event.target.closest(".admin-drag-handle");
+    if (!handle) return;
+    const tr = handle.closest("tr");
+    if (!tr?.dataset.itemId) return;
+    dragSourceId = tr.dataset.itemId;
+    event.dataTransfer.setData("text/plain", dragSourceId);
+    event.dataTransfer.effectAllowed = "move";
+    tr.classList.add("is-dragging-source");
+  });
+
+  ROOT.addEventListener("dragend", () => {
+    ROOT.querySelectorAll(".admin-table tbody tr.is-dragging-source").forEach((row) =>
+      row.classList.remove("is-dragging-source"),
+    );
+    clearOver();
+    dragSourceId = null;
+  });
+
+  ROOT.addEventListener("dragover", (event) => {
+    if (!dragActive() || !dragSourceId) return;
+    const tr = event.target.closest(".admin-table tbody tr");
+    if (!tr?.dataset.itemId) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    if (lastOverTr && lastOverTr !== tr) lastOverTr.classList.remove("is-drag-over");
+    tr.classList.add("is-drag-over");
+    lastOverTr = tr;
+  });
+
+  ROOT.addEventListener("drop", (event) => {
+    if (!dragActive()) return;
+    const tr = event.target.closest(".admin-table tbody tr");
+    if (!tr?.dataset.itemId) return;
+    event.preventDefault();
+    clearOver();
+    const fromId = event.dataTransfer.getData("text/plain");
+    const toId = tr.dataset.itemId;
+    if (!fromId || fromId === toId) return;
+    void persistHomeDisplayOrderAfterDrop(fromId, toId);
+  });
+}
+
 function itemRow(v, r) {
+  const showDrag = Boolean(r.homeDragSort && !state.filter.trim());
+  const dragCell = showDrag
+    ? `<td class="admin-drag-cell">
+        <span class="admin-drag-handle" draggable="true" title="拖拽调整列表展示顺序" aria-label="拖拽排序">⋮⋮</span>
+      </td>`
+    : "";
   const cover = resolveMediaUrlForImg(v.images?.[0]?.url || "");
   const extraCells = (r.extraColumns || [])
     .map((c) => `<td>${escapeHtml(c.render ? c.render(v[c.key]) : v[c.key] ?? "")}</td>`)
     .join("");
   return `
-    <tr>
+    <tr data-item-id="${escapeAttr(v.id)}">
+      ${dragCell}
       <td>${cover ? `<img class="admin-thumb" src="${escapeAttr(cover)}" alt="">` : '<div class="admin-thumb"></div>'}</td>
       <td>
         <div style="font-weight:600;">${escapeHtml(v.name)}</div>
@@ -845,10 +970,24 @@ function renderSpecsTab(r, draft) {
 }
 
 function renderPublishTab(r, draft, isNew) {
+  const sortField = r.homeDragSort
+    ? ""
+    : `
+        <div class="admin-field admin-col-6">
+          <label>排序</label>
+          <input class="admin-input" type="number" data-draft="displayOrder" value="${Number(draft.displayOrder ?? 0)}">
+          <div class="admin-field-hint">数字越小越靠前，相同数字按更新时间排序。</div>
+        </div>`;
+  const orderHint = r.homeDragSort
+    ? `<div class="admin-field admin-col-6">
+          <label>列表展示顺序</label>
+          <div class="admin-field-hint" style="margin-top:2px;">在「${escapeHtml(r.headerLabel)}」列表页拖拽左侧手柄调整并自动保存，无需在此填写数字。</div>
+        </div>`
+    : "";
   return `
     <section class="admin-section">
       <div class="admin-section-head">
-        <h3>发布与排序</h3>
+        <h3>${r.homeDragSort ? "发布" : "发布与排序"}</h3>
         <p>系统会在保存时自动生成内部${escapeHtml(r.label)}标识（不在界面显示）。</p>
       </div>
       <div class="admin-grid-12">
@@ -860,11 +999,8 @@ function renderPublishTab(r, draft, isNew) {
           </label>
           <div class="admin-field-hint">关闭后仅你能在后台看到，该车不会出现在前台列表。</div>
         </div>
-        <div class="admin-field admin-col-6">
-          <label>排序</label>
-          <input class="admin-input" type="number" data-draft="displayOrder" value="${Number(draft.displayOrder ?? 0)}">
-          <div class="admin-field-hint">数字越小越靠前，相同数字按更新时间排序。</div>
-        </div>
+        ${orderHint}
+        ${sortField}
       </div>
       ${isNew ? '<div class="admin-message" style="margin-top:14px;">新车辆保存后再回来上传图片。</div>' : ""}
     </section>

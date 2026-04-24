@@ -158,10 +158,22 @@ window.TK168_DATA = (() => {
     brands.map((brand) => [normalizeBrandKeyToken(brand.key), brand.key])
   );
 
+  /** e.g. admin `ferrari-test` → token `ferraritest` → canonical `ferrari` */
+  const brandKeyEnvSuffixes = ['test', 'dev', 'staging'];
+
   function resolveCanonicalBrandKey(rawBrandKey) {
     const token = normalizeBrandKeyToken(rawBrandKey);
     if (!token) return '';
-    return brandKeyAliasMap[token] || canonicalBrandKeyByToken.get(token) || '';
+    const direct = brandKeyAliasMap[token] || canonicalBrandKeyByToken.get(token) || '';
+    if (direct) return direct;
+    for (const suffix of brandKeyEnvSuffixes) {
+      if (!token.endsWith(suffix) || token.length <= suffix.length) continue;
+      const baseToken = token.slice(0, -suffix.length);
+      const resolved =
+        brandKeyAliasMap[baseToken] || canonicalBrandKeyByToken.get(baseToken) || '';
+      if (resolved) return resolved;
+    }
+    return '';
   }
 
   const vehicleTypeOptions = [
@@ -868,9 +880,6 @@ window.TK168_DATA = (() => {
   // (richly localised `specs`, `highlights`, `description`, etc.) keep
   // falling back to the built-in defaults.  If the API has never been
   // reached we behave exactly like before.
-  const apiVehicles = Array.isArray(window.TK168_API_VEHICLES)
-    ? window.TK168_API_VEHICLES
-    : null;
   const apiPresets = (window.TK168_API_PRESETS && typeof window.TK168_API_PRESETS === "object")
     ? window.TK168_API_PRESETS
     : null;
@@ -902,27 +911,41 @@ window.TK168_DATA = (() => {
   //
   // If the API is unreachable we fall back to the old behaviour so file://
   // previews and offline dev don't end up with an empty site.
-  let seedVehicles;
-  let includeBrandLibraryCards = false;
-  if (apiVehicles && apiVehicles.length) {
-    const baseById = new Map(baseVehicles.map((v) => [v.id, v]));
-    seedVehicles = apiVehicles.map((apiV) => mergeVehicleData(baseById.get(apiV.id), apiV));
-  } else {
-    seedVehicles = baseVehicles;
-    includeBrandLibraryCards = true;
+  function buildMergedVehicleListFromHydrate() {
+    const apiList = Array.isArray(window.TK168_API_VEHICLES)
+      ? window.TK168_API_VEHICLES
+      : null;
+    let seed;
+    let includeBrandLibraryCards = false;
+    if (apiList && apiList.length) {
+      const baseById = new Map(baseVehicles.map((v) => [v.id, v]));
+      seed = apiList.map((apiV) => mergeVehicleData(baseById.get(apiV.id), apiV));
+    } else {
+      seed = baseVehicles;
+      includeBrandLibraryCards = true;
+    }
+    const raw = includeBrandLibraryCards
+      ? appendBrandLibraryVehicles(seed, brandLibraryItems)
+      : seed;
+    return raw
+      .map((vehicle) => {
+        const canonicalBrandKey = resolveCanonicalBrandKey(vehicle.brandKey);
+        return canonicalBrandKey
+          ? { ...vehicle, brandKey: canonicalBrandKey }
+          : { ...vehicle };
+      })
+      .filter((vehicle) => activeBrandKeySet.has(vehicle.brandKey));
   }
-  const rawVehicleList = includeBrandLibraryCards
-    ? appendBrandLibraryVehicles(seedVehicles, brandLibraryItems)
-    : seedVehicles;
-  const vehicles = rawVehicleList
-    .map((vehicle) => {
-      const canonicalBrandKey = resolveCanonicalBrandKey(vehicle.brandKey);
-      return canonicalBrandKey
-        ? { ...vehicle, brandKey: canonicalBrandKey }
-        : { ...vehicle };
-    })
-    .filter((vehicle) => activeBrandKeySet.has(vehicle.brandKey));
 
+  /** 与 `window.TK168_API_VEHICLES` 同步的可变数组；顺序与后台 display_order 一致 */
+  const vehicles = [];
+  vehicles.push(...buildMergedVehicleListFromHydrate());
+
+  function refreshVehiclesFromApiHydrate() {
+    const next = buildMergedVehicleListFromHydrate();
+    vehicles.length = 0;
+    vehicles.push(...next);
+  }
 
   const news = [
     {
@@ -1821,9 +1844,11 @@ window.TK168_DATA = (() => {
   // the レンタル板块 — independent from the on-sale `vehicles` inventory.
   // Each rental is adapted into the shape vehicle cards expect.
   function buildRentalVehicleRecord(rental) {
+    const rawBrand = rental.brandKey || '';
+    const brandKey = resolveCanonicalBrandKey(rawBrand) || rawBrand;
     const fallback = {
       id: rental.id,
-      brandKey: rental.brandKey || '',
+      brandKey,
       name: rental.name || rental.id,
       nameJa: rental.nameJa,
       nameEn: rental.nameEn,
@@ -2079,7 +2104,9 @@ window.TK168_DATA = (() => {
   }
 
   function buildBrandUrl(brandKey) {
-    return buildInventoryUrl({ brand: brandKey });
+    const resolved = resolveCanonicalBrandKey(brandKey);
+    const brand = resolved || String(brandKey || '').trim();
+    return buildInventoryUrl({ brand });
   }
 
   /**
@@ -2172,6 +2199,7 @@ window.TK168_DATA = (() => {
     buildFilterSummary,
     buildBrandUrl,
     buildDetailUrl,
-    mergeApiVehicleWithBase
+    mergeApiVehicleWithBase,
+    refreshVehiclesFromApiHydrate
   };
 })();
