@@ -35,22 +35,24 @@ const reportedHardwareConcurrency = Number(window.navigator?.hardwareConcurrency
 const hasLowDeviceMemory = Number.isFinite(reportedDeviceMemory) && reportedDeviceMemory > 0 && reportedDeviceMemory <= 4;
 const hasLowCpuBudget = Number.isFinite(reportedHardwareConcurrency) && reportedHardwareConcurrency > 0 && reportedHardwareConcurrency <= 4;
 const hasSlowNetwork = /(?:^|[^a-z])(slow-2g|2g|3g)(?:$|[^a-z])/.test(effectiveNetworkType);
+/** 仅 2G / slow-2G；不把 3G 当慢网（移动端 API 常把 4G 标成 3g，会误关视频） */
+const hasVerySlowNetwork = /(?:^|[^a-z])(slow-2g|2g)(?:$|[^a-z])/.test(effectiveNetworkType);
 const shouldPreferLiteTouchExperience = Boolean(
   coarsePointerViewport?.matches && (hasLowDeviceMemory || hasLowCpuBudget || hasSlowNetwork || shouldConserveData)
 );
-/** 省流或慢网：仅不加载首屏大横幅 hero 视频；片头 intro MP4 仍会照常请求/播放 */
-const shouldUseLiteExperience = Boolean(shouldConserveData || hasSlowNetwork);
-const prefersReducedMotion = Boolean(prefersReducedHeroVideoMotion?.matches);
-const heroVideoDisabled = Boolean(shouldUseLiteExperience || prefersReducedMotion);
+/** 省流或极慢网才关横幅视频；片头与 Hero 在一般手机网络下保持开启 */
+const shouldUseLiteExperience = Boolean(shouldConserveData || hasVerySlowNetwork);
+const heroVideoDisabled = Boolean(shouldUseLiteExperience);
 window.TK168RuntimeProfile = Object.freeze({
   liteMode: shouldUseLiteExperience,
   heroVideoDisabled,
   shouldConserveData,
   hasSlowNetwork,
+  hasVerySlowNetwork,
   hasLowDeviceMemory,
   hasLowCpuBudget
 });
-document.documentElement.classList.toggle('tk168-lite-mode', shouldUseLiteExperience || heroVideoDisabled);
+document.documentElement.classList.toggle('tk168-lite-mode', shouldUseLiteExperience);
 const SKIP_INTRO_ONCE_KEY = 'tk168_skip_intro_once';
 /** 同标签页会话内已播放过片头则不再播放（避免从子页返回首页反复观看） */
 const INTRO_SEEN_SESSION_KEY = 'tk168_landing_intro_seen';
@@ -304,10 +306,6 @@ enforceHomeInitialScroll();
 if (shouldSkipIntroOnce() || hasIntroBeenSeenThisSession()) {
   introVideo?.pause();
   showMain({ immediate: true });
-} else if (prefersReducedMotion) {
-  introVideo?.pause();
-  markIntroSeenThisSession();
-  showMain({ immediate: true });
 } else if (!INTRO_ENABLED) {
   introVideo?.pause();
   showMain({ immediate: true });
@@ -383,7 +381,9 @@ if (heroSection && heroVideo) {
     heroVideoInView = Boolean(entries[0]?.isIntersecting);
     syncHeroVideoPlayback();
   }, {
-    threshold: 0.12
+    /* 移动端地址栏伸缩时 0.12 易误判为不可见，略放宽 */
+    threshold: 0.02,
+    rootMargin: '0px 0px 12% 0px'
   });
 
   heroVisibilityObserver.observe(heroSection);

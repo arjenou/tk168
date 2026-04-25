@@ -32,10 +32,10 @@
 
 .no-hero-page #navbar,
 #navbar.chrome-solid {
-  background: rgba(23, 23, 23, 0.82);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(23, 23, 23, 0.54);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .no-hero-page #navbar:hover,
@@ -45,8 +45,8 @@
 #navbar.chrome-solid:focus-within,
 #navbar.chrome-solid.mobile-open,
 #navbar.chrome-solid.scrolled {
-  background: rgba(23, 23, 23, 0.88);
-  border-bottom-color: rgba(255, 255, 255, 0.16);
+  background: rgba(23, 23, 23, 0.62);
+  border-bottom-color: rgba(255, 255, 255, 0.11);
 }
 
 .inq-main {

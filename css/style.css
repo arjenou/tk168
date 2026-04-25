@@ -108,21 +108,20 @@ body.is-home-landing {
   navigation: auto;
 }
 
-/* 首次进入页面的淡入：轻微上滑 + 渐显，与跳转过渡风格一致 */
+/* 首次进入页面的淡入：仅 opacity，避免 body 上出现 transform 导致子元素
+   position:fixed 相对 body 算位、顶栏随滚动（见 CSS fixed 与 containing block） */
 @keyframes tk168PageFadeIn {
   from {
     opacity: 0;
-    transform: translate3d(0, 6px, 0);
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
   }
 }
 
 body {
   animation: tk168PageFadeIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  will-change: opacity, transform;
+  will-change: opacity;
 }
 
 /* Body skeleton-active 时不触发淡入动画 —— overlay 会接管过渡，
@@ -321,20 +320,28 @@ img {
     width: min(58vw, 180px);
   }
 }
+/* 全站顶栏：固定 + 半透毛玻璃，滚动/悬停时略加深，内容始终从下方滑过不挡交互 */
 #navbar {
   position: fixed;
   inset: 0 0 auto 0;
   z-index: 1000;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: rgba(10, 12, 20, 0.24);
+  backdrop-filter: blur(26px) saturate(1.12);
+  -webkit-backdrop-filter: blur(26px) saturate(1.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.056);
   transition: background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease;
-  border-bottom: 1px solid transparent;
 }
 
 #navbar.scrolled,
-#navbar:hover {
-  background: rgba(23, 23, 23, 0.82);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border-color: rgba(255, 255, 255, 0.1);
+#navbar:hover,
+#navbar:focus-within,
+#navbar.mobile-open {
+  background: rgba(23, 23, 23, 0.5);
+  backdrop-filter: blur(30px) saturate(1.1);
+  -webkit-backdrop-filter: blur(30px) saturate(1.1);
+  border-color: rgba(255, 255, 255, 0.072);
 }
 
 .nav-wrap {

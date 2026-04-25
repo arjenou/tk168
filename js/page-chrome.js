@@ -233,7 +233,7 @@
     setupMobileNav();
     setNavbarMode({ mode: navMode });
 
-    const shouldUseScrollChrome = pageKey !== 'detail' && navMode !== 'solid';
+    const shouldUseScrollChrome = navMode !== 'solid';
     if (shouldUseScrollChrome) {
       bindNavbarScrollState({ threshold: scrollThreshold });
     } else {

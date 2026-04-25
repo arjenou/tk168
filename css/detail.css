@@ -122,11 +122,13 @@ input {
   position: fixed;
   inset: 0 0 auto 0;
   z-index: 1000;
-  /* Detail page starts on a white top section; keep chrome visible from the first screen. */
-  background: rgba(23, 23, 23, 0.82);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  /* 与全站顶栏一致：白底/任意背景下略透明；滚动/展开菜单时加深 */
+  background: rgba(10, 12, 20, 0.24);
+  backdrop-filter: blur(26px) saturate(1.12);
+  -webkit-backdrop-filter: blur(26px) saturate(1.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.056);
   transition: background .4s ease, border-color .4s ease, backdrop-filter .4s ease;
 }
 
@@ -134,10 +136,10 @@ input {
 #navbar:hover,
 #navbar:focus-within,
 #navbar.mobile-open {
-  background: rgba(23, 23, 23, 0.82);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border-color: rgba(255, 255, 255, 0.10);
+  background: rgba(23, 23, 23, 0.5);
+  backdrop-filter: blur(30px) saturate(1.1);
+  -webkit-backdrop-filter: blur(30px) saturate(1.1);
+  border-color: rgba(255, 255, 255, 0.072);
 }
 
 .nav-wrap {
@@ -3075,24 +3077,21 @@ body.price-help-open {
 @keyframes tk168PageFadeIn {
   from {
     opacity: 0;
-    transform: translate3d(0, 8px, 0);
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
   }
 }
 
 body {
   animation: tk168PageFadeIn 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  will-change: opacity, transform;
+  will-change: opacity;
 }
 
 html.is-page-navigating body {
   opacity: 0;
-  transform: translate3d(0, -6px, 0);
-  transition: opacity 260ms cubic-bezier(0.4, 0, 0.2, 1),
-              transform 260ms cubic-bezier(0.4, 0, 0.2, 1);
+  transform: none;
+  transition: opacity 260ms cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
   animation: none;
 }
