@@ -38,18 +38,19 @@ const hasSlowNetwork = /(?:^|[^a-z])(slow-2g|2g|3g)(?:$|[^a-z])/.test(effectiveN
 const shouldPreferLiteTouchExperience = Boolean(
   coarsePointerViewport?.matches && (hasLowDeviceMemory || hasLowCpuBudget || hasSlowNetwork || shouldConserveData)
 );
-const shouldUseLiteExperience = Boolean(
-  false
-);
+/** 省流或慢网：仅不加载首屏大横幅 hero 视频；片头 intro MP4 仍会照常请求/播放 */
+const shouldUseLiteExperience = Boolean(shouldConserveData || hasSlowNetwork);
+const prefersReducedMotion = Boolean(prefersReducedHeroVideoMotion?.matches);
+const heroVideoDisabled = Boolean(shouldUseLiteExperience || prefersReducedMotion);
 window.TK168RuntimeProfile = Object.freeze({
-  liteMode: false,
-  heroVideoDisabled: false,
+  liteMode: shouldUseLiteExperience,
+  heroVideoDisabled,
   shouldConserveData,
   hasSlowNetwork,
   hasLowDeviceMemory,
   hasLowCpuBudget
 });
-document.documentElement.classList.toggle('tk168-lite-mode', shouldUseLiteExperience);
+document.documentElement.classList.toggle('tk168-lite-mode', shouldUseLiteExperience || heroVideoDisabled);
 const SKIP_INTRO_ONCE_KEY = 'tk168_skip_intro_once';
 /** 同标签页会话内已播放过片头则不再播放（避免从子页返回首页反复观看） */
 const INTRO_SEEN_SESSION_KEY = 'tk168_landing_intro_seen';
@@ -151,10 +152,20 @@ function resolveWorkerMediaUrl(path, options = {}) {
   return sameOrigin || !apiBase ? raw : `${apiBase.replace(/\/+$/, '')}${raw}`;
 }
 
+/** 窄屏时优先用 data-src-mobile（可指向更低码率文件，无属性则同桌面） */
+function getVideoDataPath(el) {
+  if (!el) return '';
+  const mobile = el.getAttribute('data-src-mobile');
+  if (mobile && typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 760px)').matches) {
+    return mobile.trim();
+  }
+  return (el.getAttribute('data-src') || el.getAttribute('src') || '').trim();
+}
+
 function hydrateIntroVideoSource(options = {}) {
   if (!introVideo) return;
   if (introVideo.currentSrc) return;
-  const raw = introVideo.getAttribute('data-src') || introVideo.getAttribute('src');
+  const raw = getVideoDataPath(introVideo);
   if (!raw) return;
   const source = resolveWorkerMediaUrl(raw, options);
   if (!source) return;
@@ -164,7 +175,9 @@ function hydrateIntroVideoSource(options = {}) {
 
 function hydrateHeroVideoSource() {
   if (!heroVideo || heroVideoSourceReady) return;
-  const source = resolveWorkerMediaUrl(heroVideo.dataset.src);
+  const raw = getVideoDataPath(heroVideo);
+  if (!raw) return;
+  const source = resolveWorkerMediaUrl(raw);
   if (!source) return;
   heroVideo.src = source;
   heroVideo.load();
@@ -180,6 +193,10 @@ function canRunHeroVideo() {
 
 function syncHeroVideoPlayback() {
   if (!heroVideo) return;
+  if (window.TK168RuntimeProfile?.heroVideoDisabled) {
+    heroVideo.pause();
+    return;
+  }
   if (!canRunHeroVideo()) {
     heroVideo.pause();
     return;
@@ -286,6 +303,10 @@ enforceHomeInitialScroll();
 
 if (shouldSkipIntroOnce() || hasIntroBeenSeenThisSession()) {
   introVideo?.pause();
+  showMain({ immediate: true });
+} else if (prefersReducedMotion) {
+  introVideo?.pause();
+  markIntroSeenThisSession();
   showMain({ immediate: true });
 } else if (!INTRO_ENABLED) {
   introVideo?.pause();

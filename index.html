@@ -19,6 +19,7 @@
     <div class="loading-screen__brand" aria-hidden="true">
       <img src="assets/images/logo_TK168.svg" alt="" width="160" height="160" decoding="async" fetchpriority="high">
     </div>
+    <!-- 可选 data-src-mobile：窄屏用更小码率片头，上传后设与 R2 中路径一致即生效 -->
     <video id="intro-video" data-src="/api/media/videos/seed/intro-logo-trimmed.mp4" muted playsinline
       preload="auto"></video>
   </div>
@@ -30,6 +31,7 @@
     <!-- ─ 第一页：Hero ─ -->
     <section id="hero">
       <div class="hero-video-wrap">
+        <!-- 可选 data-src-mobile：手机用更低分辨率 hero（如 360p/480p 另存为 seed 下文件）以减轻首屏流量 -->
         <video id="hero-video" class="hero-media" data-src="https://api.tk168.co.jp/api/media/videos/seed/hero-main-web540.mp4" muted loop playsinline
           preload="none"></video>
         <div class="hero-overlay"></div>
@@ -184,7 +186,7 @@
   <script src="js/page-chrome.js?v=20260417i"></script>
   <script src="js/renderers.js?v=20260418b"></script>
   <script src="js/search-ui.js?v=20260526b"></script>
-  <script src="js/script.js?v=20260526c"></script>
+  <script src="js/script.js?v=20260526e"></script>
   <script src="js/home-cube.js?v=20260428a"></script>
 </body>
 
