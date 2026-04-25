@@ -915,6 +915,9 @@ window.TK168_DATA = (() => {
     const apiList = Array.isArray(window.TK168_API_VEHICLES)
       ? window.TK168_API_VEHICLES
       : null;
+    const apiVehicleIds = apiList && apiList.length
+      ? new Set(apiList.map((v) => v && v.id).filter(Boolean))
+      : new Set();
     let seed;
     let includeBrandLibraryCards = false;
     if (apiList && apiList.length) {
@@ -934,7 +937,14 @@ window.TK168_DATA = (() => {
           ? { ...vehicle, brandKey: canonicalBrandKey }
           : { ...vehicle };
       })
-      .filter((vehicle) => activeBrandKeySet.has(vehicle.brandKey));
+      .filter((vehicle) => {
+        if (activeBrandKeySet.has(vehicle.brandKey)) return true;
+        // 后台「首页车辆」写入的数据应全部可见；白名单只约束静态种子与品牌馆占位，避免 test 等自填品牌整卡被裁掉
+        if (apiVehicleIds.size > 0 && vehicle.id && apiVehicleIds.has(vehicle.id)) {
+          return true;
+        }
+        return false;
+      });
   }
 
   /** 与 `window.TK168_API_VEHICLES` 同步的可变数组；顺序与后台 display_order 一致 */
@@ -1261,29 +1271,59 @@ window.TK168_DATA = (() => {
     fuel: {
       zh: {
         汽油: '汽油',
+        柴油: '柴油',
+        油电混动: '油电混动',
+        插电混动: '插电混动',
+        纯电动: '纯电动',
+        增程式: '增程式',
         Hybrid: '混动',
         EV: '纯电'
       },
       ja: {
         汽油: 'ガソリン',
+        柴油: 'ディーゼル',
+        油电混动: 'ハイブリッド',
+        插电混动: 'プラグインハイブリッド',
+        纯电动: 'バッテリーEV',
+        增程式: 'レンジエクステンダー',
         Hybrid: 'ハイブリッド',
         EV: 'EV'
       },
       en: {
         汽油: 'Gasoline',
+        柴油: 'Diesel',
+        油电混动: 'Hybrid',
+        插电混动: 'Plug-in hybrid',
+        纯电动: 'Battery electric',
+        增程式: 'Range-extended electric',
         Hybrid: 'Hybrid',
         EV: 'EV'
       }
     },
     trans: {
       zh: {
-        自动挡: '自动挡'
+        自动挡: '自动挡',
+        手动挡: '手动挡',
+        CVT无级变速: 'CVT无级变速',
+        手自一体: '手自一体',
+        双离合: '双离合',
+        电动车单速: '电动车单速'
       },
       ja: {
-        自动挡: 'AT'
+        自动挡: 'AT',
+        手动挡: 'MT',
+        CVT无级变速: 'CVT',
+        手自一体: 'マニュアルモード付AT',
+        双离合: 'DCT',
+        电动车单速: '固定减速比'
       },
       en: {
-        自动挡: 'Automatic'
+        自动挡: 'Automatic',
+        手动挡: 'Manual',
+        CVT无级变速: 'CVT',
+        手自一体: 'Automatic (manual mode)',
+        双离合: 'Dual-clutch',
+        电动车单速: 'Single-speed reduction'
       }
     },
     bodyStyle: {
@@ -1332,16 +1372,28 @@ window.TK168_DATA = (() => {
     },
     drive: {
       zh: {
+        前轮驱动: '前轮驱动',
+        后轮驱动: '后轮驱动',
         四轮驱动: '四轮驱动',
-        后轮驱动: '后轮驱动'
+        适时四驱: '适时四驱',
+        全时四驱: '全时四驱',
+        电动四驱: '电动四驱'
       },
       ja: {
+        前轮驱动: 'FF',
+        后轮驱动: 'FR',
         四轮驱动: '4WD',
-        后轮驱动: 'FR'
+        适时四驱: 'マルチ4WD',
+        全时四驱: 'フルタイム4WD',
+        电动四驱: '電動4WD'
       },
       en: {
-        四轮驱动: 'AWD',
-        后轮驱动: 'RWD'
+        前轮驱动: 'FWD',
+        后轮驱动: 'RWD',
+        四轮驱动: 'AWD/4WD',
+        适时四驱: 'On-demand AWD',
+        全时四驱: 'Full-time AWD',
+        电动四驱: 'eAWD'
       }
     },
     serviceRecord: {
@@ -1460,18 +1512,27 @@ window.TK168_DATA = (() => {
     seats: {
       zh: {
         '2 座': '2 座',
+        '4 座': '4 座',
         '5 座': '5 座',
-        '7 座': '7 座'
+        '6 座': '6 座',
+        '7 座': '7 座',
+        '8 座及以上': '8 座及以上'
       },
       ja: {
         '2 座': '2人乗り',
+        '4 座': '4人乗り',
         '5 座': '5人乗り',
-        '7 座': '7人乗り'
+        '6 座': '6人乗り',
+        '7 座': '7人乗り',
+        '8 座及以上': '8人乗り以上'
       },
       en: {
         '2 座': '2 seats',
+        '4 座': '4 seats',
         '5 座': '5 seats',
-        '7 座': '7 seats'
+        '6 座': '6 seats',
+        '7 座': '7 seats',
+        '8 座及以上': '8+ seats'
       }
     }
   };
@@ -1571,7 +1632,32 @@ window.TK168_DATA = (() => {
     return option.labelZh || option.labelJa || option.labelEn || type;
   }
 
+  /** 车身 slug（首页筛选）或 labelZh → 用于门数等逻辑的中文语境 */
+  function resolveBodyStyleLabelZh(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    const opt = bodyTypeSearchOptions.find((o) => o.value === raw || o.labelZh === raw);
+    if (opt) return opt.labelZh;
+    return raw;
+  }
+
+  /** 车身类型：优先 bodyTypeSearchOptions（与首页「车身」筛选一致），否则旧版自由文案表 */
+  function getBodyStyleFieldLabel(value, language = getCurrentLanguage()) {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    const opt = bodyTypeSearchOptions.find((o) => o.value === raw || o.labelZh === raw);
+    if (opt) {
+      if (language === 'en') return opt.labelEn || opt.labelJa || opt.labelZh;
+      if (language === 'ja') return opt.labelJa || opt.labelEn || opt.labelZh;
+      return opt.labelZh;
+    }
+    const fieldCatalog = vehicleFieldTranslations.bodyStyle || {};
+    const catalog = fieldCatalog[language] || fieldCatalog.ja || fieldCatalog.zh;
+    return catalog?.[raw] || raw;
+  }
+
   function getVehicleFieldLabel(field, value, language = getCurrentLanguage()) {
+    if (field === 'bodyStyle') return getBodyStyleFieldLabel(value, language);
     const fieldCatalog = vehicleFieldTranslations[field] || {};
     const catalog = fieldCatalog[language] || fieldCatalog.ja || fieldCatalog.zh;
     return catalog?.[value] || value;
@@ -1688,7 +1774,7 @@ window.TK168_DATA = (() => {
     if (key === 'drive') return getVehicleFieldLabel('drive', vehicle.drive, language);
     if (key === 'seats') return getVehicleFieldLabel('seats', vehicle.seats, language);
     if (key === 'doors') {
-      const bodyContext = `${vehicle.bodyStyle || ''} ${vehicle.type || ''}`;
+      const bodyContext = `${resolveBodyStyleLabelZh(vehicle.bodyStyle)} ${vehicle.type || ''}`;
       let doorCount = 2;
       if (/(SUV|MPV|旅行车|ワゴン)/i.test(bodyContext)) doorCount = 5;
       else if (/(轿车|セダン)/i.test(bodyContext)) doorCount = 4;
@@ -1870,9 +1956,83 @@ window.TK168_DATA = (() => {
     return 'news-detail.html';
   }
 
+  let _brandKeyCatalog = null; // { keySet, shortJa }
+  function ensureBrandKeyCatalog() {
+    if (_brandKeyCatalog) return;
+    const keySet = new Set();
+    const shortJa = new Map();
+    const groups = (typeof window !== 'undefined' && window.TK168AdminBrandKeyOptionGroups) || [];
+    for (const g of groups) {
+      for (const o of g.options || []) {
+        if (!o?.value) continue;
+        const k = String(o.value);
+        keySet.add(k);
+        const full = String(o.label || o.value);
+        const short = full
+          .replace(/\s*（[0-9,]+）\s*$/u, '')
+          .replace(/\s*\([0-9,]+\)\s*$/g, '')
+          .replace(/\s*—\s*[^—]+$/u, '')
+          .trim() || k;
+        shortJa.set(k, short);
+      }
+    }
+    _brandKeyCatalog = { keySet, shortJa };
+  }
+
+  function titleEnFromBrandSlug(s) {
+    return String(s)
+      .split(/-/)
+      .filter(Boolean)
+      .map((p) => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase())
+      .join(' ');
+  }
+
+  function makeCatalogBrand(lookupKey) {
+    ensureBrandKeyCatalog();
+    if (!_brandKeyCatalog.keySet.has(lookupKey)) return null;
+    const tri =
+      typeof window !== "undefined" && window.TK168BrandKeyNameI18n
+        ? window.TK168BrandKeyNameI18n[lookupKey]
+        : null;
+    if (tri && tri.ja && tri.zh && tri.en) {
+      return {
+        key: lookupKey,
+        labelJa: tri.ja,
+        labelZh: tri.zh,
+        labelEn: tri.en,
+        file: "",
+        heroImage: "assets/images/f2.webp",
+        isCatalogOnly: true
+      };
+    }
+    const short = _brandKeyCatalog.shortJa.get(lookupKey) || lookupKey;
+    const en = titleEnFromBrandSlug(lookupKey);
+    return {
+      key: lookupKey,
+      labelJa: short,
+      labelZh: en,
+      labelEn: en,
+      file: "",
+      heroImage: "assets/images/f2.webp",
+      isCatalogOnly: true
+    };
+  }
+
   function getBrandByKey(key) {
-    const canonicalKey = resolveCanonicalBrandKey(key) || String(key || '').trim().toLowerCase();
-    return brands.find((brand) => brand.key === canonicalKey) || null;
+    const raw = String(key || '').trim();
+    if (!raw) return null;
+    const resolved = resolveCanonicalBrandKey(key) || '';
+    if (resolved) {
+      const b = brands.find((brand) => brand.key === resolved);
+      if (b) return b;
+    }
+    ensureBrandKeyCatalog();
+    const set = _brandKeyCatalog.keySet;
+    const candidates = [resolved, raw.toLowerCase()].filter(Boolean);
+    for (const c of candidates) {
+      if (set.has(c)) return makeCatalogBrand(c);
+    }
+    return null;
   }
 
   function getBrandAccentColor(key) {
@@ -2096,7 +2256,10 @@ window.TK168_DATA = (() => {
     };
 
     if (!value) return defaults[filterKey] || '';
-
+    if (filterKey === 'brand') {
+      const b = getBrandByKey(value);
+      if (b) return getBrandLabel(b, getCurrentLanguage());
+    }
     const option = getSearchFilterOptions(filterKey).find((item) => item.value === value);
     return option ? option.label : defaults[filterKey];
   }

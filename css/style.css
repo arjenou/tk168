@@ -388,8 +388,10 @@ img {
   color: #fff;
 }
 
-/* Hide current page entry in header nav to avoid redundant same-page clicks. */
-#navbar .nav-links > .nav-link[aria-current=page] {
+/* Hide only the redundant ホーム link on the index (logo also goes home). Hiding
+   every [aria-current] item breaks parity on ブランド展示 / 詳細 etc. where the
+   current section must stay visible to match the index bar. */
+#navbar .nav-links > .nav-link[aria-current=page][data-nav-key="landing"] {
   display: none;
 }
 
@@ -1675,6 +1677,31 @@ body.contact-popover-open {
 .fb-filter-menu-body::-webkit-scrollbar-thumb {
   background: rgba(23, 23, 23, 0.18);
   border-radius: 999px;
+}
+
+/* メーカー：与后台「品牌 Key」相同的国家/地区分组 */
+.fb-filter-menu--brand .fb-filter-menu-body {
+  max-height: min(52vh, 360px);
+}
+
+.fb-filter-menu--brand .fb-filter-menu-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fb-filter-menu--brand .fb-filter-menu-group + .fb-filter-menu-group {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(23, 23, 23, 0.08);
+}
+
+.fb-filter-menu--brand .fb-filter-menu-group-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: rgba(23, 23, 23, 0.45);
+  padding: 4px 12px 2px;
 }
 
 .fb-filter-option {
@@ -3684,6 +3711,9 @@ html:lang(en) .footer-newsletter h4 {
   }
   .fb-filter-menu-body {
     max-height: 220px;
+  }
+  .fb-filter-menu--brand .fb-filter-menu-body {
+    max-height: min(48vh, 300px);
   }
   .fb-filter-option {
     gap: 10px;

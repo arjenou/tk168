@@ -121,6 +121,13 @@ button { font: inherit; cursor: pointer; }
   display: none !important;
 }
 
+/* 品牌 Key：长下拉 + 分组 */
+.admin-field--brand-key .admin-input--brand-key {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
 .admin-input,
 .admin-textarea,
 .admin-select {

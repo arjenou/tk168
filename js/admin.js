@@ -131,22 +131,44 @@ const RESOURCES = {
         id: "basic",
         label: "基本信息",
         fields: [
-          { key: "brandKey", label: "品牌 Key", placeholder: "lamborghini", span: 4, required: true },
+          {
+            key: "brandKey",
+            label: "品牌 Key",
+            type: "select",
+            brandKeyCatalog: true,
+            span: 4,
+            required: true,
+            hint: "自列表选择存库用英文 Key；旧数据若不在列表中会单独出现为一项。",
+          },
           { key: "year", label: "年份", placeholder: "2022", span: 4 },
-          { key: "type", label: "车型分类", placeholder: "高性能 SUV", span: 4 },
+          {
+            key: "type",
+            label: "车型分类",
+            type: "select",
+            optionsCatalog: "vehicleType",
+            span: 4,
+            hint: "规范类名，与前台详情「车型」及库存筛选一致（中/日/英由站点语言自动翻译）。",
+          },
           {
             key: "icon",
             label: "图标",
             type: "select",
             iconCatalog: true,
             span: 4,
-            hint: "相对 assets/images/ 的文件名。",
+            hint: "下拉里为中文品牌名；存库仍为 brands/logos 下的 SVG 路径。",
           },
-          { key: "bodyStyle", label: "车身类型", placeholder: "高性能 SUV", span: 4 },
-          { key: "drive", label: "驱动方式", placeholder: "四轮驱动", span: 4 },
+          {
+            key: "bodyStyle",
+            label: "车身类型",
+            type: "select",
+            optionsCatalog: "bodyStyle",
+            span: 4,
+            hint: "与首页「车身类型」筛选键一致，存库为英文 slug（如 suv、sedan）。旧数据为中文时会显示「当前值」可改选。",
+          },
+          { key: "drive", label: "驱动方式", type: "select", optionsCatalog: "drive", span: 4 },
           { key: "bodyColor", label: "车身颜色", placeholder: "曜石黑", span: 4 },
           { key: "interiorColor", label: "内饰颜色", placeholder: "黑色真皮", span: 4 },
-          { key: "seats", label: "座位", placeholder: "5 座", span: 4 },
+          { key: "seats", label: "座位", type: "select", optionsCatalog: "seats", span: 4 },
           { key: "origin", label: "产地", placeholder: "意大利进口", span: 4 },
           { key: "serviceRecord", label: "保养记录", placeholder: "完整在册", span: 4 },
         ],
@@ -157,8 +179,8 @@ const RESOURCES = {
         fields: [
           { key: "engine", label: "发动机", placeholder: "4.0L V8", span: 6 },
           { key: "mileage", label: "里程 (km)", placeholder: "3,200", span: 3 },
-          { key: "fuel", label: "燃料", placeholder: "汽油", span: 3 },
-          { key: "trans", label: "变速箱", placeholder: "自动挡", span: 4 },
+          { key: "fuel", label: "燃料", type: "select", optionsCatalog: "fuel", span: 3 },
+          { key: "trans", label: "变速箱", type: "select", optionsCatalog: "trans", span: 3 },
           { key: "totalPrice", label: "支付总额", placeholder: "¥ 1,980,000", hint: "含手续费的显示总价", span: 4 },
           { key: "basePrice", label: "车辆本体价格", placeholder: "¥ 1,860,000", span: 4 },
         ],
@@ -240,22 +262,44 @@ const RESOURCES = {
         id: "basic",
         label: "基本信息",
         fields: [
-          { key: "brandKey", label: "品牌 Key", placeholder: "lamborghini", span: 4, required: true },
+          {
+            key: "brandKey",
+            label: "品牌 Key",
+            type: "select",
+            brandKeyCatalog: true,
+            span: 4,
+            required: true,
+            hint: "自列表选择存库用英文 Key；旧数据若不在列表中会单独出现为一项。",
+          },
           { key: "year", label: "年份", placeholder: "2022", span: 4 },
-          { key: "type", label: "车型分类", placeholder: "高性能 SUV", span: 4 },
+          {
+            key: "type",
+            label: "车型分类",
+            type: "select",
+            optionsCatalog: "vehicleType",
+            span: 4,
+            hint: "规范类名，与前台详情「车型」及库存筛选一致（中/日/英由站点语言自动翻译）。",
+          },
           {
             key: "icon",
             label: "图标",
             type: "select",
             iconCatalog: true,
             span: 4,
-            hint: "相对 assets/images/ 的文件名。",
+            hint: "下拉里为中文品牌名；存库仍为 brands/logos 下的 SVG 路径。",
           },
-          { key: "bodyStyle", label: "车身类型", placeholder: "高性能 SUV", span: 4 },
-          { key: "drive", label: "驱动方式", placeholder: "四轮驱动", span: 4 },
+          {
+            key: "bodyStyle",
+            label: "车身类型",
+            type: "select",
+            optionsCatalog: "bodyStyle",
+            span: 4,
+            hint: "与首页「车身类型」筛选键一致，存库为英文 slug（如 suv、sedan）。",
+          },
+          { key: "drive", label: "驱动方式", type: "select", optionsCatalog: "drive", span: 4 },
           { key: "bodyColor", label: "车身颜色", placeholder: "曜石黑", span: 4 },
           { key: "interiorColor", label: "内饰颜色", placeholder: "黑色真皮", span: 4 },
-          { key: "seats", label: "座位", placeholder: "2 座", span: 4 },
+          { key: "seats", label: "座位", type: "select", optionsCatalog: "seats", span: 4 },
           { key: "origin", label: "产地", placeholder: "德国进口", span: 4 },
         ],
       },
@@ -265,8 +309,8 @@ const RESOURCES = {
         fields: [
           { key: "engine", label: "发动机", placeholder: "4.0L V8", span: 6 },
           { key: "mileage", label: "里程 (km)", placeholder: "3,200", span: 3 },
-          { key: "fuel", label: "燃料", placeholder: "汽油", span: 3 },
-          { key: "trans", label: "变速箱", placeholder: "自动挡", span: 3 },
+          { key: "fuel", label: "燃料", type: "select", optionsCatalog: "fuel", span: 3 },
+          { key: "trans", label: "变速箱", type: "select", optionsCatalog: "trans", span: 3 },
         ],
       },
       {
@@ -1033,18 +1077,118 @@ const BRAND_LOGO_ICON_FILES = [
   "volvo.svg",
 ];
 
+/** `*.svg` 文件名 → 中文品牌名（图标下拉仅改展示，存库值仍为 `brands/logos/...`） */
+const BRAND_LOGO_FILE_TO_ZH = {
+  "acura.svg": "讴歌",
+  "alfaromeo.svg": "阿尔法·罗密欧",
+  "amg.svg": "梅赛德斯-AMG",
+  "astonmartin.svg": "阿斯顿·马丁",
+  "audi.svg": "奥迪",
+  "bentley.svg": "宾利",
+  "bmw.svg": "宝马",
+  "bugatti.svg": "布加迪",
+  "cadillac.svg": "凯迪拉克",
+  "chevrolet.svg": "雪佛兰",
+  "chrysler.svg": "克莱斯勒",
+  "citroen.svg": "雪铁龙",
+  "daf.svg": "达夫",
+  "dsautomobiles.svg": "DS 汽车",
+  "ferrari.svg": "法拉利",
+  "fiat.svg": "菲亚特",
+  "ford.svg": "福特",
+  "honda.svg": "本田",
+  "hyundai.svg": "现代",
+  "infiniti.svg": "英菲尼迪",
+  "iveco.svg": "依维柯",
+  "jaguar.svg": "捷豹",
+  "jeep.svg": "Jeep",
+  "kia.svg": "起亚",
+  "koenigsegg.svg": "科尼赛克",
+  "lamborghini.svg": "兰博基尼",
+  "landrover.svg": "路虎",
+  "lexus.svg": "雷克萨斯",
+  "man.svg": "曼恩",
+  "maserati.svg": "玛莎拉蒂",
+  "mazda.svg": "马自达",
+  "mclaren.svg": "迈凯伦",
+  "mercedes.svg": "奔驰",
+  "mg.svg": "MG",
+  "mini.svg": "MINI",
+  "mitsubishi.svg": "三菱",
+  "nissan.svg": "日产",
+  "opel.svg": "欧宝",
+  "peugeot.svg": "标致",
+  "polestar.svg": "极星",
+  "porsche.svg": "保时捷",
+  "ram.svg": "公羊 Ram",
+  "renault.svg": "雷诺",
+  "rollsroyce.svg": "劳斯莱斯",
+  "scania.svg": "斯堪尼亚",
+  "seat.svg": "西雅特",
+  "skoda.svg": "斯柯达",
+  "smart.svg": "smart",
+  "subaru.svg": "斯巴鲁",
+  "suzuki.svg": "铃木",
+  "tata.svg": "塔塔",
+  "tesla.svg": "特斯拉",
+  "toyota.svg": "丰田",
+  "volkswagen.svg": "大众",
+  "volvo.svg": "沃尔沃"
+};
+
+function brandLogoIconLabelZh(storedPath) {
+  const p = String(storedPath || "").trim();
+  if (!p) return "无";
+  const base = p.split("/").pop() || p;
+  return BRAND_LOGO_FILE_TO_ZH[base] || base;
+}
+
 /**
- * 下拉选项：存库值仍为相对 `assets/images/` 的路径；展示仅文件名/路径，不加说明文字。
+ * 品牌 Key：按国家分组；存库为英文 slug，与 `admin-brand-key-options.js` 一致。
+ */
+function buildBrandKeySelectHtml(draftKey, rawValue) {
+  const groups = (typeof window !== "undefined" && window.TK168AdminBrandKeyOptionGroups) || [];
+  const cur = String(rawValue == null ? "" : rawValue).trim();
+  const known = new Set();
+  for (const g of groups) {
+    for (const o of g.options || []) known.add(String(o.value));
+  }
+  const parts = [
+    `<option value="">${cur ? "（选择其他品牌 / 清空）" : "（选择品牌 Key）"}</option>`,
+  ];
+  if (cur && !known.has(cur)) {
+    parts.push(
+      `<option value="${escapeAttr(cur)}" selected>${escapeHtml(`${cur}（当前，未在标准列表）`)}</option>`,
+    );
+  }
+  for (const g of groups) {
+    const body = (g.options || [])
+      .map((o) => {
+        const sel = o.value === cur ? " selected" : "";
+        return `<option value="${escapeAttr(o.value)}"${sel}>${escapeHtml(o.label)}</option>`;
+      })
+      .join("");
+    if (!body) continue;
+    parts.push(`<optgroup label="${escapeAttr(g.label)}">${body}</optgroup>`);
+  }
+  return `<select class="admin-input admin-input--brand-key" data-draft="${escapeAttr(
+    String(draftKey),
+  )}">${parts.join("")}</select>`;
+}
+
+/**
+ * 下拉选项：存库值仍为 `brands/logos/*.svg`；下拉面展示为中文品牌名（见 `BRAND_LOGO_FILE_TO_ZH`）。
  */
 function buildVehicleIconOptions(stored) {
   // 首项为「无」= 不存 icon；不列出 logo_TK168 与 b1 等（旧数据用 unshift 仍可选中）。
   const rows = [{ value: "", label: "无" }];
   for (const file of BRAND_LOGO_ICON_FILES) {
-    rows.push({ value: `brands/logos/${file}`, label: file });
+    const zh = BRAND_LOGO_FILE_TO_ZH[file] || file;
+    rows.push({ value: `brands/logos/${file}`, label: zh });
   }
   const cur = String(stored == null ? "" : stored).trim();
   if (cur && !rows.some((r) => r.value === cur)) {
-    rows.unshift({ value: cur, label: cur });
+    rows.unshift({ value: cur, label: brandLogoIconLabelZh(cur) + "（当前文件）" });
   }
   return rows;
 }
@@ -1057,6 +1201,17 @@ const EDITOR_TABS = [
   { id: "staff", label: "员工介绍区", requiresStaff: true },
   { id: "publish", label: "发布设置" },
 ];
+
+/** 与 js/admin-vehicle-field-options.js 中 TK168AdminVehicleFieldOptions 的 key 一致 */
+function buildAdminVehicleCatalogOptions(catalogKey, stored) {
+  const cat = (typeof window !== "undefined" && window.TK168AdminVehicleFieldOptions) || {};
+  const base = Array.isArray(cat[catalogKey]) ? cat[catalogKey].slice() : [];
+  const cur = String(stored == null ? "" : stored).trim();
+  if (cur && !base.some((o) => String(o.value) === cur)) {
+    base.unshift({ value: cur, label: `${cur}（当前值）` });
+  }
+  return [{ value: "", label: "— 未选择 —" }, ...base];
+}
 
 function renderEditorField(field, draft) {
   const key = field.key;
@@ -1071,12 +1226,17 @@ function renderEditorField(field, draft) {
 
   let control;
   if (field.type === "select") {
+    if (field.brandKeyCatalog) {
+      control = buildBrandKeySelectHtml(key, draft[key]);
+    } else {
     const options = field.iconCatalog
       ? buildVehicleIconOptions(draft[key])
-      : (field.options || []);
+      : field.optionsCatalog
+        ? buildAdminVehicleCatalogOptions(field.optionsCatalog, draft[key])
+        : (field.options || []);
     const currentVal = field.iconCatalog
       ? String(draft[key] == null ? "" : draft[key]).trim()
-      : value;
+      : String(draft[key] == null ? "" : draft[key]).trim();
     const opts = options
       .map(
         (opt) =>
@@ -1109,13 +1269,16 @@ function renderEditorField(field, draft) {
     } else {
       control = `<select class="admin-input" data-draft="${key}">${opts}</select>`;
     }
+    }
   } else if (field.type === "number") {
     control = `<input class="admin-input" type="number" data-draft="${key}" value="${escapeAttr(value ?? 0)}" placeholder="${escapeAttr(field.placeholder || "")}">`;
   } else {
     control = `<input class="admin-input" type="text" data-draft="${key}" value="${escapeAttr(value ?? "")}" placeholder="${escapeAttr(field.placeholder || "")}">`;
   }
 
-  const wrapClass = field.iconCatalog ? " admin-field--icon-row" : "";
+  const wrapClass = field.iconCatalog
+    ? " admin-field--icon-row"
+    : (field.brandKeyCatalog ? " admin-field--brand-key" : "");
   return `
     <div class="admin-field admin-col-${span}${wrapClass}">
       <label>${escapeHtml(field.label)}${requiredMark}</label>

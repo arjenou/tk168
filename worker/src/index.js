@@ -181,6 +181,20 @@ async function readJson(request) {
   }
 }
 
+/**
+ * R2 GET by logical media key. If the object was uploaded with path separators
+ * flattened to underscores (e.g. `videos_seed_foo.mp4` instead of `videos/seed/foo.mp4`),
+ * fall back to that shape so the public URL /api/media/videos/seed/foo.mp4 still works.
+ */
+async function getR2MediaObject(env, key) {
+  let object = await env.R2.get(key);
+  if (object) return object;
+  if (!key.includes("/")) return null;
+  const flatKey = key.replaceAll("/", "_");
+  if (flatKey === key) return null;
+  return env.R2.get(flatKey);
+}
+
 async function handleApi(request, env, url) {
   let path = url.pathname.replace(/^\/api\/?/, "/");
   if (path.length > 1) path = path.replace(/\/+$/, "") || "/";
@@ -214,7 +228,7 @@ async function handleApi(request, env, url) {
   if (path.startsWith("/media/") && method === "GET") {
     const key = decodeURIComponent(path.slice("/media/".length));
     if (!key) return error(400, "missing_key");
-    const object = await env.R2.get(key);
+    const object = await getR2MediaObject(env, key);
     if (!object) return error(404, "not_found");
     const headers = new Headers();
     object.writeHttpMetadata(headers);

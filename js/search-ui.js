@@ -27,6 +27,51 @@ window.TK168SearchUI = (() => {
     };
   }
 
+  /** 「その他の国」行中 — 后地区名（与 admin 选项日文一致） */
+  const REGION_SUFFIX_JA = {
+    オーストリア: { zh: '奥地利', ja: 'オーストリア', en: 'Austria' },
+    スペイン: { zh: '西班牙', ja: 'スペイン', en: 'Spain' },
+    ルーマニア: { zh: '罗马尼亚', ja: 'ルーマニア', en: 'Romania' },
+    ロシア: { zh: '俄罗斯', ja: 'ロシア', en: 'Russia' },
+    中国: { zh: '中国', ja: '中国', en: 'China' },
+    韓国: { zh: '韩国', ja: '韓国', en: 'South Korea' },
+    タイ: { zh: '泰国', ja: 'タイ', en: 'Thailand' },
+    マレーシア: { zh: '马来西亚', ja: 'マレーシア', en: 'Malaysia' },
+    南アフリカ: { zh: '南非', ja: '南アフリカ', en: 'South Africa' }
+  };
+
+  function formatRegionSuffixFromJa(regionJa) {
+    const lang = window.TK168I18N?.getLanguage?.() || 'ja';
+    const p = REGION_SUFFIX_JA[regionJa];
+    if (p) return lang === 'zh' ? p.zh : (lang === 'en' ? p.en : p.ja);
+    return regionJa;
+  }
+
+  /** メーカー选项：与当前语言下的品牌名 + 台数（与 i18n / brand-key-name-i18n 一致） */
+  function formatMakerMenuOptionLabel(o) {
+    const b = window.TK168_DATA.getBrandByKey(o.value);
+    if (!b) return o.label;
+    const lang = window.TK168I18N?.getLanguage?.() || 'ja';
+    const name = window.TK168_DATA.getBrandLabel(b, lang);
+    const m = String(o.label).match(/[（(]([0-9,]+)[）)]/);
+    const count = m ? m[1] : '';
+    const raw = String(o.label);
+    if (raw.includes('—') || raw.includes('–')) {
+      const rja = raw.split(/[—–]/)[1]?.trim() || '';
+      if (count) return `${name} (${count}) — ${formatRegionSuffixFromJa(rja)}`;
+    }
+    if (count) return `${name} (${count})`;
+    return name;
+  }
+
+  function getMakerGroupTitle(g) {
+    if (g.i18nKey && window.TK168I18N?.t) {
+      const out = window.TK168I18N.t(g.i18nKey);
+      if (out && out !== g.i18nKey) return out;
+    }
+    return g.label;
+  }
+
   function createEmptyState() {
     return cloneState({});
   }
@@ -183,29 +228,55 @@ window.TK168SearchUI = (() => {
     }
 
     function buildMakerModelMenu(root, button) {
-      const menu = createDropdownMenu(root, button, 'fb-filter-menu--brand', 280);
-      const brands = window.TK168_DATA.brands;
+      const menu = createDropdownMenu(root, button, 'fb-filter-menu--brand', 300);
       const allLabel = window.TK168I18N?.t('search.all') || '不限';
-      const allNote = window.TK168I18N?.getLanguage?.() === 'ja' ? 'すべてのブランド' : '全部品牌';
+      const allNote = window.TK168I18N?.t('search.makerAllBrandsNote') || '全部品牌';
+      const groups = (typeof window !== 'undefined' && window.TK168AdminBrandKeyOptionGroups) || [];
+      const brands = window.TK168_DATA.brands;
 
-      menu.innerHTML = `
-        <div class="fb-filter-menu-body">
-          ${buildFilterOption({
-            value: '',
-            label: allLabel,
-            selected: !state.brand,
-            note: allNote
-          })}
-          ${brands.map((brand) => {
-            const label = window.TK168_DATA.getBrandLabel(brand);
-            return buildFilterOption({
-              value: brand.key,
-              label,
-              selected: brand.key === state.brand
-            });
-          }).join('')}
-        </div>
-      `;
+      const allRow = buildFilterOption({
+        value: '',
+        label: allLabel,
+        selected: !state.brand,
+        note: allNote
+      });
+
+      let bodyInner;
+      if (groups.length) {
+        bodyInner = allRow
+          + groups
+            .map((g) => {
+              const gTitle = getMakerGroupTitle(g);
+              const rows = (g.options || [])
+                .map((o) => buildFilterOption({
+                  value: o.value,
+                  label: formatMakerMenuOptionLabel(o),
+                  selected: o.value === state.brand
+                }))
+                .join('');
+              if (!rows) return '';
+              return `<div class="fb-filter-menu-group" role="group" aria-label="${escapeHtml(gTitle)}">
+  <div class="fb-filter-menu-group-label">${escapeHtml(gTitle)}</div>
+  ${rows}
+</div>`;
+            })
+            .filter(Boolean)
+            .join('');
+      } else {
+        bodyInner = allRow
+          + brands
+            .map((brand) => {
+              const label = window.TK168_DATA.getBrandLabel(brand);
+              return buildFilterOption({
+                value: brand.key,
+                label,
+                selected: brand.key === state.brand
+              });
+            })
+            .join('');
+      }
+
+      menu.innerHTML = `<div class="fb-filter-menu-body">${bodyInner}</div>`;
 
       menu.addEventListener('click', (event) => {
         const option = event.target.closest('.fb-filter-option');
