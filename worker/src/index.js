@@ -28,6 +28,8 @@ import {
   uploadRentalImage,
   deleteRentalImage,
   reorderRentalImages,
+  uploadRentalStaffPhoto,
+  clearRentalStaffPhoto,
 } from "./rentals.js";
 import {
   listJournalEntries,
@@ -468,6 +470,20 @@ async function handleApi(request, env, url) {
       const imageId = Number(delMatch[2]);
       await deleteRentalImage(env, rentalId, imageId);
       return json({ ok: true });
+    }
+    const staffRentalMatch = /^\/admin\/rentals\/([^/]+)\/staff-photo$/.exec(path);
+    if (staffRentalMatch && method === "POST") {
+      const rentalId = decodeURIComponent(staffRentalMatch[1]);
+      const form = await request.formData();
+      const file = form.get("file");
+      if (!(file instanceof File)) return error(400, "no_file");
+      const rental = await uploadRentalStaffPhoto(env, rentalId, file);
+      return json({ rental });
+    }
+    if (staffRentalMatch && method === "DELETE") {
+      const rentalId = decodeURIComponent(staffRentalMatch[1]);
+      const rental = await clearRentalStaffPhoto(env, rentalId);
+      return json({ rental });
     }
   }
 

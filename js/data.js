@@ -1989,7 +1989,7 @@ window.TK168_DATA = (() => {
       nameEn: rental.nameEn,
       year: rental.year || '',
       type: rental.type || '',
-      icon: rental.icon || 'b1.svg',
+      icon: rental.icon && String(rental.icon).trim() ? String(rental.icon).trim() : '',
       mileage: rental.mileage || '',
       engine: rental.engine || '',
       fuel: rental.fuel || '',
@@ -2010,6 +2010,9 @@ window.TK168_DATA = (() => {
       features: rental.features || defaultFeatures,
       photo: rental.photo || '',
       gallery: Array.isArray(rental.gallery) ? rental.gallery : [],
+      staffMessage: rental.staffMessage,
+      staffPhone: rental.staffPhone,
+      staffPhoto: rental.staffPhoto,
     };
     return fallback;
   }

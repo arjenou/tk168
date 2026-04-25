@@ -48,6 +48,23 @@ function apiOrigin() {
   }
 }
 
+/** 存库为 `b1.svg` 或 `brands/logos/xx.svg` → 站点根下静态资源 URL（用于管理端预览图） */
+function iconFieldPreviewUrl(stored) {
+  const raw = String(stored == null ? "" : stored).trim();
+  if (!raw) return "";
+  let p = raw.replace(/^\/+/, "");
+  if (/^https?:\/\//i.test(p)) return p;
+  if (p.startsWith("assets/images/")) {
+    // ok
+  } else if (p.startsWith("assets/") && !p.startsWith("assets/images/")) {
+    p = p.replace(/^assets\//, "assets/images/");
+  } else {
+    p = `assets/images/${p}`;
+  }
+  if (p.startsWith("assets/")) return `/${p}`;
+  return p.startsWith("/") ? p : `/${p}`;
+}
+
 /** DB stores `/api/media/...`; resolve against the Worker origin when the page is not on that host. */
 function resolveMediaUrlForImg(url) {
   if (!url) return "";
@@ -95,6 +112,7 @@ const RESOURCES = {
     apiImages: (id) => `/admin/vehicles/${encodeURIComponent(id)}/images`,
     apiImage: (id, imgId) =>
       `/admin/vehicles/${encodeURIComponent(id)}/images/${imgId}`,
+    apiImagesReorder: (id) => `/admin/vehicles/${encodeURIComponent(id)}/images/reorder`,
     apiStaffPhoto: (id) => `/admin/vehicles/${encodeURIComponent(id)}/staff-photo`,
     listKey: "vehicles",
     itemKey: "vehicle",
@@ -116,7 +134,14 @@ const RESOURCES = {
           { key: "brandKey", label: "品牌 Key", placeholder: "lamborghini", span: 4, required: true },
           { key: "year", label: "年份", placeholder: "2022", span: 4 },
           { key: "type", label: "车型分类", placeholder: "高性能 SUV", span: 4 },
-          { key: "icon", label: "图标文件名", placeholder: "b1.svg", hint: "素材文件夹里的小图标", span: 4 },
+          {
+            key: "icon",
+            label: "图标",
+            type: "select",
+            iconCatalog: true,
+            span: 4,
+            hint: "相对 assets/images/ 的文件名。",
+          },
           { key: "bodyStyle", label: "车身类型", placeholder: "高性能 SUV", span: 4 },
           { key: "drive", label: "驱动方式", placeholder: "四轮驱动", span: 4 },
           { key: "bodyColor", label: "车身颜色", placeholder: "曜石黑", span: 4 },
@@ -160,7 +185,7 @@ const RESOURCES = {
       ["highlightChassisTail", "车台末尾号"],
     ],
     emptyDraft: () => ({
-      id: "", brandKey: "", name: "", nameJa: "", nameEn: "", year: "", type: "", icon: "b1.svg",
+      id: "", brandKey: "", name: "", nameJa: "", nameEn: "", year: "", type: "", icon: "",
       mileage: "", engine: "", fuel: "汽油", trans: "自动挡",
       totalPrice: "", basePrice: "",
       bodyStyle: "", drive: "", bodyColor: "", interiorColor: "", seats: "",
@@ -195,6 +220,8 @@ const RESOURCES = {
     apiImages: (id) => `/admin/rentals/${encodeURIComponent(id)}/images`,
     apiImage: (id, imgId) =>
       `/admin/rentals/${encodeURIComponent(id)}/images/${imgId}`,
+    apiImagesReorder: (id) => `/admin/rentals/${encodeURIComponent(id)}/images/reorder`,
+    apiStaffPhoto: (id) => `/admin/rentals/${encodeURIComponent(id)}/staff-photo`,
     listKey: "rentals",
     itemKey: "rental",
     duplicateCode: "rental_id_taken",
@@ -216,7 +243,14 @@ const RESOURCES = {
           { key: "brandKey", label: "品牌 Key", placeholder: "lamborghini", span: 4, required: true },
           { key: "year", label: "年份", placeholder: "2022", span: 4 },
           { key: "type", label: "车型分类", placeholder: "高性能 SUV", span: 4 },
-          { key: "icon", label: "图标文件名", placeholder: "b1.svg", span: 4 },
+          {
+            key: "icon",
+            label: "图标",
+            type: "select",
+            iconCatalog: true,
+            span: 4,
+            hint: "相对 assets/images/ 的文件名。",
+          },
           { key: "bodyStyle", label: "车身类型", placeholder: "高性能 SUV", span: 4 },
           { key: "drive", label: "驱动方式", placeholder: "四轮驱动", span: 4 },
           { key: "bodyColor", label: "车身颜色", placeholder: "曜石黑", span: 4 },
@@ -259,13 +293,17 @@ const RESOURCES = {
     ],
     presets: [],
     emptyDraft: () => ({
-      id: "", brandKey: "", name: "", nameJa: "", nameEn: "", year: "", type: "", icon: "b1.svg",
+      id: "", brandKey: "", name: "", nameJa: "", nameEn: "", year: "", type: "", icon: "",
       mileage: "", engine: "", fuel: "汽油", trans: "自动挡",
       bodyStyle: "", drive: "", bodyColor: "", interiorColor: "",
       seats: "2 座", origin: "",
       dailyRate: 0, deposit: 0, minDays: 1, rentalStatus: "available",
       overviewZh: [""], overviewJa: [""], overviewEn: null,
       benefits: null, features: null,
+      staffPhotoR2Key: null,
+      staffPhotoUrl: null,
+      staffMessage: "",
+      staffPhone: "",
       displayOrder: 0, isPublished: true, images: [],
     }),
   },
@@ -332,10 +370,24 @@ const state = {
   users: [],
   editingId: null,
   editingDraft: null,
+  /** 右侧图库：当前大图预览对应的图片 id（null 则显示封面/首图） */
+  editingImagePreviewId: null,
   filter: "",
   loading: false,
   toast: null,
 };
+
+/** 右侧「封面与图片」大图预览：优先手动选中的缩略图，否则封面（isPrimary） */
+function resolveAsidePreviewImage(draft) {
+  const imgs = draft?.images || [];
+  if (imgs.length === 0) return null;
+  const pid = state.editingImagePreviewId;
+  if (pid != null) {
+    const hit = imgs.find((i) => Number(i.id) === Number(pid));
+    if (hit) return hit;
+  }
+  return imgs.find((i) => i.isPrimary) || imgs[0];
+}
 
 function currentResource() {
   return RESOURCES[state.resource];
@@ -690,6 +742,7 @@ function renderList() {
     const draft = r.emptyDraft();
     draft.displayOrder = (state.items[r.key] || []).length;
     state.editingDraft = draft;
+    state.editingImagePreviewId = null;
     state.view = "editor";
     render();
   });
@@ -878,6 +931,7 @@ function bindRowActions() {
       if (!item) return;
       state.editingId = id;
       state.editingDraft = { ...item, images: [...(item.images || [])] };
+      state.editingImagePreviewId = null;
       state.view = "editor";
       render();
     });
@@ -920,11 +974,87 @@ function bindRowActions() {
 
 // -------------------- Editor --------------------
 
-// Editor tabs shown at the top of the left column. "specs" only rendered
-// when the resource has preset rows (vehicles).
+/** 与 `assets/images/brands/logos/*.svg` 一致（首页品牌轮盘同款资源） */
+const BRAND_LOGO_ICON_FILES = [
+  "acura.svg",
+  "alfaromeo.svg",
+  "amg.svg",
+  "astonmartin.svg",
+  "audi.svg",
+  "bentley.svg",
+  "bmw.svg",
+  "bugatti.svg",
+  "cadillac.svg",
+  "chevrolet.svg",
+  "chrysler.svg",
+  "citroen.svg",
+  "daf.svg",
+  "dsautomobiles.svg",
+  "ferrari.svg",
+  "fiat.svg",
+  "ford.svg",
+  "honda.svg",
+  "hyundai.svg",
+  "infiniti.svg",
+  "iveco.svg",
+  "jaguar.svg",
+  "jeep.svg",
+  "kia.svg",
+  "koenigsegg.svg",
+  "lamborghini.svg",
+  "landrover.svg",
+  "lexus.svg",
+  "man.svg",
+  "maserati.svg",
+  "mazda.svg",
+  "mclaren.svg",
+  "mercedes.svg",
+  "mg.svg",
+  "mini.svg",
+  "mitsubishi.svg",
+  "nissan.svg",
+  "opel.svg",
+  "peugeot.svg",
+  "polestar.svg",
+  "porsche.svg",
+  "ram.svg",
+  "renault.svg",
+  "rollsroyce.svg",
+  "scania.svg",
+  "seat.svg",
+  "skoda.svg",
+  "smart.svg",
+  "subaru.svg",
+  "suzuki.svg",
+  "tata.svg",
+  "tesla.svg",
+  "toyota.svg",
+  "volkswagen.svg",
+  "volvo.svg",
+];
+
+/**
+ * 下拉选项：存库值仍为相对 `assets/images/` 的路径；展示仅文件名/路径，不加说明文字。
+ */
+function buildVehicleIconOptions(stored) {
+  // 首项为「无」= 不存 icon；不列出 logo_TK168 与 b1 等（旧数据用 unshift 仍可选中）。
+  const rows = [{ value: "", label: "无" }];
+  for (const file of BRAND_LOGO_ICON_FILES) {
+    rows.push({ value: `brands/logos/${file}`, label: file });
+  }
+  const cur = String(stored == null ? "" : stored).trim();
+  if (cur && !rows.some((r) => r.value === cur)) {
+    rows.unshift({ value: cur, label: cur });
+  }
+  return rows;
+}
+
+// Editor tabs shown at the top of the left column. "specs" only when
+// "staff" for 首页车辆 与 レンタル车辆（同一条 icon + 员工区逻辑）。
 const EDITOR_TABS = [
   { id: "content", label: "内容" },
   { id: "specs", label: "规格 / 选项", requiresPresets: true },
+  { id: "staff", label: "员工介绍区", requiresStaff: true },
   { id: "publish", label: "发布设置" },
 ];
 
@@ -941,21 +1071,53 @@ function renderEditorField(field, draft) {
 
   let control;
   if (field.type === "select") {
-    const opts = (field.options || [])
+    const options = field.iconCatalog
+      ? buildVehicleIconOptions(draft[key])
+      : (field.options || []);
+    const currentVal = field.iconCatalog
+      ? String(draft[key] == null ? "" : draft[key]).trim()
+      : value;
+    const opts = options
       .map(
         (opt) =>
-          `<option value="${escapeAttr(opt.value)}" ${opt.value === value ? "selected" : ""}>${escapeHtml(opt.label)}</option>`,
+          `<option value="${escapeAttr(opt.value)}" ${
+            String(opt.value) === String(currentVal) ? "selected" : ""
+          }>${escapeHtml(opt.label)}</option>`,
       )
       .join("");
-    control = `<select class="admin-input" data-draft="${key}">${opts}</select>`;
+    if (field.iconCatalog) {
+      const preview = iconFieldPreviewUrl(currentVal);
+      const hasPreview = Boolean(preview);
+      control = `
+        <div class="admin-icon-select-row">
+          <select class="admin-input" data-draft="${key}" id="adminIconFieldSelect">${opts}</select>
+          <div class="admin-icon-preview" aria-hidden="true">
+            <img
+              id="adminIconPreviewImg"
+              class="admin-icon-preview-img${hasPreview ? "" : " is-empty"}"
+              ${hasPreview ? `src="${escapeAttr(preview)}"` : ""}
+              alt=""
+              width="56"
+              height="56"
+              loading="lazy"
+              decoding="async"
+              ${hasPreview ? "" : " hidden"}
+              onerror="this.classList.add('is-empty'); this.removeAttribute('src'); this.hidden=true;"
+            >
+          </div>
+        </div>`;
+    } else {
+      control = `<select class="admin-input" data-draft="${key}">${opts}</select>`;
+    }
   } else if (field.type === "number") {
     control = `<input class="admin-input" type="number" data-draft="${key}" value="${escapeAttr(value ?? 0)}" placeholder="${escapeAttr(field.placeholder || "")}">`;
   } else {
     control = `<input class="admin-input" type="text" data-draft="${key}" value="${escapeAttr(value ?? "")}" placeholder="${escapeAttr(field.placeholder || "")}">`;
   }
 
+  const wrapClass = field.iconCatalog ? " admin-field--icon-row" : "";
   return `
-    <div class="admin-field admin-col-${span}">
+    <div class="admin-field admin-col-${span}${wrapClass}">
       <label>${escapeHtml(field.label)}${requiredMark}</label>
       ${control}
       ${hint}
@@ -1079,20 +1241,43 @@ function renderVehicleStaffSection(draft) {
       </div>
       <div class="admin-field">
         <label>担当者照片</label>
-        <div class="admin-field-hint" style="margin-bottom:8px;">须先保存本车后再上传。留空为默认插画头像。</div>
-        ${
-          hasImg
-            ? `<div class="admin-cover-preview" style="max-width:120px;max-height:120px;border-radius:12px;"><img src="${imgSrc}" alt=""></div>`
-            : `<div class="admin-cover-preview admin-cover-empty" style="max-width:120px;">无照片</div>`
-        }
-        <div class="admin-upload">
-          <input id="staffPhotoUpload" type="file" accept="image/*" ${isNew ? "disabled" : ""}>
-          <label for="staffPhotoUpload">${isNew ? "保存后可上传" : "选择员工照片"}</label>
-          <div style="margin-top:8px;">
-            <button type="button" class="admin-btn admin-btn-sm admin-btn-ghost" id="staffClearStaffPhoto" ${
-              isNew || !hasImg ? "disabled" : ""
-            }>移除照片</button>
-          </div>
+        <div class="admin-field-hint" style="margin-bottom:8px;">${
+          isNew
+            ? "请先保存本车，再点左侧方格上传；留空为默认头像。"
+            : "点击方格选择图片；有图时右上角可移除。留空为默认头像。"
+        }</div>
+        <div class="admin-staff-photo">
+          <input
+            class="admin-staff-file"
+            id="staffPhotoUpload"
+            type="file"
+            accept="image/*"
+            ${isNew ? "disabled" : ""}
+            aria-label="选择员工照片"
+          >
+          <label
+            for="staffPhotoUpload"
+            class="admin-staff-tile${isNew ? " admin-staff-tile--disabled" : ""}"
+          >
+            ${
+              hasImg
+                ? `<img class="admin-staff-tile-img" src="${imgSrc}" alt="" loading="lazy" decoding="async">`
+                : `<span class="admin-staff-tile-placeholder">${
+                    isNew ? "先保存" : "无照片"
+                  }<br><span class="admin-staff-tile-hint">${isNew ? "后上传" : "点击上传"}</span></span>`
+            }
+          </label>
+          ${
+            hasImg && !isNew
+              ? `<button
+                  type="button"
+                  class="admin-staff-remove"
+                  id="staffClearStaffPhoto"
+                  title="移除照片"
+                  aria-label="移除照片"
+                >×</button>`
+              : ""
+          }
         </div>
       </div>
       <div class="admin-field" style="margin-top:10px;">
@@ -1165,8 +1350,6 @@ function renderContentTab(r, draft) {
         <textarea class="admin-textarea" data-overview="en" placeholder="English overview (optional).">${escapeHtml(overviewEn)}</textarea>
       </div>
     </section>
-
-    ${r.key === "vehicles" ? renderVehicleStaffSection(draft) : ""}
   `;
 }
 
@@ -1287,7 +1470,9 @@ function renderEditor() {
   const isNew = state.editingId === "__new__";
 
   const availableTabs = EDITOR_TABS.filter(
-    (t) => !t.requiresPresets || (r.presets && r.presets.length > 0),
+    (t) =>
+      (!t.requiresPresets || (r.presets && r.presets.length > 0)) &&
+      (!t.requiresStaff || r.key === "vehicles" || r.key === "rentals"),
   );
   if (!availableTabs.some((t) => t.id === state.editorTab)) {
     state.editorTab = availableTabs[0].id;
@@ -1303,10 +1488,15 @@ function renderEditor() {
   let tabBody = "";
   if (state.editorTab === "content") tabBody = renderContentTab(r, draft);
   else if (state.editorTab === "specs") tabBody = renderSpecsTab(r, draft);
+  else if (state.editorTab === "staff")
+    tabBody =
+      r.key === "vehicles" || r.key === "rentals" ? renderVehicleStaffSection(draft) : "";
   else if (state.editorTab === "publish") tabBody = renderPublishTab(r, draft, isNew);
 
   const primaryImage = (draft.images || []).find((i) => i.isPrimary) || (draft.images || [])[0];
   const imageCount = (draft.images || []).length;
+  const asidePreview = r.listKind === "journal" ? null : resolveAsidePreviewImage(draft);
+  const selectedThumbId = asidePreview?.id;
   const editorTitle = isNew
     ? `新增${r.label}`
     : r.listKind === "journal"
@@ -1344,12 +1534,27 @@ function renderEditor() {
       : `<aside class="admin-editor-aside">
         <section class="admin-card">
           <h2>封面与图片</h2>
-          ${primaryImage
-            ? `<div class="admin-cover-preview"><img src="${escapeAttr(resolveMediaUrlForImg(primaryImage.url))}" alt="${escapeAttr(primaryImage.alt || "")}"></div>`
-            : `<div class="admin-cover-preview admin-cover-empty">暂未上传图片</div>`}
-          <div class="admin-cover-meta">共 ${imageCount} 张图片 · 第一张自动作为封面</div>
-          <div class="admin-images" id="imagesGrid">
-            ${(draft.images || []).map(imageTile).join("") || ""}
+          <div class="admin-image-main" id="adminImageMainBlock">
+            ${
+              asidePreview
+                ? `<div class="admin-image-main-frame">
+                    <img src="${escapeAttr(resolveMediaUrlForImg(asidePreview.url))}" alt="${escapeAttr(
+                    asidePreview.alt || "",
+                  )}" loading="lazy" decoding="async">
+                  </div>
+                  <div class="admin-image-main-bar">
+                    ${
+                      asidePreview.isPrimary
+                        ? '<span class="admin-image-main-status">当前为首页封面</span>'
+                        : '<button type="button" class="admin-btn admin-btn-sm admin-btn-primary" id="adminSetCoverBtn">设为首图（首页展示）</button>'
+                    }
+                  </div>`
+                : `<div class="admin-image-main-frame admin-cover-empty">暂未上传图片</div>`
+            }
+          </div>
+          <div class="admin-cover-meta">共 ${imageCount} 张 · 点缩略图切换大图 · 可指定任一张为首页封面</div>
+          <div class="admin-images admin-images--thumbs" id="imagesGrid">
+            ${(draft.images || []).map((im) => imageTile(im, selectedThumbId)).join("")}
           </div>
           <div class="admin-upload">
             <input id="imageUpload" type="file" accept="image/*" multiple ${isNew ? "disabled" : ""}>
@@ -1387,12 +1592,14 @@ function renderEditor() {
   bindEditor();
 }
 
-function imageTile(img) {
+function imageTile(img, selectedPreviewId) {
+  const isSel =
+    selectedPreviewId != null && Number(selectedPreviewId) === Number(img.id);
   return `
-    <div class="admin-image-tile" data-image="${img.id}">
-      <img src="${escapeAttr(resolveMediaUrlForImg(img.url))}" alt="${escapeAttr(img.alt || "")}">
+    <div class="admin-image-tile${isSel ? " is-selected" : ""}" data-image="${img.id}" role="button" tabindex="0" title="点击在上方预览">
+      <img src="${escapeAttr(resolveMediaUrlForImg(img.url))}" alt="${escapeAttr(img.alt || "")}" loading="lazy" decoding="async">
       ${img.isPrimary ? '<span class="primary-flag">封面</span>' : ""}
-      <button class="remove" title="删除图片" data-remove-image="${img.id}">×</button>
+      <button type="button" class="remove" title="删除图片" data-remove-image="${img.id}">×</button>
     </div>
   `;
 }
@@ -1403,6 +1610,7 @@ function bindEditor() {
     state.view = "list";
     state.editingId = null;
     state.editingDraft = null;
+    state.editingImagePreviewId = null;
     state.editorTab = "content";
     render();
   });
@@ -1435,10 +1643,25 @@ function bindEditor() {
     else if (input.type === "number") state.editingDraft[key] = Number(input.value);
     else state.editingDraft[key] = input.value;
   };
+  const syncAdminIconPreview = () => {
+    const img = document.getElementById("adminIconPreviewImg");
+    if (!img) return;
+    const url = iconFieldPreviewUrl(state.editingDraft?.icon);
+    if (url) {
+      img.src = url;
+      img.classList.remove("is-empty");
+      img.hidden = false;
+    } else {
+      img.removeAttribute("src");
+      img.classList.add("is-empty");
+      img.hidden = true;
+    }
+  };
   document.querySelectorAll("[data-draft]").forEach((input) => {
     const evt = input.tagName === "SELECT" || input.type === "checkbox" ? "change" : "input";
     input.addEventListener(evt, () => {
       applyDraftInput(input);
+      if (input.dataset.draft === "icon") syncAdminIconPreview();
       if (input.dataset.draft === "isPublished") {
         // Re-render so the header badge + switch label stay in sync.
         renderEditor();
@@ -1546,6 +1769,7 @@ function bindEditor() {
         for (const file of files) form.append("file", file);
         const res = await api(r.apiImages(state.editingId), { method: "POST", body: form });
         state.editingDraft.images = [...(state.editingDraft.images || []), ...res.images];
+        state.editingImagePreviewId = null;
         const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
         if (cached) cached.images = state.editingDraft.images;
         renderEditor();
@@ -1556,13 +1780,15 @@ function bindEditor() {
     });
 
     document.querySelectorAll("[data-remove-image]").forEach((btn) => {
-      btn.addEventListener("click", async () => {
+      btn.addEventListener("click", async (ev) => {
+        ev.stopPropagation();
         const imageId = Number(btn.dataset.removeImage);
         if (!confirm("删除这张图片？")) return;
         try {
           await api(r.apiImage(state.editingId, imageId), { method: "DELETE" });
           state.editingDraft.images = state.editingDraft.images.filter((i) => i.id !== imageId);
           state.editingDraft.images.forEach((i, idx) => (i.isPrimary = idx === 0));
+          if (state.editingImagePreviewId === imageId) state.editingImagePreviewId = null;
           const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
           if (cached) cached.images = state.editingDraft.images;
           renderEditor();
@@ -1572,15 +1798,49 @@ function bindEditor() {
         }
       });
     });
+
+    if (typeof r.apiImagesReorder === "function") {
+      document.getElementById("adminSetCoverBtn")?.addEventListener("click", async () => {
+        if (state.editingId === "__new__") return;
+        const preview = resolveAsidePreviewImage(state.editingDraft);
+        if (!preview || preview.isPrimary) return;
+        const imgs = state.editingDraft.images || [];
+        const order = [preview.id, ...imgs.filter((i) => i.id !== preview.id).map((i) => i.id)];
+        try {
+          await api(r.apiImagesReorder(state.editingId), { method: "POST", body: { order } });
+          const res = await api(r.apiItem(state.editingId));
+          const item = res[r.itemKey];
+          state.editingDraft = { ...state.editingDraft, ...item, images: item.images };
+          state.editingImagePreviewId = preview.id;
+          const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
+          if (cached) Object.assign(cached, state.editingDraft);
+          renderEditor();
+          showToast("已设为首图");
+        } catch (err) {
+          showToast(`操作失败：${err.message}`, "error");
+        }
+      });
+
+      document.getElementById("imagesGrid")?.addEventListener("click", (e) => {
+        if (e.target.closest("[data-remove-image], .remove")) return;
+        const tile = e.target.closest(".admin-image-tile[data-image]");
+        if (!tile) return;
+        state.editingImagePreviewId = Number(tile.dataset.image);
+        renderEditor();
+      });
+    }
   }
 
-  if (r.key === "vehicles" && typeof r.apiStaffPhoto === "function") {
+  if (
+    (r.key === "vehicles" || r.key === "rentals") &&
+    typeof r.apiStaffPhoto === "function"
+  ) {
     document.getElementById("staffPhotoUpload")?.addEventListener("change", async (event) => {
       const files = Array.from(event.target.files || []);
       event.target.value = "";
       if (files.length === 0) return;
       if (state.editingId === "__new__") {
-        showToast("请先保存车辆", "error");
+        showToast("请先保存本记录", "error");
         return;
       }
       const file = files[0];
@@ -1588,16 +1848,16 @@ function bindEditor() {
         const form = new FormData();
         form.append("file", file);
         const res = await api(r.apiStaffPhoto(state.editingId), { method: "POST", body: form });
-        const vehicle = res.vehicle;
+        const item = res[r.itemKey];
         state.editingDraft = {
           ...state.editingDraft,
-          staffPhotoR2Key: vehicle.staffPhotoR2Key,
-          staffPhotoUrl: vehicle.staffPhotoUrl,
+          staffPhotoR2Key: item.staffPhotoR2Key,
+          staffPhotoUrl: item.staffPhotoUrl,
         };
         const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
         if (cached) {
-          cached.staffPhotoR2Key = vehicle.staffPhotoR2Key;
-          cached.staffPhotoUrl = vehicle.staffPhotoUrl;
+          cached.staffPhotoR2Key = item.staffPhotoR2Key;
+          cached.staffPhotoUrl = item.staffPhotoUrl;
         }
         renderEditor();
         showToast("员工照片已更新");
@@ -1610,16 +1870,16 @@ function bindEditor() {
       if (!confirm("移除员工照片？")) return;
       try {
         const res = await api(r.apiStaffPhoto(state.editingId), { method: "DELETE" });
-        const vehicle = res.vehicle;
+        const item = res[r.itemKey];
         state.editingDraft = {
           ...state.editingDraft,
-          staffPhotoR2Key: vehicle.staffPhotoR2Key,
-          staffPhotoUrl: vehicle.staffPhotoUrl,
+          staffPhotoR2Key: item.staffPhotoR2Key,
+          staffPhotoUrl: item.staffPhotoUrl,
         };
         const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
         if (cached) {
-          cached.staffPhotoR2Key = vehicle.staffPhotoR2Key;
-          cached.staffPhotoUrl = vehicle.staffPhotoUrl;
+          cached.staffPhotoR2Key = item.staffPhotoR2Key;
+          cached.staffPhotoUrl = item.staffPhotoUrl;
         }
         renderEditor();
         showToast("已移除员工照片");
@@ -1650,7 +1910,6 @@ async function saveItem() {
     if (v && typeof v === "object" && !v.zh && !v.ja && !v.en) payload[key] = null;
   });
   delete payload.images;
-
   try {
     if (state.editingId === "__new__") {
       let created = null;
