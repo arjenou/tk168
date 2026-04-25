@@ -949,6 +949,7 @@ window.TK168_DATA = (() => {
 
   const news = [
     {
+      id: 'static-0',
       title: '2026年最值得期待的超跑：性能进化与设计美学的再一次碰撞',
       titleJa: '2026年注目のスーパーカー特集 性能進化とデザイン美学が再び交差する',
       titleEn: '2026 supercars to watch: where performance evolution meets design again',
@@ -962,6 +963,7 @@ window.TK168_DATA = (() => {
       summaryEn: 'From Ferrari to Bugatti, the 2026 supercar line-up is starting to take shape. TK168 highlights the design language and performance points worth tracking in advance.'
     },
     {
+      id: 'static-1',
       title: '全新法拉利 SF90 Spider 正式入库',
       titleJa: '新型 Ferrari SF90 Spider が正式入庫',
       titleEn: 'New Ferrari SF90 Spider officially added to stock',
@@ -972,6 +974,7 @@ window.TK168_DATA = (() => {
       image: 'assets/images/f4.webp'
     },
     {
+      id: 'static-2',
       title: 'TK168 × Monaco 慈善拍卖活动圆满落幕',
       titleJa: 'TK168 × Monaco チャリティーオークション開催レポート',
       titleEn: 'TK168 × Monaco charity auction event recap',
@@ -1738,6 +1741,7 @@ window.TK168_DATA = (() => {
     const raw = window.TK168_API_JOURNAL;
     if (!Array.isArray(raw) || raw.length === 0) return null;
     return raw.map((j) => ({
+      id: j.id || '',
       title: j.titleZh || '',
       titleJa: j.titleJa || '',
       titleEn: j.titleEn || '',
@@ -1774,6 +1778,96 @@ window.TK168_DATA = (() => {
 
   function refreshJournalFromApiHydrate() {
     /* 资讯从 window.TK168_API_JOURNAL 即时读取，无需同步本地数组 */
+  }
+
+  function pickI18nField(language, zh, ja, en) {
+    if (language === 'en') return (en || ja || zh || '').trim();
+    if (language === 'ja') return (ja || en || zh || '').trim();
+    return (zh || ja || en || '').trim();
+  }
+
+  /** 与 `getNewsItems` 同一数据源，用于独立详情页 */
+  function getNewsDetailRecord({ id, index, language = getCurrentLanguage() } = {}) {
+    const fromApi = buildNewsListFromApi();
+    const useApi = fromApi && fromApi.length;
+    const rows = useApi
+      ? fromApi.map((r) => ({
+          id: r.id,
+          titleZh: r.title,
+          titleJa: r.titleJa,
+          titleEn: r.titleEn,
+          categoryZh: r.category,
+          categoryJa: r.categoryJa,
+          categoryEn: r.categoryEn,
+          summaryZh: r.summary,
+          summaryJa: r.summaryJa,
+          summaryEn: r.summaryEn,
+          bodyZh: r.bodyZh,
+          bodyJa: r.bodyJa,
+          bodyEn: r.bodyEn,
+          image: r.image,
+          date: r.date
+        }))
+      : news.map((n, i) => ({
+          id: n.id || `static-${i}`,
+          titleZh: n.title,
+          titleJa: n.titleJa,
+          titleEn: n.titleEn,
+          categoryZh: n.category,
+          categoryJa: n.categoryJa,
+          categoryEn: n.categoryEn,
+          summaryZh: n.summary,
+          summaryJa: n.summaryJa,
+          summaryEn: n.summaryEn,
+          bodyZh: n.bodyZh,
+          bodyJa: n.bodyJa,
+          bodyEn: n.bodyEn,
+          image: n.image,
+          date: n.date
+        }));
+
+    let row = null;
+    const rawId = id != null && String(id).trim() ? String(id).trim() : '';
+    if (rawId) {
+      row = rows.find((r) => r.id === rawId) || null;
+    }
+    if (!row && index != null && index !== '') {
+      const n = Number.parseInt(String(index), 10);
+      if (Number.isFinite(n) && n >= 0 && n < rows.length) row = rows[n];
+    }
+    if (!row) return null;
+
+    const bodyRaw = pickI18nField(language, row.bodyZh, row.bodyJa, row.bodyEn);
+    const summaryRaw = pickI18nField(
+      language,
+      row.summaryZh,
+      row.summaryJa,
+      row.summaryEn
+    );
+    return {
+      id: row.id,
+      title: pickI18nField(language, row.titleZh, row.titleJa, row.titleEn),
+      category: pickI18nField(
+        language,
+        row.categoryZh,
+        row.categoryJa,
+        row.categoryEn
+      ),
+      date: row.date || '',
+      image: row.image || '',
+      summary: summaryRaw,
+      body: (bodyRaw || '').trim()
+    };
+  }
+
+  function getJournalDetailPageUrl({ id, index } = {}) {
+    if (id != null && String(id).trim()) {
+      return `news-detail.html?id=${encodeURIComponent(String(id).trim())}`;
+    }
+    if (index != null && index !== '' && Number.isFinite(Number(index))) {
+      return `news-detail.html?i=${encodeURIComponent(String(index))}`;
+    }
+    return 'news-detail.html';
   }
 
   function getBrandByKey(key) {
@@ -2239,6 +2333,8 @@ window.TK168_DATA = (() => {
     getRentableVehicles,
     getDisplayPrice,
     getNewsItems,
+    getNewsDetailRecord,
+    getJournalDetailPageUrl,
     getSearchFilterOptions,
     getSearchFilterLabel,
     parseInventoryFilters,

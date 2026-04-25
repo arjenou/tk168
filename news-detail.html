@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="page.journalTitle">最新情報 — TK168 Premium Automotive</title>
+  <link rel="stylesheet" href="css/style.css?v=20260428b">
+  <link rel="stylesheet" href="css/skeleton.css?v=20260420h">
+  <script src="js/skeleton-boot.js?v=20260420h"></script>
+  <link rel="stylesheet" href="css/showcase-template.css?v=20260417u">
+  <link rel="stylesheet" href="css/about.css?v=20260417u">
+  <link rel="stylesheet" href="css/news-detail.css?v=20260428b">
+</head>
+
+<body class="about-page showcase-page news-detail-page" data-i18n-page-title="page.journalTitle">
+  <div data-layout-nav></div>
+
+  <div class="news-detail-hero" data-news-hero>
+    <div class="news-detail-hero__media" data-news-hero-img-wrap></div>
+    <div class="news-detail-hero__overlay" aria-hidden="true"></div>
+  </div>
+
+  <main class="about-main">
+    <article class="news-detail-article" data-news-detail-article>
+      <div class="news-detail-article__surface" data-news-surface>
+        <p class="news-detail-article__kicker" data-i18n="news.detailKicker">LATEST JOURNAL</p>
+        <div class="news-detail-article__head" data-news-head>
+          <span class="news-detail-article__tag" data-news-tag style="display:none"></span>
+        </div>
+        <h1 data-news-title>—</h1>
+        <p class="news-detail-article__date" data-news-date></p>
+        <div class="news-detail-article__body" data-news-body>
+          <p class="news-detail-article__empty" data-i18n="news.detailLoading">読み込み中…</p>
+        </div>
+        <a href="about.html#about-news" class="news-detail-article__back" data-i18n="news.detailBack">最新情報一覧へ</a>
+      </div>
+    </article>
+
+    <div class="news-detail-notfound" data-news-notfound hidden>
+      <h1 data-i18n="news.notFound">記事が見つかりません</h1>
+      <a href="about.html#about-news" data-i18n="news.detailBack">最新情報一覧へ</a>
+    </div>
+  </main>
+
+  <div data-layout-footer></div>
+
+  <script src="js/layout-shell.js?v=20260419a"></script>
+  <script src="js/api-hydrate.js?v=20260428a"></script>
+  <script src="js/data.js?v=20260428b"></script>
+  <script src="js/i18n.js?v=20260418c"></script>
+  <script src="js/common-links.js?v=20260419a"></script>
+  <script src="js/page-chrome.js?v=20260417i"></script>
+  <script src="js/news-detail.js?v=20260428b"></script>
+</body>
+
+</html>

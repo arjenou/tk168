@@ -23,8 +23,12 @@
     return window.TK168I18N?.t?.('news.more') || (getLanguage() === 'en' ? 'Learn more' : '詳細を見る');
   }
 
-  function buildNewsHref(index) {
-    return `about.html?news=${encodeURIComponent(String(index))}#about-news`;
+  function buildNewsHref(item) {
+    const url = window.TK168_DATA?.getJournalDetailPageUrl?.({
+      id: item.id,
+      index: item._index
+    });
+    return url || `news-detail.html?i=${encodeURIComponent(String(item._index))}`;
   }
 
   function getTagClass(category = '') {
@@ -65,7 +69,7 @@
         ${summary}
         <div class="news-meta">
           <span>${item.date || ''}</span>
-          <a href="${buildNewsHref(item._index)}" class="news-more">${getDetailLabel()}</a>
+          <a href="${buildNewsHref(item)}" class="news-more">${getDetailLabel()}</a>
         </div>
       </div>
     `;
@@ -88,7 +92,7 @@
               ${summary}
               <div class="news-meta">
                 <span>${item.date || ''}</span>
-                <a href="${buildNewsHref(item._index)}" class="news-more" data-news-index="${item._index}">${detailLabel}</a>
+                <a href="${buildNewsHref(item)}" class="news-more">${detailLabel}</a>
               </div>
             </div>
           </article>
@@ -123,6 +127,7 @@
   }
 
   function handleGridInteraction(event) {
+    if (event.target.closest('a.news-more')) return;
     const trigger = event.target.closest('[data-news-index]');
     if (!trigger || !gridRoot.contains(trigger)) return;
 

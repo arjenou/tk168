@@ -4,6 +4,7 @@ const {
   vehicles,
   getBrandLabel,
   getNewsItems,
+  getJournalDetailPageUrl,
   buildBrandUrl,
   buildDetailUrl,
   buildInventoryUrl,
@@ -483,7 +484,9 @@ function bindHomeVehicleResizeSync() {
 
 function buildNewsCardHTML(item, isLarge = false, index = 0) {
   const isInboundCategory = /(\u5165\u5eab|\u5230\u5e93|入庫|新車)/.test(item.category || '');
-  const newsHref = `about.html?news=${encodeURIComponent(String(index))}#about-news`;
+  const newsHref = typeof getJournalDetailPageUrl === 'function'
+    ? getJournalDetailPageUrl({ id: item.id, index })
+    : `news-detail.html?i=${encodeURIComponent(String(index))}`;
   const summary = item.summary ? `<p>${item.summary}</p>` : '';
   return `
     <div class="news-card ${isLarge ? 'news-large' : 'news-small'}">
