@@ -68,6 +68,9 @@ let heroVideoDeferredArmed = false;
 let introStartedAt = 0;
 let introSafetyTimer = 0;
 let introMaxDurationTimer = 0;
+/** 片头期间预拉取横幅视频：首帧就绪或短时 fallback 触发，进入主页时更易已缓冲 */
+let heroIntroPrefetchTimer = 0;
+const HERO_PREFETCH_FALLBACK_MS = 420;
 
 function hasExplicitHomeHashTarget() {
   if (!window.location.hash || window.location.hash === '#') return false;
@@ -177,6 +180,7 @@ function hydrateIntroVideoSource(options = {}) {
 
 function hydrateHeroVideoSource() {
   if (!heroVideo || heroVideoSourceReady) return;
+  if (window.TK168RuntimeProfile?.heroVideoDisabled) return;
   const raw = getVideoDataPath(heroVideo);
   if (!raw) return;
   const source = resolveWorkerMediaUrl(raw);
@@ -184,6 +188,11 @@ function hydrateHeroVideoSource() {
   heroVideo.src = source;
   heroVideo.load();
   heroVideoSourceReady = true;
+}
+
+/** 片头播放期间提前给横幅 video 赋 src 并 load（与片头并行；进主页后 sync 只负责 play） */
+function prefetchHeroDuringIntro() {
+  hydrateHeroVideoSource();
 }
 
 function canRunHeroVideo() {
@@ -271,6 +280,10 @@ function showMain({ immediate = false } = {}) {
     window.clearTimeout(introMaxDurationTimer);
     introMaxDurationTimer = 0;
   }
+  if (heroIntroPrefetchTimer) {
+    window.clearTimeout(heroIntroPrefetchTimer);
+    heroIntroPrefetchTimer = 0;
+  }
   document.body.classList.remove('is-home-landing');
   forceHomeScrollTop();
   mainContent.classList.remove('hidden');
@@ -312,9 +325,18 @@ if (shouldSkipIntroOnce() || hasIntroBeenSeenThisSession()) {
 } else {
   introStartedAt = window.performance?.now?.() || Date.now();
   introVideo?.addEventListener('loadeddata', () => {
+    if (heroIntroPrefetchTimer) {
+      window.clearTimeout(heroIntroPrefetchTimer);
+      heroIntroPrefetchTimer = 0;
+    }
     loadingScreen?.classList.add('is-intro-decoded');
+    prefetchHeroDuringIntro();
   }, { once: true });
   hydrateIntroVideoSource();
+  heroIntroPrefetchTimer = window.setTimeout(() => {
+    heroIntroPrefetchTimer = 0;
+    prefetchHeroDuringIntro();
+  }, HERO_PREFETCH_FALLBACK_MS);
   let introEndedBound = false;
   function bindIntroEnded() {
     if (introEndedBound) return;
