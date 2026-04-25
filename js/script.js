@@ -55,6 +55,8 @@ const SKIP_INTRO_ONCE_KEY = 'tk168_skip_intro_once';
 const INTRO_SEEN_SESSION_KEY = 'tk168_landing_intro_seen';
 const HERO_VIDEO_DEFER_MS = 3600;
 const INTRO_SKIP_UNLOCK_MS = 900;
+/** 片头最长时间；部分内嵌 WebView 不触发 video ended，仅靠该超时进入主页 */
+const INTRO_MAX_DURATION_MS = 20000;
 const INTRO_ENABLED = true;
 let heroVideoSourceReady = false;
 let heroVideoInView = true;
@@ -62,6 +64,7 @@ let heroVideoDeferredTimer = 0;
 let heroVideoDeferredArmed = false;
 let introStartedAt = 0;
 let introSafetyTimer = 0;
+let introMaxDurationTimer = 0;
 
 function hasExplicitHomeHashTarget() {
   if (!window.location.hash || window.location.hash === '#') return false;
@@ -245,6 +248,10 @@ function showMain({ immediate = false } = {}) {
     window.clearTimeout(introSafetyTimer);
     introSafetyTimer = 0;
   }
+  if (introMaxDurationTimer) {
+    window.clearTimeout(introMaxDurationTimer);
+    introMaxDurationTimer = 0;
+  }
   document.body.classList.remove('is-home-landing');
   forceHomeScrollTop();
   mainContent.classList.remove('hidden');
@@ -315,6 +322,14 @@ if (shouldSkipIntroOnce() || hasIntroBeenSeenThisSession()) {
     showMain({ immediate: true });
   });
   loadingScreen?.addEventListener('click', requestIntroDismiss);
+  /** 部分内嵌 WebView 不合成 click，仅靠 touchend 才能跳过片头 */
+  loadingScreen?.addEventListener('touchend', () => {
+    requestIntroDismiss();
+  }, { passive: true });
+  introMaxDurationTimer = window.setTimeout(() => {
+    markIntroSeenThisSession();
+    showMain({ immediate: true });
+  }, INTRO_MAX_DURATION_MS);
   introSafetyTimer = window.setTimeout(() => {
     markIntroSeenThisSession();
     showMain({ immediate: true });
@@ -334,10 +349,9 @@ if (shouldSkipIntroOnce() || hasIntroBeenSeenThisSession()) {
         return;
       }
       introVideo.play().catch(() => {
-        if (introVideo?.error) {
-          markIntroSeenThisSession();
-          showMain({ immediate: true });
-        }
+        // 内嵌浏览器常自动拒绝 muted play 且不设置 error，必须进入主页
+        markIntroSeenThisSession();
+        showMain({ immediate: true });
       });
     }, 300);
   });
