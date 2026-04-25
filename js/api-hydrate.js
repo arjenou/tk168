@@ -17,6 +17,7 @@
 (() => {
   const VEHICLE_KEY = "tk168:vehicles:v1";
   const RENTAL_KEY = "tk168:rentals:v1";
+  const JOURNAL_KEY = "tk168:journal:v1";
   const MAX_AGE_MS = 5 * 60 * 1000;
 
   // Default API host for the production site.  Pages can override by
@@ -195,11 +196,20 @@
     window.TK168_API_RENTALS = rentals.map(adaptRental);
   }
 
+  function installJournal(journal) {
+    window.TK168_API_JOURNAL = (journal || []).map((j) => ({
+      ...j,
+      imageUrl: j?.imageUrl ? toAbsoluteMedia(j.imageUrl) : j?.imageUrl,
+    }));
+  }
+
   // Synchronously expose whatever we have cached.
   const cachedVehicles = readCache(VEHICLE_KEY, "vehicles");
   if (cachedVehicles) installVehicles(cachedVehicles.vehicles);
   const cachedRentals = readCache(RENTAL_KEY, "rentals");
   if (cachedRentals) installRentals(cachedRentals.rentals);
+  const cachedJournal = readCache(JOURNAL_KEY, "journal");
+  if (cachedJournal) installJournal(cachedJournal.journal);
 
   if (!/^https?:$/.test(location.protocol)) return;
 
@@ -236,6 +246,7 @@
   Promise.all([
     refresh("vehicles", "vehicles", cachedVehicles, VEHICLE_KEY, installVehicles),
     refresh("rentals", "rentals", cachedRentals, RENTAL_KEY, installRentals),
+    refresh("journal", "journal", cachedJournal, JOURNAL_KEY, installJournal),
   ]).then((flags) => {
     const diverged = flags.some(Boolean);
     if (!diverged) return;

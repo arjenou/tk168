@@ -27,6 +27,15 @@ import {
   deleteRentalImage,
   reorderRentalImages,
 } from "./rentals.js";
+import {
+  listJournalEntries,
+  getJournalEntry,
+  createJournalEntry,
+  updateJournalEntry,
+  deleteJournalEntry,
+  clearJournalCover,
+  uploadJournalCover,
+} from "./journal.js";
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
 
@@ -187,6 +196,10 @@ async function handleApi(request, env, url) {
   if (path === "/rentals" && method === "GET") {
     const rentals = await listRentals(env, { includeUnpublished: false });
     return json({ rentals });
+  }
+  if (path === "/journal" && method === "GET") {
+    const journal = await listJournalEntries(env, { includeUnpublished: false });
+    return json({ journal });
   }
   if (path.startsWith("/rentals/") && method === "GET" && path.split("/").length === 3) {
     const id = decodeURIComponent(path.split("/")[2]);
@@ -358,6 +371,53 @@ async function handleApi(request, env, url) {
       }
     }
   }
+  if (path === "/admin/journal" && method === "GET") {
+    const journal = await listJournalEntries(env, { includeUnpublished: true });
+    return json({ journal });
+  }
+  if (path === "/admin/journal" && method === "POST") {
+    const body = await readJson(request);
+    const entry = await createJournalEntry(env, body);
+    return json({ entry }, 201);
+  }
+  {
+    const coverMatch = /^\/admin\/journal\/([^/]+)\/cover$/.exec(path);
+    if (coverMatch && method === "POST") {
+      const id = decodeURIComponent(coverMatch[1]);
+      const form = await request.formData();
+      const file = form.get("file");
+      if (!(file instanceof File)) return error(400, "no_file");
+      const entry = await uploadJournalCover(env, id, file);
+      return json({ entry });
+    }
+    if (coverMatch && method === "DELETE") {
+      const id = decodeURIComponent(coverMatch[1]);
+      const entry = await clearJournalCover(env, id);
+      return json({ entry });
+    }
+  }
+  {
+    const match = /^\/admin\/journal\/([^/]+)$/.exec(path);
+    if (match) {
+      const id = decodeURIComponent(match[1]);
+      if (method === "GET") {
+        const entry = await getJournalEntry(env, id);
+        if (!entry) return error(404, "not_found");
+        return json({ entry });
+      }
+      if (method === "PUT" || method === "PATCH") {
+        const body = await readJson(request);
+        const entry = await updateJournalEntry(env, id, body);
+        return json({ entry });
+      }
+      if (method === "DELETE") {
+        const ok = await deleteJournalEntry(env, id);
+        if (!ok) return error(404, "not_found");
+        return json({ ok: true });
+      }
+    }
+  }
+
   {
     const match = /^\/admin\/rentals\/([^/]+)\/images$/.exec(path);
     if (match && method === "POST") {

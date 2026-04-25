@@ -482,7 +482,7 @@ function bindHomeVehicleResizeSync() {
 }
 
 function buildNewsCardHTML(item, isLarge = false, index = 0) {
-  const isInboundCategory = /(\u5165\u5eab|\u5230\u5e93)/.test(item.category || '');
+  const isInboundCategory = /(\u5165\u5eab|\u5230\u5e93|入庫|新車)/.test(item.category || '');
   const newsHref = `about.html?news=${encodeURIComponent(String(index))}#about-news`;
   const summary = item.summary ? `<p>${item.summary}</p>` : '';
   return `
@@ -506,15 +506,21 @@ function renderHomeNews() {
   if (!newsGrid || typeof getNewsItems !== 'function') return;
 
   const items = getNewsItems();
-  const [first, second, third] = items;
-  if (!first || !second || !third) return;
+  if (!items.length) {
+    newsGrid.innerHTML = '';
+    return;
+  }
+  const [first, second, ...rest] = items;
+  const side = [second, ...rest].filter(Boolean);
+  if (!first) {
+    newsGrid.innerHTML = '';
+    return;
+  }
+  const sideHtml = side.map((it, i) => buildNewsCardHTML(it, false, i + 1)).join('');
 
   newsGrid.innerHTML = `
     ${buildNewsCardHTML(first, true, 0)}
-    <div class="news-side">
-      ${buildNewsCardHTML(second, false, 1)}
-      ${buildNewsCardHTML(third, false, 2)}
-    </div>
+    ${side.length ? `<div class="news-side">${sideHtml}</div>` : ''}
   `;
 
   window.TK168CommonLinks?.enhanceClickableCards(newsGrid);
@@ -587,9 +593,15 @@ window.addEventListener('tk168:languagechange', () => {
 });
 
 document.addEventListener('tk168:data-updated', (event) => {
-  if (!event.detail?.vehicles) return;
-  window.TK168_DATA?.refreshVehiclesFromApiHydrate?.();
-  renderHomeContent();
+  if (event.detail?.vehicles) {
+    window.TK168_DATA?.refreshVehiclesFromApiHydrate?.();
+  }
+  if (event.detail?.journal) {
+    window.TK168_DATA?.refreshJournalFromApiHydrate?.();
+  }
+  if (event.detail?.vehicles || event.detail?.journal) {
+    renderHomeContent();
+  }
 });
 })();
 

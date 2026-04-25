@@ -2,9 +2,10 @@
 // No framework; vanilla DOM + fetch.  All endpoints use cookie-based auth
 // (the server sets an HttpOnly `tk168_admin` cookie on login).
 //
-// The admin exposes two independent inventories:
+// The admin exposes three content areas:
 //   * "vehicles"  -> /api/admin/vehicles  (homepage / detail page)
 //   * "rentals"   -> /api/admin/rentals   (rental.html fleet)
+//   * "journal"   -> /api/admin/journal  (LATEST JOURNAL / 最新情報 on home + about)
 // They share most of the editor shell but expose different field sets.
 
 // The admin is served from https://www.tk168.co.jp/admin (Vercel) but the
@@ -64,7 +65,7 @@ function resolveMediaUrlForImg(url) {
 
 /** Internal vehicle/rental primary key; not shown in admin UI. Prefix v / r + random a-z0-9. */
 function generateInventoryId(resourceKey) {
-  const prefix = resourceKey === "rentals" ? "r" : "v";
+  const prefix = resourceKey === "rentals" ? "r" : resourceKey === "journal" ? "n" : "v";
   const alphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
   const buf = new Uint8Array(14);
   crypto.getRandomValues(buf);
@@ -263,6 +264,44 @@ const RESOURCES = {
       displayOrder: 0, isPublished: true, images: [],
     }),
   },
+
+  journal: {
+    key: "journal",
+    label: "最新情報",
+    listKind: "journal",
+    apiList: "/admin/journal",
+    apiItem: (id) => `/admin/journal/${encodeURIComponent(id)}`,
+    apiCover: (id) => `/admin/journal/${encodeURIComponent(id)}/cover`,
+    listKey: "journal",
+    itemKey: "entry",
+    duplicateCode: "journal_id_taken",
+    headerLabel: "LATEST JOURNAL / 最新情報",
+    emptyLabel: "暂无资讯",
+    homeDragSort: true,
+    homeDragSortHint:
+      "拖拽左侧手柄可调整首页与关于页「最新情报」的展示顺序（保存后立即生效）。搜索时会暂时隐藏手柄。",
+    fieldGroups: [],
+    presets: [],
+    emptyDraft: () => ({
+      id: "",
+      titleZh: "",
+      titleJa: "",
+      titleEn: "",
+      categoryZh: "",
+      categoryJa: "",
+      categoryEn: "",
+      summaryZh: "",
+      summaryJa: "",
+      summaryEn: "",
+      bodyZh: "",
+      bodyJa: "",
+      bodyEn: "",
+      dateLabel: "",
+      displayOrder: 0,
+      isPublished: true,
+      images: [],
+    }),
+  },
 };
 
 function statusLabel(status) {
@@ -279,12 +318,12 @@ const state = {
   user: null,
   // "login" | "list" | "editor" | "users"
   view: "login",
-  // "vehicles" | "rentals" — which inventory is currently active
+  // "vehicles" | "rentals" | "journal" — which inventory is currently active
   resource: "vehicles",
   // "content" | "specs" | "media" — active editor tab
   editorTab: "content",
   // per-resource caches, keyed by resource name
-  items: { vehicles: [], rentals: [] },
+  items: { vehicles: [], rentals: [], journal: [] },
   users: [],
   editingId: null,
   editingDraft: null,
@@ -455,6 +494,12 @@ function navHtml() {
       onClick: "rentals-list",
     },
     {
+      id: "nav-journal",
+      label: RESOURCES.journal.label,
+      active: onList && state.resource === "journal",
+      onClick: "journal-list",
+    },
+    {
       id: "nav-users",
       label: "管理员",
       active: state.view === "users",
@@ -503,6 +548,10 @@ function bindShell() {
         state.resource = "rentals";
         state.view = "list";
         await refreshItems();
+      } else if (target === "journal-list") {
+        state.resource = "journal";
+        state.view = "list";
+        await refreshItems();
       } else if (target === "users") {
         state.view = "users";
         await refreshUsers();
@@ -523,9 +572,17 @@ function bindShell() {
 // -------------------- List view --------------------
 
 function filteredItems() {
+  const r = currentResource();
   const items = state.items[state.resource] || [];
   const q = state.filter.trim().toLowerCase();
   if (!q) return items;
+  if (r.listKind === "journal") {
+    return items.filter((v) =>
+      [v.id, v.titleZh, v.titleJa, v.titleEn, v.categoryZh, v.categoryJa, v.categoryEn, v.dateLabel].some(
+        (field) => String(field || "").toLowerCase().includes(q),
+      ),
+    );
+  }
   return items.filter((v) =>
     [v.id, v.name, v.nameJa, v.nameEn, v.brandKey, v.type, v.year].some((field) =>
       String(field || "").toLowerCase().includes(q),
@@ -554,21 +611,28 @@ function renderList() {
       ? `<th class="admin-th-drag" scope="col" title="拖拽排序">顺序</th>`
       : "";
 
-  const inner = `
-    <div class="admin-page-head">
-      <h1>${escapeHtml(r.headerLabel)} <span style="color:var(--admin-text-dim);font-size:14px;font-weight:400;">（${items.length} 台）</span></h1>
-      ${dragHint}
-      <div class="admin-toolbar">
-        <input id="itemSearch" class="admin-input admin-search" type="search" placeholder="搜索 名称 / 品牌" value="${escapeHtml(state.filter)}">
-        <button class="admin-btn admin-btn-primary" id="newItemBtn">+ 新增${r.label}</button>
-      </div>
-    </div>
-    <div class="admin-table-wrap">
-      ${state.loading
-        ? '<div class="admin-loading">加载中…</div>'
-        : rows.length === 0
-        ? `<div class="admin-empty">${escapeHtml(r.emptyLabel)}</div>`
-        : `<table class="admin-table">
+  const countUnit = r.listKind === "journal" ? "条" : "台";
+  const searchPh = r.listKind === "journal" ? "搜索 标题 / 分类" : "搜索 名称 / 品牌";
+  const rowRenderer = r.listKind === "journal" ? journalItemRow : itemRow;
+  const tableBlock =
+    r.listKind === "journal"
+      ? `<table class="admin-table">
+            <thead>
+              <tr>
+                ${dragHead}
+                <th style="width:84px;">封面</th>
+                <th>标题</th>
+                <th>分类</th>
+                <th>日期</th>
+                <th>状态</th>
+                <th style="text-align:right;">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map((row) => rowRenderer(row, r)).join("")}
+            </tbody>
+          </table>`
+      : `<table class="admin-table">
             <thead>
               <tr>
                 ${dragHead}
@@ -584,9 +648,24 @@ function renderList() {
               </tr>
             </thead>
             <tbody>
-              ${rows.map((row) => itemRow(row, r)).join("")}
+              ${rows.map((row) => rowRenderer(row, r)).join("")}
             </tbody>
-          </table>`}
+          </table>`;
+  const inner = `
+    <div class="admin-page-head">
+      <h1>${escapeHtml(r.headerLabel)} <span style="color:var(--admin-text-dim);font-size:14px;font-weight:400;">（${items.length} ${countUnit}）</span></h1>
+      ${dragHint}
+      <div class="admin-toolbar">
+        <input id="itemSearch" class="admin-input admin-search" type="search" placeholder="${escapeAttr(searchPh)}" value="${escapeHtml(state.filter)}">
+        <button class="admin-btn admin-btn-primary" id="newItemBtn">+ 新增${r.label}</button>
+      </div>
+    </div>
+    <div class="admin-table-wrap">
+      ${state.loading
+        ? '<div class="admin-loading">加载中…</div>'
+        : rows.length === 0
+        ? `<div class="admin-empty">${escapeHtml(r.emptyLabel)}</div>`
+        : tableBlock}
     </div>
   `;
   ROOT.innerHTML = appShell(inner);
@@ -595,8 +674,9 @@ function renderList() {
   const searchInput = document.getElementById("itemSearch");
   searchInput?.addEventListener("input", (event) => {
     state.filter = event.target.value;
+    const rr = r.listKind === "journal" ? journalItemRow : itemRow;
     const tbody = document.querySelector(".admin-table tbody");
-    if (tbody) tbody.innerHTML = filteredItems().map((row) => itemRow(row, r)).join("");
+    if (tbody) tbody.innerHTML = filteredItems().map((row) => rr(row, r)).join("");
     bindRowActions();
   });
 
@@ -634,7 +714,13 @@ async function persistHomeDisplayOrderAfterDrop(fromId, toId) {
       v.displayOrder = i;
     });
     state.items[r.key] = list;
-    showToast(r.key === "rentals" ? "租赁页展示顺序已保存" : "首页展示顺序已保存");
+    showToast(
+      r.key === "rentals"
+        ? "租赁页展示顺序已保存"
+        : r.key === "journal"
+          ? "最新情報展示顺序已保存"
+          : "首页展示顺序已保存",
+    );
     render();
   } catch (err) {
     showToast(`保存顺序失败：${err.message}`, "error");
@@ -707,6 +793,39 @@ function ensureHomeInventoryDragDelegate() {
   });
 }
 
+function journalItemRow(v, r) {
+  const showDrag = Boolean(r.homeDragSort && !state.filter.trim());
+  const dragCell = showDrag
+    ? `<td class="admin-drag-cell">
+        <span class="admin-drag-handle" draggable="true" title="拖拽调整资讯顺序" aria-label="拖拽排序">⋮⋮</span>
+      </td>`
+    : "";
+  const cover = resolveMediaUrlForImg(v.imageUrl || v.images?.[0]?.url || "");
+  return `
+    <tr data-item-id="${escapeAttr(v.id)}">
+      ${dragCell}
+      <td>${cover ? `<img class="admin-thumb" src="${escapeAttr(cover)}" alt="">` : '<div class="admin-thumb"></div>'}</td>
+      <td>
+        <div style="font-weight:600;">${escapeHtml(v.titleZh || v.titleJa || v.titleEn || "—")}</div>
+        <div style="color:var(--admin-text-dim);font-size:12px;">${escapeHtml(v.id || "")}</div>
+      </td>
+      <td>${escapeHtml(v.categoryZh || v.categoryJa || v.categoryEn || "—")}</td>
+      <td>${escapeHtml(v.dateLabel || "—")}</td>
+      <td>
+        <button class="admin-badge ${v.isPublished ? "is-on" : "is-off"}" data-toggle-pub="${escapeAttr(v.id)}" title="点击切换发布状态">
+          ${v.isPublished ? "已发布" : "草稿"}
+        </button>
+      </td>
+      <td>
+        <div class="admin-actions-cell">
+          <button class="admin-btn admin-btn-sm" data-edit="${escapeAttr(v.id)}">编辑</button>
+          <button class="admin-btn admin-btn-sm admin-btn-danger" data-delete="${escapeAttr(v.id)}">删除</button>
+        </div>
+      </td>
+    </tr>
+  `;
+}
+
 function itemRow(v, r) {
   const showDrag = Boolean(r.homeDragSort && !state.filter.trim());
   const dragCell = showDrag
@@ -762,8 +881,10 @@ function bindRowActions() {
     btn.addEventListener("click", async () => {
       const id = btn.dataset.delete;
       const row = (state.items[r.key] || []).find((x) => x.id === id);
-      const label = row?.name || id;
-      if (!confirm(`确认删除「${label}」？将同时删除其所有图片。`)) return;
+      const label =
+        r.listKind === "journal" ? row?.titleZh || row?.titleJa || id : row?.name || id;
+      const extraHint = r.listKind === "journal" ? "" : "将同时删除其所有图片。";
+      if (!confirm(`确认删除「${label}」？${extraHint}`)) return;
       try {
         await api(r.apiItem(id), { method: "DELETE" });
         showToast("已删除");
@@ -848,7 +969,101 @@ function renderEditorGroup(group, draft) {
     </section>`;
 }
 
+function renderJournalContentTab(draft) {
+  return `
+    <section class="admin-section">
+      <div class="admin-section-head">
+        <h3>标题 <span class="admin-required">*</span></h3>
+        <p>至少填写中文或日文标题其一；日站优先展示日文、中文站展示中文。</p>
+      </div>
+      <div class="admin-grid-12">
+        <div class="admin-field admin-col-4">
+          <label>中文</label>
+          <input class="admin-input" data-draft="titleZh" value="${escapeAttr(draft.titleZh ?? "")}" placeholder="2026 年最值得期待…">
+        </div>
+        <div class="admin-field admin-col-4">
+          <label>日文</label>
+          <input class="admin-input" data-draft="titleJa" value="${escapeAttr(draft.titleJa ?? "")}" placeholder="2026年注目の…">
+        </div>
+        <div class="admin-field admin-col-4">
+          <label>英文</label>
+          <input class="admin-input" data-draft="titleEn" value="${escapeAttr(draft.titleEn ?? "")}">
+        </div>
+      </div>
+    </section>
+    <section class="admin-section">
+      <div class="admin-section-head">
+        <h3>分类标签</h3>
+        <p>对应首页副标题中的「市场 / 新入库 / 品牌」等，展示在文章卡片角标上。</p>
+      </div>
+      <div class="admin-grid-12">
+        <div class="admin-field admin-col-4">
+          <label>中文</label>
+          <input class="admin-input" data-draft="categoryZh" value="${escapeAttr(draft.categoryZh ?? "")}" placeholder="行业动态">
+        </div>
+        <div class="admin-field admin-col-4">
+          <label>日文</label>
+          <input class="admin-input" data-draft="categoryJa" value="${escapeAttr(draft.categoryJa ?? "")}" placeholder="マーケット情報">
+        </div>
+        <div class="admin-field admin-col-4">
+          <label>英文</label>
+          <input class="admin-input" data-draft="categoryEn" value="${escapeAttr(draft.categoryEn ?? "")}" placeholder="Market">
+        </div>
+      </div>
+    </section>
+    <section class="admin-section">
+      <div class="admin-section-head">
+        <h3>摘要 / 导言</h3>
+        <p>在首页大卡片上展示；不填则前台该段留空（小卡可能只显示标题）。</p>
+      </div>
+      <div class="admin-field">
+        <label>中文</label>
+        <textarea class="admin-textarea" data-draft="summaryZh" rows="3" placeholder="一句话概括…">${escapeHtml(draft.summaryZh ?? "")}</textarea>
+      </div>
+      <div class="admin-field" style="margin-top:10px;">
+        <label>日文</label>
+        <textarea class="admin-textarea" data-draft="summaryJa" rows="3">${escapeHtml(draft.summaryJa ?? "")}</textarea>
+      </div>
+      <div class="admin-field" style="margin-top:10px;">
+        <label>英文</label>
+        <textarea class="admin-textarea" data-draft="summaryEn" rows="3">${escapeHtml(draft.summaryEn ?? "")}</textarea>
+      </div>
+    </section>
+    <section class="admin-section">
+      <div class="admin-section-head">
+        <h3>详情全文（选填）</h3>
+        <p>可在后续用于独立资讯详情页；当前 about 区由摘要与链接展示。</p>
+      </div>
+      <div class="admin-field">
+        <label>中文</label>
+        <textarea class="admin-textarea" data-journal-body="bodyZh" rows="5">${escapeHtml(draft.bodyZh ?? "")}</textarea>
+      </div>
+      <div class="admin-field" style="margin-top:10px;">
+        <label>日文</label>
+        <textarea class="admin-textarea" data-journal-body="bodyJa" rows="5">${escapeHtml(draft.bodyJa ?? "")}</textarea>
+      </div>
+      <div class="admin-field" style="margin-top:10px;">
+        <label>英文</label>
+        <textarea class="admin-textarea" data-journal-body="bodyEn" rows="5">${escapeHtml(draft.bodyEn ?? "")}</textarea>
+      </div>
+    </section>
+    <section class="admin-section">
+      <div class="admin-section-head">
+        <h3>展示日期</h3>
+        <p>前台日期文案，可填如 <code>2026 · 04 · 08</code> 或 <code>2026.04.08</code>。</p>
+      </div>
+      <div class="admin-grid-12">
+        <div class="admin-field admin-col-6">
+          <label>日期字符串</label>
+          <input class="admin-input" data-draft="dateLabel" value="${escapeAttr(draft.dateLabel ?? "")}" placeholder="2026 · 04 · 08">
+        </div>
+      </div>
+    </section>
+  `;
+}
+
 function renderContentTab(r, draft) {
+  if (r.listKind === "journal") return renderJournalContentTab(draft);
   const groupsHtml = (r.fieldGroups || [])
     .map((g) => renderEditorGroup(g, draft))
     .join("");
@@ -997,12 +1212,20 @@ function renderPublishTab(r, draft, isNew) {
             <input type="checkbox" data-draft="isPublished" ${draft.isPublished ? "checked" : ""}>
             <span>${draft.isPublished ? "已发布" : "已下架"}</span>
           </label>
-          <div class="admin-field-hint">关闭后仅你能在后台看到，该车不会出现在前台列表。</div>
+          <div class="admin-field-hint">${
+            r.listKind === "journal"
+              ? "关闭后仅你能在后台看到，前台不展示该条资讯。"
+              : "关闭后仅你能在后台看到，该车不会出现在前台列表。"
+          }</div>
         </div>
         ${orderHint}
         ${sortField}
       </div>
-      ${isNew ? '<div class="admin-message" style="margin-top:14px;">新车辆保存后再回来上传图片。</div>' : ""}
+      ${isNew && r.listKind === "journal"
+        ? '<div class="admin-message" style="margin-top:14px;">保存条目标后可于右侧上传封面图。</div>'
+        : isNew
+          ? '<div class="admin-message" style="margin-top:14px;">新车辆保存后再回来上传图片。</div>'
+          : ""}
     </section>
   `;
 }
@@ -1033,27 +1256,41 @@ function renderEditor() {
 
   const primaryImage = (draft.images || []).find((i) => i.isPrimary) || (draft.images || [])[0];
   const imageCount = (draft.images || []).length;
-
-  const inner = `
-    <div class="admin-page-head">
-      <div>
-        <div class="admin-crumb"><button class="admin-btn admin-btn-ghost admin-btn-sm" id="cancelEdit">← 返回列表</button></div>
-        <h1>${isNew ? `新增${escapeHtml(r.label)}` : escapeHtml(draft.name || draft.nameJa || draft.nameEn || "未命名")}</h1>
-        ${!isNew && (draft.brandKey || draft.year) ? `<div class="admin-subtle">${[draft.brandKey, draft.year].filter(Boolean).map(escapeHtml).join(" · ")}</div>` : ""}
-      </div>
-      <div class="admin-toolbar">
-        <span class="admin-badge ${draft.isPublished ? "is-on" : "is-off"}">${draft.isPublished ? "已发布" : "已下架"}</span>
-        <button class="admin-btn admin-btn-primary" id="saveEdit">保存</button>
-      </div>
-    </div>
-
-    <div class="admin-editor">
-      <div class="admin-editor-main">
-        <div class="admin-tabs">${tabsHtml}</div>
-        <div class="admin-tab-body">${tabBody}</div>
-      </div>
-
-      <aside class="admin-editor-aside">
+  const editorTitle = isNew
+    ? `新增${r.label}`
+    : r.listKind === "journal"
+      ? (draft.titleZh || draft.titleJa || draft.titleEn || "未命名")
+      : (draft.name || draft.nameJa || draft.nameEn || "未命名");
+  const editorSub =
+    r.listKind === "journal" && !isNew && (draft.dateLabel || draft.id)
+      ? `<div class="admin-subtle">${[draft.dateLabel, draft.id].filter(Boolean).map(escapeHtml).join(" · ")}</div>`
+      : !isNew && (draft.brandKey || draft.year)
+        ? `<div class="admin-subtle">${[draft.brandKey, draft.year].filter(Boolean).map(escapeHtml).join(" · ")}</div>`
+        : "";
+  const asideBlock =
+    r.listKind === "journal"
+      ? `<aside class="admin-editor-aside">
+        <section class="admin-card">
+          <h2>封面图</h2>
+          ${
+            primaryImage
+              ? `<div class="admin-cover-preview"><img src="${escapeAttr(resolveMediaUrlForImg(primaryImage.url))}" alt=""></div>`
+              : `<div class="admin-cover-preview admin-cover-empty">暂无封面</div>`
+          }
+          <div class="admin-cover-meta">首页大卡片与关于页主卡共用此图</div>
+          <div class="admin-upload">
+            <input id="imageUpload" type="file" accept="image/*" ${isNew ? "disabled" : ""}>
+            <label for="imageUpload">${isNew ? "保存后可上传" : "选择一张封面图"}</label>
+            <div style="margin-top:8px;">
+              <button type="button" class="admin-btn admin-btn-sm admin-btn-ghost" id="journalClearCover" ${
+                isNew || !primaryImage ? "disabled" : ""
+              }>移除封面</button>
+            </div>
+            <div style="margin-top:8px;color:var(--admin-text-dim);font-size:12px;">JPG / PNG / WEBP / AVIF，建议 5MB 以内</div>
+          </div>
+        </section>
+      </aside>`
+      : `<aside class="admin-editor-aside">
         <section class="admin-card">
           <h2>封面与图片</h2>
           ${primaryImage
@@ -1069,7 +1306,28 @@ function renderEditor() {
             <div style="margin-top:8px;color:var(--admin-text-dim);font-size:12px;">JPG / PNG / WEBP / AVIF，单张建议 5MB 以内</div>
           </div>
         </section>
-      </aside>
+      </aside>`;
+
+  const inner = `
+    <div class="admin-page-head">
+      <div>
+        <div class="admin-crumb"><button class="admin-btn admin-btn-ghost admin-btn-sm" id="cancelEdit">← 返回列表</button></div>
+        <h1>${isNew ? `新增${escapeHtml(r.label)}` : escapeHtml(String(editorTitle))}</h1>
+        ${editorSub}
+      </div>
+      <div class="admin-toolbar">
+        <span class="admin-badge ${draft.isPublished ? "is-on" : "is-off"}">${draft.isPublished ? "已发布" : "已下架"}</span>
+        <button class="admin-btn admin-btn-primary" id="saveEdit">保存</button>
+      </div>
+    </div>
+
+    <div class="admin-editor">
+      <div class="admin-editor-main">
+        <div class="admin-tabs">${tabsHtml}</div>
+        <div class="admin-tab-body">${tabBody}</div>
+      </div>
+
+      ${asideBlock}
     </div>
   `;
 
@@ -1175,60 +1433,113 @@ function bindEditor() {
     });
   });
 
-  document.getElementById("saveEdit").addEventListener("click", saveItem);
-
-  document.getElementById("imageUpload")?.addEventListener("change", async (event) => {
-    const files = Array.from(event.target.files || []);
-    event.target.value = "";
-    if (files.length === 0) return;
-    if (state.editingId === "__new__") {
-      showToast("请先保存再上传图片", "error");
-      return;
-    }
-    try {
-      const form = new FormData();
-      for (const file of files) form.append("file", file);
-      const res = await api(r.apiImages(state.editingId), { method: "POST", body: form });
-      state.editingDraft.images = [...(state.editingDraft.images || []), ...res.images];
-      const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
-      if (cached) cached.images = state.editingDraft.images;
-      renderEditor();
-      showToast(`已上传 ${res.images.length} 张图片`);
-    } catch (err) {
-      showToast(`上传失败：${err.message}`, "error");
-    }
+  document.querySelectorAll("[data-journal-body]").forEach((textarea) => {
+    textarea.addEventListener("input", () => {
+      const key = textarea.dataset.journalBody;
+      if (key) state.editingDraft[key] = textarea.value;
+    });
   });
 
-  document.querySelectorAll("[data-remove-image]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const imageId = Number(btn.dataset.removeImage);
-      if (!confirm("删除这张图片？")) return;
+  document.getElementById("saveEdit").addEventListener("click", saveItem);
+
+  if (r.listKind === "journal" && typeof r.apiCover === "function") {
+    document.getElementById("imageUpload")?.addEventListener("change", async (event) => {
+      const files = Array.from(event.target.files || []);
+      event.target.value = "";
+      if (files.length === 0) return;
+      if (state.editingId === "__new__") {
+        showToast("请先保存条目", "error");
+        return;
+      }
+      const file = files[0];
       try {
-        await api(r.apiImage(state.editingId, imageId), { method: "DELETE" });
-        state.editingDraft.images = state.editingDraft.images.filter((i) => i.id !== imageId);
-        state.editingDraft.images.forEach((i, idx) => (i.isPrimary = idx === 0));
+        const form = new FormData();
+        form.append("file", file);
+        const res = await api(r.apiCover(state.editingId), { method: "POST", body: form });
+        const entry = res.entry;
+        state.editingDraft = { ...entry, images: entry.images || [] };
+        const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
+        if (cached) Object.assign(cached, state.editingDraft);
+        renderEditor();
+        showToast("封面已更新");
+      } catch (err) {
+        showToast(`上传失败：${err.message}`, "error");
+      }
+    });
+    document.getElementById("journalClearCover")?.addEventListener("click", async () => {
+      if (state.editingId === "__new__") return;
+      if (!confirm("移除封面？")) return;
+      try {
+        const res = await api(r.apiCover(state.editingId), { method: "DELETE" });
+        const entry = res.entry;
+        state.editingDraft = { ...entry, images: entry.images || [] };
+        const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
+        if (cached) Object.assign(cached, state.editingDraft);
+        renderEditor();
+        showToast("已移除封面");
+      } catch (err) {
+        showToast(`操作失败：${err.message}`, "error");
+      }
+    });
+  } else {
+    document.getElementById("imageUpload")?.addEventListener("change", async (event) => {
+      const files = Array.from(event.target.files || []);
+      event.target.value = "";
+      if (files.length === 0) return;
+      if (state.editingId === "__new__") {
+        showToast("请先保存再上传图片", "error");
+        return;
+      }
+      try {
+        const form = new FormData();
+        for (const file of files) form.append("file", file);
+        const res = await api(r.apiImages(state.editingId), { method: "POST", body: form });
+        state.editingDraft.images = [...(state.editingDraft.images || []), ...res.images];
         const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
         if (cached) cached.images = state.editingDraft.images;
         renderEditor();
-        showToast("已删除图片");
+        showToast(`已上传 ${res.images.length} 张图片`);
       } catch (err) {
-        showToast(`删除失败：${err.message}`, "error");
+        showToast(`上传失败：${err.message}`, "error");
       }
     });
-  });
+
+    document.querySelectorAll("[data-remove-image]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const imageId = Number(btn.dataset.removeImage);
+        if (!confirm("删除这张图片？")) return;
+        try {
+          await api(r.apiImage(state.editingId, imageId), { method: "DELETE" });
+          state.editingDraft.images = state.editingDraft.images.filter((i) => i.id !== imageId);
+          state.editingDraft.images.forEach((i, idx) => (i.isPrimary = idx === 0));
+          const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
+          if (cached) cached.images = state.editingDraft.images;
+          renderEditor();
+          showToast("已删除图片");
+        } catch (err) {
+          showToast(`删除失败：${err.message}`, "error");
+        }
+      });
+    });
+  }
 }
 
 async function saveItem() {
   const r = currentResource();
   const draft = state.editingDraft;
-  if (!draft.brandKey || !draft.name) {
+  if (r.listKind === "journal") {
+    if (!String(draft.titleZh || draft.titleJa || "").trim()) {
+      showToast("请填写中文或日文标题", "error");
+      return;
+    }
+  } else if (!draft.brandKey || !draft.name) {
     showToast("品牌与中文车型名称为必填项", "error");
     return;
   }
 
   // Strip empty preset objects so they persist as NULL instead of {zh:"",ja:""}
   const payload = { ...draft };
-  r.presets.forEach(([key]) => {
+  (r.presets || []).forEach(([key]) => {
     const v = payload[key];
     if (v && typeof v === "object" && !v.zh && !v.ja && !v.en) payload[key] = null;
   });
@@ -1258,7 +1569,9 @@ async function saveItem() {
       }
       state.editingId = created.id;
       state.editingDraft = { ...created, images: created.images || [] };
-      showToast("已创建。现在可以上传图片。");
+      showToast(
+        r.listKind === "journal" ? "已创建。可在右侧上传封面图。" : "已创建。现在可以上传图片。",
+      );
     } else {
       const res = await api(r.apiItem(state.editingId), {
         method: "PUT",

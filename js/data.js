@@ -1720,8 +1720,45 @@ window.TK168_DATA = (() => {
       : `${year}（${eraCode}${eraYear}）`;
   }
 
+  function absoluteApiUrlIfNeeded(path) {
+    const s = String(path || '').trim();
+    if (!s) return '';
+    if (/^https?:\/\//i.test(s)) return s;
+    if (s.startsWith('/api/')) {
+      const base = typeof window.TK168_API_BASE === 'string'
+        ? window.TK168_API_BASE.replace(/\/+$/, '')
+        : '';
+      if (base) return `${base}${s}`;
+    }
+    return s;
+  }
+
+  /** 后台 /api/journal 拉取后的条目；无或空数组时回退到内置 `news` */
+  function buildNewsListFromApi() {
+    const raw = window.TK168_API_JOURNAL;
+    if (!Array.isArray(raw) || raw.length === 0) return null;
+    return raw.map((j) => ({
+      title: j.titleZh || '',
+      titleJa: j.titleJa || '',
+      titleEn: j.titleEn || '',
+      category: j.categoryZh || '',
+      categoryJa: j.categoryJa || '',
+      categoryEn: j.categoryEn || '',
+      summary: j.summaryZh || '',
+      summaryJa: j.summaryJa || '',
+      summaryEn: j.summaryEn || '',
+      image: absoluteApiUrlIfNeeded(j.imageUrl) || j.imageUrl || '',
+      date: j.dateLabel || '',
+      bodyZh: j.bodyZh,
+      bodyJa: j.bodyJa,
+      bodyEn: j.bodyEn
+    }));
+  }
+
   function getNewsItems(language = getCurrentLanguage()) {
-    return news.map((item) => ({
+    const fromApi = buildNewsListFromApi();
+    const source = fromApi && fromApi.length ? fromApi : news;
+    return source.map((item) => ({
       ...item,
       title: language === 'en'
         ? (item.titleEn || item.titleJa || item.title)
@@ -1733,6 +1770,10 @@ window.TK168_DATA = (() => {
         ? (item.summaryEn || item.summaryJa || item.summary || '')
         : (language === 'ja' ? (item.summaryJa || item.summaryEn || item.summary || '') : (item.summary || item.summaryJa || item.summaryEn || ''))
     }));
+  }
+
+  function refreshJournalFromApiHydrate() {
+    /* 资讯从 window.TK168_API_JOURNAL 即时读取，无需同步本地数组 */
   }
 
   function getBrandByKey(key) {
@@ -2209,6 +2250,7 @@ window.TK168_DATA = (() => {
     buildBrandUrl,
     buildDetailUrl,
     mergeApiVehicleWithBase,
-    refreshVehiclesFromApiHydrate
+    refreshVehiclesFromApiHydrate,
+    refreshJournalFromApiHydrate
   };
 })();

@@ -146,4 +146,11 @@
     const index = parseActiveIndex(items);
     hydrate(index, { syncUrl: false });
   });
+
+  document.addEventListener('tk168:data-updated', (e) => {
+    if (!e.detail?.journal) return;
+    const items = getNewsItems();
+    const index = Math.min(parseActiveIndex(items), Math.max(0, items.length - 1));
+    hydrate(items.length ? index : 0, { syncUrl: false });
+  });
 })();
