@@ -444,19 +444,19 @@ function navHtml() {
   const items = [
     {
       id: "nav-vehicles",
-      label: "🏠 " + RESOURCES.vehicles.label,
+      label: RESOURCES.vehicles.label,
       active: onList && state.resource === "vehicles",
       onClick: "vehicles-list",
     },
     {
       id: "nav-rentals",
-      label: "🚗 " + RESOURCES.rentals.label,
+      label: RESOURCES.rentals.label,
       active: onList && state.resource === "rentals",
       onClick: "rentals-list",
     },
     {
       id: "nav-users",
-      label: "👤 管理员",
+      label: "管理员",
       active: state.view === "users",
       onClick: "users",
     },

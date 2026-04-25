@@ -8,8 +8,9 @@
   const nextButton = document.querySelector('#brands [data-nav="next"]');
   const swipeHint = document.querySelector('#brands [data-swipe-hint]');
   const swipeHintText = swipeHint?.querySelector('.lisboa-mobile-swipe-hint__text');
-  const DESKTOP_VISIBLE_THUMBS = 6;
-  const MOBILE_VISIBLE_THUMBS = 4;
+  /** 奇数个：当前选中项始终在中间槽，配合循环取模可无限轮播 */
+  const DESKTOP_VISIBLE_THUMBS = 7;
+  const MOBILE_VISIBLE_THUMBS = 5;
 
   if (!shell || !stage || !thumbs) return;
 
@@ -508,22 +509,20 @@
     return button;
   }
 
-  function getVisibleThumbIndexes() {
-    if (isMobileViewport()) {
-      return Array.from(
-        { length: Math.min(MOBILE_VISIBLE_THUMBS, slides.length) },
-        (_, offset) => (activeIndex + offset) % slides.length
-      );
-    }
+  function getVisibleThumbCount() {
+    return isMobileViewport() ? MOBILE_VISIBLE_THUMBS : DESKTOP_VISIBLE_THUMBS;
+  }
 
-    if (slides.length <= DESKTOP_VISIBLE_THUMBS) {
+  function getVisibleThumbIndexes() {
+    const n = Math.min(getVisibleThumbCount(), slides.length);
+    if (slides.length <= n) {
       return slides.map((_, index) => index);
     }
-
-    const maxStart = slides.length - DESKTOP_VISIBLE_THUMBS;
-    const idealStart = activeIndex - 2;
-    const start = Math.max(0, Math.min(maxStart, idealStart));
-    return Array.from({ length: DESKTOP_VISIBLE_THUMBS }, (_, offset) => start + offset);
+    const half = Math.floor(n / 2);
+    return Array.from({ length: n }, (_, i) => {
+      const raw = activeIndex - half + i;
+      return ((raw % slides.length) + slides.length) % slides.length;
+    });
   }
 
   function renderThumbs() {

@@ -2013,6 +2013,8 @@ window.TK168_DATA = (() => {
           brand?.labelEn,
           vehicle.type,
           getVehicleTypeLabel(vehicle.type, 'ja'),
+          getVehicleTypeLabel(vehicle.type, 'zh'),
+          getVehicleTypeLabel(vehicle.type, 'en'),
           vehicle.engine,
           vehicle.fuel,
           getVehicleFieldLabel('fuel', vehicle.fuel, 'ja'),
@@ -2023,14 +2025,16 @@ window.TK168_DATA = (() => {
           vehicle.interiorColor
         ].join(' ').toLowerCase();
 
-        if (!haystack.includes(keyword)) return false;
+        const tokens = keyword.split(/\s+/).filter(Boolean);
+        const toks = tokens.length ? tokens : [keyword];
+        if (!toks.every((t) => haystack.includes(t))) return false;
       }
 
       return true;
     });
   }
 
-  function buildInventoryUrl(filters = {}) {
+  function serializeInventoryFilters(filters = {}) {
     const params = new URLSearchParams();
     const normalized = {
       brand: filters.brand || '',
@@ -2046,7 +2050,11 @@ window.TK168_DATA = (() => {
       if (value) params.set(key, value);
     });
 
-    const query = params.toString();
+    return params.toString();
+  }
+
+  function buildInventoryUrl(filters = {}) {
+    const query = serializeInventoryFilters(filters);
     return `brand.html${query ? `?${query}` : ''}`;
   }
 
@@ -2194,6 +2202,7 @@ window.TK168_DATA = (() => {
     getSearchFilterLabel,
     parseInventoryFilters,
     filterVehicles,
+    serializeInventoryFilters,
     buildInventoryUrl,
     countActiveFilters,
     buildFilterSummary,

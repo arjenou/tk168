@@ -21,29 +21,33 @@ window.TK168SearchUI = (() => {
       type: state.type || '',
       price: state.price || '',
       priceMetric: state.priceMetric === 'base' ? 'base' : 'total',
-      year: '',
-      mileage: '',
+      year: state.year || '',
+      mileage: state.mileage || '',
       keyword: state.keyword || ''
     };
   }
 
   function createEmptyState() {
-    return {
-      brand: '',
-      type: '',
-      price: '',
-      priceMetric: 'total',
-      year: '',
-      mileage: '',
-      keyword: ''
-    };
+    return cloneState({});
   }
 
-  function createInventorySearchUI({ roots = [], mobileButtons = [], initialState = {}, onSubmit }) {
+  function createInventorySearchUI({
+    roots = [],
+    mobileButtons = [],
+    initialState = {},
+    onSubmit,
+    onFiltersChange
+  }) {
     const state = cloneState(initialState);
     const desktopRoots = roots.filter(Boolean);
     const mobileCtas = mobileButtons.filter(Boolean);
     let openMenuState = null;
+    let suppressFiltersNotify = true;
+
+    function notifyFiltersChange() {
+      if (suppressFiltersNotify || typeof onFiltersChange !== 'function') return;
+      onFiltersChange(cloneState(state));
+    }
 
     function getFieldOptions(field) {
       return [
@@ -172,6 +176,7 @@ window.TK168SearchUI = (() => {
         state[field] = option.dataset.value || '';
         updateAll();
         closeMenu();
+        notifyFiltersChange();
       });
 
       return menu;
@@ -208,6 +213,7 @@ window.TK168SearchUI = (() => {
         state.brand = option.dataset.value || '';
         updateAll();
         closeMenu();
+        notifyFiltersChange();
       });
 
       return menu;
@@ -253,6 +259,7 @@ window.TK168SearchUI = (() => {
           const nextMenu = buildPriceMenu(root, button);
           menu.replaceWith(nextMenu);
           if (openMenuState?.menu === menu) openMenuState.menu = nextMenu;
+          notifyFiltersChange();
           return;
         }
 
@@ -261,6 +268,7 @@ window.TK168SearchUI = (() => {
         state.price = option.dataset.value || '';
         updateAll();
         closeMenu();
+        notifyFiltersChange();
       });
 
       return menu;
@@ -286,6 +294,7 @@ window.TK168SearchUI = (() => {
         state.type = option.dataset.value || '';
         updateAll();
         closeMenu();
+        notifyFiltersChange();
       });
 
       return menu;
@@ -455,6 +464,9 @@ window.TK168SearchUI = (() => {
     });
 
     updateAll();
+    queueMicrotask(() => {
+      suppressFiltersNotify = false;
+    });
 
     return {
       getState: () => cloneState(state),

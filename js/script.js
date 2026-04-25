@@ -87,6 +87,45 @@ function enforceHomeInitialScroll() {
   window.setTimeout(forceHomeScrollTop, 0);
 }
 
+function scrollToHomeBrands({ behavior = 'smooth' } = {}) {
+  const node = document.getElementById('brands');
+  if (!node) return;
+  const y = window.pageYOffset + node.getBoundingClientRect().top;
+  const top = Math.max(0, Math.round(y));
+  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+  const mode = reduced ? 'auto' : behavior;
+  try {
+    window.scrollTo({ top, left: 0, behavior: mode });
+  } catch {
+    window.scrollTo(0, top);
+  }
+}
+
+function queueHomeBrandsHashScroll() {
+  if (location.hash !== '#brands') return;
+  const run = () => scrollToHomeBrands({ behavior: 'auto' });
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(run);
+  });
+  window.setTimeout(run, 120);
+}
+
+(function bindHomeBrandsInPageAnchor() {
+  document.addEventListener('click', (event) => {
+    if (event.defaultPrevented || event.button !== 0) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const a = event.target?.closest && event.target.closest('a[href="#brands"]');
+    if (!a) return;
+    event.preventDefault();
+    if (window.history && window.history.pushState) {
+      window.history.pushState(null, '', '#brands');
+    } else {
+      window.location.hash = 'brands';
+    }
+    scrollToHomeBrands({ behavior: 'smooth' });
+  });
+})();
+
 function resolveWorkerMediaUrl(path) {
   const raw = String(path || '').trim();
   if (!raw) return '';
@@ -194,6 +233,7 @@ function showMain({ immediate = false } = {}) {
   mainContent.classList.remove('hidden');
   forceHomeScrollTop();
   syncHeroVideoPlayback();
+  queueHomeBrandsHashScroll();
 
   if (immediate) {
     loadingScreen.style.display = 'none';
@@ -279,7 +319,9 @@ const {
   getNewsItems,
   buildDetailUrl,
   buildInventoryUrl,
-  parseInventoryFilters
+  parseInventoryFilters,
+  filterVehicles,
+  serializeInventoryFilters
 } = homeDataApi;
 
 const HOME_VEHICLES_PER_PAGE = 6;
@@ -292,9 +334,10 @@ const homeVehicleNext = document.getElementById('homeVehicleNext');
 const homeVehicleMobileViewport = window.matchMedia('(max-width: 760px)');
 const homeVehicleTabletViewport = window.matchMedia('(max-width: 1180px)');
 
-const homeSearchState = typeof parseInventoryFilters === 'function'
-  ? parseInventoryFilters(window.location.search)
-  : {};
+let homeActiveFilters =
+  typeof parseInventoryFilters === 'function'
+    ? parseInventoryFilters(window.location.search)
+    : {};
 
 let currentHomeVehiclePage = pendingHomeScrollRestore
   ? pendingHomeScrollRestore.page
@@ -327,14 +370,21 @@ function chunkHomeVehicles(items, chunkSize) {
   return pages;
 }
 
+function getHomeVehiclesDisplayed() {
+  if (typeof filterVehicles !== 'function') return homeVehicles;
+  return filterVehicles(homeVehicles, homeActiveFilters);
+}
+
 function getHomeVehicleTotalPages() {
-  return Math.max(1, Math.ceil(homeVehicles.length / getHomeVehiclesPerPage()));
+  const list = getHomeVehiclesDisplayed();
+  return Math.max(1, Math.ceil(list.length / getHomeVehiclesPerPage()));
 }
 
 function renderHomeVehiclePages() {
   if (!homeVehicleGrid) return;
 
-  const pages = chunkHomeVehicles(homeVehicles, getHomeVehiclesPerPage());
+  const displayed = getHomeVehiclesDisplayed();
+  const pages = chunkHomeVehicles(displayed, getHomeVehiclesPerPage());
   const totalPages = Math.max(1, pages.length);
   currentHomeVehiclePage = Math.max(0, Math.min(totalPages - 1, currentHomeVehiclePage));
   currentHomeVehicleColumns = getHomeVehicleColumns();
@@ -348,7 +398,7 @@ function renderHomeVehiclePages() {
     card.style.transitionDelay = `${index * 0.05}s`;
     card.innerHTML = window.TK168Renderers.buildInventoryCardHTML(
       vehicle,
-      buildDetailUrl(vehicle.id, homeSearchState)
+      buildDetailUrl(vehicle.id, homeActiveFilters)
     );
     card.querySelectorAll('img').forEach((image) => {
       image.loading = 'lazy';
@@ -473,6 +523,22 @@ function renderHomeNews() {
   });
 }
 
+function applyHomeInventoryFilters(filterState) {
+  const qs =
+    typeof serializeInventoryFilters === 'function'
+      ? serializeInventoryFilters(filterState)
+      : '';
+  homeActiveFilters =
+    typeof parseInventoryFilters === 'function'
+      ? parseInventoryFilters(qs ? `?${qs}` : '')
+      : { ...filterState };
+  const url = new URL(window.location.href);
+  url.search = qs;
+  history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+  currentHomeVehiclePage = 0;
+  renderHomeVehiclePages();
+}
+
 function initHomeSearch() {
   window.TK168SearchUI.createInventorySearchUI({
     roots: [
@@ -482,13 +548,13 @@ function initHomeSearch() {
     mobileButtons: [
       document.querySelector('#floating-bar .fb-mobile .fb-cta')
     ].filter(Boolean),
-    initialState: homeSearchState,
+    initialState: homeActiveFilters,
+    onFiltersChange: applyHomeInventoryFilters,
     onSubmit: (filters) => {
-      const target = buildInventoryUrl(filters);
-      if (window.TK168LayoutShell?.navigate) {
-        window.TK168LayoutShell.navigate(target);
-      } else {
-        window.location.href = target;
+      applyHomeInventoryFilters(filters);
+      const section = document.getElementById('vehicles');
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
   });
