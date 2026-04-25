@@ -11,6 +11,7 @@ INSERT INTO vehicles (
     cond_eco_tax_eligible, cond_one_owner, cond_rental_up,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance, listing_periodic_book,
     highlight_steering, highlight_chassis_tail,
+    staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-urus', 'lamborghini', '兰博基尼 Urus', NULL, NULL, '2022', '高性能SUV',
@@ -24,6 +25,7 @@ INSERT INTO vehicles (
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年12月","ja":"2026(R08)年12月"}',
     '{"zh":"整备付","ja":"整備付"}', '{"zh":"附","ja":"付"}',
     '{"zh":"右舵","ja":"右ハンドル"}', '{"zh":"381","ja":"381"}',
+    NULL, NULL, NULL, NULL,
     0, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Urus', 1, 0);
@@ -39,6 +41,7 @@ INSERT INTO vehicles (
     cond_eco_tax_eligible, cond_one_owner, cond_rental_up,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance, listing_periodic_book,
     highlight_steering, highlight_chassis_tail,
+    staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'audi-r8-spyder', 'audi', '奥迪 R8 Spyder', NULL, NULL, '2023', '敞篷跑车',
@@ -52,6 +55,7 @@ INSERT INTO vehicles (
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年09月","ja":"2026(R08)年09月"}',
     '{"zh":"整备付","ja":"整備付"}', '{"zh":"附","ja":"付"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"127","ja":"127"}',
+    NULL, NULL, NULL, NULL,
     1, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('audi-r8-spyder', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '奥迪 R8 Spyder', 1, 0);
@@ -67,6 +71,7 @@ INSERT INTO vehicles (
     cond_eco_tax_eligible, cond_one_owner, cond_rental_up,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance, listing_periodic_book,
     highlight_steering, highlight_chassis_tail,
+    staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'ferrari-458-italia', 'ferrari', '法拉利 458 Italia', NULL, NULL, '2019', '中置跑车',
@@ -80,6 +85,7 @@ INSERT INTO vehicles (
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年06月","ja":"2026(R08)年06月"}',
     '{"zh":"无","ja":"なし"}', '{"zh":"附","ja":"付"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"458","ja":"458"}',
+    NULL, NULL, NULL, NULL,
     2, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-458-italia', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '法拉利 458 Italia', 1, 0);
@@ -95,6 +101,7 @@ INSERT INTO vehicles (
     cond_eco_tax_eligible, cond_one_owner, cond_rental_up,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance, listing_periodic_book,
     highlight_steering, highlight_chassis_tail,
+    staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'bmw-x6-m', 'bmw', '宝马 X6 M', NULL, NULL, '2024', '轿跑SUV',
@@ -108,6 +115,7 @@ INSERT INTO vehicles (
     '{"zh":"无","ja":"なし"}', '{"zh":"2027（R09）年03月","ja":"2027(R09)年03月"}',
     '{"zh":"整备付","ja":"整備付"}', '{"zh":"附","ja":"付"}',
     '{"zh":"右舵","ja":"右ハンドル"}', '{"zh":"642","ja":"642"}',
+    NULL, NULL, NULL, NULL,
     3, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('bmw-x6-m', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '宝马 X6 M', 1, 0);
@@ -123,6 +131,7 @@ INSERT INTO vehicles (
     cond_eco_tax_eligible, cond_one_owner, cond_rental_up,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance, listing_periodic_book,
     highlight_steering, highlight_chassis_tail,
+    staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'ferrari-488-gtb', 'ferrari', '法拉利 488 GTB', NULL, NULL, '2021', '中置跑车',
@@ -136,6 +145,7 @@ INSERT INTO vehicles (
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年11月","ja":"2026(R08)年11月"}',
     '{"zh":"整备付","ja":"整備付"}', '{"zh":"附","ja":"付"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"488","ja":"488"}',
+    NULL, NULL, NULL, NULL,
     4, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-488-gtb', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '法拉利 488 GTB', 1, 0);
@@ -151,6 +161,7 @@ INSERT INTO vehicles (
     cond_eco_tax_eligible, cond_one_owner, cond_rental_up,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance, listing_periodic_book,
     highlight_steering, highlight_chassis_tail,
+    staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-aventador', 'lamborghini', '兰博基尼 Aventador', NULL, NULL, '2022', 'V12超跑',
@@ -164,6 +175,7 @@ INSERT INTO vehicles (
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年10月","ja":"2026(R08)年10月"}',
     '{"zh":"无","ja":"なし"}', '{"zh":"附","ja":"付"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"770","ja":"770"}',
+    NULL, NULL, NULL, NULL,
     5, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-aventador', 'seed:vehicles/seed/006.png', '/api/media/vehicles/seed/006.png', '兰博基尼 Aventador', 1, 0);
@@ -179,6 +191,7 @@ INSERT INTO vehicles (
     cond_eco_tax_eligible, cond_one_owner, cond_rental_up,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance, listing_periodic_book,
     highlight_steering, highlight_chassis_tail,
+    staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-huracan-evo', 'lamborghini', '兰博基尼 Huracan EVO', NULL, NULL, '2023', '中置跑车',
@@ -192,6 +205,7 @@ INSERT INTO vehicles (
     '{"zh":"无","ja":"なし"}', '{"zh":"2027（R09）年01月","ja":"2027(R09)年01月"}',
     '{"zh":"整备付","ja":"整備付"}', '{"zh":"附","ja":"付"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"613","ja":"613"}',
+    NULL, NULL, NULL, NULL,
     6, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '兰博基尼 Huracan EVO', 1, 0);
@@ -207,6 +221,7 @@ INSERT INTO vehicles (
     cond_eco_tax_eligible, cond_one_owner, cond_rental_up,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance, listing_periodic_book,
     highlight_steering, highlight_chassis_tail,
+    staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-urus-s', 'lamborghini', '兰博基尼 Urus S', NULL, NULL, '2024', '高性能SUV',
@@ -220,6 +235,7 @@ INSERT INTO vehicles (
     '{"zh":"无","ja":"なし"}', '{"zh":"2027（R09）年05月","ja":"2027(R09)年05月"}',
     '{"zh":"整备付","ja":"整備付"}', '{"zh":"附","ja":"付"}',
     '{"zh":"右舵","ja":"右ハンドル"}', '{"zh":"524","ja":"524"}',
+    NULL, NULL, NULL, NULL,
     7, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-s', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus S', 1, 0);
@@ -235,6 +251,7 @@ INSERT INTO vehicles (
     cond_eco_tax_eligible, cond_one_owner, cond_rental_up,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance, listing_periodic_book,
     highlight_steering, highlight_chassis_tail,
+    staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-huracan-sto', 'lamborghini', '兰博基尼 Huracan STO', NULL, NULL, '2022', '中置跑车',
@@ -248,6 +265,7 @@ INSERT INTO vehicles (
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年08月","ja":"2026(R08)年08月"}',
     '{"zh":"无","ja":"なし"}', '{"zh":"附","ja":"付"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"912","ja":"912"}',
+    NULL, NULL, NULL, NULL,
     8, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-sto', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan STO', 1, 0);
@@ -263,6 +281,7 @@ INSERT INTO vehicles (
     cond_eco_tax_eligible, cond_one_owner, cond_rental_up,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance, listing_periodic_book,
     highlight_steering, highlight_chassis_tail,
+    staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-gallardo', 'lamborghini', '兰博基尼 Gallardo', NULL, NULL, '2019', '中置跑车',
@@ -276,6 +295,7 @@ INSERT INTO vehicles (
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年04月","ja":"2026(R08)年04月"}',
     '{"zh":"无","ja":"なし"}', '{"zh":"无","ja":"なし"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"305","ja":"305"}',
+    NULL, NULL, NULL, NULL,
     9, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-gallardo', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '兰博基尼 Gallardo', 1, 0);
@@ -291,6 +311,7 @@ INSERT INTO vehicles (
     cond_eco_tax_eligible, cond_one_owner, cond_rental_up,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance, listing_periodic_book,
     highlight_steering, highlight_chassis_tail,
+    staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-sian-fkp-37', 'lamborghini', '兰博基尼 Sian FKP 37', NULL, NULL, '2021', '混动超跑',
@@ -304,6 +325,7 @@ INSERT INTO vehicles (
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年07月","ja":"2026(R08)年07月"}',
     '{"zh":"整备付","ja":"整備付"}', '{"zh":"附","ja":"付"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"037","ja":"037"}',
+    NULL, NULL, NULL, NULL,
     10, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-sian-fkp-37', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Sian FKP 37', 1, 0);
@@ -319,6 +341,7 @@ INSERT INTO vehicles (
     cond_eco_tax_eligible, cond_one_owner, cond_rental_up,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance, listing_periodic_book,
     highlight_steering, highlight_chassis_tail,
+    staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-urus-performante', 'lamborghini', '兰博基尼 Urus Performante', NULL, NULL, '2023', '高性能SUV',
@@ -332,6 +355,7 @@ INSERT INTO vehicles (
     '{"zh":"无","ja":"なし"}', '{"zh":"2027（R09）年02月","ja":"2027(R09)年02月"}',
     '{"zh":"整备付","ja":"整備付"}', '{"zh":"附","ja":"付"}',
     '{"zh":"右舵","ja":"右ハンドル"}', '{"zh":"801","ja":"801"}',
+    NULL, NULL, NULL, NULL,
     11, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-performante', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus Performante', 1, 0);
@@ -347,6 +371,7 @@ INSERT INTO vehicles (
     cond_eco_tax_eligible, cond_one_owner, cond_rental_up,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance, listing_periodic_book,
     highlight_steering, highlight_chassis_tail,
+    staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-huracan-evo-rwd', 'lamborghini', '兰博基尼 Huracan EVO RWD', NULL, NULL, '2020', '中置跑车',
@@ -360,6 +385,7 @@ INSERT INTO vehicles (
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年05月","ja":"2026(R08)年05月"}',
     '{"zh":"整备付","ja":"整備付"}', '{"zh":"附","ja":"付"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"274","ja":"274"}',
+    NULL, NULL, NULL, NULL,
     12, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo-rwd', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan EVO RWD', 1, 0);

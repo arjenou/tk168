@@ -16,6 +16,8 @@ import {
   uploadVehicleImage,
   deleteVehicleImage,
   reorderVehicleImages,
+  uploadVehicleStaffPhoto,
+  clearVehicleStaffPhoto,
 } from "./vehicles.js";
 import {
   listRentals,
@@ -339,6 +341,20 @@ async function handleApi(request, env, url) {
       const imageId = Number(delMatch[2]);
       await deleteVehicleImage(env, vehicleId, imageId);
       return json({ ok: true });
+    }
+    const staffMatch = /^\/admin\/vehicles\/([^/]+)\/staff-photo$/.exec(path);
+    if (staffMatch && method === "POST") {
+      const vehicleId = decodeURIComponent(staffMatch[1]);
+      const form = await request.formData();
+      const file = form.get("file");
+      if (!(file instanceof File)) return error(400, "no_file");
+      const vehicle = await uploadVehicleStaffPhoto(env, vehicleId, file);
+      return json({ vehicle });
+    }
+    if (staffMatch && method === "DELETE") {
+      const vehicleId = decodeURIComponent(staffMatch[1]);
+      const vehicle = await clearVehicleStaffPhoto(env, vehicleId);
+      return json({ vehicle });
     }
   }
 

@@ -112,6 +112,7 @@ baseVehicles.forEach((v, index) => {
     cond_eco_tax_eligible, cond_one_owner, cond_rental_up,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance, listing_periodic_book,
     highlight_steering, highlight_chassis_tail,
+    staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     ${esc(v.id)}, ${esc(v.brandKey)}, ${esc(v.name)}, ${esc(v.nameJa)}, ${esc(v.nameEn)}, ${esc(v.year)}, ${esc(v.type)},
@@ -125,6 +126,7 @@ baseVehicles.forEach((v, index) => {
     ${presetJson(listing.repairHistory)}, ${presetJson(listing.vehicleInspection)},
     ${presetJson(listing.legalMaintenance)}, ${presetJson(listing.periodicInspectionBook)},
     ${presetJson(highlight.steering)}, ${presetJson(highlight.chassisTail)},
+    NULL, NULL, NULL, NULL,
     ${index}, 1
   );`;
   lines.push(insert);

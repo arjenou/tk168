@@ -105,6 +105,9 @@
       overviewEn: keepMeaningful(v.overviewEn),
       benefits: keepMeaningful(v.benefits),
       features: keepMeaningful(v.features),
+      staffPhoto: keepMeaningful(toAbsoluteMedia(v.staffPhotoUrl)),
+      staffMessage: keepMeaningful(v.staffMessage),
+      staffPhone: keepMeaningful(v.staffPhone),
     };
     const out = {};
     for (const [k, val] of Object.entries(raw)) if (val !== undefined) out[k] = val;

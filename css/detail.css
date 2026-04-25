@@ -1829,10 +1829,33 @@ body.price-help-open {
   pointer-events: none;
 }
 
+.staff-portrait[hidden] {
+  display: none;
+}
+
 .staff-portrait {
   position: absolute;
   inset: 0;
   z-index: 0;
+}
+
+.staff-photo-img {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.staff-photo--custom::before,
+.staff-photo--custom::after {
+  display: none;
+}
+
+.staff-photo--custom .staff-photo-mark {
+  display: none;
 }
 
 .staff-hair,
@@ -1956,6 +1979,24 @@ body.price-help-open {
   color: rgba(43, 41, 38, 0.68);
   margin: 0;
   max-width: 26ch;
+}
+
+.staff-phone {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  max-width: 26ch;
+}
+
+.staff-phone-link {
+  color: rgba(43, 41, 38, 0.85);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(43, 41, 38, 0.22);
+}
+
+.staff-phone-link:hover {
+  border-bottom-color: rgba(43, 41, 38, 0.45);
 }
 
 .featured-section {

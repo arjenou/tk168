@@ -95,6 +95,7 @@ const RESOURCES = {
     apiImages: (id) => `/admin/vehicles/${encodeURIComponent(id)}/images`,
     apiImage: (id, imgId) =>
       `/admin/vehicles/${encodeURIComponent(id)}/images/${imgId}`,
+    apiStaffPhoto: (id) => `/admin/vehicles/${encodeURIComponent(id)}/staff-photo`,
     listKey: "vehicles",
     itemKey: "vehicle",
     duplicateCode: "vehicle_id_taken",
@@ -178,6 +179,10 @@ const RESOURCES = {
       listingPeriodicBook: { zh: "", ja: "", en: "" },
       highlightSteering: { zh: "", ja: "", en: "" },
       highlightChassisTail: { zh: "", ja: "", en: "" },
+      staffPhotoR2Key: null,
+      staffPhotoUrl: null,
+      staffMessage: "",
+      staffPhone: "",
       displayOrder: 0, isPublished: true, images: [],
     }),
   },
@@ -1062,6 +1067,50 @@ function renderJournalContentTab(draft) {
   `;
 }
 
+function renderVehicleStaffSection(draft) {
+  const isNew = state.editingId === "__new__";
+  const hasImg = Boolean(draft.staffPhotoUrl);
+  const imgSrc = hasImg ? escapeAttr(resolveMediaUrlForImg(draft.staffPhotoUrl)) : "";
+  return `
+    <section class="admin-section">
+      <div class="admin-section-head">
+        <h3>员工介绍区（选填）</h3>
+        <p>对应详情页侧栏「スタッフ紹介」。不填时保持默认图标、团队名称与多语言介绍；可只填写部分项目。</p>
+      </div>
+      <div class="admin-field">
+        <label>担当者照片</label>
+        <div class="admin-field-hint" style="margin-bottom:8px;">须先保存本车后再上传。留空为默认插画头像。</div>
+        ${
+          hasImg
+            ? `<div class="admin-cover-preview" style="max-width:120px;max-height:120px;border-radius:12px;"><img src="${imgSrc}" alt=""></div>`
+            : `<div class="admin-cover-preview admin-cover-empty" style="max-width:120px;">无照片</div>`
+        }
+        <div class="admin-upload">
+          <input id="staffPhotoUpload" type="file" accept="image/*" ${isNew ? "disabled" : ""}>
+          <label for="staffPhotoUpload">${isNew ? "保存后可上传" : "选择员工照片"}</label>
+          <div style="margin-top:8px;">
+            <button type="button" class="admin-btn admin-btn-sm admin-btn-ghost" id="staffClearStaffPhoto" ${
+              isNew || !hasImg ? "disabled" : ""
+            }>移除照片</button>
+          </div>
+        </div>
+      </div>
+      <div class="admin-field" style="margin-top:10px;">
+        <label>个人说明</label>
+        <textarea class="admin-textarea" data-draft="staffMessage" rows="3" placeholder="不填则使用前台多语言默认介绍">${escapeHtml(
+          draft.staffMessage ?? "",
+        )}</textarea>
+      </div>
+      <div class="admin-field" style="margin-top:10px;">
+        <label>联系电话</label>
+        <input class="admin-input" data-draft="staffPhone" value="${escapeAttr(
+          draft.staffPhone ?? "",
+        )}" placeholder="不填则不在此区显示（页面底部仍可用店铺总机）">
+      </div>
+    </section>
+  `;
+}
+
 function renderContentTab(r, draft) {
   if (r.listKind === "journal") return renderJournalContentTab(draft);
   const groupsHtml = (r.fieldGroups || [])
@@ -1116,6 +1165,8 @@ function renderContentTab(r, draft) {
         <textarea class="admin-textarea" data-overview="en" placeholder="English overview (optional).">${escapeHtml(overviewEn)}</textarea>
       </div>
     </section>
+
+    ${r.key === "vehicles" ? renderVehicleStaffSection(draft) : ""}
   `;
 }
 
@@ -1520,6 +1571,61 @@ function bindEditor() {
           showToast(`删除失败：${err.message}`, "error");
         }
       });
+    });
+  }
+
+  if (r.key === "vehicles" && typeof r.apiStaffPhoto === "function") {
+    document.getElementById("staffPhotoUpload")?.addEventListener("change", async (event) => {
+      const files = Array.from(event.target.files || []);
+      event.target.value = "";
+      if (files.length === 0) return;
+      if (state.editingId === "__new__") {
+        showToast("请先保存车辆", "error");
+        return;
+      }
+      const file = files[0];
+      try {
+        const form = new FormData();
+        form.append("file", file);
+        const res = await api(r.apiStaffPhoto(state.editingId), { method: "POST", body: form });
+        const vehicle = res.vehicle;
+        state.editingDraft = {
+          ...state.editingDraft,
+          staffPhotoR2Key: vehicle.staffPhotoR2Key,
+          staffPhotoUrl: vehicle.staffPhotoUrl,
+        };
+        const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
+        if (cached) {
+          cached.staffPhotoR2Key = vehicle.staffPhotoR2Key;
+          cached.staffPhotoUrl = vehicle.staffPhotoUrl;
+        }
+        renderEditor();
+        showToast("员工照片已更新");
+      } catch (err) {
+        showToast(`上传失败：${err.message}`, "error");
+      }
+    });
+    document.getElementById("staffClearStaffPhoto")?.addEventListener("click", async () => {
+      if (state.editingId === "__new__") return;
+      if (!confirm("移除员工照片？")) return;
+      try {
+        const res = await api(r.apiStaffPhoto(state.editingId), { method: "DELETE" });
+        const vehicle = res.vehicle;
+        state.editingDraft = {
+          ...state.editingDraft,
+          staffPhotoR2Key: vehicle.staffPhotoR2Key,
+          staffPhotoUrl: vehicle.staffPhotoUrl,
+        };
+        const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
+        if (cached) {
+          cached.staffPhotoR2Key = vehicle.staffPhotoR2Key;
+          cached.staffPhotoUrl = vehicle.staffPhotoUrl;
+        }
+        renderEditor();
+        showToast("已移除员工照片");
+      } catch (err) {
+        showToast(`操作失败：${err.message}`, "error");
+      }
     });
   }
 }

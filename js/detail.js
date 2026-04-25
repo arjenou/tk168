@@ -77,6 +77,13 @@ const FEATURED_SLIDER_NAV_ID = 'detailFeaturedSliderNav';
 const FAVORITES_STORAGE_KEY = 'tk168_favorites';
 const FAVORITES_WINDOW_NAME_KEY = 'tk168_favorites=';
 
+const detailStaffPhoto = document.getElementById('detailStaffPhoto');
+const detailStaffPhotoImg = document.getElementById('detailStaffPhotoImg');
+const detailStaffPortrait = document.getElementById('detailStaffPortrait');
+const detailStaffBio = document.getElementById('detailStaffBio');
+const detailStaffPhone = document.getElementById('detailStaffPhone');
+const detailStaffPhoneLink = document.getElementById('detailStaffPhoneLink');
+
 let currentGalleryIndex = 0;
 let currentThumbOffset = 0;
 let activePriceHelp = '';
@@ -297,6 +304,50 @@ const PRICE_HELP_CONTENT = {
     }
   }
 };
+
+function applyDetailStaffCard() {
+  if (!detailStaffPhoto || !detailStaffBio) return;
+  const phoneRaw = String(currentVehicle?.staffPhone || '').trim();
+  const customBio = String(currentVehicle?.staffMessage || '').trim();
+  const staffPhoto = currentVehicle?.staffPhoto;
+  const photoSrc = staffPhoto
+    ? window.TK168_DATA.resolveVehicleMediaSource(staffPhoto)
+    : '';
+
+  if (photoSrc) {
+    detailStaffPhoto.classList.add('staff-photo--custom');
+    if (detailStaffPhotoImg) {
+      detailStaffPhotoImg.hidden = false;
+      detailStaffPhotoImg.src = photoSrc;
+      detailStaffPhotoImg.alt = '';
+    }
+    if (detailStaffPortrait) detailStaffPortrait.hidden = true;
+  } else {
+    detailStaffPhoto.classList.remove('staff-photo--custom');
+    if (detailStaffPhotoImg) {
+      detailStaffPhotoImg.hidden = true;
+      detailStaffPhotoImg.removeAttribute('src');
+    }
+    if (detailStaffPortrait) detailStaffPortrait.hidden = false;
+  }
+
+  if (customBio) {
+    detailStaffBio.textContent = customBio;
+    detailStaffBio.removeAttribute('data-i18n');
+  } else {
+    detailStaffBio.setAttribute('data-i18n', 'detail.staffBio');
+    const translated = window.TK168I18N?.t('detail.staffBio');
+    if (translated) detailStaffBio.textContent = translated;
+  }
+
+  if (phoneRaw && detailStaffPhone && detailStaffPhoneLink) {
+    detailStaffPhone.hidden = false;
+    detailStaffPhoneLink.href = `tel:${phoneRaw.replace(/\s+/g, '')}`;
+    detailStaffPhoneLink.textContent = phoneRaw;
+  } else if (detailStaffPhone) {
+    detailStaffPhone.hidden = true;
+  }
+}
 
 function formatPriceMarkup(displayPrice = '') {
   const trimmed = String(displayPrice || '').trim();
@@ -1091,6 +1142,7 @@ async function bootstrapDetailPage() {
       renderOverview();
       renderBenefits();
       renderFeatures();
+      applyDetailStaffCard();
       syncLinks();
       renderFeaturedCars();
     } finally {
@@ -1127,6 +1179,7 @@ window.addEventListener('tk168:languagechange', () => {
   renderOverview();
   renderBenefits();
   renderFeatures();
+  applyDetailStaffCard();
   syncLinks();
   renderFeaturedCars();
   if (activePriceHelp) {
