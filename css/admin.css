@@ -223,6 +223,13 @@ button { font: inherit; cursor: pointer; }
   gap: 16px;
   margin-bottom: 22px;
   flex-wrap: wrap;
+  /* Keep title + 保存 in view when scrolling long forms and tables */
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--admin-bg);
+  padding-bottom: 12px;
+  box-shadow: 0 1px 0 var(--admin-border);
 }
 
 .admin-page-head h1 {
