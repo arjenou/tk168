@@ -49,6 +49,11 @@ body {
   overflow-x: hidden;
 }
 
+/* 片头全屏前避免首屏白底闪烁（#loading-screen 为黑） */
+body.is-home-landing {
+  background: #000;
+}
+
 /* Global component scale: keep fullscreen media/background untouched.
    搜索条不使用 CSS zoom，避免与 iOS 聚焦放大 / 双指缩放合成层冲突导致卡顿或缩放残留。 */
 .hero-content,
@@ -256,6 +261,9 @@ img {
   background: #000;
   z-index: 9999;
   transition: opacity 0.9s ease;
+  /* 子元素用绝对定位铺满时，仍保留明确高度 */
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 #loading-screen.fade-out {
@@ -263,15 +271,54 @@ img {
   pointer-events: none;
 }
 
+.loading-screen__brand {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  /* 盖在片头视频上方：未解码时 video 为黑底，若 video 压在上面会整屏全黑 */
+  z-index: 2;
+  width: min(42vw, 200px);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.45s ease;
+}
+
+.loading-screen__brand img {
+  width: 100%;
+  height: auto;
+  display: block;
+  opacity: 0.92;
+  filter: drop-shadow(0 0 32px rgba(242, 250, 90, 0.22));
+}
+
+#loading-screen.is-intro-decoded .loading-screen__brand {
+  opacity: 0;
+}
+
 #intro-video {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  pointer-events: none;
+  /* 首帧解码前 video 常呈现纯黑，盖住下层 logo；等 loadeddata 再渐显 */
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+#loading-screen.is-intro-decoded #intro-video {
+  opacity: 1;
 }
 
 @media (max-width: 760px) {
   #intro-video {
     object-fit: contain;
+  }
+  .loading-screen__brand {
+    width: min(58vw, 180px);
   }
 }
 #navbar {

@@ -61,6 +61,7 @@ let heroVideoInView = true;
 let heroVideoDeferredTimer = 0;
 let heroVideoDeferredArmed = false;
 let introStartedAt = 0;
+let introSafetyTimer = 0;
 
 function hasExplicitHomeHashTarget() {
   if (!window.location.hash || window.location.hash === '#') return false;
@@ -127,10 +128,18 @@ function queueHomeBrandsHashScroll() {
   });
 })();
 
-function resolveWorkerMediaUrl(path) {
+function resolveWorkerMediaUrl(path, options = {}) {
+  const preferApi = options.preferApi === true;
   const raw = String(path || '').trim();
   if (!raw) return '';
   if (/^(?:https?:)?\/\//.test(raw)) return raw.startsWith('//') ? `https:${raw}` : raw;
+  const mediaBase = !preferApi && typeof window.TK168_MEDIA_BASE === 'string' && window.TK168_MEDIA_BASE.trim();
+  if (mediaBase) {
+    const norm = raw.replace(/^\/?api\/media\/?/i, '').replace(/^\/+/, '');
+    if (norm && (raw.startsWith('/api/media/') || raw.toLowerCase().startsWith('api/media/'))) {
+      return `${mediaBase.replace(/\/+$/, '')}/${norm}`;
+    }
+  }
   if (!raw.startsWith('/api/')) return raw;
   const apiBase = (typeof window.TK168_API_BASE === 'string' && window.TK168_API_BASE.trim())
     ? window.TK168_API_BASE
@@ -139,10 +148,12 @@ function resolveWorkerMediaUrl(path) {
   return sameOrigin || !apiBase ? raw : `${apiBase.replace(/\/+$/, '')}${raw}`;
 }
 
-function hydrateIntroVideoSource() {
+function hydrateIntroVideoSource(options = {}) {
   if (!introVideo) return;
-  if (introVideo.currentSrc || introVideo.getAttribute('src')) return;
-  const source = resolveWorkerMediaUrl(introVideo.dataset.src);
+  if (introVideo.currentSrc) return;
+  const raw = introVideo.getAttribute('data-src') || introVideo.getAttribute('src');
+  if (!raw) return;
+  const source = resolveWorkerMediaUrl(raw, options);
   if (!source) return;
   introVideo.src = source;
   introVideo.load();
@@ -230,6 +241,11 @@ let isMainShown = false;
 function showMain({ immediate = false } = {}) {
   if (isMainShown) return;
   isMainShown = true;
+  if (introSafetyTimer) {
+    window.clearTimeout(introSafetyTimer);
+    introSafetyTimer = 0;
+  }
+  document.body.classList.remove('is-home-landing');
   forceHomeScrollTop();
   mainContent.classList.remove('hidden');
   forceHomeScrollTop();
@@ -269,13 +285,61 @@ if (shouldSkipIntroOnce() || hasIntroBeenSeenThisSession()) {
   showMain({ immediate: true });
 } else {
   introStartedAt = window.performance?.now?.() || Date.now();
+  introVideo?.addEventListener('loadeddata', () => {
+    loadingScreen?.classList.add('is-intro-decoded');
+  }, { once: true });
   hydrateIntroVideoSource();
-  introVideo?.addEventListener('ended', completeIntro);
-  loadingScreen?.addEventListener('click', requestIntroDismiss);
-  setTimeout(completeIntro, 4000);
-  introVideo?.play().catch(() => {
+  let introEndedBound = false;
+  function bindIntroEnded() {
+    if (introEndedBound) return;
+    introEndedBound = true;
+    introVideo?.addEventListener('ended', completeIntro, { once: true });
+  }
+  bindIntroEnded();
+  let introLoadFallbackTried = false;
+  introVideo?.addEventListener('error', function onIntroError() {
+    if (!introLoadFallbackTried && window.TK168_MEDIA_BASE) {
+      introLoadFallbackTried = true;
+      introVideo.removeEventListener('error', onIntroError);
+      introVideo.removeAttribute('src');
+      hydrateIntroVideoSource({ preferApi: true });
+      bindIntroEnded();
+      introVideo.addEventListener('error', () => {
+        markIntroSeenThisSession();
+        showMain({ immediate: true });
+      }, { once: true });
+      introVideo.play().catch(() => {});
+      return;
+    }
     markIntroSeenThisSession();
     showMain({ immediate: true });
+  });
+  loadingScreen?.addEventListener('click', requestIntroDismiss);
+  introSafetyTimer = window.setTimeout(() => {
+    markIntroSeenThisSession();
+    showMain({ immediate: true });
+  }, 120000);
+  introVideo?.play().catch(() => {
+    if (!introVideo) return;
+    if (introVideo.error) {
+      markIntroSeenThisSession();
+      showMain({ immediate: true });
+      return;
+    }
+    window.setTimeout(() => {
+      if (!introVideo) return;
+      if (introVideo.error) {
+        markIntroSeenThisSession();
+        showMain({ immediate: true });
+        return;
+      }
+      introVideo.play().catch(() => {
+        if (introVideo?.error) {
+          markIntroSeenThisSession();
+          showMain({ immediate: true });
+        }
+      });
+    }, 300);
   });
 }
 

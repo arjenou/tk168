@@ -122,6 +122,10 @@ body.rental-page {
   color: var(--rental-text-sub);
 }
 
+.rental-section--fleet .rental-section-head--fleet {
+  margin-bottom: 48px;
+}
+
 .rental-overview-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.04fr) minmax(0, 0.96fr);
@@ -635,6 +639,10 @@ html:lang(ja) .rental-page :is(.rental-hero-title, .rental-section-head h2, h3) 
   .rental-section-head {
     margin-bottom: 20px;
     padding-inline-start: 0;
+  }
+
+  .rental-section--fleet .rental-section-head--fleet {
+    margin-bottom: 32px;
   }
 
   .rental-section-head h2 {

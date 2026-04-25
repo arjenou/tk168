@@ -216,6 +216,7 @@ async function handleApi(request, env, url) {
     object.writeHttpMetadata(headers);
     headers.set("etag", object.httpEtag);
     headers.set("cache-control", "public, max-age=31536000, immutable");
+    headers.set("access-control-allow-origin", "*");
     return new Response(object.body, { headers });
   }
 
