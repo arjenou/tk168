@@ -11,6 +11,7 @@ window.TK168CommonLinks?.applyCommonLinks();
 const detailContext = window.TK168InventoryContext.createDetailContext(window.location.search);
 const requestedVehicleId = detailContext.requestedVehicleId;
 let currentVehicle = detailContext.currentVehicle;
+const isRentalDetail = detailContext.isRentalDetail;
 const currentBrand = detailContext.currentBrand;
 const currentFilters = detailContext.filters;
 const hasActiveFilters = detailContext.hasActiveFilters;
@@ -1124,16 +1125,19 @@ async function bootstrapDetailPage() {
     Boolean(requestedVehicleId) && currentVehicle?.id === requestedVehicleId;
 
   function applyCanonicalUrl() {
+    if (!currentVehicle) return;
     if (requestedVehicleId && currentVehicle.id !== requestedVehicleId) {
+      const urlFilters = isRentalDetail ? { ...currentFilters, from: 'rental' } : currentFilters;
       window.history.replaceState(
         {},
         '',
-        window.TK168_DATA.buildDetailUrl(currentVehicle.id, currentFilters)
+        window.TK168_DATA.buildDetailUrl(currentVehicle.id, urlFilters)
       );
     }
   }
 
   function renderAll() {
+    if (!currentVehicle) return;
     try {
       applyCanonicalUrl();
       renderVehicleHeader();
@@ -1148,6 +1152,24 @@ async function bootstrapDetailPage() {
     } finally {
       detailShell?.classList.remove('detail-shell--hydrating');
     }
+  }
+
+  if (isRentalDetail) {
+    if (tryLive) {
+      const flat = await window.TK168ApiHydrate?.fetchPublishedRentalById?.(requestedVehicleId);
+      const merged = flat && window.TK168_DATA.mergeApiRentalWithBase?.(flat);
+      if (merged) {
+        currentVehicle = merged;
+        renderAll();
+        return;
+      }
+    }
+    if (hasLocalMatch) {
+      renderAll();
+    } else {
+      detailShell?.classList.remove('detail-shell--hydrating');
+    }
+    return;
   }
 
   if (hasLocalMatch) {

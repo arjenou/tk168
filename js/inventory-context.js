@@ -28,6 +28,7 @@ window.TK168InventoryContext = (() => {
   function createDetailContext(search) {
     const {
       getVehicleById,
+      getRentalVehicleDetailById,
       getBrandByKey,
       vehicles,
       parseInventoryFilters,
@@ -39,6 +40,7 @@ window.TK168InventoryContext = (() => {
 
     const params = new URLSearchParams(search);
     const requestedVehicleId = (params.get('id') || '').trim();
+    const isRentalDetail = params.get('from') === 'rental';
 
     // Resolution order when the query id can't be found:
     //   1. same id minus the `-catalog` suffix — catalog entries are
@@ -64,34 +66,44 @@ window.TK168InventoryContext = (() => {
       getVehicleById(SITE_DEFAULT_ID) ||
       (Array.isArray(vehicles) ? vehicles[0] : null);
 
-    let currentVehicle = requestedVehicleId ? getVehicleById(requestedVehicleId) : null;
-    if (!currentVehicle && requestedVehicleId.endsWith('-catalog')) {
-      const trimmed = requestedVehicleId.replace(/-catalog$/, '');
-      currentVehicle = getVehicleById(trimmed) || null;
-      if (!currentVehicle) {
-        const parts = trimmed.split('-');
-        if (parts.length > 0) currentVehicle = findRealBrandMatch(parts[0]);
+    let currentVehicle = null;
+    if (isRentalDetail) {
+      if (requestedVehicleId) {
+        currentVehicle = getRentalVehicleDetailById(requestedVehicleId);
       }
+    } else {
+      currentVehicle = requestedVehicleId ? getVehicleById(requestedVehicleId) : null;
+      if (!currentVehicle && requestedVehicleId && requestedVehicleId.endsWith('-catalog')) {
+        const trimmed = requestedVehicleId.replace(/-catalog$/, '');
+        currentVehicle = getVehicleById(trimmed) || null;
+        if (!currentVehicle) {
+          const parts = trimmed.split('-');
+          if (parts.length > 0) currentVehicle = findRealBrandMatch(parts[0]);
+        }
+      }
+      if (!currentVehicle) currentVehicle = firstRealVehicle();
+      if (!currentVehicle) currentVehicle = getVehicleById(SITE_DEFAULT_ID);
     }
-    if (!currentVehicle) currentVehicle = firstRealVehicle();
-    if (!currentVehicle) currentVehicle = getVehicleById(SITE_DEFAULT_ID);
 
     const currentBrand = getBrandByKey(currentVehicle?.brandKey);
     const filters = parseInventoryFilters(search);
     const activeFilterCount = countActiveFilters(filters);
     const hasActiveFilters = activeFilterCount > 0;
 
+    const filterPayload = { ...filters, ...(isRentalDetail ? { from: 'rental' } : {}) };
+
     return {
       requestedVehicleId: requestedVehicleId || (currentVehicle?.id ?? ''),
       currentVehicle,
+      isRentalDetail,
       currentBrand,
-      filters,
+      filters: filterPayload,
       activeFilterCount,
       hasActiveFilters,
       inventoryHref: hasActiveFilters
         ? buildInventoryUrl(filters)
         : buildBrandUrl(currentBrand?.key || currentVehicle?.brandKey || ''),
-      canonicalDetailUrl: buildDetailUrl(currentVehicle?.id || '', filters)
+      canonicalDetailUrl: buildDetailUrl(currentVehicle?.id || '', filterPayload)
     };
   }
 

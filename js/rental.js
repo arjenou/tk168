@@ -265,8 +265,8 @@ function buildInquiryHref(vehicle) {
 
 function buildVehicleCardHtml(vehicle, language) {
   const detailUrl = typeof buildDetailUrl === 'function'
-    ? buildDetailUrl(vehicle.id)
-    : `detail.html?id=${encodeURIComponent(vehicle.id)}`;
+    ? buildDetailUrl(vehicle.id, { from: 'rental' })
+    : `detail.html?id=${encodeURIComponent(vehicle.id)}&from=rental`;
 
   if (typeof buildInventoryCardHTML === 'function') {
     return `
@@ -314,8 +314,8 @@ function hydrateRentalVehicleCard(card, vehicle, language) {
   const fuel = getVehicleFieldLabel('fuel', vehicle.fuel, language);
   const inquiryHref = buildInquiryHref(vehicle);
   const detailUrl = typeof buildDetailUrl === 'function'
-    ? buildDetailUrl(vehicle.id)
-    : `detail.html?id=${encodeURIComponent(vehicle.id)}`;
+    ? buildDetailUrl(vehicle.id, { from: 'rental' })
+    : `detail.html?id=${encodeURIComponent(vehicle.id)}&from=rental`;
 
   card.dataset.detailUrl = detailUrl;
   card.removeAttribute('onclick');

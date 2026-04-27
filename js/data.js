@@ -2090,6 +2090,28 @@ window.TK168_DATA = (() => {
     return list.find((r) => r && r.id === id) || null;
   }
 
+  /** レンタル専用テーブル由来の1台を、詳細HTMLが期待する車両形に整形（在庫車 getVehicleById とは分離） */
+  function getRentalVehicleDetailById(id) {
+    const r = getApiRentalById(String(id || '').trim());
+    return r ? buildRentalVehicleRecord(r) : null;
+  }
+
+  /** 単体取得の生データを `TK168_API_RENTALS` に突き合わせたうえで詳細用レコードを返す */
+  function mergeApiRentalWithBase(flat) {
+    if (!flat || !flat.id) return null;
+    const list = getApiRentals();
+    if (list) {
+      const next = list.map((r) => (r && r.id === flat.id ? { ...r, ...flat } : r));
+      if (!next.some((r) => r && r.id === flat.id)) {
+        next.push(flat);
+      }
+      window.TK168_API_RENTALS = next;
+    } else {
+      window.TK168_API_RENTALS = [flat];
+    }
+    return getRentalVehicleDetailById(flat.id);
+  }
+
   function getVehicleRentalProfile(vehicleOrId) {
     const vehicleId = typeof vehicleOrId === 'string' ? vehicleOrId : vehicleOrId?.id;
     if (!vehicleId) {
@@ -2273,7 +2295,9 @@ window.TK168_DATA = (() => {
       priceMetric: params.get('priceMetric') === 'base' ? 'base' : 'total',
       year: params.get('year') || '',
       mileage: params.get('mileage') || '',
-      keyword: (params.get('keyword') || '').trim()
+      keyword: (params.get('keyword') || '').trim(),
+      /** レンタル在庫の詳細: 在庫車 id と衝突させない */
+      from: params.get('from') === 'rental' ? 'rental' : ''
     };
 
     if (filters.brand && !getBrandByKey(filters.brand)) filters.brand = '';
@@ -2449,7 +2473,8 @@ window.TK168_DATA = (() => {
       priceMetric: filters.price ? (filters.priceMetric === 'base' ? 'base' : '') : '',
       year: filters.year || '',
       mileage: filters.mileage || '',
-      keyword: String(filters.keyword || '').trim()
+      keyword: String(filters.keyword || '').trim(),
+      from: filters.from === 'rental' ? 'rental' : ''
     };
 
     Object.entries(normalized).forEach(([key, value]) => {
@@ -2512,6 +2537,8 @@ window.TK168_DATA = (() => {
     buildBrandUrl,
     buildDetailUrl,
     mergeApiVehicleWithBase,
+    getRentalVehicleDetailById,
+    mergeApiRentalWithBase,
     refreshVehiclesFromApiHydrate,
     refreshJournalFromApiHydrate
   };
