@@ -557,7 +557,7 @@ function renderLogin() {
     <div class="admin-login">
       <div class="admin-login-card">
         <div class="admin-brand">TK168 Admin</div>
-        <div class="admin-brand-sub">车辆内容后台 · Cloudflare Workers</div>
+        <div class="admin-brand-sub">车辆内容后台</div>
         <form id="loginForm">
           <div class="admin-field">
             <label for="loginUser">用户名</label>
