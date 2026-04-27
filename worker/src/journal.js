@@ -240,7 +240,22 @@ export async function clearJournalCover(env, journalId) {
   return getJournalEntry(env, journalId);
 }
 
+async function insertJournalStubIfMissing(env, id) {
+  const exists = await env.DB.prepare("SELECT id FROM journal_entries WHERE id = ?").bind(id).first();
+  if (exists) return;
+  try {
+    await env.DB.prepare(
+      `INSERT INTO journal_entries (id, is_published, display_order) VALUES (?, 0, 0)`,
+    )
+      .bind(id)
+      .run();
+  } catch (err) {
+    if (!/UNIQUE/i.test(String(err?.message || ""))) throw err;
+  }
+}
+
 export async function uploadJournalCover(env, journalId, file) {
+  await insertJournalStubIfMissing(env, journalId);
   const exists = await env.DB.prepare("SELECT id, image_r2_key FROM journal_entries WHERE id = ?")
     .bind(journalId)
     .first();

@@ -7,6 +7,24 @@
 // `createResource(descriptor)` exposes the same set of handlers that
 // `src/index.js` wired up for vehicles.
 
+/**
+ * Insert a minimal inventory row so image/staff uploads can run before the
+ * operator submits the full admin form. `brand_key` / `name` are empty until save.
+ */
+export async function insertInventoryStubIfMissing(env, table, id) {
+  const exists = await env.DB.prepare(`SELECT id FROM ${table} WHERE id = ?`).bind(id).first();
+  if (exists) return;
+  try {
+    await env.DB.prepare(
+      `INSERT INTO ${table} (id, brand_key, name, is_published, display_order) VALUES (?, '', '', 0, 0)`,
+    )
+      .bind(id)
+      .run();
+  } catch (err) {
+    if (!/UNIQUE/i.test(String(err?.message || ""))) throw err;
+  }
+}
+
 export function createResource({
   table,                 // main table name, e.g. "vehicles"
   imagesTable,           // image table name, e.g. "vehicle_images"
@@ -19,6 +37,8 @@ export function createResource({
   numericFields,         // array of snake_case columns coerced to integers
   notFoundCode,          // e.g. "vehicle_not_found"
   duplicateCode,         // e.g. "vehicle_id_taken"
+  /** When true, first image upload creates a stub row if the id is not in DB yet. */
+  stubBeforeUpload = false,
 }) {
   const reverse = Object.fromEntries(
     Object.entries(fieldMap).map(([c, s]) => [s, c]),
@@ -187,8 +207,12 @@ export function createResource({
   }
 
   async function uploadImage(env, resourceId, file, { alt = "" } = {}) {
-    const exists = await env.DB.prepare(`SELECT id FROM ${table} WHERE id = ?`)
+    let exists = await env.DB.prepare(`SELECT id FROM ${table} WHERE id = ?`)
       .bind(resourceId).first();
+    if (!exists && stubBeforeUpload) {
+      await insertInventoryStubIfMissing(env, table, resourceId);
+      exists = await env.DB.prepare(`SELECT id FROM ${table} WHERE id = ?`).bind(resourceId).first();
+    }
     if (!exists) {
       const err = new Error(notFoundCode);
       err.status = 404;

@@ -3,7 +3,7 @@
 // inventories.  Field set is a rental-focused subset of the vehicle schema
 // with extra pricing + status columns.
 
-import { createResource } from "./resource.js";
+import { createResource, insertInventoryStubIfMissing } from "./resource.js";
 
 const RENTAL_COLUMNS = [
   "id", "brand_key", "name", "name_ja", "name_en", "year", "type", "icon",
@@ -71,6 +71,7 @@ const rentalResource = createResource({
   requiredFields: ["id", "brandKey", "name"],
   notFoundCode: "rental_not_found",
   duplicateCode: "rental_id_taken",
+  stubBeforeUpload: true,
 });
 
 export const listRentals = rentalResource.list;
@@ -102,6 +103,7 @@ function safeExt(contentType, filename) {
 
 /** 租赁车辆员工照片，R2 前缀为 `rentals/…` */
 export async function uploadRentalStaffPhoto(env, rentalId, file) {
+  await insertInventoryStubIfMissing(env, "rentals", rentalId);
   const exists = await env.DB.prepare("SELECT id, staff_photo_r2_key FROM rentals WHERE id = ?")
     .bind(rentalId)
     .first();

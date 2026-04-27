@@ -2,7 +2,7 @@
 // Each vehicle is backed by rows in `vehicles` + `vehicle_images` and R2
 // objects under the `vehicles/` prefix.
 
-import { createResource } from "./resource.js";
+import { createResource, insertInventoryStubIfMissing } from "./resource.js";
 
 const VEHICLE_COLUMNS = [
   "id", "brand_key", "name", "name_ja", "name_en", "year", "type", "icon",
@@ -89,6 +89,7 @@ const vehicleResource = createResource({
   requiredFields: ["id", "brandKey", "name"],
   notFoundCode: "vehicle_not_found",
   duplicateCode: "vehicle_id_taken",
+  stubBeforeUpload: true,
 });
 
 export const listVehicles = vehicleResource.list;
@@ -129,6 +130,7 @@ function safeExt(contentType, filename) {
 
 /** Replace staff portrait image; previous R2 object is removed. */
 export async function uploadVehicleStaffPhoto(env, vehicleId, file) {
+  await insertInventoryStubIfMissing(env, "vehicles", vehicleId);
   const exists = await env.DB.prepare("SELECT id, staff_photo_r2_key FROM vehicles WHERE id = ?")
     .bind(vehicleId)
     .first();

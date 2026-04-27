@@ -413,6 +413,8 @@ const state = {
   items: { vehicles: [], rentals: [], journal: [] },
   users: [],
   editingId: null,
+  /** True while creating a row that has not been successfully saved to the list yet. */
+  editingIsNew: false,
   editingDraft: null,
   /** 右侧图库：当前大图预览对应的图片 id（null 则显示封面/首图） */
   editingImagePreviewId: null,
@@ -431,6 +433,22 @@ function resolveAsidePreviewImage(draft) {
     if (hit) return hit;
   }
   return imgs.find((i) => i.isPrimary) || imgs[0];
+}
+
+/** 新建未保存就返回列表时：若服务端仍是空占位（未发布、无图、无员工照、无有效标题/车型信息），则删除以免列表里留下垃圾行。 */
+function shouldAbandonNewDraft(r, item) {
+  if (!item || item.isPublished) return false;
+  if (r.listKind === "journal") {
+    const zh = String(item.titleZh || "").trim();
+    const ja = String(item.titleJa || "").trim();
+    const hasCover = Boolean(item.imageUrl || (item.images && item.images.length));
+    return !hasCover && !zh && !ja;
+  }
+  const imgs = item.images || [];
+  const hasStaff = Boolean(item.staffPhotoUrl);
+  const brand = String(item.brandKey || "").trim();
+  const name = String(item.name || "").trim();
+  return imgs.length === 0 && !hasStaff && !brand && !name;
 }
 
 function currentResource() {
@@ -639,6 +657,7 @@ function bindShell() {
     btn.addEventListener("click", async () => {
       const target = btn.dataset.nav;
       state.editingId = null;
+      state.editingIsNew = false;
       state.editingDraft = null;
       state.filter = "";
       if (target === "vehicles-list") {
@@ -782,8 +801,10 @@ function renderList() {
   });
 
   document.getElementById("newItemBtn")?.addEventListener("click", () => {
-    state.editingId = "__new__";
+    state.editingIsNew = true;
+    state.editingId = generateInventoryId(r.key);
     const draft = r.emptyDraft();
+    draft.id = state.editingId;
     draft.displayOrder = (state.items[r.key] || []).length;
     state.editingDraft = draft;
     state.editingImagePreviewId = null;
@@ -973,6 +994,7 @@ function bindRowActions() {
       const id = btn.dataset.edit;
       const item = (state.items[r.key] || []).find((v) => v.id === id);
       if (!item) return;
+      state.editingIsNew = false;
       state.editingId = id;
       state.editingDraft = { ...item, images: [...(item.images || [])] };
       state.editingImagePreviewId = null;
@@ -1393,7 +1415,6 @@ function renderJournalContentTab(draft) {
 }
 
 function renderVehicleStaffSection(draft) {
-  const isNew = state.editingId === "__new__";
   const hasImg = Boolean(draft.staffPhotoUrl);
   const imgSrc = hasImg ? escapeAttr(resolveMediaUrlForImg(draft.staffPhotoUrl)) : "";
   return `
@@ -1404,34 +1425,27 @@ function renderVehicleStaffSection(draft) {
       </div>
       <div class="admin-field">
         <label>担当者照片</label>
-        <div class="admin-field-hint" style="margin-bottom:8px;">${
-          isNew
-            ? "请先保存本车，再点左侧方格上传；留空为默认头像。"
-            : "点击方格选择图片；有图时右上角可移除。留空为默认头像。"
-        }</div>
+        <div class="admin-field-hint" style="margin-bottom:8px;">点击方格选择图片；有图时右上角可移除。留空为默认头像。</div>
         <div class="admin-staff-photo">
           <input
             class="admin-staff-file"
             id="staffPhotoUpload"
             type="file"
             accept="image/*"
-            ${isNew ? "disabled" : ""}
             aria-label="选择员工照片"
           >
           <label
             for="staffPhotoUpload"
-            class="admin-staff-tile${isNew ? " admin-staff-tile--disabled" : ""}"
+            class="admin-staff-tile"
           >
             ${
               hasImg
                 ? `<img class="admin-staff-tile-img" src="${imgSrc}" alt="" loading="lazy" decoding="async">`
-                : `<span class="admin-staff-tile-placeholder">${
-                    isNew ? "先保存" : "无照片"
-                  }<br><span class="admin-staff-tile-hint">${isNew ? "后上传" : "点击上传"}</span></span>`
+                : `<span class="admin-staff-tile-placeholder">无照片<br><span class="admin-staff-tile-hint">点击上传</span></span>`
             }
           </label>
           ${
-            hasImg && !isNew
+            hasImg
               ? `<button
                   type="button"
                   class="admin-staff-remove"
@@ -1581,7 +1595,7 @@ function renderSpecsTab(r, draft) {
   `;
 }
 
-function renderPublishTab(r, draft, isNew) {
+function renderPublishTab(r, draft) {
   const sortField = r.homeDragSort
     ? ""
     : `
@@ -1600,7 +1614,7 @@ function renderPublishTab(r, draft, isNew) {
     <section class="admin-section">
       <div class="admin-section-head">
         <h3>${r.homeDragSort ? "发布" : "发布与排序"}</h3>
-        <p>系统会在保存时自动生成内部${escapeHtml(r.label)}标识（不在界面显示）。</p>
+        <p>新增时系统已生成内部标识；保存写入数据库后前台才按发布状态展示（标识不在前台文案中显示）。</p>
       </div>
       <div class="admin-grid-12">
         <div class="admin-field admin-col-6">
@@ -1618,11 +1632,6 @@ function renderPublishTab(r, draft, isNew) {
         ${orderHint}
         ${sortField}
       </div>
-      ${isNew && r.listKind === "journal"
-        ? '<div class="admin-message" style="margin-top:14px;">保存条目标后可于右侧上传封面图。</div>'
-        : isNew
-          ? '<div class="admin-message" style="margin-top:14px;">新车辆保存后再回来上传图片。</div>'
-          : ""}
     </section>
   `;
 }
@@ -1630,7 +1639,7 @@ function renderPublishTab(r, draft, isNew) {
 function renderEditor() {
   const r = currentResource();
   const draft = state.editingDraft;
-  const isNew = state.editingId === "__new__";
+  const isNew = state.editingIsNew;
 
   const availableTabs = EDITOR_TABS.filter(
     (t) =>
@@ -1654,7 +1663,7 @@ function renderEditor() {
   else if (state.editorTab === "staff")
     tabBody =
       r.key === "vehicles" || r.key === "rentals" ? renderVehicleStaffSection(draft) : "";
-  else if (state.editorTab === "publish") tabBody = renderPublishTab(r, draft, isNew);
+  else if (state.editorTab === "publish") tabBody = renderPublishTab(r, draft);
 
   const primaryImage = (draft.images || []).find((i) => i.isPrimary) || (draft.images || [])[0];
   const imageCount = (draft.images || []).length;
@@ -1666,11 +1675,13 @@ function renderEditor() {
       ? (draft.titleZh || draft.titleJa || draft.titleEn || "未命名")
       : (draft.name || draft.nameJa || draft.nameEn || "未命名");
   const editorSub =
-    r.listKind === "journal" && !isNew && (draft.dateLabel || draft.id)
+    r.listKind === "journal" && (draft.dateLabel || draft.id)
       ? `<div class="admin-subtle">${[draft.dateLabel, draft.id].filter(Boolean).map(escapeHtml).join(" · ")}</div>`
       : !isNew && (draft.brandKey || draft.year)
         ? `<div class="admin-subtle">${[draft.brandKey, draft.year].filter(Boolean).map(escapeHtml).join(" · ")}</div>`
-        : "";
+        : isNew && draft.id && r.listKind !== "journal"
+          ? `<div class="admin-subtle">${escapeHtml(draft.id)}</div>`
+          : "";
   const asideBlock =
     r.listKind === "journal"
       ? `<aside class="admin-editor-aside">
@@ -1683,11 +1694,11 @@ function renderEditor() {
           }
           <div class="admin-cover-meta">首页大卡片与关于页主卡共用此图</div>
           <div class="admin-upload">
-            <input id="imageUpload" type="file" accept="image/*" ${isNew ? "disabled" : ""}>
-            <label for="imageUpload">${isNew ? "保存后可上传" : "选择一张封面图"}</label>
+            <input id="imageUpload" type="file" accept="image/*">
+            <label for="imageUpload">选择一张封面图</label>
             <div style="margin-top:8px;">
               <button type="button" class="admin-btn admin-btn-sm admin-btn-ghost" id="journalClearCover" ${
-                isNew || !primaryImage ? "disabled" : ""
+                !primaryImage ? "disabled" : ""
               }>移除封面</button>
             </div>
             <div style="margin-top:8px;color:var(--admin-text-dim);font-size:12px;">JPG / PNG / WEBP / AVIF，建议 5MB 以内</div>
@@ -1720,8 +1731,8 @@ function renderEditor() {
             ${(draft.images || []).map((im) => imageTile(im, selectedThumbId)).join("")}
           </div>
           <div class="admin-upload">
-            <input id="imageUpload" type="file" accept="image/*" multiple ${isNew ? "disabled" : ""}>
-            <label for="imageUpload">${isNew ? "保存后可上传" : "选择图片上传（可多选）"}</label>
+            <input id="imageUpload" type="file" accept="image/*" multiple>
+            <label for="imageUpload">选择图片上传（可多选）</label>
             <div style="margin-top:8px;color:var(--admin-text-dim);font-size:12px;">JPG / PNG / WEBP / AVIF，单张建议 5MB 以内</div>
           </div>
         </section>
@@ -1769,12 +1780,30 @@ function imageTile(img, selectedPreviewId) {
 
 function bindEditor() {
   const r = currentResource();
-  document.getElementById("cancelEdit").addEventListener("click", () => {
+  document.getElementById("cancelEdit").addEventListener("click", async () => {
+    const abandonId = state.editingIsNew ? state.editingId : null;
     state.view = "list";
     state.editingId = null;
+    state.editingIsNew = false;
     state.editingDraft = null;
     state.editingImagePreviewId = null;
     state.editorTab = "content";
+    if (abandonId) {
+      try {
+        const res = await api(r.apiItem(abandonId));
+        const item = res[r.itemKey];
+        if (shouldAbandonNewDraft(r, item)) {
+          await api(r.apiItem(abandonId), { method: "DELETE" });
+        }
+      } catch {
+        /* 404：尚未写入过数据库 */
+      }
+      try {
+        await refreshItems();
+      } catch {
+        /* 列表刷新失败时仍回到列表页 */
+      }
+    }
     render();
   });
 
@@ -1884,10 +1913,6 @@ function bindEditor() {
       const files = Array.from(event.target.files || []);
       event.target.value = "";
       if (files.length === 0) return;
-      if (state.editingId === "__new__") {
-        showToast("请先保存条目", "error");
-        return;
-      }
       const file = files[0];
       try {
         const form = new FormData();
@@ -1904,7 +1929,6 @@ function bindEditor() {
       }
     });
     document.getElementById("journalClearCover")?.addEventListener("click", async () => {
-      if (state.editingId === "__new__") return;
       if (!confirm("移除封面？")) return;
       try {
         const res = await api(r.apiCover(state.editingId), { method: "DELETE" });
@@ -1923,10 +1947,6 @@ function bindEditor() {
       const files = Array.from(event.target.files || []);
       event.target.value = "";
       if (files.length === 0) return;
-      if (state.editingId === "__new__") {
-        showToast("请先保存再上传图片", "error");
-        return;
-      }
       try {
         const form = new FormData();
         for (const file of files) form.append("file", file);
@@ -1964,7 +1984,6 @@ function bindEditor() {
 
     if (typeof r.apiImagesReorder === "function") {
       document.getElementById("adminSetCoverBtn")?.addEventListener("click", async () => {
-        if (state.editingId === "__new__") return;
         const preview = resolveAsidePreviewImage(state.editingDraft);
         if (!preview || preview.isPrimary) return;
         const imgs = state.editingDraft.images || [];
@@ -2002,10 +2021,6 @@ function bindEditor() {
       const files = Array.from(event.target.files || []);
       event.target.value = "";
       if (files.length === 0) return;
-      if (state.editingId === "__new__") {
-        showToast("请先保存本记录", "error");
-        return;
-      }
       const file = files[0];
       try {
         const form = new FormData();
@@ -2029,7 +2044,6 @@ function bindEditor() {
       }
     });
     document.getElementById("staffClearStaffPhoto")?.addEventListener("click", async () => {
-      if (state.editingId === "__new__") return;
       if (!confirm("移除员工照片？")) return;
       try {
         const res = await api(r.apiStaffPhoto(state.editingId), { method: "DELETE" });
@@ -2074,32 +2088,26 @@ async function saveItem() {
   });
   delete payload.images;
   try {
-    if (state.editingId === "__new__") {
-      let created = null;
-      let lastDup = null;
-      for (let attempt = 0; attempt < 12; attempt++) {
-        payload.id = generateInventoryId(r.key);
-        try {
-          const res = await api(r.apiList, { method: "POST", body: payload });
-          created = res[r.itemKey];
-          break;
-        } catch (err) {
-          if (err.code === r.duplicateCode) {
-            lastDup = err;
-            continue;
-          }
+    if (state.editingIsNew) {
+      payload.id = state.editingId;
+      let saved = null;
+      try {
+        const res = await api(r.apiList, { method: "POST", body: payload });
+        saved = res[r.itemKey];
+      } catch (err) {
+        if (err.code === r.duplicateCode) {
+          const res = await api(r.apiItem(state.editingId), { method: "PUT", body: payload });
+          saved = res[r.itemKey];
+        } else {
           throw err;
         }
       }
-      if (!created) {
-        showToast(lastDup ? "创建失败：ID 冲突，请稍后再试" : "创建失败", "error");
-        return;
-      }
-      state.editingId = created.id;
-      state.editingDraft = { ...created, images: created.images || [] };
-      showToast(
-        r.listKind === "journal" ? "已创建。可在右侧上传封面图。" : "已创建。现在可以上传图片。",
-      );
+      state.editingIsNew = false;
+      state.editingDraft = {
+        ...saved,
+        images: saved.images || state.editingDraft.images || [],
+      };
+      showToast("已创建");
     } else {
       const res = await api(r.apiItem(state.editingId), {
         method: "PUT",
