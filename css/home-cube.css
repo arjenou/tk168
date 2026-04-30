@@ -270,9 +270,11 @@
   align-items: center;
   justify-content: flex-start;
   gap: var(--thumb-gap);
-  overflow: visible;
+  overflow-x: auto;
   overflow-y: visible;
-  padding: 0;
+  padding: 0 0.12rem;
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain;
   pointer-events: auto;
   scrollbar-width: none;
   background: transparent;
@@ -284,8 +286,10 @@
 }
 #brands .lisboa-thumb {
   position: relative;
-  flex: 1 1 0;
-  min-width: 0;
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 6.85rem;
+  max-width: 9.25rem;
   height: var(--thumb-height);
   margin-top: 0;
   padding: 0.64rem 0.74rem 0.58rem;
@@ -635,6 +639,9 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  #brands .lisboa-thumbs {
+    scroll-behavior: auto;
+  }
   #brands .lisboa-thumb,
   #brands .lisboa-thumb::after,
   #brands .lisboa-thumb.is-active::before,
