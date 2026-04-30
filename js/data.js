@@ -289,7 +289,7 @@ window.TK168_DATA = (() => {
   const libraryVehicleCatalogPresets = {
     exotic: {
       typeOptions: ['中置跑车', 'GT跑车', 'V12超跑'],
-      bodyStyleOptions: ['双门跑车'],
+      bodyStyleOptions: ['跑车', '超跑', '敞篷车'],
       engineOptions: ['3.9L V8', '5.2L V10', '6.5L V12'],
       fuelOptions: ['汽油'],
       driveOptions: ['后轮驱动', '四轮驱动'],
@@ -301,7 +301,7 @@ window.TK168_DATA = (() => {
     },
     gt: {
       typeOptions: ['GT跑车', '双门轿跑'],
-      bodyStyleOptions: ['双门跑车', '双门轿跑'],
+      bodyStyleOptions: ['跑车', '双门轿跑', '敞篷车'],
       engineOptions: ['3.0L V6', '4.0L V8', '5.2L V10'],
       fuelOptions: ['汽油'],
       driveOptions: ['后轮驱动', '四轮驱动'],
@@ -313,7 +313,7 @@ window.TK168_DATA = (() => {
     },
     suv: {
       typeOptions: ['豪华SUV', '高性能SUV', '越野SUV', '轿跑SUV'],
-      bodyStyleOptions: ['豪华SUV', '高性能 SUV', '越野SUV', '轿跑SUV'],
+      bodyStyleOptions: ['SUV', '越野车'],
       engineOptions: ['2.0L Turbo', '3.0L V6', '3.5L V6 Hybrid', '4.0L V8'],
       fuelOptions: ['汽油', 'Hybrid'],
       driveOptions: ['四轮驱动'],
@@ -325,7 +325,7 @@ window.TK168_DATA = (() => {
     },
     sedan: {
       typeOptions: ['行政轿车', '豪华轿车', '高性能轿车'],
-      bodyStyleOptions: ['行政轿车', '豪华轿车', '高性能轿车'],
+      bodyStyleOptions: ['轿车'],
       engineOptions: ['2.0L Turbo', '2.5L Hybrid', '3.0L V6'],
       fuelOptions: ['汽油', 'Hybrid'],
       driveOptions: ['后轮驱动', '四轮驱动'],
@@ -340,6 +340,22 @@ window.TK168_DATA = (() => {
   const libraryVehicleColors = ['珍珠白', '黑色', '银色', '灰色', '蓝色', '酒红色', '黄色', '绿色', '米色', '紫色'];
   const libraryVehicleInteriors = ['黑色', '棕色', '米色', '灰色', '红色', '白色', '蓝色'];
   const libraryVehicleIcons = ['b1.svg', 'b2.svg', 'b3.svg', 'b4.svg', 'b5.svg', 'b6.svg'];
+
+  /** 管理端 / 首页筛选 / 存库统一使用的车身类型（中文） */
+  const standardBodyStyleValues = [
+    'SUV',
+    'MPV',
+    '轿车',
+    '跑车',
+    '超跑',
+    '敞篷车',
+    '旅行车',
+    '双门轿跑',
+    '皮卡',
+    '轻自动车',
+    '商务车 / 面包车',
+    '越野车'
+  ];
 
   function pickCatalogValue(pool, seed) {
     if (!Array.isArray(pool) || pool.length === 0) return '';
@@ -458,7 +474,7 @@ window.TK168_DATA = (() => {
       trans: '自动挡',
       totalPrice: '¥ 1,980,000',
       basePrice: '¥ 1,860,000',
-      bodyStyle: '高性能 SUV',
+      bodyStyle: 'SUV',
       drive: '四轮驱动',
       bodyColor: '曜石黑',
       interiorColor: '黑色真皮',
@@ -491,7 +507,7 @@ window.TK168_DATA = (() => {
       trans: '自动挡',
       totalPrice: '¥ 1,600,000',
       basePrice: '¥ 1,490,000',
-      bodyStyle: '双门跑车',
+      bodyStyle: '跑车',
       drive: '四轮驱动',
       bodyColor: '曜石黑',
       interiorColor: '棕色真皮',
@@ -524,7 +540,7 @@ window.TK168_DATA = (() => {
       trans: '自动挡',
       totalPrice: '¥ 1,750,000',
       basePrice: '¥ 1,640,000',
-      bodyStyle: '双门跑车',
+      bodyStyle: '跑车',
       drive: '后轮驱动',
       bodyColor: '竞技红',
       interiorColor: '黑红拼色真皮',
@@ -557,7 +573,7 @@ window.TK168_DATA = (() => {
       trans: '自动挡',
       totalPrice: '¥ 750,000',
       basePrice: '¥ 698,000',
-      bodyStyle: '高性能 SUV',
+      bodyStyle: 'SUV',
       drive: '四轮驱动',
       bodyColor: '矿石白',
       interiorColor: '黑色真皮',
@@ -590,7 +606,7 @@ window.TK168_DATA = (() => {
       trans: '自动挡',
       totalPrice: '¥ 2,250,000',
       basePrice: '¥ 2,120,000',
-      bodyStyle: '双门跑车',
+      bodyStyle: '跑车',
       drive: '后轮驱动',
       bodyColor: '亮银灰',
       interiorColor: '深棕真皮',
@@ -623,7 +639,7 @@ window.TK168_DATA = (() => {
       trans: '自动挡',
       totalPrice: '¥ 4,000,000',
       basePrice: '¥ 3,780,000',
-      bodyStyle: '双门跑车',
+      bodyStyle: '跑车',
       drive: '四轮驱动',
       bodyColor: '珍珠白',
       interiorColor: '黑色 Alcantara',
@@ -656,7 +672,7 @@ window.TK168_DATA = (() => {
       trans: '自动挡',
       totalPrice: '¥ 2,680,000',
       basePrice: '¥ 2,520,000',
-      bodyStyle: '双门跑车',
+      bodyStyle: '跑车',
       drive: '四轮驱动',
       bodyColor: '珍珠黄',
       interiorColor: '黑黄拼色',
@@ -689,7 +705,7 @@ window.TK168_DATA = (() => {
       trans: '自动挡',
       totalPrice: '¥ 2,280,000',
       basePrice: '¥ 2,140,000',
-      bodyStyle: '高性能 SUV',
+      bodyStyle: 'SUV',
       drive: '四轮驱动',
       bodyColor: '石墨灰',
       interiorColor: '黑橙拼色',
@@ -722,7 +738,7 @@ window.TK168_DATA = (() => {
       trans: '自动挡',
       totalPrice: '¥ 3,150,000',
       basePrice: '¥ 2,960,000',
-      bodyStyle: '双门跑车',
+      bodyStyle: '跑车',
       drive: '后轮驱动',
       bodyColor: '赛道灰',
       interiorColor: '黑色 Alcantara',
@@ -755,7 +771,7 @@ window.TK168_DATA = (() => {
       trans: '自动挡',
       totalPrice: '¥ 1,480,000',
       basePrice: '¥ 1,360,000',
-      bodyStyle: '双门跑车',
+      bodyStyle: '跑车',
       drive: '四轮驱动',
       bodyColor: '黑曜石',
       interiorColor: '黑色真皮',
@@ -788,7 +804,7 @@ window.TK168_DATA = (() => {
       trans: '自动挡',
       totalPrice: '¥ 8,800,000',
       basePrice: '¥ 8,320,000',
-      bodyStyle: '双门跑车',
+      bodyStyle: '跑车',
       drive: '四轮驱动',
       bodyColor: '金属绿',
       interiorColor: '黑金拼色',
@@ -821,7 +837,7 @@ window.TK168_DATA = (() => {
       trans: '自动挡',
       totalPrice: '¥ 2,650,000',
       basePrice: '¥ 2,490,000',
-      bodyStyle: '高性能 SUV',
+      bodyStyle: 'SUV',
       drive: '四轮驱动',
       bodyColor: '哑光灰',
       interiorColor: '黑红拼色',
@@ -854,7 +870,7 @@ window.TK168_DATA = (() => {
       trans: '自动挡',
       totalPrice: '¥ 2,100,000',
       basePrice: '¥ 1,960,000',
-      bodyStyle: '双门跑车',
+      bodyStyle: '跑车',
       drive: '后轮驱动',
       bodyColor: '珍珠白',
       interiorColor: '黑色真皮',
@@ -1328,6 +1344,18 @@ window.TK168_DATA = (() => {
     },
     bodyStyle: {
       zh: {
+        SUV: 'SUV',
+        MPV: 'MPV',
+        轿车: '轿车',
+        跑车: '跑车',
+        超跑: '超跑',
+        敞篷车: '敞篷车',
+        旅行车: '旅行车',
+        双门轿跑: '双门轿跑',
+        皮卡: '皮卡',
+        轻自动车: '轻自动车',
+        '商务车 / 面包车': '商务车 / 面包车',
+        越野车: '越野车',
         '高性能 SUV': '高性能 SUV',
         '双门跑车': '双门跑车',
         豪华SUV: '豪华SUV',
@@ -1336,12 +1364,44 @@ window.TK168_DATA = (() => {
         行政轿车: '行政轿车',
         豪华轿车: '豪华轿车',
         高性能轿车: '高性能轿车',
-        双门轿跑: '双门轿跑',
         GT跑车: 'GT跑车',
-        旅行车: '旅行车',
-        MPV: 'MPV'
+        中置跑车: '中置跑车',
+        敞篷跑车: '敞篷跑车',
+        V12超跑: 'V12超跑',
+        混动超跑: '混动超跑',
+        纯电性能车: '纯电性能车',
+        猎装车: '猎装车',
+        四门轿跑: '四门轿跑',
+        kei: '轻型车',
+        compact: '紧凑型车',
+        suv: 'SUV',
+        sedan: '轿车',
+        camper: '露营房车',
+        coupe: '轿跑',
+        hybrid: '混动',
+        hatchback: '掀背车',
+        convertible: '敞篷',
+        pickup: '皮卡',
+        welfare: '福祉车',
+        'commercial-van': '商用面包车',
+        truck: '卡车',
+        wagon: '旅行车',
+        mpv: 'MPV',
+        other: '其他'
       },
       ja: {
+        SUV: 'SUV',
+        MPV: 'MPV',
+        轿车: 'セダン',
+        跑车: 'スポーツカー',
+        超跑: 'スーパーカー',
+        敞篷车: 'コンバーチブル',
+        旅行车: 'ステーションワゴン',
+        双门轿跑: '2ドアクーペ',
+        皮卡: 'ピックアップトラック',
+        轻自动车: '軽自動車',
+        '商务车 / 面包车': '商用バン / ミニバン',
+        越野车: 'オフロード車',
         '高性能 SUV': 'ハイパフォーマンス SUV',
         '双门跑车': '2ドアスポーツ',
         豪华SUV: 'ラグジュアリーSUV',
@@ -1350,24 +1410,76 @@ window.TK168_DATA = (() => {
         行政轿车: 'エグゼクティブセダン',
         豪华轿车: 'ラグジュアリーセダン',
         高性能轿车: 'ハイパフォーマンスセダン',
-        双门轿跑: '2ドアクーペ',
         GT跑车: 'GTカー',
-        旅行车: 'ワゴン',
-        MPV: 'MPV'
+        中置跑车: 'ミッドシップスポーツ',
+        敞篷跑车: 'オープンスポーツ',
+        V12超跑: 'V12スーパーカー',
+        混动超跑: 'ハイブリッドスーパーカー',
+        纯电性能车: '電動ハイパフォーマンス',
+        猎装车: 'シューティングブレーク',
+        四门轿跑: '4ドアクーペ',
+        kei: '軽自動車',
+        compact: 'コンパクトカー',
+        suv: 'SUV',
+        sedan: 'セダン',
+        camper: 'キャンピングカー',
+        coupe: 'クーペ',
+        hybrid: 'ハイブリッド',
+        hatchback: 'ハッチバック',
+        convertible: 'コンバーチブル',
+        pickup: 'ピックアップ',
+        welfare: '福祉車',
+        'commercial-van': '商用バン',
+        truck: 'トラック',
+        wagon: 'ワゴン',
+        mpv: 'ミニバン',
+        other: 'その他'
       },
       en: {
+        SUV: 'SUV',
+        MPV: 'MPV',
+        轿车: 'Sedan',
+        跑车: 'Sports car',
+        超跑: 'Supercar',
+        敞篷车: 'Convertible',
+        旅行车: 'Wagon',
+        双门轿跑: 'Coupe',
+        皮卡: 'Pickup truck',
+        轻自动车: 'Kei car',
+        '商务车 / 面包车': 'Commercial van',
+        越野车: 'Off-road vehicle',
         '高性能 SUV': 'High-performance SUV',
-        '双门跑车': 'Two-door Sports Car',
+        '双门跑车': 'Two-door sports car',
         豪华SUV: 'Luxury SUV',
         越野SUV: 'Off-road SUV',
         轿跑SUV: 'Coupe SUV',
-        行政轿车: 'Executive Sedan',
-        豪华轿车: 'Luxury Sedan',
-        高性能轿车: 'High-performance Sedan',
-        双门轿跑: 'Two-door Coupe',
-        GT跑车: 'GT Car',
-        旅行车: 'Wagon',
-        MPV: 'MPV'
+        行政轿车: 'Executive sedan',
+        豪华轿车: 'Luxury sedan',
+        高性能轿车: 'High-performance sedan',
+        GT跑车: 'GT car',
+        中置跑车: 'Mid-engine sports car',
+        敞篷跑车: 'Convertible sports car',
+        V12超跑: 'V12 supercar',
+        混动超跑: 'Hybrid supercar',
+        纯电性能车: 'Electric performance car',
+        猎装车: 'Shooting brake',
+        四门轿跑: 'Four-door coupe',
+        kei: 'Kei car',
+        compact: 'Compact car',
+        suv: 'SUV',
+        sedan: 'Sedan',
+        camper: 'Camper van',
+        coupe: 'Coupe',
+        hybrid: 'Hybrid',
+        hatchback: 'Hatchback',
+        convertible: 'Convertible',
+        pickup: 'Pickup',
+        welfare: 'Welfare vehicle',
+        'commercial-van': 'Commercial van',
+        truck: 'Truck',
+        wagon: 'Wagon',
+        mpv: 'MPV',
+        other: 'Other'
       }
     },
     drive: {
@@ -1746,10 +1858,15 @@ window.TK168_DATA = (() => {
     return raw;
   }
 
-  /** 车身类型：优先 bodyTypeSearchOptions（与首页「车身」筛选一致），否则旧版自由文案表 */
+  /** 车身类型：新标准中文值走 vehicleFieldTranslations；旧 slug/筛选项走 bodyTypeSearchOptions */
   function getBodyStyleFieldLabel(value, language = getCurrentLanguage()) {
     const raw = String(value || '').trim();
     if (!raw) return '';
+    if (standardBodyStyleValues.includes(raw)) {
+      const fieldCatalog = vehicleFieldTranslations.bodyStyle || {};
+      const catalog = fieldCatalog[language] || fieldCatalog.ja || fieldCatalog.zh;
+      return catalog?.[raw] || raw;
+    }
     const opt = bodyTypeSearchOptions.find((o) => o.value === raw || o.labelZh === raw);
     if (opt) {
       if (language === 'en') return opt.labelEn || opt.labelJa || opt.labelZh;
@@ -1881,7 +1998,7 @@ window.TK168_DATA = (() => {
     if (key === 'doors') {
       const bodyContext = `${resolveBodyStyleLabelZh(vehicle.bodyStyle)} ${vehicle.type || ''}`;
       let doorCount = 2;
-      if (/(SUV|MPV|旅行车|ワゴン)/i.test(bodyContext)) doorCount = 5;
+      if (/(SUV|MPV|旅行车|ワゴン|越野车)/i.test(bodyContext)) doorCount = 5;
       else if (/(轿车|セダン)/i.test(bodyContext)) doorCount = 4;
       if (language === 'en') return `${doorCount} doors`;
       return language === 'ja' ? `${doorCount}ドア` : `${doorCount} 门`;
@@ -2337,6 +2454,13 @@ window.TK168_DATA = (() => {
       }));
     }
 
+    if (filterKey === 'bodyStyle') {
+      return standardBodyStyleValues.map((zh) => ({
+        value: zh,
+        label: getBodyStyleFieldLabel(zh, language)
+      }));
+    }
+
     if (filterKey === 'type') {
       return bodyTypeSearchOptions.map(({ value, labelZh, labelJa, labelEn }) => ({
         value,
@@ -2377,6 +2501,7 @@ window.TK168_DATA = (() => {
     const defaults = {
       brand: window.TK168I18N?.t('search.brand') || '按品牌',
       type: window.TK168I18N?.t('search.type') || '按车型',
+      bodyStyle: window.TK168I18N?.t('search.bodyStyle') || '车身类型',
       price: window.TK168I18N?.t('search.price') || '总额预算',
       year: window.TK168I18N?.t('search.year') || '上牌年份',
       mileage: window.TK168I18N?.t('search.mileage') || '行驶里程'
@@ -2387,6 +2512,9 @@ window.TK168_DATA = (() => {
       const b = getBrandByKey(value);
       if (b) return getBrandLabel(b, getCurrentLanguage());
     }
+    if (filterKey === 'bodyStyle' && value) {
+      return getBodyStyleFieldLabel(value, getCurrentLanguage());
+    }
     const option = getSearchFilterOptions(filterKey).find((item) => item.value === value);
     return option ? option.label : defaults[filterKey];
   }
@@ -2396,6 +2524,7 @@ window.TK168_DATA = (() => {
     const filters = {
       brand: params.get('brand') || '',
       type: params.get('type') || '',
+      bodyStyle: params.get('bodyStyle') || '',
       price: params.get('price') || '',
       priceMetric: params.get('priceMetric') === 'base' ? 'base' : 'total',
       year: params.get('year') || '',
@@ -2407,6 +2536,7 @@ window.TK168_DATA = (() => {
 
     if (filters.brand && !getBrandByKey(filters.brand)) filters.brand = '';
     if (filters.type && !getSearchFilterOptions('type').some((item) => item.value === filters.type)) filters.type = '';
+    if (filters.bodyStyle && !standardBodyStyleValues.includes(filters.bodyStyle)) filters.bodyStyle = '';
     if (filters.price && !priceOptions.some((item) => item.value === filters.price)) filters.price = '';
     if (filters.year && !yearOptions.some((item) => item.value === filters.year)) filters.year = '';
     if (filters.mileage && !mileageOptions.some((item) => item.value === filters.mileage)) filters.mileage = '';
@@ -2424,6 +2554,7 @@ window.TK168_DATA = (() => {
     return list.filter((vehicle) => {
       if (filters.brand && vehicle.brandKey !== filters.brand) return false;
       if (filters.type && !matchVehicleTypeFilter(filters.type, vehicle.type)) return false;
+      if (filters.bodyStyle && String(vehicle.bodyStyle || '').trim() !== filters.bodyStyle) return false;
       if (priceOption) {
         const amount = priceMetric === 'base'
           ? parseCurrency(getVehicleBasePrice(vehicle))
@@ -2450,6 +2581,9 @@ window.TK168_DATA = (() => {
           getVehicleFieldLabel('fuel', vehicle.fuel, 'ja'),
           vehicle.trans,
           getVehicleFieldLabel('trans', vehicle.trans, 'ja'),
+          vehicle.bodyStyle,
+          getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, 'ja'),
+          getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, 'en'),
           vehicle.bodyColor,
           getVehicleFieldLabel('bodyColor', vehicle.bodyColor, 'ja'),
           vehicle.interiorColor,
@@ -2470,6 +2604,7 @@ window.TK168_DATA = (() => {
     const normalized = {
       brand: filters.brand || '',
       type: filters.type || '',
+      bodyStyle: filters.bodyStyle || '',
       price: filters.price || '',
       priceMetric: filters.price ? (filters.priceMetric === 'base' ? 'base' : '') : '',
       year: filters.year || '',
@@ -2520,7 +2655,7 @@ window.TK168_DATA = (() => {
   }
 
   function countActiveFilters(filters = {}) {
-    return ['brand', 'type', 'price', 'year', 'mileage', 'keyword']
+    return ['brand', 'type', 'bodyStyle', 'price', 'year', 'mileage', 'keyword']
       .filter((key) => String(filters[key] || '').trim() !== '')
       .length;
   }
@@ -2531,6 +2666,7 @@ window.TK168_DATA = (() => {
 
     if (brand) parts.push(getBrandLabel(brand));
     if (filters.type) parts.push(getVehicleTypeLabel(filters.type));
+    if (filters.bodyStyle) parts.push(getBodyStyleFieldLabel(filters.bodyStyle));
     if (filters.price) parts.push(getSearchFilterLabel('price', filters.price));
     if (filters.year) parts.push(getSearchFilterLabel('year', filters.year));
     if (filters.mileage) parts.push(getSearchFilterLabel('mileage', filters.mileage));
@@ -2575,6 +2711,7 @@ window.TK168_DATA = (() => {
     const normalized = {
       brand: filters.brand || '',
       type: filters.type || '',
+      bodyStyle: filters.bodyStyle || '',
       price: filters.price || '',
       priceMetric: filters.price ? (filters.priceMetric === 'base' ? 'base' : '') : '',
       year: filters.year || '',

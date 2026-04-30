@@ -1,7 +1,7 @@
 /**
  * 管理端「规格」下拉：选项文案一律为中文；存库值与 js/data.js 中
- * vehicleTypeOptions / bodyTypeSearchOptions / vehicleFieldTranslations 对齐，
- * 车身颜色与内饰颜色共用 vehicleColorPalette（中文存库）。
+ * vehicleTypeOptions / vehicleFieldTranslations 对齐，
+ * 车身类型选项与 js/data.js standardBodyStyleValues / vehicleFieldTranslations.bodyStyle 一致。
  * 前台 i18n 由 TK168_DATA.getVehicleTypeLabel / getVehicleFieldLabel 负责。
  */
 (function () {
@@ -25,26 +25,6 @@
     { value: "旅行车", label: "旅行车" },
     { value: "MPV", label: "MPV" },
     { value: "皮卡", label: "皮卡" }
-  ];
-
-  /** 与首页「车身类型」筛选 bodyTypeSearchOptions 一致，存库为英文 slug */
-  const bodyStyle = [
-    { value: "kei", label: "轻型车" },
-    { value: "compact", label: "紧凑型车" },
-    { value: "mpv", label: "MPV" },
-    { value: "wagon", label: "旅行车" },
-    { value: "suv", label: "SUV" },
-    { value: "sedan", label: "轿车" },
-    { value: "camper", label: "露营房车" },
-    { value: "coupe", label: "轿跑" },
-    { value: "hybrid", label: "混动" },
-    { value: "hatchback", label: "掀背车" },
-    { value: "convertible", label: "敞篷" },
-    { value: "pickup", label: "皮卡" },
-    { value: "welfare", label: "福祉车" },
-    { value: "commercial-van", label: "商用面包车" },
-    { value: "truck", label: "卡车" },
-    { value: "other", label: "其他" }
   ];
 
   const drive = [
@@ -83,6 +63,22 @@
     { value: "手自一体", label: "手自一体" },
     { value: "双离合", label: "双离合（DCT）" },
     { value: "电动车单速", label: "电动车单速" }
+  ];
+
+  /** 与 js/data.js standardBodyStyleValues 顺序、存库中文值一致 */
+  const bodyStyle = [
+    { value: "SUV", label: "SUV" },
+    { value: "MPV", label: "MPV" },
+    { value: "轿车", label: "轿车" },
+    { value: "跑车", label: "跑车" },
+    { value: "超跑", label: "超跑" },
+    { value: "敞篷车", label: "敞篷车" },
+    { value: "旅行车", label: "旅行车" },
+    { value: "双门轿跑", label: "双门轿跑" },
+    { value: "皮卡", label: "皮卡" },
+    { value: "轻自动车", label: "轻自动车" },
+    { value: "商务车 / 面包车", label: "商务车 / 面包车" },
+    { value: "越野车", label: "越野车" }
   ];
 
   /** 与 js/data.js vehicleFieldTranslations.bodyColor / interiorColor 的键一致；存库为中文，前台自动译日/英 */

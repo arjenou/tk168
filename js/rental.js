@@ -278,7 +278,8 @@ function buildVehicleCardHtml(vehicle, language) {
 
   const profile = getVehicleRentalProfile(vehicle);
   const title = getVehicleName(vehicle, language);
-  const type = getVehicleTypeLabel(vehicle.type, language);
+  const type =
+    getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, language) || getVehicleTypeLabel(vehicle.type, language);
   const inquiryHref = buildInquiryHref(vehicle);
 
   return `

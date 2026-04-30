@@ -157,14 +157,7 @@ const RESOURCES = {
             span: 4,
             hint: "下拉里为中文品牌名；存库仍为 brands/logos 下的 SVG 路径。",
           },
-          {
-            key: "bodyStyle",
-            label: "车身类型",
-            type: "select",
-            optionsCatalog: "bodyStyle",
-            span: 4,
-            hint: "与首页「车身类型」筛选键一致，存库为英文 slug（如 suv、sedan）。旧数据为中文时会显示「当前值」可改选。",
-          },
+          { key: "bodyStyle", label: "车身类型", type: "select", optionsCatalog: "bodyStyle", span: 4, hint: "规范选项（中文存库）；首页筛选与卡片展示会按站点语言自动翻译。旧数据不在列表中显示为「当前值」。" },
           { key: "drive", label: "驱动方式", type: "select", optionsCatalog: "drive", span: 4 },
           {
             key: "bodyColor",
@@ -302,14 +295,7 @@ const RESOURCES = {
             span: 4,
             hint: "下拉里为中文品牌名；存库仍为 brands/logos 下的 SVG 路径。",
           },
-          {
-            key: "bodyStyle",
-            label: "车身类型",
-            type: "select",
-            optionsCatalog: "bodyStyle",
-            span: 4,
-            hint: "与首页「车身类型」筛选键一致，存库为英文 slug（如 suv、sedan）。",
-          },
+          { key: "bodyStyle", label: "车身类型", type: "select", optionsCatalog: "bodyStyle", span: 4, hint: "规范选项（中文存库）；首页筛选与卡片展示会按站点语言自动翻译。旧数据不在列表中显示为「当前值」。" },
           { key: "drive", label: "驱动方式", type: "select", optionsCatalog: "drive", span: 4 },
           {
             key: "bodyColor",

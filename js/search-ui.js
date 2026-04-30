@@ -19,6 +19,7 @@ window.TK168SearchUI = (() => {
     return {
       brand: state.brand || '',
       type: state.type || '',
+      bodyStyle: state.bodyStyle || '',
       price: state.price || '',
       priceMetric: state.priceMetric === 'base' ? 'base' : 'total',
       year: state.year || '',
@@ -345,38 +346,11 @@ window.TK168SearchUI = (() => {
       return menu;
     }
 
-    function buildTypeMenu(root, button) {
-      const menu = createDropdownMenu(root, button, 'fb-filter-menu--type', 260);
-      const options = getFieldOptions('type');
-
-      menu.innerHTML = `
-        <div class="fb-filter-menu-body">
-          ${options.map((option) => buildFilterOption({
-            value: option.value,
-            label: option.label,
-            selected: option.value === state.type
-          })).join('')}
-        </div>
-      `;
-
-      menu.addEventListener('click', (event) => {
-        const option = event.target.closest('.fb-filter-option');
-        if (!option) return;
-        state.type = option.dataset.value || '';
-        updateAll();
-        closeMenu();
-        notifyFiltersChange();
-      });
-
-      return menu;
-    }
-
     function openMenu(root, button, field) {
       closeMenu();
       let menu;
       if (field === 'makerModel') menu = buildMakerModelMenu(root, button);
       else if (field === 'price') menu = buildPriceMenu(root, button);
-      else if (field === 'type') menu = buildTypeMenu(root, button);
       else menu = buildMenu(root, button, field);
       root.appendChild(menu);
       button.classList.add('is-open');

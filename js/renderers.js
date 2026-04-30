@@ -281,7 +281,7 @@ window.TK168Renderers = (() => {
         </div>
         <div class="${variant.titleWrap}">
           <h3 class="${variant.title}">${vehicleName}</h3>
-          <p class="${variant.subtitle}">${vehicle.year} · ${getVehicleTypeLabel(vehicle.type)}</p>
+          <p class="${variant.subtitle}">${vehicle.year} · ${getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle) || getVehicleTypeLabel(vehicle.type)}</p>
         </div>
       </div>
       <div class="${variant.cover}">
