@@ -1,6 +1,7 @@
 /**
  * 管理端「规格」下拉：选项文案一律为中文；存库值与 js/data.js 中
  * vehicleTypeOptions / bodyTypeSearchOptions / vehicleFieldTranslations 对齐，
+ * 车身颜色与内饰颜色共用 vehicleColorPalette（中文存库）。
  * 前台 i18n 由 TK168_DATA.getVehicleTypeLabel / getVehicleFieldLabel 负责。
  */
 (function () {
@@ -84,12 +85,36 @@
     { value: "电动车单速", label: "电动车单速" }
   ];
 
+  /** 与 js/data.js vehicleFieldTranslations.bodyColor / interiorColor 的键一致；存库为中文，前台自动译日/英 */
+  const vehicleColorPalette = [
+    { value: "白色", label: "白色" },
+    { value: "珍珠白", label: "珍珠白" },
+    { value: "黑色", label: "黑色" },
+    { value: "珍珠黑", label: "珍珠黑" },
+    { value: "银色", label: "银色" },
+    { value: "灰色", label: "灰色" },
+    { value: "蓝色", label: "蓝色" },
+    { value: "深蓝色", label: "深蓝色" },
+    { value: "红色", label: "红色" },
+    { value: "酒红色", label: "酒红色" },
+    { value: "粉色", label: "粉色" },
+    { value: "黄色", label: "黄色" },
+    { value: "金色", label: "金色" },
+    { value: "橙色", label: "橙色" },
+    { value: "绿色", label: "绿色" },
+    { value: "棕色", label: "棕色" },
+    { value: "米色", label: "米色" },
+    { value: "紫色", label: "紫色" }
+  ];
+
   window.TK168AdminVehicleFieldOptions = {
     vehicleType,
     bodyStyle,
     drive,
     seats,
     fuel,
-    trans
+    trans,
+    bodyColor: vehicleColorPalette,
+    interiorColor: vehicleColorPalette
   };
 })();
