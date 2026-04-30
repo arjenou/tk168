@@ -20,8 +20,8 @@
   background: #FFFFFF;
   color: var(--page-text);
   font-family: "SF Pro Display", "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
-  overflow-x: hidden;
-  overflow-y: visible;
+  /* 勿用 overflow-x: hidden + overflow-y: visible：规范会把 y 算成 auto，竖直方向会裁切底部品牌条上移/光晕 */
+  overflow: visible;
   isolation: isolate;
   /* 与 style.css 一致：避免 #brands 作为锚点目标时视口上沿仍落在上屏内 */
   scroll-margin-top: 0;
@@ -260,7 +260,8 @@
   align-items: flex-end;
   justify-content: flex-start;
   gap: var(--thumb-nav-gap);
-  padding-top: 0.45rem;
+  /* 为 .lisboa-thumbs 内选中项上移、scale、光晕预留竖直空间，避免被父级裁切 */
+  padding-top: 1.1rem;
   pointer-events: none;
 }
 #brands .lisboa-thumbs {
@@ -274,7 +275,8 @@
   gap: var(--thumb-gap);
   overflow-x: auto;
   overflow-y: visible;
-  padding: 0.2rem 0.55rem;
+  /* 顶/底留足空间：选中态 translateY + scale + box-shadow 会高出卡片盒；overflow-x≠visible 时 y 常被当成 auto 而裁切，padding 把绘制留在 padding 盒内 */
+  padding: 1.35rem 0.55rem 0.85rem;
   scroll-padding-inline: 0.55rem;
   scroll-behavior: smooth;
   overscroll-behavior-x: contain;
