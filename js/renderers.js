@@ -172,6 +172,8 @@ window.TK168Renderers = (() => {
   }
 
   function resolveVehicleCardBrandIcon(vehicle) {
+    const resolve = window.TK168_DATA?.resolveVehicleBrandGlyphUrl;
+    if (typeof resolve === 'function') return resolve(vehicle);
     const brand = window.TK168_DATA.getBrandByKey(vehicle.brandKey);
     if (brand?.file) return `assets/images/brands/logos/${brand.file}`;
     return 'assets/images/logo_TK168.svg';

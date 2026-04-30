@@ -2257,6 +2257,19 @@ window.TK168_DATA = (() => {
     return null;
   }
 
+  /** 列表/卡片角标：优先后台「图标」字段，否则用品牌库 file（catalog-only 品牌无 file 时必依赖 icon） */
+  function resolveVehicleBrandGlyphUrl(vehicle) {
+    if (!vehicle) return 'assets/images/logo_TK168.svg';
+    const icon = String(vehicle.icon || '').trim();
+    if (icon) {
+      const url = resolveVehicleMediaSource(icon);
+      if (url) return url;
+    }
+    const brand = getBrandByKey(vehicle.brandKey);
+    if (brand?.file) return `assets/images/brands/logos/${brand.file}`;
+    return 'assets/images/logo_TK168.svg';
+  }
+
   function getBrandAccentColor(key) {
     const canonicalKey = resolveCanonicalBrandKey(key) || String(key || '').trim().toLowerCase();
     return brandAccentMap[canonicalKey] || '#171717';
@@ -2749,6 +2762,7 @@ window.TK168_DATA = (() => {
     getVehicleModelName,
     getVehicleName,
     resolveVehicleMediaSource,
+    resolveVehicleBrandGlyphUrl,
     getVehicleTypeLabel,
     getVehicleFieldLabel,
     getVehicleOverview,
