@@ -9,6 +9,7 @@
   --thumb-height: 5.55rem;
   --thumb-bottom: 0.78rem;
   --thumb-gap: 0.82rem;
+  --thumb-nav-gap: max(1.12rem, calc(var(--thumb-gap) + 0.35rem));
   --thumb-button-width: 2rem;
   --section-padding-block: clamp(1.5rem, 2.8vw, 2.75rem);
   --section-padding-inline: clamp(1.25rem, 3vw, 2.75rem);
@@ -19,7 +20,8 @@
   background: #FFFFFF;
   color: var(--page-text);
   font-family: "SF Pro Display", "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
   isolation: isolate;
   /* 与 style.css 一致：避免 #brands 作为锚点目标时视口上沿仍落在上屏内 */
   scroll-margin-top: 0;
@@ -257,9 +259,9 @@
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
-  gap: var(--thumb-gap);
+  gap: var(--thumb-nav-gap);
+  padding-top: 0.45rem;
   pointer-events: none;
-  z-index: 2;
 }
 #brands .lisboa-thumbs {
   position: relative;
@@ -272,7 +274,8 @@
   gap: var(--thumb-gap);
   overflow-x: auto;
   overflow-y: visible;
-  padding: 0 0.12rem;
+  padding: 0.2rem 0.55rem;
+  scroll-padding-inline: 0.55rem;
   scroll-behavior: smooth;
   overscroll-behavior-x: contain;
   pointer-events: auto;

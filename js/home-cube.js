@@ -562,7 +562,7 @@
     window.requestAnimationFrame(() => {
       const active = thumbs.querySelector(`.lisboa-thumb[data-index="${activeIndex}"]`);
       if (!active) return;
-      const pad = 6;
+      const pad = 8;
       const cr = thumbs.getBoundingClientRect();
       const ar = active.getBoundingClientRect();
       if (ar.left >= cr.left + pad && ar.right <= cr.right - pad) {
