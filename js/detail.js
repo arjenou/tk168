@@ -43,7 +43,6 @@ const detailBasePriceValue = document.getElementById('detailBasePriceValue');
 const specTable = document.getElementById('specTable');
 const detailOverview = document.getElementById('detailOverview');
 const benefitBars = document.getElementById('benefitBars');
-const featureGrid = document.getElementById('featureGrid');
 const detailBackToBrand = document.getElementById('detailBackToBrand');
 const detailPhoneLink = document.getElementById('detailPhoneLink');
 const detailEmailLink = document.getElementById('detailEmailLink');
@@ -648,10 +647,6 @@ function renderBenefits() {
   benefitBars.innerHTML = window.TK168Renderers.buildDetailBenefitsHTML(currentVehicle);
 }
 
-function renderFeatures() {
-  featureGrid.innerHTML = window.TK168Renderers.buildDetailFeaturesHTML(currentVehicle);
-}
-
 function syncLinks() {
   const params = new URLSearchParams();
   params.set('id', currentVehicle.id);
@@ -1145,7 +1140,6 @@ async function bootstrapDetailPage() {
       renderSpecs();
       renderOverview();
       renderBenefits();
-      renderFeatures();
       applyDetailStaffCard();
       syncLinks();
       renderFeaturedCars();
@@ -1200,7 +1194,6 @@ window.addEventListener('tk168:languagechange', () => {
   renderSpecs();
   renderOverview();
   renderBenefits();
-  renderFeatures();
   applyDetailStaffCard();
   syncLinks();
   renderFeaturedCars();

@@ -1,12 +1,4 @@
 window.TK168Renderers = (() => {
-  const detailFeatureIcons = [
-    'assets/images/spec-displacement.svg',
-    'assets/images/spec-drivetrain.svg',
-    'assets/images/spec-steering-wheel.svg',
-    'assets/images/spec-seating-capacity.svg',
-    'assets/images/spec-door-count.svg',
-    'assets/images/spec-chassis-tail.svg'
-  ];
   const detailGalleryClasses = ['shot-main', 'shot-front', 'shot-rear', 'shot-wheel'];
   const BRAND_BADGE_VER = '20260411a';
   const FAVORITES_STORAGE_KEY = 'tk168_favorites';
@@ -413,24 +405,14 @@ window.TK168Renderers = (() => {
 
   function buildDetailBenefitsHTML(vehicle) {
     const language = window.TK168I18N?.getLanguage?.() || 'ja';
-    const specs = [
+    const dash = '-';
+    const basicSpecs = [
       [language === 'en' ? 'Body type' : (language === 'ja' ? 'ボディタイプ' : '车身类型'), getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle)],
       [language === 'en' ? 'Color' : (language === 'ja' ? '色' : '颜色'), getVehicleFieldLabel('bodyColor', vehicle.bodyColor)],
       [language === 'en' ? 'Engine type' : (language === 'ja' ? 'エンジン種別' : '发动机种别'), getVehicleFieldLabel('fuel', vehicle.fuel)],
       [language === 'en' ? 'Transmission' : (language === 'ja' ? 'ミッション' : '变速箱'), getVehicleFieldLabel('trans', vehicle.trans)]
     ];
-
-    return specs.map(([label, value]) => `
-      <div class="benefit-bar benefit-bar--spec">
-        <span class="benefit-spec-label">${label}</span>
-        <span class="benefit-spec-value">${value}</span>
-      </div>
-    `).join('');
-  }
-
-  function buildDetailFeaturesHTML(vehicle) {
-    const language = window.TK168I18N?.getLanguage?.() || 'ja';
-    const items = [
+    const highlightSpecs = [
       [language === 'en' ? 'Displacement' : (language === 'ja' ? '排気量' : '排气量'), getVehicleHighlightField(vehicle, 'displacement')],
       [language === 'en' ? 'Drive' : (language === 'ja' ? '駆動方式' : '驱动方式'), getVehicleHighlightField(vehicle, 'drive')],
       [language === 'en' ? 'Steering' : (language === 'ja' ? 'ハンドル' : '方向盘'), getVehicleHighlightField(vehicle, 'steering')],
@@ -438,18 +420,17 @@ window.TK168Renderers = (() => {
       [language === 'en' ? 'Doors' : (language === 'ja' ? 'ドア数' : '车门数'), getVehicleHighlightField(vehicle, 'doors')],
       [language === 'en' ? 'Chassis tail' : (language === 'ja' ? '車台末尾番号' : '车台末尾号'), getVehicleHighlightField(vehicle, 'chassisTail')]
     ];
+    const specs = [...basicSpecs, ...highlightSpecs];
 
-    return items.map(([label, value], index) => `
-      <div class="feature-item">
-        <span class="feature-icon" aria-hidden="true">
-          <img src="${detailFeatureIcons[index] || detailFeatureIcons[0]}" alt="" loading="lazy" decoding="async">
-        </span>
-        <div class="feature-copy">
-          <span class="feature-label">${label}</span>
-          <strong class="feature-value">${value || '-'}</strong>
-        </div>
+    return specs.map(([label, value]) => {
+      const display = value == null || String(value).trim() === '' ? dash : value;
+      return `
+      <div class="benefit-bar benefit-bar--spec">
+        <span class="benefit-spec-label">${label}</span>
+        <span class="benefit-spec-value">${display}</span>
       </div>
-    `).join('');
+    `;
+    }).join('');
   }
 
   return {
@@ -459,7 +440,6 @@ window.TK168Renderers = (() => {
     buildDetailSpecsHTML,
     buildDetailOverviewHTML,
     buildDetailBenefitsHTML,
-    buildDetailFeaturesHTML,
     bindVehicleCardLikes,
     getFavoriteVehicleIds: readFavoriteIds,
     renderPaginationDots
