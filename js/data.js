@@ -400,7 +400,7 @@ window.TK168_DATA = (() => {
   }
 
   function formatCatalogPrice(amount) {
-    return `¥ ${Number(amount || 0).toLocaleString('en-US')}`;
+    return `¥ ${Number(amount || 0).toLocaleString('ja-JP', { useGrouping: true })}`;
   }
 
   function resolveLibraryVehicleCategory(brandKey, modelSlug, modelName) {
@@ -1813,28 +1813,32 @@ window.TK168_DATA = (() => {
   }
 
   function formatRmbPrice(amount) {
+    const opts = { useGrouping: true };
     if (amount >= 10000) {
       const wan = amount / 10000;
       const fractionDigits = Number.isInteger(wan) ? 0 : 1;
       return `${wan.toLocaleString('zh-CN', {
+        ...opts,
         minimumFractionDigits: fractionDigits,
         maximumFractionDigits: 1
       })}万元`;
     }
-    return `${amount.toLocaleString('zh-CN')}元`;
+    return `${amount.toLocaleString('zh-CN', opts)}元`;
   }
 
-  function formatJpyPrice(amountRmb) {
-        const amountJpy = amountRmb * RMB_TO_JPY_RATE;
+  function formatJpyPrice(amountRmb, numberLocale = 'ja-JP') {
+    const amountJpy = amountRmb * RMB_TO_JPY_RATE;
+    const opts = { useGrouping: true };
     if (amountJpy >= 10000) {
       const man = amountJpy / 10000;
       const fractionDigits = Number.isInteger(man) ? 0 : 1;
-      return `${man.toLocaleString('ja-JP', {
+      return `${man.toLocaleString(numberLocale, {
+        ...opts,
         minimumFractionDigits: fractionDigits,
         maximumFractionDigits: 1
       })}万円`;
     }
-    return `${amountJpy.toLocaleString('ja-JP')}円`;
+    return `${amountJpy.toLocaleString(numberLocale, opts)}円`;
   }
 
   function parseMileage(value) {
@@ -2587,7 +2591,9 @@ window.TK168_DATA = (() => {
   function getDisplayPrice(value, language = getCurrentLanguage()) {
     const amount = parseCurrency(value);
     if (!amount) return '';
-    return language === 'zh' ? formatRmbPrice(amount) : formatJpyPrice(amount);
+    if (language === 'zh') return formatRmbPrice(amount);
+    if (language === 'en') return formatJpyPrice(amount, 'en-US');
+    return formatJpyPrice(amount, 'ja-JP');
   }
 
   function getVehicleTotalPriceDisplay(vehicle, language = getCurrentLanguage()) {

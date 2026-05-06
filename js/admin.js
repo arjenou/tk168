@@ -187,8 +187,8 @@ const RESOURCES = {
           { key: "mileage", label: "里程（万公里）", placeholder: "", span: 3, hint: "选填。存库为万公里量级约数（0.32≈3200km）；不必填精确公里数。可写「0.5万」或带小数点位数。" },
           { key: "fuel", label: "油種", type: "select", optionsCatalog: "fuel", span: 3 },
           { key: "trans", label: "变速箱", type: "select", optionsCatalog: "trans", span: 3 },
-          { key: "totalPrice", label: "支付总额", placeholder: "¥ 1,980,000", hint: "含手续费的显示总价", span: 4 },
-          { key: "basePrice", label: "车辆本体价格", placeholder: "¥ 1,860,000", span: 4 },
+          { key: "totalPrice", label: "支付总额", placeholder: "¥ 1,980,000", hint: "含手续费的显示总价；失焦或保存时自动按日式千分位排版。", span: 4 },
+          { key: "basePrice", label: "车辆本体价格", placeholder: "¥ 1,860,000", hint: "失焦或保存时自动按日式千分位排版。", span: 4 },
         ],
       },
     ],
@@ -408,6 +408,20 @@ function splitLegacyEngineCombined(engine) {
   return { displacement: t, cylinders: "" };
 }
 
+/** 与前台 parseCurrency 一致：只取整数金额（元） */
+function parseInventoryPriceDigits(raw) {
+  return Number(String(raw ?? "").replace(/[^\d]/g, "")) || 0;
+}
+
+/** 日式千分位存库：¥ 1,980,000 */
+function formatInventoryPriceYenStyle(raw) {
+  const s = String(raw ?? "").trim();
+  if (!s) return "";
+  const n = parseInventoryPriceDigits(s);
+  if (!n) return s;
+  return `¥ ${n.toLocaleString("ja-JP", { useGrouping: true })}`;
+}
+
 function normalizeInventoryDraftForEngine(draft) {
   if (!draft || typeof draft !== "object") return draft;
   let displacement = String(draft.displacement ?? "").trim();
@@ -417,7 +431,14 @@ function normalizeInventoryDraftForEngine(draft) {
     displacement = sp.displacement;
     cylinders = sp.cylinders;
   }
-  return { ...draft, displacement, cylinders };
+  const next = { ...draft, displacement, cylinders };
+  if (Object.prototype.hasOwnProperty.call(draft, "totalPrice")) {
+    next.totalPrice = formatInventoryPriceYenStyle(draft.totalPrice);
+  }
+  if (Object.prototype.hasOwnProperty.call(draft, "basePrice")) {
+    next.basePrice = formatInventoryPriceYenStyle(draft.basePrice);
+  }
+  return next;
 }
 
 function combinedEngineFromDraft(draft) {
@@ -987,6 +1008,12 @@ function itemRow(v, r) {
   const extraCells = (r.extraColumns || [])
     .map((c) => `<td>${escapeHtml(c.render ? c.render(v[c.key]) : v[c.key] ?? "")}</td>`)
     .join("");
+  const priceKey = r.priceColumn?.key;
+  const rawPrice = priceKey != null ? v[priceKey] ?? "" : "";
+  const priceCell =
+    r.key === "vehicles" && priceKey === "totalPrice"
+      ? formatInventoryPriceYenStyle(rawPrice)
+      : rawPrice;
   return `
     <tr data-item-id="${escapeAttr(v.id)}">
       ${dragCell}
@@ -996,7 +1023,7 @@ function itemRow(v, r) {
       </td>
       <td>${escapeHtml(v.brandKey || "")}</td>
       <td>${escapeHtml(v.year || "")}</td>
-      <td>${escapeHtml(v[r.priceColumn.key] ?? "")}</td>
+      <td>${escapeHtml(priceCell)}</td>
       ${extraCells}
       <td>${(v.images || []).length}</td>
       <td>
@@ -1924,6 +1951,15 @@ function bindEditor() {
     });
   });
 
+  document.querySelectorAll('[data-draft="totalPrice"], [data-draft="basePrice"]').forEach((input) => {
+    input.addEventListener("blur", () => {
+      const key = input.dataset.draft;
+      const formatted = formatInventoryPriceYenStyle(input.value);
+      input.value = formatted;
+      state.editingDraft[key] = formatted;
+    });
+  });
+
   document.querySelectorAll("[data-preset]").forEach((input) => {
     input.addEventListener("input", () => {
       const [key, lang] = input.dataset.preset.split(".");
@@ -2156,6 +2192,14 @@ async function saveItem() {
   delete payload.images;
   if (r.key === "vehicles" || r.key === "rentals") {
     payload.engine = combinedEngineFromDraft(payload);
+  }
+  if (r.key === "vehicles") {
+    if (Object.prototype.hasOwnProperty.call(payload, "totalPrice")) {
+      payload.totalPrice = formatInventoryPriceYenStyle(payload.totalPrice);
+    }
+    if (Object.prototype.hasOwnProperty.call(payload, "basePrice")) {
+      payload.basePrice = formatInventoryPriceYenStyle(payload.basePrice);
+    }
   }
   try {
     if (state.editingIsNew) {
