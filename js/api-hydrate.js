@@ -114,12 +114,8 @@
 
     const cond = {};
     [
-      ["condNonSmoking", "nonSmoking"],
-      ["condAuthorizedImport", "authorizedImport"],
       ["condDealerWarranty", "dealerWarranty"],
-      ["condEcoTaxEligible", "ecoTaxEligible"],
       ["condOneOwner", "oneOwner"],
-      ["condRentalUp", "rentalUp"],
     ].forEach(([from, to]) => { if (v[from]) cond[to] = v[from]; });
 
     const listing = {};
@@ -127,7 +123,6 @@
       ["listingRepairHistory", "repairHistory"],
       ["listingVehicleInspection", "vehicleInspection"],
       ["listingLegalMaintenance", "legalMaintenance"],
-      ["listingPeriodicBook", "periodicInspectionBook"],
     ].forEach(([from, to]) => { if (v[from]) listing[to] = v[from]; });
 
     const highlight = {};

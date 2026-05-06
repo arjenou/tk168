@@ -359,28 +359,18 @@ window.TK168Renderers = (() => {
           repair: 'Repair history',
           inspection: 'Vehicle inspection',
           legalMaintenance: 'Legal maintenance',
-          inspectionBook: 'Maintenance record book',
-          nonSmoking: 'Non-smoking car',
-          authorizedImport: 'Authorized import',
           dealerWarranty: 'Dealer warranty',
-          ecoTaxEligible: 'Eco tax eligible',
-          oneOwner: 'One owner',
-          rentalUp: 'Former rental'
+          oneOwner: 'One owner'
         }
       : (language === 'ja'
         ? {
             year: '年式(初度登録年)',
-            mileage: '走行距',
+            mileage: '走行距離',
             repair: '修復歴',
             inspection: '車検',
             legalMaintenance: '法定整備',
-            inspectionBook: '定期点検記録簿',
-            nonSmoking: '禁煙車',
-            authorizedImport: '正規輸入車',
             dealerWarranty: '販売店保証',
-            ecoTaxEligible: 'エコカー減税対象車',
-            oneOwner: 'ワンオーナー',
-            rentalUp: 'レンタカーアップ'
+            oneOwner: 'ワンオーナー'
           }
         : {
             year: '首次上牌年份',
@@ -388,31 +378,26 @@ window.TK168Renderers = (() => {
             repair: '修复历史',
             inspection: '车检',
             legalMaintenance: '法定整备',
-            inspectionBook: '定期点检记录簿',
-            nonSmoking: '禁烟车',
-            authorizedImport: '正规进口车',
             dealerWarranty: '店铺质保',
-            ecoTaxEligible: '节能车减税对象车',
-            oneOwner: '一手车主',
-            rentalUp: '租赁退役车'
+            oneOwner: '一手车主'
           });
+    /* 两列交错排版（与现有 .spec-table 样式一致）；已下线：禁煙車、正規輸入車、エコカー減税、レンタカーアップ、定期点検記録簿 */
     const leftColumn = [
       [specLabels.year, formatRegistrationYear(vehicle.year) || `${vehicle.year}${language === 'en' ? '' : (language === 'ja' ? '年' : ' 年')}`],
       [specLabels.mileage, `${vehicle.mileage} km`],
       [specLabels.repair, getVehicleListingField(vehicle, 'repairHistory') || emptyValue],
       [specLabels.inspection, getVehicleListingField(vehicle, 'vehicleInspection') || emptyValue],
-      [specLabels.legalMaintenance, getVehicleListingField(vehicle, 'legalMaintenance') || emptyValue],
-      [specLabels.inspectionBook, getVehicleListingField(vehicle, 'periodicInspectionBook') || emptyValue]
+      [specLabels.legalMaintenance, getVehicleListingField(vehicle, 'legalMaintenance') || emptyValue]
     ];
     const rightColumn = [
-      [specLabels.nonSmoking, getVehicleConditionField(vehicle, 'nonSmoking') || emptyValue],
-      [specLabels.authorizedImport, getVehicleConditionField(vehicle, 'authorizedImport') || emptyValue],
       [specLabels.dealerWarranty, getVehicleConditionField(vehicle, 'dealerWarranty') || emptyValue],
-      [specLabels.ecoTaxEligible, getVehicleConditionField(vehicle, 'ecoTaxEligible') || emptyValue],
-      [specLabels.oneOwner, getVehicleConditionField(vehicle, 'oneOwner') || emptyValue],
-      [specLabels.rentalUp, getVehicleConditionField(vehicle, 'rentalUp') || emptyValue]
+      [specLabels.oneOwner, getVehicleConditionField(vehicle, 'oneOwner') || emptyValue]
     ];
-    const specs = leftColumn.flatMap((item, index) => [item, rightColumn[index]]);
+    const specs = [];
+    for (let i = 0; i < leftColumn.length; i++) {
+      specs.push(leftColumn[i]);
+      if (rightColumn[i]) specs.push(rightColumn[i]);
+    }
 
     return specs.map(([label, value]) => `
       <div class="spec-row">

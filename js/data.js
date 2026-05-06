@@ -1014,108 +1014,56 @@ window.TK168_DATA = (() => {
 
   const vehicleConditionPresets = {
     'lamborghini-urus': {
-      nonSmoking: { zh: '是', ja: '○' },
-      authorizedImport: { zh: '是', ja: '○' },
       dealerWarranty: { zh: '3个月 / 5,000km', ja: '3ヵ月 / 5,000km' },
-      ecoTaxEligible: { zh: '不适用', ja: '対象外' },
       oneOwner: { zh: '是', ja: '○' },
-      rentalUp: { zh: '否', ja: '-' }
     },
     'audi-r8-spyder': {
-      nonSmoking: { zh: '是', ja: '○' },
-      authorizedImport: { zh: '是', ja: '○' },
       dealerWarranty: { zh: '6个月 / 10,000km', ja: '6ヵ月 / 10,000km' },
-      ecoTaxEligible: { zh: '不适用', ja: '対象外' },
       oneOwner: { zh: '是', ja: '○' },
-      rentalUp: { zh: '否', ja: '-' }
     },
     'ferrari-458-italia': {
-      nonSmoking: { zh: '是', ja: '○' },
-      authorizedImport: { zh: '是', ja: '○' },
       dealerWarranty: { zh: '1个月 / 1,000km', ja: '1ヵ月 / 1,000km' },
-      ecoTaxEligible: { zh: '不适用', ja: '対象外' },
       oneOwner: { zh: '否', ja: '-' },
-      rentalUp: { zh: '否', ja: '-' }
     },
     'bmw-x6-m': {
-      nonSmoking: { zh: '是', ja: '○' },
-      authorizedImport: { zh: '是', ja: '○' },
       dealerWarranty: { zh: '12个月 / 20,000km', ja: '12ヵ月 / 20,000km' },
-      ecoTaxEligible: { zh: '不适用', ja: '対象外' },
       oneOwner: { zh: '是', ja: '○' },
-      rentalUp: { zh: '否', ja: '-' }
     },
     'ferrari-488-gtb': {
-      nonSmoking: { zh: '是', ja: '○' },
-      authorizedImport: { zh: '是', ja: '○' },
       dealerWarranty: { zh: '3个月 / 3,000km', ja: '3ヵ月 / 3,000km' },
-      ecoTaxEligible: { zh: '不适用', ja: '対象外' },
       oneOwner: { zh: '否', ja: '-' },
-      rentalUp: { zh: '否', ja: '-' }
     },
     'lamborghini-aventador': {
-      nonSmoking: { zh: '是', ja: '○' },
-      authorizedImport: { zh: '是', ja: '○' },
       dealerWarranty: { zh: '店保 1个月', ja: '販売店保証 1ヵ月' },
-      ecoTaxEligible: { zh: '不适用', ja: '対象外' },
       oneOwner: { zh: '否', ja: '-' },
-      rentalUp: { zh: '否', ja: '-' }
     },
     'lamborghini-huracan-evo': {
-      nonSmoking: { zh: '是', ja: '○' },
-      authorizedImport: { zh: '是', ja: '○' },
       dealerWarranty: { zh: '6个月 / 5,000km', ja: '6ヵ月 / 5,000km' },
-      ecoTaxEligible: { zh: '不适用', ja: '対象外' },
       oneOwner: { zh: '是', ja: '○' },
-      rentalUp: { zh: '否', ja: '-' }
     },
     'lamborghini-urus-s': {
-      nonSmoking: { zh: '是', ja: '○' },
-      authorizedImport: { zh: '是', ja: '○' },
       dealerWarranty: { zh: '12个月 / 20,000km', ja: '12ヵ月 / 20,000km' },
-      ecoTaxEligible: { zh: '不适用', ja: '対象外' },
       oneOwner: { zh: '是', ja: '○' },
-      rentalUp: { zh: '否', ja: '-' }
     },
     'lamborghini-huracan-sto': {
-      nonSmoking: { zh: '是', ja: '○' },
-      authorizedImport: { zh: '是', ja: '○' },
       dealerWarranty: { zh: '3个月 / 3,000km', ja: '3ヵ月 / 3,000km' },
-      ecoTaxEligible: { zh: '不适用', ja: '対象外' },
       oneOwner: { zh: '否', ja: '-' },
-      rentalUp: { zh: '否', ja: '-' }
     },
     'lamborghini-gallardo': {
-      nonSmoking: { zh: '否', ja: '-' },
-      authorizedImport: { zh: '是', ja: '○' },
       dealerWarranty: { zh: '无', ja: '保証無' },
-      ecoTaxEligible: { zh: '不适用', ja: '対象外' },
       oneOwner: { zh: '否', ja: '-' },
-      rentalUp: { zh: '否', ja: '-' }
     },
     'lamborghini-sian-fkp-37': {
-      nonSmoking: { zh: '是', ja: '○' },
-      authorizedImport: { zh: '是', ja: '○' },
       dealerWarranty: { zh: '店保 1个月', ja: '販売店保証 1ヵ月' },
-      ecoTaxEligible: { zh: '适用', ja: '対象' },
       oneOwner: { zh: '是', ja: '○' },
-      rentalUp: { zh: '否', ja: '-' }
     },
     'lamborghini-urus-performante': {
-      nonSmoking: { zh: '是', ja: '○' },
-      authorizedImport: { zh: '是', ja: '○' },
       dealerWarranty: { zh: '12个月 / 20,000km', ja: '12ヵ月 / 20,000km' },
-      ecoTaxEligible: { zh: '不适用', ja: '対象外' },
       oneOwner: { zh: '是', ja: '○' },
-      rentalUp: { zh: '否', ja: '-' }
     },
     'lamborghini-huracan-evo-rwd': {
-      nonSmoking: { zh: '是', ja: '○' },
-      authorizedImport: { zh: '是', ja: '○' },
       dealerWarranty: { zh: '6个月 / 5,000km', ja: '6ヵ月 / 5,000km' },
-      ecoTaxEligible: { zh: '不适用', ja: '対象外' },
       oneOwner: { zh: '否', ja: '-' },
-      rentalUp: { zh: '否', ja: '-' }
     }
   };
 
@@ -1124,79 +1072,66 @@ window.TK168_DATA = (() => {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2026（R08）年12月', ja: '2026(R08)年12月' },
       legalMaintenance: { zh: '整备付', ja: '整備付' },
-      periodicInspectionBook: { zh: '附', ja: '付' }
     },
     'audi-r8-spyder': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2026（R08）年09月', ja: '2026(R08)年09月' },
       legalMaintenance: { zh: '整备付', ja: '整備付' },
-      periodicInspectionBook: { zh: '附', ja: '付' }
     },
     'ferrari-458-italia': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2026（R08）年06月', ja: '2026(R08)年06月' },
       legalMaintenance: { zh: '无', ja: 'なし' },
-      periodicInspectionBook: { zh: '附', ja: '付' }
     },
     'bmw-x6-m': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2027（R09）年03月', ja: '2027(R09)年03月' },
       legalMaintenance: { zh: '整备付', ja: '整備付' },
-      periodicInspectionBook: { zh: '附', ja: '付' }
     },
     'ferrari-488-gtb': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2026（R08）年11月', ja: '2026(R08)年11月' },
       legalMaintenance: { zh: '整备付', ja: '整備付' },
-      periodicInspectionBook: { zh: '附', ja: '付' }
     },
     'lamborghini-aventador': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2026（R08）年10月', ja: '2026(R08)年10月' },
       legalMaintenance: { zh: '无', ja: 'なし' },
-      periodicInspectionBook: { zh: '附', ja: '付' }
     },
     'lamborghini-huracan-evo': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2027（R09）年01月', ja: '2027(R09)年01月' },
       legalMaintenance: { zh: '整备付', ja: '整備付' },
-      periodicInspectionBook: { zh: '附', ja: '付' }
     },
     'lamborghini-urus-s': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2027（R09）年05月', ja: '2027(R09)年05月' },
       legalMaintenance: { zh: '整备付', ja: '整備付' },
-      periodicInspectionBook: { zh: '附', ja: '付' }
     },
     'lamborghini-huracan-sto': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2026（R08）年08月', ja: '2026(R08)年08月' },
       legalMaintenance: { zh: '无', ja: 'なし' },
-      periodicInspectionBook: { zh: '附', ja: '付' }
     },
     'lamborghini-gallardo': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2026（R08）年04月', ja: '2026(R08)年04月' },
       legalMaintenance: { zh: '无', ja: 'なし' },
-      periodicInspectionBook: { zh: '无', ja: 'なし' }
     },
     'lamborghini-sian-fkp-37': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2026（R08）年07月', ja: '2026(R08)年07月' },
       legalMaintenance: { zh: '整备付', ja: '整備付' },
-      periodicInspectionBook: { zh: '附', ja: '付' }
     },
     'lamborghini-urus-performante': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2027（R09）年02月', ja: '2027(R09)年02月' },
       legalMaintenance: { zh: '整备付', ja: '整備付' },
-      periodicInspectionBook: { zh: '附', ja: '付' }
     },
     'lamborghini-huracan-evo-rwd': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2026（R08）年05月', ja: '2026(R08)年05月' },
       legalMaintenance: { zh: '整备付', ja: '整備付' },
-      periodicInspectionBook: { zh: '附', ja: '付' }
     }
   };
 

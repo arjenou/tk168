@@ -37,17 +37,12 @@ CREATE TABLE IF NOT EXISTS vehicles (
   overview_en     TEXT,            -- JSON array of strings
   benefits        TEXT,            -- JSON array
   features        TEXT,            -- JSON array
-  -- Condition preset fields (JSON {zh,ja,en})
-  cond_non_smoking            TEXT,
-  cond_authorized_import      TEXT,
+  -- Condition / listing preset fields (JSON {zh,ja,en})
   cond_dealer_warranty        TEXT,
-  cond_eco_tax_eligible       TEXT,
   cond_one_owner              TEXT,
-  cond_rental_up              TEXT,
   listing_repair_history      TEXT,
   listing_vehicle_inspection  TEXT,
   listing_legal_maintenance   TEXT,
-  listing_periodic_book       TEXT,
   highlight_steering          TEXT,
   highlight_chassis_tail      TEXT,
   staff_photo_r2_key          TEXT,
