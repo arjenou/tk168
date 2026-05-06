@@ -88,6 +88,8 @@
       gallery,
       mileage: keepMeaningful(v.mileage),
       engine: keepMeaningful(v.engine),
+      displacement: keepMeaningful(v.displacement),
+      cylinders: keepMeaningful(v.cylinders),
       fuel: keepMeaningful(v.fuel),
       trans: keepMeaningful(v.trans),
       totalPrice: keepMeaningful(v.totalPrice),
@@ -123,6 +125,7 @@
       ["listingRepairHistory", "repairHistory"],
       ["listingVehicleInspection", "vehicleInspection"],
       ["listingLegalMaintenance", "legalMaintenance"],
+      ["listingFuelGrade", "fuelGrade"],
     ].forEach(([from, to]) => { if (v[from]) listing[to] = v[from]; });
 
     const highlight = {};
@@ -149,6 +152,8 @@
       gallery,
       mileage: keepMeaningful(r.mileage),
       engine: keepMeaningful(r.engine),
+      displacement: keepMeaningful(r.displacement),
+      cylinders: keepMeaningful(r.cylinders),
       fuel: keepMeaningful(r.fuel),
       trans: keepMeaningful(r.trans),
       bodyStyle: keepMeaningful(r.bodyStyle),

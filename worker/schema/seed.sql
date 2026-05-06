@@ -3,25 +3,27 @@
 DELETE FROM vehicle_images;
 DELETE FROM vehicles;
 INSERT INTO vehicles (
-    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, displacement, cylinders, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
     cond_dealer_warranty, cond_one_owner,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance,
+    listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-urus', 'lamborghini', '兰博基尼 Urus', NULL, NULL, '2022', '高性能SUV',
-    'b1.svg', '3,200', '4.0L V8', '汽油', '自动挡',
-    '¥ 1,980,000', '¥ 1,860,000', 'SUV', '四轮驱动',
+    'b1.svg', '3,200', '4.0L V8', '4.0L', 'V8', '汽油', '自动挡',
+    '¥ 1,980,000', '¥ 1,860,000', 'SUV', 'AWD',
     '曜石黑', '黑色真皮', '5 座', '完整在册', '意大利进口',
     '["这台 Lamborghini Urus 保持了完整保养记录与出色的整体状态，在高性能 SUV 的张力之外，也保留了足够从容的日常使用感。","车身姿态、内饰质感与机械完成度都处于很整齐的水准，适合被当作兼顾性能表达与通勤场景的一台主力座驾。"]', '["この Lamborghini Urus は整備履歴が明確で、全体のコンディションも非常に整っています。高性能 SUV らしい緊張感を保ちながら、日常域では落ち着いた扱いやすさも感じられる一台です。","ボディの佇まい、内装の質感、機関系のまとまりまで全体の完成度が高く、パフォーマンス性と日常使いを両立したメインカーとして自然に選べる内容です。"]', NULL,
     '["一年质保服务","支持旧车置换","可选金融分期","专属交付顾问"]', '["质检认证","现车在库","全国配送","手续透明","专人跟进","售后支持","急速交付"]',
     '{"zh":"3个月 / 5,000km","ja":"3ヵ月 / 5,000km"}', '{"zh":"是","ja":"○"}',
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年12月","ja":"2026(R08)年12月"}',
     '{"zh":"整备付","ja":"整備付"}',
+    '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"右舵","ja":"右ハンドル"}', '{"zh":"381","ja":"381"}',
     NULL, NULL, NULL, NULL,
     0, 1
@@ -31,25 +33,27 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Urus', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Urus', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, displacement, cylinders, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
     cond_dealer_warranty, cond_one_owner,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance,
+    listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'audi-r8-spyder', 'audi', '奥迪 R8 Spyder', NULL, NULL, '2023', '敞篷跑车',
-    'b2.svg', '90', '5.2L V10', '汽油', '自动挡',
-    '¥ 1,600,000', '¥ 1,490,000', '跑车', '四轮驱动',
+    'b2.svg', '90', '5.2L V10', '5.2L', 'V10', '汽油', '自动挡',
+    '¥ 1,600,000', '¥ 1,490,000', '跑车', 'AWD',
     '曜石黑', '棕色真皮', '2 座', '完整在册', '德国进口',
     '["这台奥迪 R8 保持了低里程与完整保养记录，低伏车身与中置布局让整车始终带着很鲜明的超跑比例。","无论是漆面状态、机械质感还是敞篷姿态，都呈现出相当完整的完成度，兼具驾驶乐趣与日常使用的稳定感。"]', '["このアウディ R8 Spyder は低走行で整備履歴も明確に保たれており、低く構えたシルエットとミッドシップレイアウトによって、スーパーカーらしいプロポーションが際立っています。","ボディコンディション、機械的な質感、オープントップの見栄えまで総合的な完成度が高く、走る楽しさと日常での扱いやすさをバランスよく備えています。"]', NULL,
     '["一年质保服务","支持旧车置换","可选金融分期","专属交付顾问"]', '["质检认证","现车在库","全国配送","手续透明","专人跟进","售后支持","急速交付"]',
     '{"zh":"6个月 / 10,000km","ja":"6ヵ月 / 10,000km"}', '{"zh":"是","ja":"○"}',
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年09月","ja":"2026(R08)年09月"}',
     '{"zh":"整备付","ja":"整備付"}',
+    '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"127","ja":"127"}',
     NULL, NULL, NULL, NULL,
     1, 1
@@ -59,25 +63,27 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('audi-r8-spyder', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '奥迪 R8 Spyder', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('audi-r8-spyder', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '奥迪 R8 Spyder', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, displacement, cylinders, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
     cond_dealer_warranty, cond_one_owner,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance,
+    listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'ferrari-458-italia', 'ferrari', '法拉利 458 Italia', NULL, NULL, '2019', '中置跑车',
-    'b3.svg', '15,200', '4.5L V8', '汽油', '自动挡',
-    '¥ 1,750,000', '¥ 1,640,000', '跑车', '后轮驱动',
+    'b3.svg', '15,200', '4.5L V8', '4.5L', 'V8', '汽油', '自动挡',
+    '¥ 1,750,000', '¥ 1,640,000', '跑车', 'RWD',
     '竞技红', '黑红拼色真皮', '2 座', '完整在册', '意大利进口',
     '["Ferrari 458 Italia 保留了自然吸气时代极具代表性的声浪与比例，是法拉利车系里辨识度很高的一代作品。","这台车的整体状态干净利落，既有足够鲜明的收藏气质，也保留了很纯粹的驾驶表达。"]', '["Ferrari 458 Italia は自然吸気時代を象徴するサウンドとプロポーションを色濃く残した一台で、フェラーリの中でも特に印象深い世代として知られています。","この個体は全体の状態が非常にすっきりと整っており、コレクション性を感じさせながらも、純粋なドライビングプレジャーをしっかり残しています。"]', NULL,
     '["一年质保服务","支持旧车置换","可选金融分期","专属交付顾问"]', '["质检认证","现车在库","全国配送","手续透明","专人跟进","售后支持","急速交付"]',
     '{"zh":"1个月 / 1,000km","ja":"1ヵ月 / 1,000km"}', '{"zh":"否","ja":"-"}',
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年06月","ja":"2026(R08)年06月"}',
     '{"zh":"无","ja":"なし"}',
+    '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"458","ja":"458"}',
     NULL, NULL, NULL, NULL,
     2, 1
@@ -87,25 +93,27 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-458-italia', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '法拉利 458 Italia', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-458-italia', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '法拉利 458 Italia', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, displacement, cylinders, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
     cond_dealer_warranty, cond_one_owner,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance,
+    listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'bmw-x6-m', 'bmw', '宝马 X6 M', NULL, NULL, '2024', '轿跑SUV',
-    'b4.svg', '120', '4.4L V8', '汽油', '自动挡',
-    '¥ 750,000', '¥ 698,000', 'SUV', '四轮驱动',
+    'b4.svg', '120', '4.4L V8', '4.4L', 'V8', '汽油', '自动挡',
+    '¥ 750,000', '¥ 698,000', 'SUV', 'AWD',
     '矿石白', '黑色真皮', '5 座', '完整在册', '德国进口',
     '["BMW X6 M 将轿跑 SUV 的线条与高性能动力结合得很直接，整车视觉重心低，气场也足够鲜明。","低里程与整齐的车况让它更像一台完成度很高的性能日用车，在通勤与长途场景里都保持着稳定质感。"]', '["BMW X6 M はクーペ SUV ならではの流麗なラインと高出力ユニットを素直に結びつけた一台で、低重心に見えるスタンスが強い存在感を生み出しています。","低走行かつコンディションも整っており、日常使いのしやすさを備えながら、パフォーマンスモデルとしての濃さもしっかり感じられる内容です。"]', NULL,
     '["一年质保服务","支持旧车置换","可选金融分期","专属交付顾问"]', '["质检认证","现车在库","全国配送","手续透明","专人跟进","售后支持","急速交付"]',
     '{"zh":"12个月 / 20,000km","ja":"12ヵ月 / 20,000km"}', '{"zh":"是","ja":"○"}',
     '{"zh":"无","ja":"なし"}', '{"zh":"2027（R09）年03月","ja":"2027(R09)年03月"}',
     '{"zh":"整备付","ja":"整備付"}',
+    '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"右舵","ja":"右ハンドル"}', '{"zh":"642","ja":"642"}',
     NULL, NULL, NULL, NULL,
     3, 1
@@ -115,25 +123,27 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('bmw-x6-m', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '宝马 X6 M', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('bmw-x6-m', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '宝马 X6 M', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, displacement, cylinders, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
     cond_dealer_warranty, cond_one_owner,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance,
+    listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'ferrari-488-gtb', 'ferrari', '法拉利 488 GTB', NULL, NULL, '2021', '中置跑车',
-    'b5.svg', '8,700', '3.9L V8', '汽油', '自动挡',
-    '¥ 2,250,000', '¥ 2,120,000', '跑车', '后轮驱动',
+    'b5.svg', '8,700', '3.9L V8', '3.9L', 'V8', '汽油', '自动挡',
+    '¥ 2,250,000', '¥ 2,120,000', '跑车', 'RWD',
     '亮银灰', '深棕真皮', '2 座', '完整在册', '意大利进口',
     '["Ferrari 488 GTB 有着很成熟的空气动力学比例，车身线条紧凑而克制，是法拉利近代设计语言里很完整的一台作品。","这台车的状态收得很整齐，既保留了性能车应有的锋利感，也维持了足够清爽的日常可驾性。"]', '["Ferrari 488 GTB は空力処理を感じさせる完成度の高いプロポーションを持ち、引き締まったボディラインが現代フェラーリらしい美しさを際立たせています。","この個体は全体のまとまりが良く、スーパーカーらしい鋭さを保ちながらも、日常域で扱いやすいクリアな印象をしっかり残しています。"]', NULL,
     '["一年质保服务","支持旧车置换","可选金融分期","专属交付顾问"]', '["质检认证","现车在库","全国配送","手续透明","专人跟进","售后支持","急速交付"]',
     '{"zh":"3个月 / 3,000km","ja":"3ヵ月 / 3,000km"}', '{"zh":"否","ja":"-"}',
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年11月","ja":"2026(R08)年11月"}',
     '{"zh":"整备付","ja":"整備付"}',
+    '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"488","ja":"488"}',
     NULL, NULL, NULL, NULL,
     4, 1
@@ -143,25 +153,27 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-488-gtb', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '法拉利 488 GTB', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-488-gtb', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '法拉利 488 GTB', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, displacement, cylinders, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
     cond_dealer_warranty, cond_one_owner,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance,
+    listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-aventador', 'lamborghini', '兰博基尼 Aventador', NULL, NULL, '2022', 'V12超跑',
-    'b6.svg', '12,500', '6.5L V12', '汽油', '自动挡',
-    '¥ 4,000,000', '¥ 3,780,000', '跑车', '四轮驱动',
+    'b6.svg', '12,500', '6.5L V12', '6.5L', 'V12', '汽油', '自动挡',
+    '¥ 4,000,000', '¥ 3,780,000', '跑车', 'AWD',
     '珍珠白', '黑色 Alcantara', '2 座', '完整在册', '意大利进口',
     '["Aventador 保留了兰博基尼最具代表性的楔形姿态与 V12 气场，整车的存在感几乎不需要额外修饰。","从比例、声浪到细节完成度，它都更接近一台具有象征意味的旗舰超跑，而不只是单纯的性能机器。"]', '["Aventador はランボルギーニを象徴するウェッジシェイプと V12 の圧倒的な存在感をそのまま体現しており、余計な演出がなくても十分な迫力を放つ一台です。","プロポーション、サウンド、細部の仕上がりに至るまで、単なる高性能車というよりブランドの象徴性を背負ったフラッグシップとしての空気感があります。"]', NULL,
     '["一年质保服务","支持旧车置换","可选金融分期","专属交付顾问"]', '["质检认证","现车在库","全国配送","手续透明","专人跟进","售后支持","急速交付"]',
     '{"zh":"店保 1个月","ja":"販売店保証 1ヵ月"}', '{"zh":"否","ja":"-"}',
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年10月","ja":"2026(R08)年10月"}',
     '{"zh":"无","ja":"なし"}',
+    '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"770","ja":"770"}',
     NULL, NULL, NULL, NULL,
     5, 1
@@ -171,25 +183,27 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-aventador', 'seed:vehicles/seed/006.png', '/api/media/vehicles/seed/006.png', '兰博基尼 Aventador', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-aventador', 'seed:vehicles/seed/006.png', '/api/media/vehicles/seed/006.png', '兰博基尼 Aventador', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, displacement, cylinders, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
     cond_dealer_warranty, cond_one_owner,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance,
+    listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-huracan-evo', 'lamborghini', '兰博基尼 Huracan EVO', NULL, NULL, '2023', '中置跑车',
-    'b1.svg', '800', '5.2L V10', '汽油', '自动挡',
-    '¥ 2,680,000', '¥ 2,520,000', '跑车', '四轮驱动',
+    'b1.svg', '800', '5.2L V10', '5.2L', 'V10', '汽油', '自动挡',
+    '¥ 2,680,000', '¥ 2,520,000', '跑车', 'AWD',
     '珍珠黄', '黑黄拼色', '2 座', '完整在册', '意大利进口',
     '["Huracan EVO 以极低里程保留了很新鲜的状态，车身比例紧凑直接，带着典型的兰博基尼视觉张力。","它的动态表达比外形更轻快，既适合城市环境中的展示感，也保留了周末驾驶时应有的灵活回应。"]', '["Huracan EVO は極低走行らしい新鮮さを保っており、引き締まったボディバランスにはランボルギーニらしい視覚的な緊張感が宿っています。","見た目の強さに対して走りの反応は軽快で、街中での見栄えと週末のドライビングの楽しさをどちらも自然に楽しめる仕上がりです。"]', NULL,
     '["一年质保服务","支持旧车置换","可选金融分期","专属交付顾问"]', '["质检认证","现车在库","全国配送","手续透明","专人跟进","售后支持","急速交付"]',
     '{"zh":"6个月 / 5,000km","ja":"6ヵ月 / 5,000km"}', '{"zh":"是","ja":"○"}',
     '{"zh":"无","ja":"なし"}', '{"zh":"2027（R09）年01月","ja":"2027(R09)年01月"}',
     '{"zh":"整备付","ja":"整備付"}',
+    '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"613","ja":"613"}',
     NULL, NULL, NULL, NULL,
     6, 1
@@ -199,25 +213,27 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '兰博基尼 Huracan EVO', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '兰博基尼 Huracan EVO', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, displacement, cylinders, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
     cond_dealer_warranty, cond_one_owner,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance,
+    listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-urus-s', 'lamborghini', '兰博基尼 Urus S', NULL, NULL, '2024', '高性能SUV',
-    'b1.svg', '120', '4.0L V8', '汽油', '自动挡',
-    '¥ 2,280,000', '¥ 2,140,000', 'SUV', '四轮驱动',
+    'b1.svg', '120', '4.0L V8', '4.0L', 'V8', '汽油', '自动挡',
+    '¥ 2,280,000', '¥ 2,140,000', 'SUV', 'AWD',
     '石墨灰', '黑橙拼色', '5 座', '完整在册', '意大利进口',
     '["Urus S 在保留实用性的同时，依然维持了很强的品牌辨识度与性能氛围，是一台边界感很少的高性能 SUV。","整车状态新、配置完整，外观与座舱都呈现出相当统一的完成度，适合被放进更高频的日常使用场景里。"]', '["Urus S は高い実用性を持ちながらも、ブランドらしいアイコン性とパフォーマンス感をしっかり残した、懐の深いハイパフォーマンス SUV です。","車両状態は非常に新しく、装備も整っており、エクステリアとインテリアの完成度に統一感があるため、日常の使用頻度が高い環境にも自然に馴染みます。"]', NULL,
     '["一年质保服务","支持旧车置换","可选金融分期","专属交付顾问"]', '["质检认证","现车在库","全国配送","手续透明","专人跟进","售后支持","急速交付"]',
     '{"zh":"12个月 / 20,000km","ja":"12ヵ月 / 20,000km"}', '{"zh":"是","ja":"○"}',
     '{"zh":"无","ja":"なし"}', '{"zh":"2027（R09）年05月","ja":"2027(R09)年05月"}',
     '{"zh":"整备付","ja":"整備付"}',
+    '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"右舵","ja":"右ハンドル"}', '{"zh":"524","ja":"524"}',
     NULL, NULL, NULL, NULL,
     7, 1
@@ -227,25 +243,27 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-s', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus S', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-s', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus S', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, displacement, cylinders, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
     cond_dealer_warranty, cond_one_owner,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance,
+    listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-huracan-sto', 'lamborghini', '兰博基尼 Huracan STO', NULL, NULL, '2022', '中置跑车',
-    'b1.svg', '5,400', '5.2L V10', '汽油', '自动挡',
-    '¥ 3,150,000', '¥ 2,960,000', '跑车', '后轮驱动',
+    'b1.svg', '5,400', '5.2L V10', '5.2L', 'V10', '汽油', '自动挡',
+    '¥ 3,150,000', '¥ 2,960,000', '跑车', 'RWD',
     '赛道灰', '黑色 Alcantara', '2 座', '完整在册', '意大利进口',
     '["Huracan STO 的设定明显更偏赛道取向，空气动力学细节与车身姿态都带着非常直接的功能性表达。","它保留了更纯粹的操控导向，同时也让整车在静止状态下就有很强的收藏与展示意味。"]', '["Huracan STO は明確にサーキット志向へ振られたモデルで、空力パーツや車体の構えそのものに機能性がストレートに表れています。","操作感はよりピュアで、停まっている状態でもコレクション性と展示映えの強さを感じさせる、非常に個性の立った一台です。"]', NULL,
     '["一年质保服务","支持旧车置换","可选金融分期","专属交付顾问"]', '["质检认证","现车在库","全国配送","手续透明","专人跟进","售后支持","急速交付"]',
     '{"zh":"3个月 / 3,000km","ja":"3ヵ月 / 3,000km"}', '{"zh":"否","ja":"-"}',
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年08月","ja":"2026(R08)年08月"}',
     '{"zh":"无","ja":"なし"}',
+    '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"912","ja":"912"}',
     NULL, NULL, NULL, NULL,
     8, 1
@@ -255,25 +273,27 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-sto', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan STO', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-sto', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan STO', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, displacement, cylinders, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
     cond_dealer_warranty, cond_one_owner,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance,
+    listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-gallardo', 'lamborghini', '兰博基尼 Gallardo', NULL, NULL, '2019', '中置跑车',
-    'b1.svg', '28,000', '5.0L V10', '汽油', '自动挡',
-    '¥ 1,480,000', '¥ 1,360,000', '跑车', '四轮驱动',
+    'b1.svg', '28,000', '5.0L V10', '5.0L', 'V10', '汽油', '自动挡',
+    '¥ 1,480,000', '¥ 1,360,000', '跑车', 'AWD',
     '黑曜石', '黑色真皮', '2 座', '完整在册', '意大利进口',
     '["Gallardo 保留了兰博基尼早期非常鲜明的车身比例，线条更简洁，也更容易让人联想到品牌过去的设计阶段。","这台车的状态干净稳定，既有经典时期的气质，也带着很明确的品牌历史感。"]', '["Gallardo はランボルギーニ初期の鮮烈なプロポーションを色濃く残し、よりシンプルなラインによってブランドの過去のデザイン文脈を想起させる一台です。","この個体はコンディションが安定しており、クラシックな時代感とブランドの歴史性を素直に味わえる内容にまとまっています。"]', NULL,
     '["一年质保服务","支持旧车置换","可选金融分期","专属交付顾问"]', '["质检认证","现车在库","全国配送","手续透明","专人跟进","售后支持","急速交付"]',
     '{"zh":"无","ja":"保証無"}', '{"zh":"否","ja":"-"}',
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年04月","ja":"2026(R08)年04月"}',
     '{"zh":"无","ja":"なし"}',
+    '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"305","ja":"305"}',
     NULL, NULL, NULL, NULL,
     9, 1
@@ -283,25 +303,27 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-gallardo', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '兰博基尼 Gallardo', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-gallardo', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '兰博基尼 Gallardo', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, displacement, cylinders, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
     cond_dealer_warranty, cond_one_owner,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance,
+    listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-sian-fkp-37', 'lamborghini', '兰博基尼 Sian FKP 37', NULL, NULL, '2021', '混动超跑',
-    'b1.svg', '2,100', '6.5L V12', 'Hybrid', '自动挡',
-    '¥ 8,800,000', '¥ 8,320,000', '跑车', '四轮驱动',
+    'b1.svg', '2,100', '6.5L V12', '6.5L', 'V12', 'HEV（混动）', '自动挡',
+    '¥ 8,800,000', '¥ 8,320,000', '跑车', 'AWD',
     '金属绿', '黑金拼色', '2 座', '完整在册', '意大利进口',
     '["Sian FKP 37 兼具极高稀缺性与技术象征性，视觉表达和机械规格都处在品牌体系里非常特殊的位置。","相比常规量产超跑，它更像一件带有明确时代印记的收藏级作品，存在感和话题性都非常完整。"]', '["Sian FKP 37 は圧倒的な希少性と技術的象徴性を併せ持ち、デザイン表現とメカニカルな存在感の両面でブランド内でも特別な立ち位置にあるモデルです。","一般的な量産スーパーカーというより、時代性を明確に刻んだコレクターズピースに近く、存在感も話題性も非常に完成度の高い一台です。"]', NULL,
     '["一年质保服务","支持旧车置换","可选金融分期","专属交付顾问"]', '["质检认证","现车在库","全国配送","手续透明","专人跟进","售后支持","急速交付"]',
     '{"zh":"店保 1个月","ja":"販売店保証 1ヵ月"}', '{"zh":"是","ja":"○"}',
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年07月","ja":"2026(R08)年07月"}',
     '{"zh":"整备付","ja":"整備付"}',
+    '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"037","ja":"037"}',
     NULL, NULL, NULL, NULL,
     10, 1
@@ -311,25 +333,27 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-sian-fkp-37', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Sian FKP 37', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-sian-fkp-37', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Sian FKP 37', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, displacement, cylinders, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
     cond_dealer_warranty, cond_one_owner,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance,
+    listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-urus-performante', 'lamborghini', '兰博基尼 Urus Performante', NULL, NULL, '2023', '高性能SUV',
-    'b1.svg', '360', '4.0L V8', '汽油', '自动挡',
-    '¥ 2,650,000', '¥ 2,490,000', 'SUV', '四轮驱动',
+    'b1.svg', '360', '4.0L V8', '4.0L', 'V8', '汽油', '自动挡',
+    '¥ 2,650,000', '¥ 2,490,000', 'SUV', 'AWD',
     '哑光灰', '黑红拼色', '5 座', '完整在册', '意大利进口',
     '["Urus Performante 在实用轮廓之上进一步强化了性能感，整车姿态、细节处理和运动氛围都更鲜明一些。","低里程让它保留了很完整的新鲜度，无论从外观状态还是驾驶预期来看，都处在很利落的区间里。"]', '["Urus Performante は実用的な SUV の輪郭を保ちながら、さらに強いパフォーマンス色を与えられたモデルで、姿勢や細部の処理により濃いスポーツ感が表れています。","低走行によって新鮮な印象が残されており、外観の状態も走りへの期待値もともにシャープな水準にあります。"]', NULL,
     '["一年质保服务","支持旧车置换","可选金融分期","专属交付顾问"]', '["质检认证","现车在库","全国配送","手续透明","专人跟进","售后支持","急速交付"]',
     '{"zh":"12个月 / 20,000km","ja":"12ヵ月 / 20,000km"}', '{"zh":"是","ja":"○"}',
     '{"zh":"无","ja":"なし"}', '{"zh":"2027（R09）年02月","ja":"2027(R09)年02月"}',
     '{"zh":"整备付","ja":"整備付"}',
+    '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"右舵","ja":"右ハンドル"}', '{"zh":"801","ja":"801"}',
     NULL, NULL, NULL, NULL,
     11, 1
@@ -339,25 +363,27 @@ INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) 
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-performante', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus Performante', 0, 2);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-performante', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus Performante', 0, 3);
 INSERT INTO vehicles (
-    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, displacement, cylinders, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
     cond_dealer_warranty, cond_one_owner,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance,
+    listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     'lamborghini-huracan-evo-rwd', 'lamborghini', '兰博基尼 Huracan EVO RWD', NULL, NULL, '2020', '中置跑车',
-    'b1.svg', '9,200', '5.2L V10', '汽油', '自动挡',
-    '¥ 2,100,000', '¥ 1,960,000', '跑车', '后轮驱动',
+    'b1.svg', '9,200', '5.2L V10', '5.2L', 'V10', '汽油', '自动挡',
+    '¥ 2,100,000', '¥ 1,960,000', '跑车', 'RWD',
     '珍珠白', '黑色真皮', '2 座', '完整在册', '意大利进口',
     '["Huracan EVO RWD 有着更直接的转向与车尾反馈，整车动态更轻快，也更接近传统后驱跑车的驾驶语气。","它在状态上保持得很整齐，既保留了兰博基尼应有的视觉张力，也多了一层更纯粹的操控趣味。"]', '["Huracan EVO RWD はステアリングの初期応答とリアの動きがよりダイレクトで、伝統的な後輪駆動スポーツらしい軽快なドライビングフィールが魅力です。","コンディションも非常に整っており、ランボルギーニらしい視覚的な緊張感に加えて、より純粋な操る楽しさがしっかり感じられる一台です。"]', NULL,
     '["一年质保服务","支持旧车置换","可选金融分期","专属交付顾问"]', '["质检认证","现车在库","全国配送","手续透明","专人跟进","售后支持","急速交付"]',
     '{"zh":"6个月 / 5,000km","ja":"6ヵ月 / 5,000km"}', '{"zh":"否","ja":"-"}',
     '{"zh":"无","ja":"なし"}', '{"zh":"2026（R08）年05月","ja":"2026(R08)年05月"}',
     '{"zh":"整备付","ja":"整備付"}',
+    NULL,
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"274","ja":"274"}',
     NULL, NULL, NULL, NULL,
     12, 1

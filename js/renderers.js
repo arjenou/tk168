@@ -123,12 +123,8 @@ window.TK168Renderers = (() => {
     return window.TK168_DATA.getVehicleBasePriceDisplay(vehicle);
   }
 
-  function getVehicleName(vehicle) {
-    return window.TK168_DATA.getVehicleName(vehicle);
-  }
-
-  function getVehicleTypeLabel(type) {
-    return window.TK168_DATA.getVehicleTypeLabel(type);
+  function getVehicleName(vehicle, language) {
+    return window.TK168_DATA.getVehicleName(vehicle, language);
   }
 
   function getVehicleFieldLabel(field, value) {
@@ -228,7 +224,19 @@ window.TK168Renderers = (() => {
     const variant = variants[variantKey] || variants.inventory;
     const totalPrice = getVehicleTotalPrice(vehicle);
     const basePrice = getVehicleBasePrice(vehicle);
-    const vehicleName = getVehicleName(vehicle);
+    const language = window.TK168I18N?.getLanguage?.() || 'ja';
+    const vehicleName = getVehicleName(vehicle, language);
+    const vehicleBrandLine = window.TK168_DATA.getVehicleBrandTitle(vehicle, language);
+    const subtitleParts = [vehicle.year, getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle)].filter(Boolean);
+    const vehicleModelLine = window.TK168_DATA.getVehicleModelDisplayName(vehicle, language)
+      || window.TK168_DATA.getVehicleModelName(vehicle)
+      || vehicleName;
+    const titleStackHtml = [
+      vehicleBrandLine
+        ? `<span class="v-card-brand-line">${vehicleBrandLine}</span>`
+        : '',
+      `<span class="v-card-model-line">${vehicleModelLine}</span>`,
+    ].join('');
     const vehicleBrandIcon = (variant === variants.inventory)
       ? resolveVehicleCardBrandBadge(vehicle)
       : resolveVehicleCardBrandIcon(vehicle);
@@ -244,7 +252,7 @@ window.TK168Renderers = (() => {
     })();
     const metaItems = [
       { key: 'mileage', icon: 'v1.svg', alt: 'Mileage', value: `${vehicle.mileage}km` },
-      { key: 'engine', icon: 'v2.svg', alt: 'Engine', value: vehicle.engine },
+      { key: 'engine', icon: 'v2.svg', alt: 'Engine', value: window.TK168_DATA?.formatVehicleEngineLine?.(vehicle) || vehicle.engine },
       { key: 'fuel', icon: 'v3.svg', alt: 'Fuel', value: getVehicleFieldLabel('fuel', vehicle.fuel) },
       { key: 'transmission', icon: 'v4.svg', alt: 'Transmission', value: getVehicleFieldLabel('trans', vehicle.trans) }
     ];
@@ -274,8 +282,8 @@ window.TK168Renderers = (() => {
           </a>
         </div>
         <div class="${variant.titleWrap}">
-          <h3 class="${variant.title}">${vehicleName}</h3>
-          <p class="${variant.subtitle}">${vehicle.year} · ${getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle) || getVehicleTypeLabel(vehicle.type)}</p>
+          <h3 class="${variant.title}">${titleStackHtml}</h3>
+          <p class="${variant.subtitle}">${subtitleParts.join(' · ')}</p>
         </div>
       </div>
       <div class="${variant.cover}">
@@ -351,6 +359,7 @@ window.TK168Renderers = (() => {
           repair: 'Repair history',
           inspection: 'Vehicle inspection',
           legalMaintenance: 'Legal maintenance',
+          fuelGrade: 'Fuel grade',
           dealerWarranty: 'Dealer warranty',
           oneOwner: 'One owner'
         }
@@ -361,6 +370,7 @@ window.TK168Renderers = (() => {
             repair: '修復歴',
             inspection: '車検',
             legalMaintenance: '法定整備',
+            fuelGrade: '油種',
             dealerWarranty: '販売店保証',
             oneOwner: 'ワンオーナー'
           }
@@ -370,6 +380,7 @@ window.TK168Renderers = (() => {
             repair: '修复历史',
             inspection: '车检',
             legalMaintenance: '法定整备',
+            fuelGrade: '油种',
             dealerWarranty: '店铺质保',
             oneOwner: '一手车主'
           });
@@ -383,7 +394,8 @@ window.TK168Renderers = (() => {
     ];
     const rightColumn = [
       [specLabels.dealerWarranty, getVehicleConditionField(vehicle, 'dealerWarranty') || emptyValue],
-      [specLabels.oneOwner, getVehicleConditionField(vehicle, 'oneOwner') || emptyValue]
+      [specLabels.oneOwner, getVehicleConditionField(vehicle, 'oneOwner') || emptyValue],
+      [specLabels.fuelGrade, getVehicleListingField(vehicle, 'fuelGrade') || emptyValue]
     ];
     const specs = [];
     for (let i = 0; i < leftColumn.length; i++) {
@@ -414,6 +426,7 @@ window.TK168Renderers = (() => {
     ];
     const highlightSpecs = [
       [language === 'en' ? 'Displacement' : (language === 'ja' ? '排気量' : '排气量'), getVehicleHighlightField(vehicle, 'displacement')],
+      [language === 'en' ? 'Cylinder layout' : (language === 'ja' ? 'シリンダー' : '发动机缸数'), getVehicleHighlightField(vehicle, 'cylinders')],
       [language === 'en' ? 'Drive' : (language === 'ja' ? '駆動方式' : '驱动方式'), getVehicleHighlightField(vehicle, 'drive')],
       [language === 'en' ? 'Steering' : (language === 'ja' ? 'ハンドル' : '方向盘'), getVehicleHighlightField(vehicle, 'steering')],
       [language === 'en' ? 'Seats' : (language === 'ja' ? '乗車定員' : '乘车定员'), getVehicleHighlightField(vehicle, 'seats')],

@@ -853,14 +853,19 @@ function parseIntegerValue(rawValue) {
 }
 
 function getVehicleFuelToken(vehicle) {
-  const fuel = String(vehicle?.fuel || '').toLowerCase();
-  if (/(electric|ev|纯电|電気)/i.test(fuel)) return 'fuel-ev';
-  if (/(hybrid|phev|hev|混动|混合|ハイブリッド)/i.test(fuel)) return 'fuel-hybrid';
+  const fuel = String(vehicle?.fuel || '');
+  if (!fuel.trim()) return 'fuel-gas';
+  if (/FCEV|氢燃料|燃料電池|fuel\s*cell/i.test(fuel)) return 'fuel-ev';
+  if (/BEV|纯电动|純電|battery\s*electric/i.test(fuel)) return 'fuel-ev';
+  if (/EREV|增程式|レンジエクステンダー|extended[- ]range/i.test(fuel)) return 'fuel-ev';
+  if (/PHEV|插电|プラグイン|plug[- ]?in/i.test(fuel)) return 'fuel-hybrid';
+  if (/HEV|混动|ハイブリッド|hybrid/i.test(fuel)) return 'fuel-hybrid';
+  if (/(electric|纯电|電気|^\s*ev\s*$)/i.test(fuel)) return 'fuel-ev';
   return 'fuel-gas';
 }
 
 function getVehicleCategoryToken(vehicle) {
-  const haystack = `${vehicle?.type || ''} ${vehicle?.bodyStyle || ''} ${vehicle?.name || ''}`.toLowerCase();
+  const haystack = `${vehicle?.bodyStyle || ''} ${vehicle?.name || ''}`.toLowerCase();
   if (/(suv|越野|ＳＵＶ)/i.test(haystack)) return 'suv';
   if (/(跑|sport|spyder|coupe|gt|ロードスター|クーペ)/i.test(haystack)) return 'sport';
   if (/(轿|sedan|セダン)/i.test(haystack)) return 'sedan';
@@ -908,7 +913,7 @@ function vehicleMatchesCompareFilter(vehicle) {
   if (state.mileage === 'mileage-mid' && (mileage <= 10000 || mileage > 50000)) return false;
   if (state.mileage === 'mileage-high' && mileage <= 50000) return false;
 
-  const displacement = parseNumericValue(vehicle?.engine);
+  const displacement = parseNumericValue(vehicle?.displacement || vehicle?.engine);
   if (state.displacement === 'disp-low' && displacement > 3.0) return false;
   if (state.displacement === 'disp-mid' && (displacement <= 3.0 || displacement > 5.0)) return false;
   if (state.displacement === 'disp-high' && displacement <= 5.0) return false;
@@ -930,7 +935,8 @@ function vehicleMatchesCompareQuery(vehicle) {
     vehicle?.name || '',
     vehicle?.brandKey || '',
     getBrandLabel(brand || {}),
-    vehicle?.type || ''
+    vehicle?.bodyStyle || '',
+    window.TK168_DATA?.getVehicleFieldLabel?.('bodyStyle', vehicle?.bodyStyle) || ''
   ].join(' ').toLowerCase();
   return query.split(/\s+/).every((token) => searchable.includes(token));
 }

@@ -220,6 +220,8 @@ html:lang(ja) .footer-btn {
 html:lang(ja) .hero-title,
 html:lang(ja) .section-header h2,
 html:lang(ja) .v-card-name,
+html:lang(ja) .v-card-brand-line,
+html:lang(ja) .v-card-model-line,
 html:lang(ja) .news-body h3 {
   letter-spacing: 0;
 }
@@ -2145,14 +2147,30 @@ body.contact-popover-open {
 }
 
 .v-card-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.v-card-name .v-card-brand-line {
+  font-size: 11px;
+  font-weight: 600;
+  color: #9E9D9C;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+}
+
+.v-card-name .v-card-model-line {
   font-size: 16px;
   font-weight: 700;
   color: #171717;
   letter-spacing: -0.01em;
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.2;
 }
 
 .v-card-meta {

@@ -28,12 +28,10 @@
   ];
 
   const drive = [
-    { value: "前轮驱动", label: "前轮驱动（前驱）" },
-    { value: "后轮驱动", label: "后轮驱动（后驱）" },
-    { value: "四轮驱动", label: "四轮驱动（四驱）" },
-    { value: "适时四驱", label: "适时四驱" },
-    { value: "全时四驱", label: "全时四驱" },
-    { value: "电动四驱", label: "电动四驱" }
+    { value: "FWD", label: "FWD（前轮驱动）" },
+    { value: "RWD", label: "RWD（后轮驱动）" },
+    { value: "AWD", label: "AWD" },
+    { value: "4WD", label: "4WD" },
   ];
 
   const seats = [
@@ -48,12 +46,11 @@
   const fuel = [
     { value: "汽油", label: "汽油" },
     { value: "柴油", label: "柴油" },
-    { value: "油电混动", label: "油电混动" },
-    { value: "插电混动", label: "插电混动" },
-    { value: "纯电动", label: "纯电动" },
-    { value: "增程式", label: "增程式" },
-    { value: "Hybrid", label: "混动（Hybrid）" },
-    { value: "EV", label: "EV（兼容旧数据）" }
+    { value: "HEV（混动）", label: "HEV（混动）" },
+    { value: "PHEV（插电混动）", label: "PHEV（插电混动）" },
+    { value: "BEV（纯电动车）", label: "BEV（纯电动车）" },
+    { value: "EREV（增程式电动车）", label: "EREV（增程式电动车）" },
+    { value: "FCEV（氢燃料电池车）", label: "FCEV（氢燃料电池车）" }
   ];
 
   const trans = [
@@ -63,6 +60,34 @@
     { value: "手自一体", label: "手自一体" },
     { value: "双离合", label: "双离合（DCT）" },
     { value: "电动车单速", label: "电动车单速" }
+  ];
+
+  /** 排量（存库原文，可含 Turbo / Hybrid 等后缀） */
+  const displacement = [
+    { value: "2.0L Turbo", label: "2.0L Turbo" },
+    { value: "2.5L Hybrid", label: "2.5L Hybrid" },
+    { value: "3.0L", label: "3.0L" },
+    { value: "3.5L", label: "3.5L" },
+    { value: "3.9L", label: "3.9L" },
+    { value: "4.0L", label: "4.0L" },
+    { value: "4.4L", label: "4.4L" },
+    { value: "4.5L", label: "4.5L" },
+    { value: "5.0L", label: "5.0L" },
+    { value: "5.2L", label: "5.2L" },
+    { value: "6.5L", label: "6.5L" }
+  ];
+
+  /** 气缸形式 / 缸数布局（V8、L4 等） */
+  const cylinders = [
+    { value: "L3", label: "L3" },
+    { value: "L4", label: "L4" },
+    { value: "V6", label: "V6" },
+    { value: "V8", label: "V8" },
+    { value: "V10", label: "V10" },
+    { value: "V12", label: "V12" },
+    { value: "W12", label: "W12" },
+    { value: "H6", label: "水平对置 6 缸（H6）" },
+    { value: "电动", label: "电动驱动单元" }
   ];
 
   /** 与 js/data.js standardBodyStyleValues 顺序、存库中文值一致 */
@@ -110,6 +135,8 @@
     seats,
     fuel,
     trans,
+    displacement,
+    cylinders,
     bodyColor: vehicleColorPalette,
     interiorColor: vehicleColorPalette
   };

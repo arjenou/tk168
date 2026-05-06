@@ -4,7 +4,7 @@
     getVehicleById,
     getVehicleName,
     getBrandLabel,
-    getVehicleTypeLabel,
+    getVehicleFieldLabel,
     buildBrandUrl
   } = window.TK168_DATA;
 
@@ -338,7 +338,7 @@
     const image = window.TK168_DATA.resolveVehicleMediaSource(vehicle.photo || vehicle.gallery?.[0] || '002.png');
     const lang = getLanguage();
     const yearLabel = sanitize(vehicle.year);
-    const typeLabel = getVehicleTypeLabel(vehicle.type, lang);
+    const typeLabel = getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, lang) || '';
     const distance = `${vehicle.mileage || '0'}km`;
     refs.vehicleThumb.src = image;
     refs.vehicleThumb.alt = getVehicleName(vehicle, lang);

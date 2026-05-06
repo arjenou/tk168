@@ -163,7 +163,6 @@ const RENTAL_COPY = {
 const {
   getDisplayPrice,
   getVehicleName,
-  getVehicleTypeLabel,
   getVehicleFieldLabel,
   getVehicleRentalProfile,
   getRentableVehicles,
@@ -279,7 +278,7 @@ function buildVehicleCardHtml(vehicle, language) {
   const profile = getVehicleRentalProfile(vehicle);
   const title = getVehicleName(vehicle, language);
   const type =
-    getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, language) || getVehicleTypeLabel(vehicle.type, language);
+    getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, language) || '';
   const inquiryHref = buildInquiryHref(vehicle);
 
   return `
@@ -311,7 +310,7 @@ function buildVehicleCardHtml(vehicle, language) {
 function hydrateRentalVehicleCard(card, vehicle, language) {
   if (!card || !card.classList.contains('v-card')) return;
   const profile = getVehicleRentalProfile(vehicle);
-  const type = getVehicleTypeLabel(vehicle.type, language);
+  const bodyLine = getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, language);
   const fuel = getVehicleFieldLabel('fuel', vehicle.fuel, language);
   const inquiryHref = buildInquiryHref(vehicle);
   const detailUrl = typeof buildDetailUrl === 'function'
@@ -335,7 +334,9 @@ function hydrateRentalVehicleCard(card, vehicle, language) {
   }
 
   const meta = card.querySelector('.v-card-meta');
-  if (meta) meta.textContent = `${vehicle.year} · ${type} · ${copy('fleet.card.available', language)}`;
+  if (meta) {
+    meta.textContent = [vehicle.year, bodyLine, copy('fleet.card.available', language)].filter(Boolean).join(' · ');
+  }
 
   const specSpans = Array.from(card.querySelectorAll('.v-spec span'));
   const specRows = [

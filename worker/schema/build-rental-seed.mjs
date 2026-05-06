@@ -58,6 +58,15 @@ function sqlInt(value) {
   return Number(value) | 0;
 }
 
+function engineCombined(v) {
+  const d = String(v.displacement ?? "").trim();
+  const c = String(v.cylinders ?? "").trim();
+  if (d && c) return `${d} ${c}`;
+  if (d) return d;
+  if (c) return c;
+  return String(v.engine ?? "").trim();
+}
+
 const rows = [];
 let order = 0;
 for (const [id, profile] of Object.entries(rentalProfiles)) {
@@ -77,7 +86,9 @@ for (const [id, profile] of Object.entries(rentalProfiles)) {
     type: v.type || "",
     icon: v.icon || "b1.svg",
     mileage: v.mileage || "",
-    engine: v.engine || "",
+    engine: engineCombined(v),
+    displacement: String(v.displacement ?? "").trim(),
+    cylinders: String(v.cylinders ?? "").trim(),
     fuel: v.fuel || "",
     trans: v.trans || "",
     body_style: v.bodyStyle || "",
@@ -111,7 +122,7 @@ out.push("DELETE FROM rental_images;");
 for (const r of rows) {
   const cols = [
     "id", "brand_key", "name", "name_ja", "name_en", "year", "type", "icon",
-    "mileage", "engine", "fuel", "trans",
+    "mileage", "engine", "displacement", "cylinders", "fuel", "trans",
     "body_style", "drive", "body_color", "interior_color", "seats", "origin",
     "daily_rate", "deposit", "min_days", "rental_status",
     "overview_zh", "overview_ja", "overview_en",

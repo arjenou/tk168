@@ -6,7 +6,7 @@ import { createResource, insertInventoryStubIfMissing } from "./resource.js";
 
 const VEHICLE_COLUMNS = [
   "id", "brand_key", "name", "name_ja", "name_en", "year", "type", "icon",
-  "mileage", "engine", "fuel", "trans",
+  "mileage", "engine", "displacement", "cylinders", "fuel", "trans",
   "total_price", "base_price",
   "body_style", "drive", "body_color", "interior_color", "seats",
   "service_record", "origin",
@@ -15,7 +15,7 @@ const VEHICLE_COLUMNS = [
   "cond_dealer_warranty",
   "cond_one_owner",
   "listing_repair_history", "listing_vehicle_inspection",
-  "listing_legal_maintenance",
+  "listing_legal_maintenance", "listing_fuel_grade",
   "highlight_steering", "highlight_chassis_tail",
   "staff_photo_r2_key", "staff_photo_url", "staff_message", "staff_phone",
   "display_order", "is_published",
@@ -27,7 +27,7 @@ const VEHICLE_JSON_COLUMNS = new Set([
   "cond_dealer_warranty",
   "cond_one_owner",
   "listing_repair_history", "listing_vehicle_inspection",
-  "listing_legal_maintenance",
+  "listing_legal_maintenance", "listing_fuel_grade",
   "highlight_steering", "highlight_chassis_tail",
 ]);
 
@@ -42,6 +42,8 @@ const VEHICLE_FIELD_MAP = {
   icon: "icon",
   mileage: "mileage",
   engine: "engine",
+  displacement: "displacement",
+  cylinders: "cylinders",
   fuel: "fuel",
   trans: "trans",
   totalPrice: "total_price",
@@ -63,6 +65,7 @@ const VEHICLE_FIELD_MAP = {
   listingRepairHistory: "listing_repair_history",
   listingVehicleInspection: "listing_vehicle_inspection",
   listingLegalMaintenance: "listing_legal_maintenance",
+  listingFuelGrade: "listing_fuel_grade",
   highlightSteering: "highlight_steering",
   highlightChassisTail: "highlight_chassis_tail",
   staffPhotoR2Key: "staff_photo_r2_key",

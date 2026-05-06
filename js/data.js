@@ -290,9 +290,10 @@ window.TK168_DATA = (() => {
     exotic: {
       typeOptions: ['中置跑车', 'GT跑车', 'V12超跑'],
       bodyStyleOptions: ['跑车', '超跑', '敞篷车'],
-      engineOptions: ['3.9L V8', '5.2L V10', '6.5L V12'],
-      fuelOptions: ['汽油'],
-      driveOptions: ['后轮驱动', '四轮驱动'],
+      displacementOptions: ['3.9L', '5.2L', '6.5L'],
+      cylinderOptions: ['V8', 'V10', 'V12'],
+      fuelOptions: ['汽油', 'HEV（混动）'],
+      driveOptions: ['RWD', 'AWD'],
       seats: '2 座',
       totalBase: 1680000,
       totalStep: 320000,
@@ -302,9 +303,10 @@ window.TK168_DATA = (() => {
     gt: {
       typeOptions: ['GT跑车', '双门轿跑'],
       bodyStyleOptions: ['跑车', '双门轿跑', '敞篷车'],
-      engineOptions: ['3.0L V6', '4.0L V8', '5.2L V10'],
-      fuelOptions: ['汽油'],
-      driveOptions: ['后轮驱动', '四轮驱动'],
+      displacementOptions: ['3.0L', '4.0L', '5.2L'],
+      cylinderOptions: ['V6', 'V8', 'V10'],
+      fuelOptions: ['汽油', 'HEV（混动）'],
+      driveOptions: ['RWD', 'AWD'],
       seats: '2 座',
       totalBase: 920000,
       totalStep: 210000,
@@ -314,9 +316,10 @@ window.TK168_DATA = (() => {
     suv: {
       typeOptions: ['豪华SUV', '高性能SUV', '越野SUV', '轿跑SUV'],
       bodyStyleOptions: ['SUV', '越野车'],
-      engineOptions: ['2.0L Turbo', '3.0L V6', '3.5L V6 Hybrid', '4.0L V8'],
-      fuelOptions: ['汽油', 'Hybrid'],
-      driveOptions: ['四轮驱动'],
+      displacementOptions: ['2.0L Turbo', '3.0L', '3.5L', '4.0L'],
+      cylinderOptions: ['L4', 'V6', 'V6', 'V8'],
+      fuelOptions: ['汽油', 'HEV（混动）', 'PHEV（插电混动）'],
+      driveOptions: ['AWD'],
       seats: '5 座',
       totalBase: 480000,
       totalStep: 140000,
@@ -326,9 +329,10 @@ window.TK168_DATA = (() => {
     sedan: {
       typeOptions: ['行政轿车', '豪华轿车', '高性能轿车'],
       bodyStyleOptions: ['轿车'],
-      engineOptions: ['2.0L Turbo', '2.5L Hybrid', '3.0L V6'],
-      fuelOptions: ['汽油', 'Hybrid'],
-      driveOptions: ['后轮驱动', '四轮驱动'],
+      displacementOptions: ['2.0L Turbo', '2.5L Hybrid', '3.0L'],
+      cylinderOptions: ['L4', 'L4', 'V6'],
+      fuelOptions: ['汽油', 'HEV（混动）', 'PHEV（插电混动）'],
+      driveOptions: ['RWD', 'AWD'],
       seats: '5 座',
       totalBase: 280000,
       totalStep: 110000,
@@ -360,6 +364,39 @@ window.TK168_DATA = (() => {
   function pickCatalogValue(pool, seed) {
     if (!Array.isArray(pool) || pool.length === 0) return '';
     return pool[Math.abs(seed) % pool.length];
+  }
+
+  /** 历史合并字段「4.0L V8」「2.0L Turbo」→ 排量 / 缸数布局 */
+  function splitLegacyEngineSpec(combined) {
+    const t = String(combined || '').trim();
+    if (!t) return { displacement: '', cylinders: '' };
+    const m = t.match(/^([\d.]+\s*L(?:\s+(?:Turbo|Hybrid))?)(?:\s+(.+))?$/i);
+    if (m) {
+      return { displacement: (m[1] || '').trim(), cylinders: (m[2] || '').trim() };
+    }
+    return { displacement: t, cylinders: '' };
+  }
+
+  function formatVehicleEngineLine(vehicle) {
+    if (!vehicle) return '';
+    const d = String(vehicle.displacement || '').trim();
+    const c = String(vehicle.cylinders || '').trim();
+    if (d && c) return `${d} ${c}`;
+    if (d) return d;
+    if (c) return c;
+    return String(vehicle.engine || '').trim();
+  }
+
+  function normalizeVehicleEngineFields(vehicle) {
+    if (!vehicle || typeof vehicle !== 'object') return vehicle;
+    let d = String(vehicle.displacement ?? '').trim();
+    let c = String(vehicle.cylinders ?? '').trim();
+    if (!d && !c && vehicle.engine) {
+      const sp = splitLegacyEngineSpec(vehicle.engine);
+      d = sp.displacement;
+      c = sp.cylinders;
+    }
+    return { ...vehicle, displacement: d, cylinders: c };
   }
 
   function formatCatalogPrice(amount) {
@@ -416,15 +453,16 @@ window.TK168_DATA = (() => {
       photo: model.image,
       gallery: [model.image, model.image, model.image, model.image],
       mileage: mileage.toLocaleString('en-US'),
-      engine: pickCatalogValue(preset.engineOptions, seed + 2),
-      fuel: pickCatalogValue(preset.fuelOptions, seed + 3),
+      displacement: pickCatalogValue(preset.displacementOptions, seed + 2),
+      cylinders: pickCatalogValue(preset.cylinderOptions, seed + 3),
+      fuel: pickCatalogValue(preset.fuelOptions, seed + 4),
       trans: '自动挡',
       totalPrice: formatCatalogPrice(totalAmount),
       basePrice: formatCatalogPrice(baseAmount),
       bodyStyle,
-      drive: pickCatalogValue(preset.driveOptions, seed + 4),
-      bodyColor: pickCatalogValue(libraryVehicleColors, seed + 5),
-      interiorColor: pickCatalogValue(libraryVehicleInteriors, seed + 6),
+      drive: pickCatalogValue(preset.driveOptions, seed + 5),
+      bodyColor: pickCatalogValue(libraryVehicleColors, seed + 6),
+      interiorColor: pickCatalogValue(libraryVehicleInteriors, seed + 7),
       seats: preset.seats,
       serviceRecord: '完整在册',
       origin: libraryVehicleOrigins[brand.key] || '日本进口',
@@ -469,13 +507,14 @@ window.TK168_DATA = (() => {
       photo: '001.png',
       gallery: ['001.png', '001.png', '001.png', '001.png'],
       mileage: '3,200',
-      engine: '4.0L V8',
+      displacement: '4.0L',
+      cylinders: 'V8',
       fuel: '汽油',
       trans: '自动挡',
       totalPrice: '¥ 1,980,000',
       basePrice: '¥ 1,860,000',
       bodyStyle: 'SUV',
-      drive: '四轮驱动',
+      drive: 'AWD',
       bodyColor: '曜石黑',
       interiorColor: '黑色真皮',
       seats: '5 座',
@@ -502,13 +541,14 @@ window.TK168_DATA = (() => {
       photo: '002.png',
       gallery: ['002.png', '002.png', '002.png', '002.png'],
       mileage: '90',
-      engine: '5.2L V10',
+      displacement: '5.2L',
+      cylinders: 'V10',
       fuel: '汽油',
       trans: '自动挡',
       totalPrice: '¥ 1,600,000',
       basePrice: '¥ 1,490,000',
       bodyStyle: '跑车',
-      drive: '四轮驱动',
+      drive: 'AWD',
       bodyColor: '曜石黑',
       interiorColor: '棕色真皮',
       seats: '2 座',
@@ -535,13 +575,14 @@ window.TK168_DATA = (() => {
       photo: '003.png',
       gallery: ['003.png', '003.png', '003.png', '003.png'],
       mileage: '15,200',
-      engine: '4.5L V8',
+      displacement: '4.5L',
+      cylinders: 'V8',
       fuel: '汽油',
       trans: '自动挡',
       totalPrice: '¥ 1,750,000',
       basePrice: '¥ 1,640,000',
       bodyStyle: '跑车',
-      drive: '后轮驱动',
+      drive: 'RWD',
       bodyColor: '竞技红',
       interiorColor: '黑红拼色真皮',
       seats: '2 座',
@@ -568,13 +609,14 @@ window.TK168_DATA = (() => {
       photo: '004.png',
       gallery: ['004.png', '004.png', '004.png', '004.png'],
       mileage: '120',
-      engine: '4.4L V8',
+      displacement: '4.4L',
+      cylinders: 'V8',
       fuel: '汽油',
       trans: '自动挡',
       totalPrice: '¥ 750,000',
       basePrice: '¥ 698,000',
       bodyStyle: 'SUV',
-      drive: '四轮驱动',
+      drive: 'AWD',
       bodyColor: '矿石白',
       interiorColor: '黑色真皮',
       seats: '5 座',
@@ -601,13 +643,14 @@ window.TK168_DATA = (() => {
       photo: '005.png',
       gallery: ['005.png', '005.png', '005.png', '005.png'],
       mileage: '8,700',
-      engine: '3.9L V8',
+      displacement: '3.9L',
+      cylinders: 'V8',
       fuel: '汽油',
       trans: '自动挡',
       totalPrice: '¥ 2,250,000',
       basePrice: '¥ 2,120,000',
       bodyStyle: '跑车',
-      drive: '后轮驱动',
+      drive: 'RWD',
       bodyColor: '亮银灰',
       interiorColor: '深棕真皮',
       seats: '2 座',
@@ -634,13 +677,14 @@ window.TK168_DATA = (() => {
       photo: '006.png',
       gallery: ['006.png', '006.png', '006.png', '006.png'],
       mileage: '12,500',
-      engine: '6.5L V12',
+      displacement: '6.5L',
+      cylinders: 'V12',
       fuel: '汽油',
       trans: '自动挡',
       totalPrice: '¥ 4,000,000',
       basePrice: '¥ 3,780,000',
       bodyStyle: '跑车',
-      drive: '四轮驱动',
+      drive: 'AWD',
       bodyColor: '珍珠白',
       interiorColor: '黑色 Alcantara',
       seats: '2 座',
@@ -667,13 +711,14 @@ window.TK168_DATA = (() => {
       photo: '003.png',
       gallery: ['003.png', '003.png', '003.png', '003.png'],
       mileage: '800',
-      engine: '5.2L V10',
+      displacement: '5.2L',
+      cylinders: 'V10',
       fuel: '汽油',
       trans: '自动挡',
       totalPrice: '¥ 2,680,000',
       basePrice: '¥ 2,520,000',
       bodyStyle: '跑车',
-      drive: '四轮驱动',
+      drive: 'AWD',
       bodyColor: '珍珠黄',
       interiorColor: '黑黄拼色',
       seats: '2 座',
@@ -700,13 +745,14 @@ window.TK168_DATA = (() => {
       photo: '004.png',
       gallery: ['004.png', '004.png', '004.png', '004.png'],
       mileage: '120',
-      engine: '4.0L V8',
+      displacement: '4.0L',
+      cylinders: 'V8',
       fuel: '汽油',
       trans: '自动挡',
       totalPrice: '¥ 2,280,000',
       basePrice: '¥ 2,140,000',
       bodyStyle: 'SUV',
-      drive: '四轮驱动',
+      drive: 'AWD',
       bodyColor: '石墨灰',
       interiorColor: '黑橙拼色',
       seats: '5 座',
@@ -733,13 +779,14 @@ window.TK168_DATA = (() => {
       photo: '005.png',
       gallery: ['005.png', '005.png', '005.png', '005.png'],
       mileage: '5,400',
-      engine: '5.2L V10',
+      displacement: '5.2L',
+      cylinders: 'V10',
       fuel: '汽油',
       trans: '自动挡',
       totalPrice: '¥ 3,150,000',
       basePrice: '¥ 2,960,000',
       bodyStyle: '跑车',
-      drive: '后轮驱动',
+      drive: 'RWD',
       bodyColor: '赛道灰',
       interiorColor: '黑色 Alcantara',
       seats: '2 座',
@@ -766,13 +813,14 @@ window.TK168_DATA = (() => {
       photo: '002.png',
       gallery: ['002.png', '002.png', '002.png', '002.png'],
       mileage: '28,000',
-      engine: '5.0L V10',
+      displacement: '5.0L',
+      cylinders: 'V10',
       fuel: '汽油',
       trans: '自动挡',
       totalPrice: '¥ 1,480,000',
       basePrice: '¥ 1,360,000',
       bodyStyle: '跑车',
-      drive: '四轮驱动',
+      drive: 'AWD',
       bodyColor: '黑曜石',
       interiorColor: '黑色真皮',
       seats: '2 座',
@@ -799,13 +847,14 @@ window.TK168_DATA = (() => {
       photo: '001.png',
       gallery: ['001.png', '001.png', '001.png', '001.png'],
       mileage: '2,100',
-      engine: '6.5L V12',
-      fuel: 'Hybrid',
+      displacement: '6.5L',
+      cylinders: 'V12',
+      fuel: 'HEV（混动）',
       trans: '自动挡',
       totalPrice: '¥ 8,800,000',
       basePrice: '¥ 8,320,000',
       bodyStyle: '跑车',
-      drive: '四轮驱动',
+      drive: 'AWD',
       bodyColor: '金属绿',
       interiorColor: '黑金拼色',
       seats: '2 座',
@@ -832,13 +881,14 @@ window.TK168_DATA = (() => {
       photo: '004.png',
       gallery: ['004.png', '004.png', '004.png', '004.png'],
       mileage: '360',
-      engine: '4.0L V8',
+      displacement: '4.0L',
+      cylinders: 'V8',
       fuel: '汽油',
       trans: '自动挡',
       totalPrice: '¥ 2,650,000',
       basePrice: '¥ 2,490,000',
       bodyStyle: 'SUV',
-      drive: '四轮驱动',
+      drive: 'AWD',
       bodyColor: '哑光灰',
       interiorColor: '黑红拼色',
       seats: '5 座',
@@ -865,13 +915,14 @@ window.TK168_DATA = (() => {
       photo: '005.png',
       gallery: ['005.png', '005.png', '005.png', '005.png'],
       mileage: '9,200',
-      engine: '5.2L V10',
+      displacement: '5.2L',
+      cylinders: 'V10',
       fuel: '汽油',
       trans: '自动挡',
       totalPrice: '¥ 2,100,000',
       basePrice: '¥ 1,960,000',
       bodyStyle: '跑车',
-      drive: '后轮驱动',
+      drive: 'RWD',
       bodyColor: '珍珠白',
       interiorColor: '黑色真皮',
       seats: '2 座',
@@ -949,9 +1000,10 @@ window.TK168_DATA = (() => {
     return raw
       .map((vehicle) => {
         const canonicalBrandKey = resolveCanonicalBrandKey(vehicle.brandKey);
-        return canonicalBrandKey
+        const v = canonicalBrandKey
           ? { ...vehicle, brandKey: canonicalBrandKey }
           : { ...vehicle };
+        return normalizeVehicleEngineFields(v);
       })
       .filter((vehicle) => {
         if (activeBrandKeySet.has(vehicle.brandKey)) return true;
@@ -1072,61 +1124,73 @@ window.TK168_DATA = (() => {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2026（R08）年12月', ja: '2026(R08)年12月' },
       legalMaintenance: { zh: '整备付', ja: '整備付' },
+      fuelGrade: { zh: '高辛烷汽油', ja: 'ハイオク', en: 'Premium' },
     },
     'audi-r8-spyder': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2026（R08）年09月', ja: '2026(R08)年09月' },
       legalMaintenance: { zh: '整备付', ja: '整備付' },
+      fuelGrade: { zh: '高辛烷汽油', ja: 'ハイオク', en: 'Premium' },
     },
     'ferrari-458-italia': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2026（R08）年06月', ja: '2026(R08)年06月' },
       legalMaintenance: { zh: '无', ja: 'なし' },
+      fuelGrade: { zh: '高辛烷汽油', ja: 'ハイオク', en: 'Premium' },
     },
     'bmw-x6-m': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2027（R09）年03月', ja: '2027(R09)年03月' },
       legalMaintenance: { zh: '整备付', ja: '整備付' },
+      fuelGrade: { zh: '高辛烷汽油', ja: 'ハイオク', en: 'Premium' },
     },
     'ferrari-488-gtb': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2026（R08）年11月', ja: '2026(R08)年11月' },
       legalMaintenance: { zh: '整备付', ja: '整備付' },
+      fuelGrade: { zh: '高辛烷汽油', ja: 'ハイオク', en: 'Premium' },
     },
     'lamborghini-aventador': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2026（R08）年10月', ja: '2026(R08)年10月' },
       legalMaintenance: { zh: '无', ja: 'なし' },
+      fuelGrade: { zh: '高辛烷汽油', ja: 'ハイオク', en: 'Premium' },
     },
     'lamborghini-huracan-evo': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2027（R09）年01月', ja: '2027(R09)年01月' },
       legalMaintenance: { zh: '整备付', ja: '整備付' },
+      fuelGrade: { zh: '高辛烷汽油', ja: 'ハイオク', en: 'Premium' },
     },
     'lamborghini-urus-s': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2027（R09）年05月', ja: '2027(R09)年05月' },
       legalMaintenance: { zh: '整备付', ja: '整備付' },
+      fuelGrade: { zh: '高辛烷汽油', ja: 'ハイオク', en: 'Premium' },
     },
     'lamborghini-huracan-sto': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2026（R08）年08月', ja: '2026(R08)年08月' },
       legalMaintenance: { zh: '无', ja: 'なし' },
+      fuelGrade: { zh: '高辛烷汽油', ja: 'ハイオク', en: 'Premium' },
     },
     'lamborghini-gallardo': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2026（R08）年04月', ja: '2026(R08)年04月' },
       legalMaintenance: { zh: '无', ja: 'なし' },
+      fuelGrade: { zh: '高辛烷汽油', ja: 'ハイオク', en: 'Premium' },
     },
     'lamborghini-sian-fkp-37': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2026（R08）年07月', ja: '2026(R08)年07月' },
       legalMaintenance: { zh: '整备付', ja: '整備付' },
+      fuelGrade: { zh: '高辛烷汽油', ja: 'ハイオク', en: 'Premium' },
     },
     'lamborghini-urus-performante': {
       repairHistory: { zh: '无', ja: 'なし' },
       vehicleInspection: { zh: '2027（R09）年02月', ja: '2027(R09)年02月' },
       legalMaintenance: { zh: '整备付', ja: '整備付' },
+      fuelGrade: { zh: '高辛烷汽油', ja: 'ハイオク', en: 'Premium' },
     },
     'lamborghini-huracan-evo-rwd': {
       repairHistory: { zh: '无', ja: 'なし' },
@@ -1223,32 +1287,47 @@ window.TK168_DATA = (() => {
       zh: {
         汽油: '汽油',
         柴油: '柴油',
-        油电混动: '油电混动',
-        插电混动: '插电混动',
-        纯电动: '纯电动',
-        增程式: '增程式',
-        Hybrid: '混动',
-        EV: '纯电'
+        'HEV（混动）': 'HEV（混动）',
+        'PHEV（插电混动）': 'PHEV（插电混动）',
+        'BEV（纯电动车）': 'BEV（纯电动车）',
+        'EREV（增程式电动车）': 'EREV（增程式电动车）',
+        'FCEV（氢燃料电池车）': 'FCEV（氢燃料电池车）',
+        油电混动: 'HEV（混动）',
+        插电混动: 'PHEV（插电混动）',
+        纯电动: 'BEV（纯电动车）',
+        增程式: 'EREV（增程式电动车）',
+        Hybrid: 'HEV（混动）',
+        EV: 'BEV（纯电动车）'
       },
       ja: {
         汽油: 'ガソリン',
         柴油: 'ディーゼル',
-        油电混动: 'ハイブリッド',
-        插电混动: 'プラグインハイブリッド',
-        纯电动: 'バッテリーEV',
-        增程式: 'レンジエクステンダー',
-        Hybrid: 'ハイブリッド',
-        EV: 'EV'
+        'HEV（混动）': 'HEV（ハイブリッド）',
+        'PHEV（插电混动）': 'PHEV（プラグイン）',
+        'BEV（纯电动车）': 'BEV（純電気）',
+        'EREV（增程式电动车）': 'EREV（レンジエクステンダー）',
+        'FCEV（氢燃料电池车）': 'FCEV（燃料電池）',
+        油电混动: 'HEV（ハイブリッド）',
+        插电混动: 'PHEV（プラグイン）',
+        纯电动: 'BEV（純電気）',
+        增程式: 'EREV（レンジエクステンダー）',
+        Hybrid: 'HEV（ハイブリッド）',
+        EV: 'BEV（純電気）'
       },
       en: {
         汽油: 'Gasoline',
         柴油: 'Diesel',
-        油电混动: 'Hybrid',
-        插电混动: 'Plug-in hybrid',
-        纯电动: 'Battery electric',
-        增程式: 'Range-extended electric',
-        Hybrid: 'Hybrid',
-        EV: 'EV'
+        'HEV（混动）': 'HEV (hybrid)',
+        'PHEV（插电混动）': 'PHEV (plug-in hybrid)',
+        'BEV（纯电动车）': 'BEV (battery electric)',
+        'EREV（增程式电动车）': 'EREV (extended-range EV)',
+        'FCEV（氢燃料电池车）': 'FCEV (fuel cell)',
+        油电混动: 'HEV (hybrid)',
+        插电混动: 'PHEV (plug-in hybrid)',
+        纯电动: 'BEV (battery electric)',
+        增程式: 'EREV (extended-range EV)',
+        Hybrid: 'HEV (hybrid)',
+        EV: 'BEV (battery electric)'
       }
     },
     trans: {
@@ -1419,29 +1498,41 @@ window.TK168_DATA = (() => {
     },
     drive: {
       zh: {
-        前轮驱动: '前轮驱动',
-        后轮驱动: '后轮驱动',
-        四轮驱动: '四轮驱动',
-        适时四驱: '适时四驱',
-        全时四驱: '全时四驱',
-        电动四驱: '电动四驱'
-      },
-      ja: {
-        前轮驱动: 'FF',
-        后轮驱动: 'FR',
-        四轮驱动: '4WD',
-        适时四驱: 'マルチ4WD',
-        全时四驱: 'フルタイム4WD',
-        电动四驱: '電動4WD'
-      },
-      en: {
+        FWD: 'FWD',
+        RWD: 'RWD',
+        AWD: 'AWD',
+        '4WD': '4WD',
         前轮驱动: 'FWD',
         后轮驱动: 'RWD',
-        四轮驱动: 'AWD/4WD',
-        适时四驱: 'On-demand AWD',
-        全时四驱: 'Full-time AWD',
-        电动四驱: 'eAWD'
-      }
+        四轮驱动: 'AWD',
+        适时四驱: 'AWD',
+        全时四驱: 'AWD',
+        电动四驱: 'AWD',
+      },
+      ja: {
+        FWD: 'FWD',
+        RWD: 'RWD',
+        AWD: 'AWD',
+        '4WD': '4WD',
+        前轮驱动: 'FWD',
+        后轮驱动: 'RWD',
+        四轮驱动: 'AWD',
+        适时四驱: 'AWD',
+        全时四驱: 'AWD',
+        电动四驱: 'AWD',
+      },
+      en: {
+        FWD: 'FWD',
+        RWD: 'RWD',
+        AWD: 'AWD',
+        '4WD': '4WD',
+        前轮驱动: 'FWD',
+        后轮驱动: 'RWD',
+        四轮驱动: 'AWD',
+        适时四驱: 'AWD',
+        全时四驱: 'AWD',
+        电动四驱: 'AWD',
+      },
     },
     serviceRecord: {
       zh: {
@@ -1671,12 +1762,12 @@ window.TK168_DATA = (() => {
         '8 座及以上': '8 座及以上'
       },
       ja: {
-        '2 座': '2人乗り',
-        '4 座': '4人乗り',
-        '5 座': '5人乗り',
-        '6 座': '6人乗り',
-        '7 座': '7人乗り',
-        '8 座及以上': '8人乗り以上'
+        '2 座': '2名',
+        '4 座': '4名',
+        '5 座': '5名',
+        '6 座': '6名',
+        '7 座': '7名',
+        '8 座及以上': '8名以上'
       },
       en: {
         '2 座': '2 seats',
@@ -1761,6 +1852,36 @@ window.TK168_DATA = (() => {
     return brand.labelZh || brand.labelJa || brand.labelEn || '';
   }
 
+  /** 去掉开头的「品牌 + 空格 / 全角空格」，用于日/英车名与品牌分行显示 */
+  function stripLeadingBrandLabel(full, brandLabel) {
+    const s = String(full || '').trim();
+    const b = String(brandLabel || '').trim();
+    if (!s || !b) return s;
+    if (s.startsWith(`${b} `)) return s.slice(b.length + 1).trim();
+    if (s.startsWith(`${b}\u3000`)) return s.slice(b.length + 1).trim();
+    return s;
+  }
+
+  function getVehicleBrandTitle(vehicle, language = getCurrentLanguage()) {
+    if (!vehicle) return '';
+    return getBrandLabel(vehicle.brandKey, language);
+  }
+
+  function getVehicleModelDisplayName(vehicle, language = getCurrentLanguage()) {
+    if (!vehicle) return '';
+    const brandLbl = getBrandLabel(vehicle.brandKey, language);
+    if (language === 'zh') return getVehicleModelName(vehicle);
+    if (language === 'ja' && String(vehicle.nameJa || '').trim()) {
+      const raw = String(vehicle.nameJa).trim();
+      return stripLeadingBrandLabel(raw, brandLbl) || raw;
+    }
+    if (language === 'en' && String(vehicle.nameEn || '').trim()) {
+      const raw = String(vehicle.nameEn).trim();
+      return stripLeadingBrandLabel(raw, brandLbl) || raw;
+    }
+    return getVehicleModelName(vehicle);
+  }
+
   function getVehicleModelName(vehicle) {
     const brand = getBrandByKey(vehicle.brandKey);
     if (!brand) return vehicle.name;
@@ -1770,7 +1891,12 @@ window.TK168_DATA = (() => {
 
   function getVehicleName(vehicle, language = getCurrentLanguage()) {
     if (!vehicle) return '';
-    if (language === 'zh') return vehicle.name || '';
+    if (language === 'zh') {
+      const model = getVehicleModelName(vehicle);
+      const brand = getBrandLabel(vehicle.brandKey, 'zh');
+      const parts = [brand, model].filter(Boolean);
+      return parts.join(' ').trim() || model || brand || '';
+    }
     if (language === 'ja' && String(vehicle.nameJa || '').trim()) return String(vehicle.nameJa).trim();
     if (language === 'en' && String(vehicle.nameEn || '').trim()) return String(vehicle.nameEn).trim();
     return `${getBrandLabel(vehicle.brandKey, language)} ${getVehicleModelName(vehicle)}`.trim();
@@ -1857,6 +1983,15 @@ window.TK168_DATA = (() => {
     };
 
     if (basicMap[raw]) return basicMap[raw];
+    if (key === 'fuelGrade') {
+      const map = {
+        普通汽油: 'Regular',
+        高辛烷汽油: 'Premium',
+        柴油: 'Diesel',
+        电动: 'Electric',
+      };
+      if (map[raw]) return map[raw];
+    }
     if (key === 'dealerWarranty') return formatEnglishWarranty(raw);
     if (key === 'vehicleInspection') return formatEnglishInspectionDate(raw);
     return raw;
@@ -1865,7 +2000,7 @@ window.TK168_DATA = (() => {
   function buildVehicleOverviewEn(vehicle) {
     if (!vehicle) return [];
     const brandName = getVehicleName(vehicle, 'en');
-    const typeLabel = getVehicleTypeLabel(vehicle.type, 'en') || 'premium vehicle';
+    const typeLabel = getBodyStyleFieldLabel(vehicle.bodyStyle, 'en') || 'premium vehicle';
     const fuelLabel = getVehicleFieldLabel('fuel', vehicle.fuel, 'en') || 'combustion';
     const driveLabel = getVehicleFieldLabel('drive', vehicle.drive, 'en') || 'road-ready';
     const bodyColorLabel = getVehicleFieldLabel('bodyColor', vehicle.bodyColor, 'en') || 'well-kept';
@@ -1874,7 +2009,7 @@ window.TK168_DATA = (() => {
     const mileageLabel = mileage ? `${mileage.toLocaleString('en-US')} km` : 'a well-kept mileage record';
 
     return [
-      `${brandName} is presented here as a ${typeLabel.toLowerCase()}, pairing ${vehicle.engine} output with ${fuelLabel.toLowerCase()} power and ${driveLabel} traction.`,
+      `${brandName} is presented here as a ${typeLabel.toLowerCase()}, pairing ${formatVehicleEngineLine(vehicle)} output with ${fuelLabel.toLowerCase()} power and ${driveLabel} traction.`,
       `Its ${bodyColorLabel.toLowerCase()} exterior, ${interiorLabel.toLowerCase()} cabin, and ${mileageLabel} make it a strong fit for clients who want clear condition, strong presence, and everyday usability.`
     ];
   }
@@ -1927,11 +2062,20 @@ window.TK168_DATA = (() => {
   function getVehicleHighlightField(vehicle, key, language = getCurrentLanguage()) {
     if (!vehicle) return '';
 
-    if (key === 'displacement') return vehicle.engine || '';
+    if (key === 'displacement') {
+      const d = String(vehicle.displacement || '').trim();
+      if (d) return d;
+      return splitLegacyEngineSpec(vehicle.engine).displacement;
+    }
+    if (key === 'cylinders') {
+      const c = String(vehicle.cylinders || '').trim();
+      if (c) return c;
+      return splitLegacyEngineSpec(vehicle.engine).cylinders;
+    }
     if (key === 'drive') return getVehicleFieldLabel('drive', vehicle.drive, language);
     if (key === 'seats') return getVehicleFieldLabel('seats', vehicle.seats, language);
     if (key === 'doors') {
-      const bodyContext = `${resolveBodyStyleLabelZh(vehicle.bodyStyle)} ${vehicle.type || ''}`;
+      const bodyContext = `${resolveBodyStyleLabelZh(vehicle.bodyStyle)} ${getVehicleModelName(vehicle)}`;
       let doorCount = 2;
       if (/(SUV|MPV|旅行车|ワゴン|越野车)/i.test(bodyContext)) doorCount = 5;
       else if (/(轿车|セダン)/i.test(bodyContext)) doorCount = 4;
@@ -2333,6 +2477,11 @@ window.TK168_DATA = (() => {
   function buildRentalVehicleRecord(rental) {
     const rawBrand = rental.brandKey || '';
     const brandKey = resolveCanonicalBrandKey(rawBrand) || rawBrand;
+    const mergedEngine = normalizeVehicleEngineFields({
+      displacement: rental.displacement,
+      cylinders: rental.cylinders,
+      engine: rental.engine,
+    });
     const fallback = {
       id: rental.id,
       brandKey,
@@ -2343,7 +2492,9 @@ window.TK168_DATA = (() => {
       type: rental.type || '',
       icon: rental.icon && String(rental.icon).trim() ? String(rental.icon).trim() : '',
       mileage: rental.mileage || '',
-      engine: rental.engine || '',
+      displacement: mergedEngine.displacement,
+      cylinders: mergedEngine.cylinders,
+      engine: formatVehicleEngineLine(mergedEngine),
       fuel: rental.fuel || '',
       trans: rental.trans || '',
       bodyStyle: rental.bodyStyle || '',
@@ -2409,15 +2560,6 @@ window.TK168_DATA = (() => {
       }));
     }
 
-    if (filterKey === 'type') {
-      return bodyTypeSearchOptions.map(({ value, labelZh, labelJa, labelEn }) => ({
-        value,
-        label: language === 'en'
-          ? (labelEn || labelJa || labelZh)
-          : (language === 'ja' ? (labelJa || labelEn || labelZh) : (labelZh || labelJa || labelEn))
-      }));
-    }
-
     if (filterKey === 'price') {
       return priceOptions.map(({ value, label, labelJa, labelEn }) => ({
         value,
@@ -2448,7 +2590,6 @@ window.TK168_DATA = (() => {
   function getSearchFilterLabel(filterKey, value) {
     const defaults = {
       brand: window.TK168I18N?.t('search.brand') || '按品牌',
-      type: window.TK168I18N?.t('search.type') || '按车型',
       bodyStyle: window.TK168I18N?.t('search.bodyStyle') || '车身类型',
       price: window.TK168I18N?.t('search.price') || '总额预算',
       year: window.TK168I18N?.t('search.year') || '上牌年份',
@@ -2471,7 +2612,6 @@ window.TK168_DATA = (() => {
     const params = new URLSearchParams(search);
     const filters = {
       brand: params.get('brand') || '',
-      type: params.get('type') || '',
       bodyStyle: params.get('bodyStyle') || '',
       price: params.get('price') || '',
       priceMetric: params.get('priceMetric') === 'base' ? 'base' : 'total',
@@ -2483,7 +2623,6 @@ window.TK168_DATA = (() => {
     };
 
     if (filters.brand && !getBrandByKey(filters.brand)) filters.brand = '';
-    if (filters.type && !getSearchFilterOptions('type').some((item) => item.value === filters.type)) filters.type = '';
     if (filters.bodyStyle && !standardBodyStyleValues.includes(filters.bodyStyle)) filters.bodyStyle = '';
     if (filters.price && !priceOptions.some((item) => item.value === filters.price)) filters.price = '';
     if (filters.year && !yearOptions.some((item) => item.value === filters.year)) filters.year = '';
@@ -2501,7 +2640,6 @@ window.TK168_DATA = (() => {
 
     return list.filter((vehicle) => {
       if (filters.brand && vehicle.brandKey !== filters.brand) return false;
-      if (filters.type && !matchVehicleTypeFilter(filters.type, vehicle.type)) return false;
       if (filters.bodyStyle && String(vehicle.bodyStyle || '').trim() !== filters.bodyStyle) return false;
       if (priceOption) {
         const amount = priceMetric === 'base'
@@ -2520,11 +2658,10 @@ window.TK168_DATA = (() => {
           brand?.labelZh,
           brand?.labelJa,
           brand?.labelEn,
-          vehicle.type,
-          getVehicleTypeLabel(vehicle.type, 'ja'),
-          getVehicleTypeLabel(vehicle.type, 'zh'),
-          getVehicleTypeLabel(vehicle.type, 'en'),
           vehicle.engine,
+          formatVehicleEngineLine(vehicle),
+          vehicle.displacement,
+          vehicle.cylinders,
           vehicle.fuel,
           getVehicleFieldLabel('fuel', vehicle.fuel, 'ja'),
           vehicle.trans,
@@ -2551,7 +2688,6 @@ window.TK168_DATA = (() => {
     const params = new URLSearchParams();
     const normalized = {
       brand: filters.brand || '',
-      type: filters.type || '',
       bodyStyle: filters.bodyStyle || '',
       price: filters.price || '',
       priceMetric: filters.price ? (filters.priceMetric === 'base' ? 'base' : '') : '',
@@ -2572,38 +2708,8 @@ window.TK168_DATA = (() => {
     return `brand.html${query ? `?${query}` : ''}`;
   }
 
-  function matchVehicleTypeFilter(filterValue, vehicleType) {
-    const groups = {
-      kei: [],
-      compact: [],
-      suv: ['高性能SUV', '豪华SUV', '越野SUV', '轿跑SUV'],
-      sedan: ['行政轿车', '豪华轿车', '高性能轿车'],
-      coupe: ['双门轿跑', '四门轿跑'],
-      convertible: ['敞篷跑车'],
-      sports: ['GT跑车', '中置跑车', 'V12超跑', '混动超跑', '纯电性能车'],
-      hybrid: ['混动超跑'],
-      wagon: ['猎装车', '旅行车'],
-      mpv: ['MPV'],
-      pickup: ['皮卡'],
-      camper: [],
-      hatchback: [],
-      welfare: [],
-      'commercial-van': [],
-      truck: [],
-      other: []
-    };
-
-    const matchedTypes = groups[filterValue];
-    if (filterValue === 'other') {
-      const known = new Set(Object.values(groups).flat());
-      return !known.has(vehicleType);
-    }
-    if (!matchedTypes) return vehicleType === filterValue;
-    return matchedTypes.includes(vehicleType);
-  }
-
   function countActiveFilters(filters = {}) {
-    return ['brand', 'type', 'bodyStyle', 'price', 'year', 'mileage', 'keyword']
+    return ['brand', 'bodyStyle', 'price', 'year', 'mileage', 'keyword']
       .filter((key) => String(filters[key] || '').trim() !== '')
       .length;
   }
@@ -2613,7 +2719,6 @@ window.TK168_DATA = (() => {
     const brand = filters.brand ? getBrandByKey(filters.brand) : null;
 
     if (brand) parts.push(getBrandLabel(brand));
-    if (filters.type) parts.push(getVehicleTypeLabel(filters.type));
     if (filters.bodyStyle) parts.push(getBodyStyleFieldLabel(filters.bodyStyle));
     if (filters.price) parts.push(getSearchFilterLabel('price', filters.price));
     if (filters.year) parts.push(getSearchFilterLabel('year', filters.year));
@@ -2658,7 +2763,6 @@ window.TK168_DATA = (() => {
 
     const normalized = {
       brand: filters.brand || '',
-      type: filters.type || '',
       bodyStyle: filters.bodyStyle || '',
       price: filters.price || '',
       priceMetric: filters.price ? (filters.priceMetric === 'base' ? 'base' : '') : '',
@@ -2678,7 +2782,7 @@ window.TK168_DATA = (() => {
   function mergeApiVehicleWithBase(apiFlat) {
     if (!apiFlat || !apiFlat.id) return null;
     const base = getVehicleById(apiFlat.id);
-    return mergeVehicleData(base, apiFlat);
+    return normalizeVehicleEngineFields(mergeVehicleData(base, apiFlat));
   }
 
   return {
@@ -2694,6 +2798,8 @@ window.TK168_DATA = (() => {
     getVehicleById,
     getVehiclesByBrand,
     getBrandLabel,
+    getVehicleBrandTitle,
+    getVehicleModelDisplayName,
     getVehicleModelName,
     getVehicleName,
     resolveVehicleMediaSource,
@@ -2732,6 +2838,7 @@ window.TK168_DATA = (() => {
     getRentalVehicleDetailById,
     mergeApiRentalWithBase,
     refreshVehiclesFromApiHydrate,
-    refreshJournalFromApiHydrate
+    refreshJournalFromApiHydrate,
+    formatVehicleEngineLine
   };
 })();

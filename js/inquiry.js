@@ -4,7 +4,7 @@
     getVehicleById,
     getVehicleName,
     getBrandLabel,
-    getVehicleTypeLabel,
+    getVehicleFieldLabel,
     buildBrandUrl
   } = window.TK168_DATA;
 
@@ -353,8 +353,8 @@
     const language = currentLanguage();
     const image = window.TK168_DATA.resolveVehicleMediaSource(vehicle.photo || vehicle.gallery?.[0] || '001.png');
     const year = sanitize(vehicle.year);
-    const typeLabel = sanitize(getVehicleTypeLabel(vehicle.type, language) || vehicle.type);
-    const engine = sanitize(vehicle.engine);
+    const typeLabel = sanitize(getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, language) || '');
+    const engineLine = window.TK168_DATA?.formatVehicleEngineLine?.(vehicle) || sanitize(vehicle.engine);
     const mileage = sanitize(vehicle.mileage);
     const statusText = currentCopy().vehicleStatus;
 
@@ -369,7 +369,7 @@
       refs.vehicleName.textContent = getVehicleName(vehicle, language);
     }
     if (refs.vehicleMeta) {
-      refs.vehicleMeta.textContent = [year, typeLabel, engine, mileage ? `${mileage}km` : '', statusText]
+      refs.vehicleMeta.textContent = [year, typeLabel, engineLine, mileage ? `${mileage}km` : '', statusText]
         .filter(Boolean)
         .join(' / ');
     }

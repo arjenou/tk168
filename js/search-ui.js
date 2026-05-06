@@ -18,7 +18,6 @@ window.TK168SearchUI = (() => {
   function cloneState(state) {
     return {
       brand: state.brand || '',
-      type: state.type || '',
       bodyStyle: state.bodyStyle || '',
       price: state.price || '',
       priceMetric: state.priceMetric === 'base' ? 'base' : 'total',

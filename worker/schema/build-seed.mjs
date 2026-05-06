@@ -88,6 +88,15 @@ function escJson(value) {
   return esc(JSON.stringify(value));
 }
 
+function engineCombined(v) {
+  const d = String(v.displacement ?? "").trim();
+  const c = String(v.cylinders ?? "").trim();
+  if (d && c) return `${d} ${c}`;
+  if (d) return d;
+  if (c) return c;
+  return String(v.engine ?? "").trim();
+}
+
 function presetJson(preset) {
   return preset ? escJson(preset) : "NULL";
 }
@@ -104,18 +113,19 @@ baseVehicles.forEach((v, index) => {
   const highlight = vehicleHighlightPresets[v.id] || {};
 
   const insert = `INSERT INTO vehicles (
-    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, displacement, cylinders, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record, origin,
     overview_zh, overview_ja, overview_en, benefits, features,
     cond_dealer_warranty, cond_one_owner,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance,
+    listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
     display_order, is_published
   ) VALUES (
     ${esc(v.id)}, ${esc(v.brandKey)}, ${esc(v.name)}, ${esc(v.nameJa)}, ${esc(v.nameEn)}, ${esc(v.year)}, ${esc(v.type)},
-    ${esc(v.icon)}, ${esc(v.mileage)}, ${esc(v.engine)}, ${esc(v.fuel)}, ${esc(v.trans)},
+    ${esc(v.icon)}, ${esc(v.mileage)}, ${esc(engineCombined(v))}, ${esc(v.displacement)}, ${esc(v.cylinders)}, ${esc(v.fuel)}, ${esc(v.trans)},
     ${esc(v.totalPrice)}, ${esc(v.basePrice)}, ${esc(v.bodyStyle)}, ${esc(v.drive)},
     ${esc(v.bodyColor)}, ${esc(v.interiorColor)}, ${esc(v.seats)}, ${esc(v.serviceRecord)}, ${esc(v.origin)},
     ${escJson(v.overview)}, ${escJson(v.overviewJa)}, ${escJson(v.overviewEn || null)},
@@ -123,6 +133,7 @@ baseVehicles.forEach((v, index) => {
     ${presetJson(cond.dealerWarranty)}, ${presetJson(cond.oneOwner)},
     ${presetJson(listing.repairHistory)}, ${presetJson(listing.vehicleInspection)},
     ${presetJson(listing.legalMaintenance)},
+    ${presetJson(listing.fuelGrade)},
     ${presetJson(highlight.steering)}, ${presetJson(highlight.chassisTail)},
     NULL, NULL, NULL, NULL,
     ${index}, 1

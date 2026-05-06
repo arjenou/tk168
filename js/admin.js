@@ -101,6 +101,13 @@ const YES_NO_DASH = [
   { label: "— / ― / —", zh: "—", ja: "―", en: "—" },
 ];
 
+const FUEL_GRADE_OPTIONS = [
+  { label: "普通汽油 / レギュラー / Regular", zh: "普通汽油", ja: "レギュラー", en: "Regular" },
+  { label: "高辛烷汽油 / ハイオク / Premium", zh: "高辛烷汽油", ja: "ハイオク", en: "Premium" },
+  { label: "柴油 / 軽油 / Diesel", zh: "柴油", ja: "軽油", en: "Diesel" },
+  { label: "电动 / 電気 / Electric", zh: "电动", ja: "電気", en: "Electric" },
+];
+
 // Resource descriptors drive the list + editor UIs so we keep a single
 // code path for the two inventories.
 const RESOURCES = {
@@ -142,14 +149,6 @@ const RESOURCES = {
           },
           { key: "year", label: "年份", placeholder: "2022", span: 4 },
           {
-            key: "type",
-            label: "车型分类",
-            type: "select",
-            optionsCatalog: "vehicleType",
-            span: 4,
-            hint: "规范类名，与前台详情「车型」及库存筛选一致（中/日/英由站点语言自动翻译）。",
-          },
-          {
             key: "icon",
             label: "图标",
             type: "select",
@@ -177,14 +176,14 @@ const RESOURCES = {
           },
           { key: "seats", label: "座位", type: "select", optionsCatalog: "seats", span: 4 },
           { key: "origin", label: "产地", placeholder: "意大利进口", span: 4 },
-          { key: "serviceRecord", label: "保养记录", placeholder: "完整在册", span: 4 },
         ],
       },
       {
         id: "power",
         label: "动力与价格",
         fields: [
-          { key: "engine", label: "发动机", placeholder: "4.0L V8", span: 6 },
+          { key: "displacement", label: "排量", type: "select", optionsCatalog: "displacement", span: 3, hint: "如 4.0L、2.0L Turbo；不在列表中会显示为「当前值」。" },
+          { key: "cylinders", label: "发动机缸数", type: "select", optionsCatalog: "cylinders", span: 3, hint: "如 V8、V12；可与排量分开维护。" },
           { key: "mileage", label: "里程 (km)", placeholder: "3,200", span: 3 },
           { key: "fuel", label: "燃料", type: "select", optionsCatalog: "fuel", span: 3 },
           { key: "trans", label: "变速箱", type: "select", optionsCatalog: "trans", span: 3 },
@@ -205,15 +204,16 @@ const RESOURCES = {
       ["listingRepairHistory", "修复历", "select", YES_NO_DASH],
       ["listingVehicleInspection", "车检", "select", YES_NO_DASH],
       ["listingLegalMaintenance", "法定整备", "select", YES_NO_DASH],
+      ["listingFuelGrade", "油种", "select", FUEL_GRADE_OPTIONS],
       ["highlightSteering", "方向盘"],
       ["highlightChassisTail", "车台末尾号"],
     ],
     emptyDraft: () => ({
       id: "", brandKey: "", name: "", nameJa: "", nameEn: "", year: "", type: "", icon: "",
-      mileage: "", engine: "", fuel: "汽油", trans: "自动挡",
+      mileage: "", displacement: "", cylinders: "", fuel: "汽油", trans: "自动挡",
       totalPrice: "", basePrice: "",
       bodyStyle: "", drive: "", bodyColor: "", interiorColor: "", seats: "",
-      serviceRecord: "完整在册", origin: "",
+      serviceRecord: "", origin: "",
       overviewZh: [""], overviewJa: [""], overviewEn: null,
       benefits: null, features: null,
       condDealerWarranty: { zh: "", ja: "", en: "" },
@@ -221,6 +221,7 @@ const RESOURCES = {
       listingRepairHistory: { zh: "", ja: "", en: "" },
       listingVehicleInspection: { zh: "", ja: "", en: "" },
       listingLegalMaintenance: { zh: "", ja: "", en: "" },
+      listingFuelGrade: { zh: "", ja: "", en: "" },
       highlightSteering: { zh: "", ja: "", en: "" },
       highlightChassisTail: { zh: "", ja: "", en: "" },
       staffPhotoR2Key: null,
@@ -270,14 +271,6 @@ const RESOURCES = {
           },
           { key: "year", label: "年份", placeholder: "2022", span: 4 },
           {
-            key: "type",
-            label: "车型分类",
-            type: "select",
-            optionsCatalog: "vehicleType",
-            span: 4,
-            hint: "规范类名，与前台详情「车型」及库存筛选一致（中/日/英由站点语言自动翻译）。",
-          },
-          {
             key: "icon",
             label: "图标",
             type: "select",
@@ -311,7 +304,8 @@ const RESOURCES = {
         id: "power",
         label: "动力",
         fields: [
-          { key: "engine", label: "发动机", placeholder: "4.0L V8", span: 6 },
+          { key: "displacement", label: "排量", type: "select", optionsCatalog: "displacement", span: 3, hint: "如 4.0L、2.0L Turbo；不在列表中会显示为「当前值」。" },
+          { key: "cylinders", label: "发动机缸数", type: "select", optionsCatalog: "cylinders", span: 3, hint: "如 V8、V12；可与排量分开维护。" },
           { key: "mileage", label: "里程 (km)", placeholder: "3,200", span: 3 },
           { key: "fuel", label: "燃料", type: "select", optionsCatalog: "fuel", span: 3 },
           { key: "trans", label: "变速箱", type: "select", optionsCatalog: "trans", span: 3 },
@@ -342,7 +336,7 @@ const RESOURCES = {
     presets: [],
     emptyDraft: () => ({
       id: "", brandKey: "", name: "", nameJa: "", nameEn: "", year: "", type: "", icon: "",
-      mileage: "", engine: "", fuel: "汽油", trans: "自动挡",
+      mileage: "", displacement: "", cylinders: "", fuel: "汽油", trans: "自动挡",
       bodyStyle: "", drive: "", bodyColor: "", interiorColor: "",
       seats: "2 座", origin: "",
       dailyRate: 0, deposit: 0, minDays: 1, rentalStatus: "available",
@@ -401,6 +395,35 @@ function statusLabel(status) {
       status
     ] || status || "—"
   );
+}
+
+/** 与 js/data.js 中 splitLegacyEngineSpec 行为一致：仅用于后台打开旧数据 */
+function splitLegacyEngineCombined(engine) {
+  const t = String(engine || "").trim();
+  if (!t) return { displacement: "", cylinders: "" };
+  const m = t.match(/^([\d.]+\s*L(?:\s+(?:Turbo|Hybrid))?)(?:\s+(.+))?$/i);
+  if (m) {
+    return { displacement: (m[1] || "").trim(), cylinders: (m[2] || "").trim() };
+  }
+  return { displacement: t, cylinders: "" };
+}
+
+function normalizeInventoryDraftForEngine(draft) {
+  if (!draft || typeof draft !== "object") return draft;
+  let displacement = String(draft.displacement ?? "").trim();
+  let cylinders = String(draft.cylinders ?? "").trim();
+  if (!displacement && !cylinders && draft.engine) {
+    const sp = splitLegacyEngineCombined(draft.engine);
+    displacement = sp.displacement;
+    cylinders = sp.cylinders;
+  }
+  return { ...draft, displacement, cylinders };
+}
+
+function combinedEngineFromDraft(draft) {
+  const d = String(draft?.displacement ?? "").trim();
+  const c = String(draft?.cylinders ?? "").trim();
+  return [d, c].filter(Boolean).join(" ").trim();
 }
 
 // -------------------- App state --------------------
@@ -1000,7 +1023,10 @@ function bindRowActions() {
       if (!item) return;
       state.editingIsNew = false;
       state.editingId = id;
-      state.editingDraft = { ...item, images: [...(item.images || [])] };
+      state.editingDraft = normalizeInventoryDraftForEngine({
+        ...item,
+        images: [...(item.images || [])],
+      });
       state.editingImagePreviewId = null;
       state.view = "editor";
       render();
@@ -1327,6 +1353,28 @@ function renderEditorGroup(group, draft) {
     </section>`;
 }
 
+/** 将「品牌 Key」从「基本信息」组抽出，放到上方「品牌与车型」区块，避免运营把品牌写进车型名。 */
+function splitBrandKeyFieldForInventory(fieldGroups) {
+  if (!Array.isArray(fieldGroups) || fieldGroups.length === 0) {
+    return { brandField: null, groupsWithoutBrand: fieldGroups || [] };
+  }
+  const basic = fieldGroups[0];
+  if (!basic || basic.id !== "basic" || !Array.isArray(basic.fields)) {
+    return { brandField: null, groupsWithoutBrand: fieldGroups };
+  }
+  const idx = basic.fields.findIndex((f) => f && f.key === "brandKey");
+  if (idx === -1) {
+    return { brandField: null, groupsWithoutBrand: fieldGroups };
+  }
+  const brandField = basic.fields[idx];
+  const restFields = basic.fields.filter((_, i) => i !== idx);
+  const nextBasic = { ...basic, fields: restFields };
+  return {
+    brandField,
+    groupsWithoutBrand: [nextBasic, ...fieldGroups.slice(1)],
+  };
+}
+
 function renderJournalContentTab(draft) {
   return `
     <section class="admin-section">
@@ -1481,7 +1529,11 @@ function renderVehicleStaffSection(draft) {
 
 function renderContentTab(r, draft) {
   if (r.listKind === "journal") return renderJournalContentTab(draft);
-  const groupsHtml = (r.fieldGroups || [])
+  const inventoryKeys = new Set(["vehicles", "rentals"]);
+  const { brandField, groupsWithoutBrand } = inventoryKeys.has(r.key)
+    ? splitBrandKeyFieldForInventory(r.fieldGroups)
+    : { brandField: null, groupsWithoutBrand: r.fieldGroups || [] };
+  const groupsHtml = (groupsWithoutBrand || [])
     .map((g) => renderEditorGroup(g, draft))
     .join("");
 
@@ -1489,24 +1541,29 @@ function renderContentTab(r, draft) {
   const overviewJa = Array.isArray(draft.overviewJa) ? draft.overviewJa.join("\n\n") : (draft.overviewJa || "");
   const overviewEn = Array.isArray(draft.overviewEn) ? draft.overviewEn.join("\n\n") : (draft.overviewEn || "");
 
+  const brandFieldHtml = brandField
+    ? `<div class="admin-grid-12">${renderEditorField({ ...brandField, span: 12 }, draft)}</div>`
+    : "";
+
   return `
     <section class="admin-section">
       <div class="admin-section-head">
-        <h3>车型名称</h3>
-        <p>中文必填；日文 / 英文可空，前台会按品牌 + 中文名推断展示。</p>
+        <h3>品牌与车型</h3>
+        <p>上方先选品牌。<strong>车型名三栏只填车款本身</strong>（如 Revuelto、Urus S），不要把品牌名写进中文里；旧数据若中文里仍含「品牌 + 空格 + 车款」，前台会自动去掉重复品牌。中文车型名必填；日文 / 英文可空，未填时前台用品牌 + 中文车款推断。</p>
       </div>
+      ${brandFieldHtml}
       <div class="admin-grid-12">
         <div class="admin-field admin-col-4">
-          <label>中文 <span class="admin-required">*</span></label>
-          <input class="admin-input" data-draft="name" value="${escapeAttr(draft.name ?? "")}" placeholder="Urus S">
+          <label>车型名（中文）<span class="admin-required">*</span></label>
+          <input class="admin-input" data-draft="name" value="${escapeAttr(draft.name ?? "")}" placeholder="例如 Revuelto，勿填「兰博基尼 …」">
         </div>
         <div class="admin-field admin-col-4">
-          <label>日文</label>
-          <input class="admin-input" data-draft="nameJa" value="${escapeAttr(draft.nameJa ?? "")}" placeholder="ウルス S">
+          <label>车型名（日文）</label>
+          <input class="admin-input" data-draft="nameJa" value="${escapeAttr(draft.nameJa ?? "")}" placeholder="レヴエルト">
         </div>
         <div class="admin-field admin-col-4">
-          <label>英文</label>
-          <input class="admin-input" data-draft="nameEn" value="${escapeAttr(draft.nameEn ?? "")}" placeholder="Urus S">
+          <label>车型名（英文）</label>
+          <input class="admin-input" data-draft="nameEn" value="${escapeAttr(draft.nameEn ?? "")}" placeholder="Revuelto">
         </div>
       </div>
     </section>
@@ -1998,7 +2055,11 @@ function bindEditor() {
           await api(r.apiImagesReorder(state.editingId), { method: "POST", body: { order } });
           const res = await api(r.apiItem(state.editingId));
           const item = res[r.itemKey];
-          state.editingDraft = { ...state.editingDraft, ...item, images: item.images };
+          const merged = { ...state.editingDraft, ...item, images: item.images };
+          state.editingDraft =
+            r.key === "vehicles" || r.key === "rentals"
+              ? normalizeInventoryDraftForEngine(merged)
+              : merged;
           state.editingImagePreviewId = preview.id;
           const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
           if (cached) Object.assign(cached, state.editingDraft);
@@ -2093,6 +2154,9 @@ async function saveItem() {
     if (v && typeof v === "object" && !v.zh && !v.ja && !v.en) payload[key] = null;
   });
   delete payload.images;
+  if (r.key === "vehicles" || r.key === "rentals") {
+    payload.engine = combinedEngineFromDraft(payload);
+  }
   try {
     if (state.editingIsNew) {
       payload.id = state.editingId;
@@ -2109,10 +2173,14 @@ async function saveItem() {
         }
       }
       state.editingIsNew = false;
-      state.editingDraft = {
+      const nextDraft = {
         ...saved,
         images: saved.images || state.editingDraft.images || [],
       };
+      state.editingDraft =
+        r.key === "vehicles" || r.key === "rentals"
+          ? normalizeInventoryDraftForEngine(nextDraft)
+          : nextDraft;
       showToast("已创建");
     } else {
       const res = await api(r.apiItem(state.editingId), {
@@ -2120,10 +2188,14 @@ async function saveItem() {
         body: payload,
       });
       const updated = res[r.itemKey];
-      state.editingDraft = {
+      const nextUp = {
         ...updated,
         images: updated.images || state.editingDraft.images,
       };
+      state.editingDraft =
+        r.key === "vehicles" || r.key === "rentals"
+          ? normalizeInventoryDraftForEngine(nextUp)
+          : nextUp;
       showToast("已保存");
     }
     await refreshItems();

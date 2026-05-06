@@ -3,7 +3,6 @@
     getVehicleById,
     getVehicleName,
     getBrandLabel,
-    getVehicleTypeLabel,
     getVehicleFieldLabel,
     getVehicleRentalProfile,
     getRentableVehicles,
@@ -500,7 +499,7 @@
     const copy = currentCopy();
     const profile = getVehicleRentalProfile(vehicle);
     const image = resolveVehicleMediaSource(vehicle.photo || vehicle.gallery?.[0] || '011.jpg');
-    const type = sanitize(getVehicleTypeLabel(vehicle.type, language) || vehicle.type);
+    const type = sanitize(getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, language) || '');
     const fuel = sanitize(getVehicleFieldLabel('fuel', vehicle.fuel, language));
     const mileage = sanitize(vehicle.mileage);
 

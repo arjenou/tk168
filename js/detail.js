@@ -37,6 +37,8 @@ const spinViewerText = document.getElementById('spinViewerText');
 const featuredGrid = document.getElementById('featuredGrid');
 const featuredSliderViewport = window.matchMedia('(max-width: 760px)');
 const detailTitle = document.getElementById('detailTitle');
+const detailTitleBrand = document.getElementById('detailTitleBrand');
+const detailTitleModel = document.getElementById('detailTitleModel');
 const detailFavoriteBtn = document.getElementById('detailFavoriteBtn');
 const detailTotalPriceValue = document.getElementById('detailTotalPriceValue');
 const detailBasePriceValue = document.getElementById('detailBasePriceValue');
@@ -510,10 +512,24 @@ function getImageGalleryPosition(index, items = getGalleryItems()) {
 }
 
 function renderVehicleHeader() {
-  const vehicleName = getVehicleName(currentVehicle);
-  const primaryImage = window.TK168_DATA.resolveVehicleMediaSource(currentVehicle.gallery?.[0] || currentVehicle.photo);
+  const language = getDetailLanguage();
+  const vehicleName = getVehicleName(currentVehicle, language);
+  const brandTitle = window.TK168_DATA.getVehicleBrandTitle(currentVehicle, language);
+  let modelTitle = window.TK168_DATA.getVehicleModelDisplayName(currentVehicle, language)
+    || window.TK168_DATA.getVehicleModelName(currentVehicle);
+  if (!modelTitle) modelTitle = vehicleName;
+
   document.title = `${vehicleName} — TK168 Premium Automotive`;
-  detailTitle.textContent = vehicleName;
+
+  if (detailTitleBrand && detailTitleModel) {
+    detailTitleBrand.textContent = brandTitle;
+    detailTitleModel.textContent = modelTitle;
+    detailTitleBrand.hidden = !brandTitle;
+  } else if (detailTitle) {
+    detailTitle.textContent = vehicleName;
+  }
+
+  const primaryImage = window.TK168_DATA.resolveVehicleMediaSource(currentVehicle.gallery?.[0] || currentVehicle.photo);
   detailTotalPriceValue.innerHTML = formatPriceMarkup(window.TK168_DATA.getVehicleTotalPriceDisplay(currentVehicle));
   detailBasePriceValue.innerHTML = formatPriceMarkup(window.TK168_DATA.getVehicleBasePriceDisplay(currentVehicle));
   setMainGalleryImage(primaryImage, `${vehicleName} ${window.TK168I18N?.t('gallery.main') || '主图'}`);
