@@ -9,6 +9,7 @@
     "db:apply:local": "wrangler d1 execute tk168 --local --file=schema/schema.sql",
     "db:apply:remote": "wrangler d1 execute tk168 --remote --file=schema/schema.sql",
     "db:seed:remote": "wrangler d1 execute tk168 --remote --file=schema/seed.sql",
-    "db:migrate:mileage:remote": "wrangler d1 execute tk168 --remote --file=schema/migrations/20260609_mileage_km_to_wan.sql"
+    "db:migrate:mileage:remote": "wrangler d1 execute tk168 --remote --file=schema/migrations/20260609_mileage_km_to_wan.sql",
+    "db:migrate:trans:remote": "wrangler d1 execute tk168 --remote --file=schema/migrations/20260610_trans_taxonomy.sql"
   }
 }

@@ -210,7 +210,7 @@ const RESOURCES = {
     ],
     emptyDraft: () => ({
       id: "", brandKey: "", name: "", nameJa: "", nameEn: "", year: "", type: "", icon: "",
-      mileage: "", displacement: "", cylinders: "", fuel: "汽油", trans: "自动挡",
+      mileage: "", displacement: "", cylinders: "", fuel: "汽油", trans: "AT",
       totalPrice: "", basePrice: "",
       bodyStyle: "", drive: "", bodyColor: "", interiorColor: "", seats: "",
       serviceRecord: "", origin: "",
@@ -336,7 +336,7 @@ const RESOURCES = {
     presets: [],
     emptyDraft: () => ({
       id: "", brandKey: "", name: "", nameJa: "", nameEn: "", year: "", type: "", icon: "",
-      mileage: "", displacement: "", cylinders: "", fuel: "汽油", trans: "自动挡",
+      mileage: "", displacement: "", cylinders: "", fuel: "汽油", trans: "AT",
       bodyStyle: "", drive: "", bodyColor: "", interiorColor: "",
       seats: "2 座", origin: "",
       dailyRate: 0, deposit: 0, minDays: 1, rentalStatus: "available",

@@ -1,8 +1,8 @@
 /**
- * 管理端「规格」下拉：选项文案一律为中文；存库值与 js/data.js 中
- * vehicleTypeOptions / vehicleFieldTranslations 对齐，
- * 车身类型选项与 js/data.js standardBodyStyleValues / vehicleFieldTranslations.bodyStyle 一致。
- * 前台 i18n 由 TK168_DATA.getVehicleTypeLabel / getVehicleFieldLabel 负责。
+ * 管理端「规格」下拉：车身类型等仍为中文存库；变速箱（trans）为英文缩写存库：
+ * 5MT / 6MT / 7MT / AT / CVT / E-CVT / DCT / Single-Speed（BEV）。
+ * 与 js/data.js vehicleFieldTranslations.trans 一致。
+ * 前台展示由 TK168_DATA.getVehicleFieldLabel 负责多语言。
  */
 (function () {
   const vehicleType = [
@@ -54,12 +54,14 @@
   ];
 
   const trans = [
-    { value: "自动挡", label: "自动挡" },
-    { value: "手动挡", label: "手动挡" },
-    { value: "CVT无级变速", label: "CVT 无级变速" },
-    { value: "手自一体", label: "手自一体" },
-    { value: "双离合", label: "双离合（DCT）" },
-    { value: "电动车单速", label: "电动车单速" }
+    { value: "5MT", label: "5MT" },
+    { value: "6MT", label: "6MT" },
+    { value: "7MT", label: "7MT" },
+    { value: "AT", label: "AT" },
+    { value: "CVT", label: "CVT" },
+    { value: "E-CVT", label: "E-CVT" },
+    { value: "DCT", label: "DCT" },
+    { value: "Single-Speed（BEV）", label: "Single-Speed（BEV）" }
   ];
 
   /** 排量（存库原文，可含 Turbo / Hybrid 等后缀） */
