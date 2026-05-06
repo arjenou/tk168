@@ -908,7 +908,9 @@ function vehicleMatchesCompareFilter(vehicle) {
   if (state.year === 'year-mid' && (year < 2020 || year > 2022)) return false;
   if (state.year === 'year-old' && year >= 2020) return false;
 
-  const mileage = parseNumericValue(vehicle?.mileage);
+  const mileage = window.TK168_DATA?.parseMileage
+    ? window.TK168_DATA.parseMileage(vehicle?.mileage)
+    : parseNumericValue(vehicle?.mileage);
   if (state.mileage === 'mileage-low' && mileage > 10000) return false;
   if (state.mileage === 'mileage-mid' && (mileage <= 10000 || mileage > 50000)) return false;
   if (state.mileage === 'mileage-high' && mileage <= 50000) return false;

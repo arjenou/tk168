@@ -184,8 +184,8 @@ const RESOURCES = {
         fields: [
           { key: "displacement", label: "排量", type: "select", optionsCatalog: "displacement", span: 3, hint: "如 4.0L、2.0L Turbo；不在列表中会显示为「当前值」。" },
           { key: "cylinders", label: "发动机缸数", type: "select", optionsCatalog: "cylinders", span: 3, hint: "如 V8、V12；可与排量分开维护。" },
-          { key: "mileage", label: "里程 (km)", placeholder: "3,200", span: 3 },
-          { key: "fuel", label: "燃料", type: "select", optionsCatalog: "fuel", span: 3 },
+          { key: "mileage", label: "里程（万公里）", placeholder: "", span: 3, hint: "选填。存库为万公里量级约数（0.32≈3200km）；不必填精确公里数。可写「0.5万」或带小数点位数。" },
+          { key: "fuel", label: "油種", type: "select", optionsCatalog: "fuel", span: 3 },
           { key: "trans", label: "变速箱", type: "select", optionsCatalog: "trans", span: 3 },
           { key: "totalPrice", label: "支付总额", placeholder: "¥ 1,980,000", hint: "含手续费的显示总价", span: 4 },
           { key: "basePrice", label: "车辆本体价格", placeholder: "¥ 1,860,000", span: 4 },
@@ -306,8 +306,8 @@ const RESOURCES = {
         fields: [
           { key: "displacement", label: "排量", type: "select", optionsCatalog: "displacement", span: 3, hint: "如 4.0L、2.0L Turbo；不在列表中会显示为「当前值」。" },
           { key: "cylinders", label: "发动机缸数", type: "select", optionsCatalog: "cylinders", span: 3, hint: "如 V8、V12；可与排量分开维护。" },
-          { key: "mileage", label: "里程 (km)", placeholder: "3,200", span: 3 },
-          { key: "fuel", label: "燃料", type: "select", optionsCatalog: "fuel", span: 3 },
+          { key: "mileage", label: "里程（万公里）", placeholder: "", span: 3, hint: "选填。存库为万公里量级约数（0.32≈3200km）；不必填精确公里数。可写「0.5万」或带小数点位数。" },
+          { key: "fuel", label: "油種", type: "select", optionsCatalog: "fuel", span: 3 },
           { key: "trans", label: "变速箱", type: "select", optionsCatalog: "trans", span: 3 },
         ],
       },

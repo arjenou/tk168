@@ -501,13 +501,14 @@
     const image = resolveVehicleMediaSource(vehicle.photo || vehicle.gallery?.[0] || '011.jpg');
     const type = sanitize(getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, language) || '');
     const fuel = sanitize(getVehicleFieldLabel('fuel', vehicle.fuel, language));
-    const mileage = sanitize(vehicle.mileage);
+    const mileageDisplay =
+      window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, language) || '';
 
     refs.vehicleThumb.src = image;
     refs.vehicleThumb.alt = getVehicleName(vehicle, language);
     refs.vehicleBrand.textContent = getBrandLabel(vehicle.brandKey, language).toUpperCase();
     refs.vehicleName.textContent = getVehicleName(vehicle, language);
-    refs.vehicleMeta.textContent = [vehicle.year, type, fuel, mileage ? `${mileage}km` : '', copy.vehicleStatus]
+    refs.vehicleMeta.textContent = [vehicle.year, type, fuel, mileageDisplay, copy.vehicleStatus]
       .filter(Boolean)
       .join(' / ');
 

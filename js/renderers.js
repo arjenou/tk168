@@ -250,8 +250,11 @@ window.TK168Renderers = (() => {
       }
       return base;
     })();
+    const mileageDisplay =
+      window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, language)
+      || '';
     const metaItems = [
-      { key: 'mileage', icon: 'v1.svg', alt: 'Mileage', value: `${vehicle.mileage}km` },
+      { key: 'mileage', icon: 'v1.svg', alt: 'Mileage', value: mileageDisplay || '-' },
       { key: 'engine', icon: 'v2.svg', alt: 'Engine', value: window.TK168_DATA?.formatVehicleEngineLine?.(vehicle) || vehicle.engine },
       { key: 'fuel', icon: 'v3.svg', alt: 'Fuel', value: getVehicleFieldLabel('fuel', vehicle.fuel) },
       { key: 'transmission', icon: 'v4.svg', alt: 'Transmission', value: getVehicleFieldLabel('trans', vehicle.trans) }
@@ -387,7 +390,7 @@ window.TK168Renderers = (() => {
     /* 两列交错排版（与现有 .spec-table 样式一致）；已下线：禁煙車、正規輸入車、エコカー減税、レンタカーアップ、定期点検記録簿 */
     const leftColumn = [
       [specLabels.year, formatRegistrationYear(vehicle.year) || `${vehicle.year}${language === 'en' ? '' : (language === 'ja' ? '年' : ' 年')}`],
-      [specLabels.mileage, `${vehicle.mileage} km`],
+      [specLabels.mileage, window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, language) || emptyValue],
       [specLabels.repair, getVehicleListingField(vehicle, 'repairHistory') || emptyValue],
       [specLabels.inspection, getVehicleListingField(vehicle, 'vehicleInspection') || emptyValue],
       [specLabels.legalMaintenance, getVehicleListingField(vehicle, 'legalMaintenance') || emptyValue]
@@ -421,7 +424,7 @@ window.TK168Renderers = (() => {
     const basicSpecs = [
       [language === 'en' ? 'Body type' : (language === 'ja' ? 'ボディタイプ' : '车身类型'), getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle)],
       [language === 'en' ? 'Color' : (language === 'ja' ? '色' : '颜色'), getVehicleFieldLabel('bodyColor', vehicle.bodyColor)],
-      [language === 'en' ? 'Engine type' : (language === 'ja' ? 'エンジン種別' : '发动机种别'), getVehicleFieldLabel('fuel', vehicle.fuel)],
+      [language === 'en' ? 'Fuel type' : '油種', getVehicleFieldLabel('fuel', vehicle.fuel)],
       [language === 'en' ? 'Transmission' : (language === 'ja' ? 'ミッション' : '变速箱'), getVehicleFieldLabel('trans', vehicle.trans)]
     ];
     const highlightSpecs = [

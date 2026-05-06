@@ -438,7 +438,7 @@ window.TK168_DATA = (() => {
     const totalAmount = preset.totalBase + ((seed % 5) * preset.totalStep);
     const baseAmount = Math.max(100000, totalAmount - (28000 + ((seed % 4) * 6000)));
     const year = 2019 + (seed % 7);
-    const mileage = preset.mileageBase + ((seed % 6) * preset.mileageStep);
+    const mileageKm = preset.mileageBase + ((seed % 6) * preset.mileageStep);
     const type = pickCatalogValue(preset.typeOptions, seed);
     const bodyStyle = pickCatalogValue(preset.bodyStyleOptions, seed + 1) || type;
     const overview = buildLibraryVehicleOverview(brand, model, type);
@@ -452,7 +452,11 @@ window.TK168_DATA = (() => {
       icon: pickCatalogValue(libraryVehicleIcons, seed),
       photo: model.image,
       gallery: [model.image, model.image, model.image, model.image],
-      mileage: mileage.toLocaleString('en-US'),
+      mileage: (() => {
+        const w = mileageKm / 10000;
+        let s = w.toFixed(2).replace(/(\.\d*?[1-9])0+$/g, '$1').replace(/\.$/, '');
+        return s || '0';
+      })(),
       displacement: pickCatalogValue(preset.displacementOptions, seed + 2),
       cylinders: pickCatalogValue(preset.cylinderOptions, seed + 3),
       fuel: pickCatalogValue(preset.fuelOptions, seed + 4),
@@ -506,7 +510,7 @@ window.TK168_DATA = (() => {
       icon: 'b1.svg',
       photo: '001.png',
       gallery: ['001.png', '001.png', '001.png', '001.png'],
-      mileage: '3,200',
+      mileage: '0.32',
       displacement: '4.0L',
       cylinders: 'V8',
       fuel: '汽油',
@@ -540,7 +544,7 @@ window.TK168_DATA = (() => {
       icon: 'b2.svg',
       photo: '002.png',
       gallery: ['002.png', '002.png', '002.png', '002.png'],
-      mileage: '90',
+      mileage: '0.009',
       displacement: '5.2L',
       cylinders: 'V10',
       fuel: '汽油',
@@ -574,7 +578,7 @@ window.TK168_DATA = (() => {
       icon: 'b3.svg',
       photo: '003.png',
       gallery: ['003.png', '003.png', '003.png', '003.png'],
-      mileage: '15,200',
+      mileage: '1.52',
       displacement: '4.5L',
       cylinders: 'V8',
       fuel: '汽油',
@@ -608,7 +612,7 @@ window.TK168_DATA = (() => {
       icon: 'b4.svg',
       photo: '004.png',
       gallery: ['004.png', '004.png', '004.png', '004.png'],
-      mileage: '120',
+      mileage: '0.012',
       displacement: '4.4L',
       cylinders: 'V8',
       fuel: '汽油',
@@ -642,7 +646,7 @@ window.TK168_DATA = (() => {
       icon: 'b5.svg',
       photo: '005.png',
       gallery: ['005.png', '005.png', '005.png', '005.png'],
-      mileage: '8,700',
+      mileage: '0.87',
       displacement: '3.9L',
       cylinders: 'V8',
       fuel: '汽油',
@@ -676,7 +680,7 @@ window.TK168_DATA = (() => {
       icon: 'b6.svg',
       photo: '006.png',
       gallery: ['006.png', '006.png', '006.png', '006.png'],
-      mileage: '12,500',
+      mileage: '1.25',
       displacement: '6.5L',
       cylinders: 'V12',
       fuel: '汽油',
@@ -710,7 +714,7 @@ window.TK168_DATA = (() => {
       icon: 'b1.svg',
       photo: '003.png',
       gallery: ['003.png', '003.png', '003.png', '003.png'],
-      mileage: '800',
+      mileage: '0.08',
       displacement: '5.2L',
       cylinders: 'V10',
       fuel: '汽油',
@@ -744,7 +748,7 @@ window.TK168_DATA = (() => {
       icon: 'b1.svg',
       photo: '004.png',
       gallery: ['004.png', '004.png', '004.png', '004.png'],
-      mileage: '120',
+      mileage: '0.012',
       displacement: '4.0L',
       cylinders: 'V8',
       fuel: '汽油',
@@ -778,7 +782,7 @@ window.TK168_DATA = (() => {
       icon: 'b1.svg',
       photo: '005.png',
       gallery: ['005.png', '005.png', '005.png', '005.png'],
-      mileage: '5,400',
+      mileage: '0.54',
       displacement: '5.2L',
       cylinders: 'V10',
       fuel: '汽油',
@@ -812,7 +816,7 @@ window.TK168_DATA = (() => {
       icon: 'b1.svg',
       photo: '002.png',
       gallery: ['002.png', '002.png', '002.png', '002.png'],
-      mileage: '28,000',
+      mileage: '2.8',
       displacement: '5.0L',
       cylinders: 'V10',
       fuel: '汽油',
@@ -846,7 +850,7 @@ window.TK168_DATA = (() => {
       icon: 'b1.svg',
       photo: '001.png',
       gallery: ['001.png', '001.png', '001.png', '001.png'],
-      mileage: '2,100',
+      mileage: '0.21',
       displacement: '6.5L',
       cylinders: 'V12',
       fuel: 'HEV（混动）',
@@ -880,7 +884,7 @@ window.TK168_DATA = (() => {
       icon: 'b1.svg',
       photo: '004.png',
       gallery: ['004.png', '004.png', '004.png', '004.png'],
-      mileage: '360',
+      mileage: '0.036',
       displacement: '4.0L',
       cylinders: 'V8',
       fuel: '汽油',
@@ -914,7 +918,7 @@ window.TK168_DATA = (() => {
       icon: 'b1.svg',
       photo: '005.png',
       gallery: ['005.png', '005.png', '005.png', '005.png'],
-      mileage: '9,200',
+      mileage: '0.92',
       displacement: '5.2L',
       cylinders: 'V10',
       fuel: '汽油',
@@ -1810,7 +1814,34 @@ window.TK168_DATA = (() => {
   }
 
   function parseMileage(value) {
-    return Number(String(value || '').replace(/[^\d]/g, '')) || 0;
+    const raw = String(value ?? '').trim();
+    if (!raw) return 0;
+    if (/万/.test(raw)) {
+      const n = parseFloat(raw.replace(/[^\d.]/g, ''));
+      return Number.isFinite(n) ? Math.round(n * 10000) : 0;
+    }
+    const compact = raw.replace(/[,，]/g, '').trim();
+    if (!/^[\d.]+$/.test(compact)) return 0;
+    const n = parseFloat(compact);
+    if (!Number.isFinite(n)) return 0;
+    if (compact.includes('.') && n < 1000) return Math.round(n * 10000);
+    return Math.round(n);
+  }
+
+  /** 展示用：有有效里程则 zh/ja 为「X万公里」，en 为「N km」；纯文字或无数字则原样返回 */
+  function formatVehicleMileageDisplay(value, language = getCurrentLanguage()) {
+    const raw = String(value ?? '').trim();
+    if (!raw) return '';
+    if (!/\d/.test(raw)) return raw;
+    const km = parseMileage(raw);
+    if (!km) return raw;
+    if (language === 'en') {
+      return `${km.toLocaleString('en-US')} km`;
+    }
+    const wan = km / 10000;
+    let s = wan.toFixed(2);
+    s = s.replace(/(\.\d*?[1-9])0+$/g, '$1').replace(/\.$/, '');
+    return `${s}万公里`;
   }
 
   function parseYear(value) {
@@ -2005,8 +2036,7 @@ window.TK168_DATA = (() => {
     const driveLabel = getVehicleFieldLabel('drive', vehicle.drive, 'en') || 'road-ready';
     const bodyColorLabel = getVehicleFieldLabel('bodyColor', vehicle.bodyColor, 'en') || 'well-kept';
     const interiorLabel = getVehicleFieldLabel('interiorColor', vehicle.interiorColor, 'en') || 'refined';
-    const mileage = parseMileage(vehicle.mileage);
-    const mileageLabel = mileage ? `${mileage.toLocaleString('en-US')} km` : 'a well-kept mileage record';
+    const mileageLabel = formatVehicleMileageDisplay(vehicle.mileage, 'en') || 'a well-kept mileage record';
 
     return [
       `${brandName} is presented here as a ${typeLabel.toLowerCase()}, pairing ${formatVehicleEngineLine(vehicle)} output with ${fuelLabel.toLowerCase()} power and ${driveLabel} traction.`,
@@ -2835,6 +2865,8 @@ window.TK168_DATA = (() => {
     buildBrandUrl,
     buildDetailUrl,
     mergeApiVehicleWithBase,
+    parseMileage,
+    formatVehicleMileageDisplay,
     getRentalVehicleDetailById,
     mergeApiRentalWithBase,
     refreshVehiclesFromApiHydrate,

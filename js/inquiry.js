@@ -355,7 +355,8 @@
     const year = sanitize(vehicle.year);
     const typeLabel = sanitize(getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, language) || '');
     const engineLine = window.TK168_DATA?.formatVehicleEngineLine?.(vehicle) || sanitize(vehicle.engine);
-    const mileage = sanitize(vehicle.mileage);
+    const mileageDisplay =
+      window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, language) || '';
     const statusText = currentCopy().vehicleStatus;
 
     if (refs.vehicleThumb) {
@@ -369,7 +370,7 @@
       refs.vehicleName.textContent = getVehicleName(vehicle, language);
     }
     if (refs.vehicleMeta) {
-      refs.vehicleMeta.textContent = [year, typeLabel, engineLine, mileage ? `${mileage}km` : '', statusText]
+      refs.vehicleMeta.textContent = [year, typeLabel, engineLine, mileageDisplay, statusText]
         .filter(Boolean)
         .join(' / ');
     }

@@ -23,7 +23,7 @@ const RENTAL_COPY = {
     'fleet.subtitle': '先看目前可谈的车，具体档期和条款再人工确认。',
     'fleet.empty': '当前暂无可立即租赁车辆，请先联系顾问确认最新状态。',
     'fleet.card.available': '可立即租',
-    'fleet.card.fuel': '燃油类型',
+    'fleet.card.fuel': '油種',
     'fleet.card.mileage': '里程',
     'fleet.card.dailyRate': '日租金',
     'fleet.card.deposit': '押金',
@@ -76,7 +76,7 @@ const RENTAL_COPY = {
     'fleet.subtitle': 'まず候補車を見て、実際の日程と条件はその後に確認します。',
     'fleet.empty': '現在すぐに貸し出せる車両はありません。スタッフへお問い合わせください。',
     'fleet.card.available': '即日相談可',
-    'fleet.card.fuel': '燃料',
+    'fleet.card.fuel': '油種',
     'fleet.card.mileage': '走行距離',
     'fleet.card.dailyRate': '1日料金',
     'fleet.card.deposit': '保証金',
@@ -193,8 +193,13 @@ function escapeHtml(value) {
     .replaceAll("'", '&#39;');
 }
 
-function formatMileage(value) {
-  return `${String(value || '0')} km`;
+function formatMileage(value, language) {
+  const lang = language ?? window.TK168I18N?.getLanguage?.() || 'ja';
+  const formatted = window.TK168_DATA?.formatVehicleMileageDisplay?.(value, lang);
+  if (formatted) return formatted;
+  const raw = String(value ?? '').trim();
+  if (raw && !/\d/.test(raw)) return raw;
+  return raw || '—';
 }
 
 function formatRate(value, language) {
@@ -294,7 +299,7 @@ function buildVehicleCardHtml(vehicle, language) {
         <div class="rental-card-facts">
           <div class="rental-fact">
             <span class="rental-fact-label">${escapeHtml(copy('fleet.card.mileage', language))}</span>
-            <span class="rental-fact-value">${escapeHtml(formatMileage(vehicle.mileage))}</span>
+            <span class="rental-fact-value">${escapeHtml(formatMileage(vehicle.mileage, language))}</span>
           </div>
           <div class="rental-fact">
             <span class="rental-fact-label">${escapeHtml(copy('fleet.card.dailyRate', language))}</span>
@@ -340,7 +345,7 @@ function hydrateRentalVehicleCard(card, vehicle, language) {
 
   const specSpans = Array.from(card.querySelectorAll('.v-spec span'));
   const specRows = [
-    { label: copy('fleet.card.mileage', language), value: formatMileage(vehicle.mileage) },
+    { label: copy('fleet.card.mileage', language), value: formatMileage(vehicle.mileage, language) },
     { label: copy('fleet.card.fuel', language), value: fuel },
     { label: copy('fleet.card.dailyRate', language), value: formatRate(profile.dailyRate, language) },
     {
