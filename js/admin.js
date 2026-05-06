@@ -327,8 +327,22 @@ const RESOURCES = {
             ],
             span: 12,
           },
-          { key: "dailyRate", label: "日租金 (¥)", type: "number", placeholder: "5600", span: 4 },
-          { key: "deposit", label: "押金 (¥)", type: "number", placeholder: "120000", span: 4 },
+          {
+            key: "dailyRate",
+            label: "日租金 (¥)",
+            type: "text",
+            placeholder: "¥ 5,600",
+            hint: "失焦或保存时自动按日式千分位排版；提交为整数元。",
+            span: 4,
+          },
+          {
+            key: "deposit",
+            label: "押金 (¥)",
+            type: "text",
+            placeholder: "¥ 120,000",
+            hint: "失焦或保存时自动按日式千分位排版；提交为整数元。",
+            span: 4,
+          },
           { key: "minDays", label: "最短租期 (天)", type: "number", placeholder: "2", span: 4 },
         ],
       },
@@ -339,7 +353,10 @@ const RESOURCES = {
       mileage: "", displacement: "", cylinders: "", fuel: "汽油", trans: "AT",
       bodyStyle: "", drive: "", bodyColor: "", interiorColor: "",
       seats: "2 座", origin: "",
-      dailyRate: 0, deposit: 0, minDays: 1, rentalStatus: "available",
+      dailyRate: "",
+      deposit: "",
+      minDays: 1,
+      rentalStatus: "available",
       overviewZh: [""], overviewJa: [""], overviewEn: null,
       benefits: null, features: null,
       staffPhotoR2Key: null,
@@ -413,12 +430,12 @@ function parseInventoryPriceDigits(raw) {
   return Number(String(raw ?? "").replace(/[^\d]/g, "")) || 0;
 }
 
-/** 日式千分位存库：¥ 1,980,000 */
+/** 日式千分位：¥ 1,980,000（含 0 → ¥ 0） */
 function formatInventoryPriceYenStyle(raw) {
   const s = String(raw ?? "").trim();
   if (!s) return "";
+  if (!/\d/.test(s)) return s;
   const n = parseInventoryPriceDigits(s);
-  if (!n) return s;
   return `¥ ${n.toLocaleString("ja-JP", { useGrouping: true })}`;
 }
 
@@ -437,6 +454,12 @@ function normalizeInventoryDraftForEngine(draft) {
   }
   if (Object.prototype.hasOwnProperty.call(draft, "basePrice")) {
     next.basePrice = formatInventoryPriceYenStyle(draft.basePrice);
+  }
+  if (Object.prototype.hasOwnProperty.call(draft, "dailyRate")) {
+    next.dailyRate = formatInventoryPriceYenStyle(draft.dailyRate);
+  }
+  if (Object.prototype.hasOwnProperty.call(draft, "deposit")) {
+    next.deposit = formatInventoryPriceYenStyle(draft.deposit);
   }
   return next;
 }
@@ -1011,7 +1034,8 @@ function itemRow(v, r) {
   const priceKey = r.priceColumn?.key;
   const rawPrice = priceKey != null ? v[priceKey] ?? "" : "";
   const priceCell =
-    r.key === "vehicles" && priceKey === "totalPrice"
+    (r.key === "vehicles" && priceKey === "totalPrice") ||
+    (r.key === "rentals" && priceKey === "dailyRate")
       ? formatInventoryPriceYenStyle(rawPrice)
       : rawPrice;
   return `
@@ -1951,7 +1975,11 @@ function bindEditor() {
     });
   });
 
-  document.querySelectorAll('[data-draft="totalPrice"], [data-draft="basePrice"]').forEach((input) => {
+  document
+    .querySelectorAll(
+      '[data-draft="totalPrice"], [data-draft="basePrice"], [data-draft="dailyRate"], [data-draft="deposit"]',
+    )
+    .forEach((input) => {
     input.addEventListener("blur", () => {
       const key = input.dataset.draft;
       const formatted = formatInventoryPriceYenStyle(input.value);
@@ -2199,6 +2227,14 @@ async function saveItem() {
     }
     if (Object.prototype.hasOwnProperty.call(payload, "basePrice")) {
       payload.basePrice = formatInventoryPriceYenStyle(payload.basePrice);
+    }
+  }
+  if (r.key === "rentals") {
+    if (Object.prototype.hasOwnProperty.call(payload, "dailyRate")) {
+      payload.dailyRate = parseInventoryPriceDigits(payload.dailyRate);
+    }
+    if (Object.prototype.hasOwnProperty.call(payload, "deposit")) {
+      payload.deposit = parseInventoryPriceDigits(payload.deposit);
     }
   }
   try {
