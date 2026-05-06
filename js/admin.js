@@ -108,6 +108,12 @@ const FUEL_GRADE_OPTIONS = [
   { label: "电动 / 電気 / Electric", zh: "电动", ja: "電気", en: "Electric" },
 ];
 
+const STEERING_OPTIONS = [
+  { label: "左舵 / 左ハンドル / LHD", zh: "左舵", ja: "左ハンドル", en: "Left-hand drive" },
+  { label: "右舵 / 右ハンドル / RHD", zh: "右舵", ja: "右ハンドル", en: "Right-hand drive" },
+  { label: "— / ― / —", zh: "—", ja: "―", en: "—" },
+];
+
 // Resource descriptors drive the list + editor UIs so we keep a single
 // code path for the two inventories.
 const RESOURCES = {
@@ -205,7 +211,7 @@ const RESOURCES = {
       ["listingVehicleInspection", "车检", "select", YES_NO_DASH],
       ["listingLegalMaintenance", "法定整备", "select", YES_NO_DASH],
       ["listingFuelGrade", "油种", "select", FUEL_GRADE_OPTIONS],
-      ["highlightSteering", "方向盘"],
+      ["highlightSteering", "方向盘", "select", STEERING_OPTIONS],
       ["highlightChassisTail", "车台末尾号"],
     ],
     emptyDraft: () => ({
@@ -1644,15 +1650,25 @@ function renderContentTab(r, draft) {
   `;
 }
 
+/** 下拉预设与已存 {zh,ja,en} 对齐：日文未填时仅按中文匹配（兼容旧数据）。 */
+function adminPresetOptionMatchesStored(opt, stored) {
+  const v = stored || {};
+  const vz = String(v.zh ?? "").trim();
+  const vj = String(v.ja ?? "").trim();
+  const oz = String(opt.zh ?? "").trim();
+  if (!vz && !vj) return false;
+  if (vz !== oz) return false;
+  if (!vj) return true;
+  return vj === String(opt.ja ?? "").trim();
+}
+
 function renderSpecsTab(r, draft) {
   const selectRows = r.presets.filter((p) => p[2] === "select");
   const textRows = r.presets.filter((p) => p[2] !== "select");
 
   const selectHtml = selectRows.map(([key, label, _kind, options]) => {
     const v = draft[key] || {};
-    const currentIdx = (options || []).findIndex(
-      (opt) => opt.zh === v.zh && opt.ja === v.ja,
-    );
+    const currentIdx = (options || []).findIndex((opt) => adminPresetOptionMatchesStored(opt, v));
     const optionsHtml = [
       `<option value="" ${currentIdx === -1 ? "selected" : ""}>未填</option>`,
       ...(options || []).map(
