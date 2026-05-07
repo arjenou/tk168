@@ -320,6 +320,8 @@
   let cleanupTimer = null;
   let autoplayVisible = false;
   let autoplayTimer = null;
+  let thumbsAutoplaySnoozeTimer = null;
+  const THUMBS_AUTOPLAY_SNOOZE_MS = 4800;
   let resizeFrame = 0;
   let lastThumbLayoutMobile = window.matchMedia('(max-width: 48rem)').matches;
   const preloadedSlideAssets = new Set();
@@ -378,16 +380,30 @@
 
   function preloadCarouselAssets() {
     if (isMobileViewport()) {
-      const active = slides[activeIndex];
-      if (active) {
-        preloadSlideAsset(getHeroLogo(active));
-        preloadSlideAsset(getFlagLogo(active));
+      const n = slides.length;
+      const span = 2;
+      for (let off = -span; off <= span; off += 1) {
+        const idx = (activeIndex + off + n * 8) % n;
+        const item = slides[idx];
+        if (item) {
+          preloadSlideAsset(getHeroLogo(item));
+          preloadSlideAsset(getFlagLogo(item));
+        }
       }
       return;
     }
     slides.forEach((item) => {
       preloadSlideAsset(getHeroLogo(item));
       preloadSlideAsset(getFlagLogo(item));
+    });
+  }
+
+  function syncHeroImageLoadingHints() {
+    const eager = isMobileViewport();
+    stage.querySelectorAll('.lisboa-slide__hero-logo').forEach((node) => {
+      if (node.tagName !== 'IMG') return;
+      node.loading = eager ? 'eager' : 'lazy';
+      node.decoding = eager ? 'sync' : 'async';
     });
   }
 
@@ -448,9 +464,9 @@
           class="lisboa-slide__hero-logo"
           src="${getHeroLogo(item)}"
           alt=""
-          loading="${index === activeIndex ? 'eager' : 'lazy'}"
+          loading="${isMobileViewport() || index === activeIndex ? 'eager' : 'lazy'}"
           fetchpriority="${index === activeIndex ? 'high' : 'low'}"
-          decoding="async"
+          decoding="${isMobileViewport() || index === activeIndex ? 'sync' : 'async'}"
         >
       </div>
       <div class="lisboa-slide__copy">
@@ -614,6 +630,22 @@
     });
   }
 
+  function clearThumbsAutoplaySnooze() {
+    if (!thumbsAutoplaySnoozeTimer) return;
+    window.clearTimeout(thumbsAutoplaySnoozeTimer);
+    thumbsAutoplaySnoozeTimer = null;
+  }
+
+  function bumpThumbsAutoplaySnooze() {
+    if (isMobileViewport()) return;
+    stopAutoplay();
+    if (thumbsAutoplaySnoozeTimer) window.clearTimeout(thumbsAutoplaySnoozeTimer);
+    thumbsAutoplaySnoozeTimer = window.setTimeout(() => {
+      thumbsAutoplaySnoozeTimer = null;
+      syncAutoplay();
+    }, THUMBS_AUTOPLAY_SNOOZE_MS);
+  }
+
   function scrollActiveThumbIntoView() {
     if (isMobileViewport()) return;
     window.requestAnimationFrame(() => {
@@ -628,7 +660,7 @@
       active.scrollIntoView({
         block: 'nearest',
         inline: 'center',
-        behavior: prefersReducedMotion.matches ? 'auto' : 'smooth'
+        behavior: 'auto'
       });
     });
   }
@@ -673,6 +705,8 @@
     updateThumbState();
     if (!isMobileViewport()) {
       scrollActiveThumbIntoView();
+    } else {
+      preloadCarouselAssets();
     }
   }
 
@@ -690,6 +724,7 @@
     thumbSwipeState.tracking = false;
     thumbSwipeState.dragging = false;
     thumbSwipeState.deltaX = 0;
+    clearThumbsAutoplaySnooze();
   }
 
   function render(immediate = true) {
@@ -703,6 +738,7 @@
     renderThumbs();
     previousIndex = activeIndex;
     updateView('right', immediate);
+    syncHeroImageLoadingHints();
   }
 
   function setActive(nextIndex) {
@@ -900,6 +936,8 @@
   function handleThumbsWheel(event) {
     if (isMobileViewport()) return;
 
+    bumpThumbsAutoplaySnooze();
+
     let delta = 0;
     if (event.shiftKey) {
       delta = event.deltaY;
@@ -933,6 +971,7 @@
 
   function shouldAutoplay() {
     if (isMobileViewport()) return false;
+    if (thumbsAutoplaySnoozeTimer) return false;
     return !prefersReducedMotion.matches && autoplayVisible && document.visibilityState === 'visible';
   }
 
@@ -1022,6 +1061,7 @@
         renderThumbs();
       }
       updateView('right', true);
+      syncHeroImageLoadingHints();
       syncAutoplay();
     });
   }
@@ -1031,8 +1071,14 @@
     render(true);
   }
 
-  prevButton?.addEventListener('click', () => step(-1));
-  nextButton?.addEventListener('click', () => step(1));
+  prevButton?.addEventListener('click', () => {
+    bumpThumbsAutoplaySnooze();
+    step(-1);
+  });
+  nextButton?.addEventListener('click', () => {
+    bumpThumbsAutoplaySnooze();
+    step(1);
+  });
   gestureLayer?.addEventListener('pointerdown', handlePointerDown);
   gestureLayer?.addEventListener('pointermove', handlePointerMove);
   gestureLayer?.addEventListener('pointerup', (event) => finishPointer(event));
@@ -1052,8 +1098,12 @@
   shell.addEventListener('touchcancel', () => finishMobileThumbSwipe(true), { passive: true });
   window.addEventListener('keydown', handleKeydown);
   window.addEventListener('resize', handleResize);
-  window.addEventListener('pagehide', stopAutoplay);
+  window.addEventListener('pagehide', () => {
+    stopAutoplay();
+    clearThumbsAutoplaySnooze();
+  });
   thumbs.addEventListener('wheel', handleThumbsWheel, { passive: false });
+  thumbs.addEventListener('pointerdown', bumpThumbsAutoplaySnooze, { passive: true });
   window.addEventListener('tk168:languagechange', handleLanguageChange);
   document.addEventListener('visibilitychange', syncAutoplay);
   prefersReducedMotion.addEventListener?.('change', syncAutoplay);

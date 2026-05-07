@@ -278,7 +278,7 @@
   /* 顶/底留足空间：选中态 translateY + scale + box-shadow 会高出卡片盒；overflow-x≠visible 时 y 常被当成 auto 而裁切，padding 把绘制留在 padding 盒内 */
   padding: 1.35rem 0.55rem 0.85rem;
   scroll-padding-inline: 0.55rem;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   overscroll-behavior-x: contain;
   pointer-events: auto;
   scrollbar-width: none;
@@ -298,7 +298,7 @@
   height: var(--thumb-height);
   margin-top: 0;
   padding: 0.64rem 0.74rem 0.58rem;
-  border: 1px solid rgba(43, 41, 38, 0.06);
+  border: 1px solid transparent;
   border-radius: 1.4rem;
   display: flex;
   flex-direction: column;
@@ -308,10 +308,10 @@
   isolation: isolate;
   z-index: 0;
   color: rgba(34, 40, 47, 0.88);
-  background: #F0F0F2;
+  background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  box-shadow: 0 12px 26px rgba(43, 41, 38, 0.08), 0 22px 38px rgba(43, 41, 38, 0.04);
+  box-shadow: none;
   cursor: pointer;
   pointer-events: auto;
   will-change: transform, box-shadow;
@@ -324,10 +324,10 @@
   inset: 1px;
   z-index: 0;
   pointer-events: none;
-  border: 1px solid rgba(255, 255, 255, 0.36);
+  border: 1px solid transparent;
   border-radius: inherit;
   background: transparent;
-  opacity: 0.88;
+  opacity: 0;
   transition: border-color 180ms ease, opacity 180ms ease, background 220ms ease, box-shadow 220ms ease;
 }
 #brands .lisboa-thumb::after {
@@ -341,7 +341,7 @@
   border-radius: 999px;
   background: radial-gradient(closest-side, rgba(43, 41, 38, 0.1), rgba(43, 41, 38, 0));
   filter: blur(11px);
-  opacity: 0.2;
+  opacity: 0;
   pointer-events: none;
   transition: opacity 180ms ease, transform 180ms ease;
 }
@@ -353,15 +353,15 @@
 #brands .lisboa-thumb:focus-visible {
   margin-top: 0;
   z-index: 1;
-  border-color: rgba(43, 41, 38, 0.07);
+  border-color: rgba(242, 250, 90, 0.35);
   transform: translateY(-0.38rem);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(249, 249, 249, 0.98)), #FBFBFB;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78), inset 0 -1px 0 rgba(255, 255, 255, 0.18), 0 16px 34px rgba(43, 41, 38, 0.1), 0 28px 46px rgba(43, 41, 38, 0.05);
+  background: transparent;
+  box-shadow: 0 0 0 1px rgba(242, 250, 90, 0.22);
   animation: lisboa-thumb-hover 1.55s ease-in-out infinite;
 }
 #brands .lisboa-thumb:hover::after,
 #brands .lisboa-thumb:focus-visible::after {
-  opacity: 0.28;
+  opacity: 0.12;
   transform: translateY(0.12rem) scaleX(1.04);
 }
 #brands .lisboa-thumb:focus-visible {
@@ -371,20 +371,23 @@
 #brands .lisboa-thumb.is-active {
   margin-top: 0;
   z-index: 2;
-  border-color: rgba(242, 250, 90, 0.24);
-  background: #989898;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 -1px 0 rgba(255, 255, 255, 0.08), 0 24px 48px rgba(43, 41, 38, 0.22), 0 40px 68px rgba(43, 41, 38, 0.1), 0 0 0 1px rgba(242, 250, 90, 0.16), 0 0 24px rgba(242, 250, 90, 0.12);
+  border-color: rgba(242, 250, 90, 0.55);
+  background: rgba(242, 250, 90, 0.08);
+  box-shadow:
+    0 0 0 2px rgba(242, 250, 90, 0.34),
+    0 12px 32px rgba(242, 250, 90, 0.16);
   transform: translateY(-0.52rem) scale(1.02);
   animation: lisboa-thumb-active 1.85s cubic-bezier(0.22, 1, 0.36, 1) infinite;
 }
 #brands .lisboa-thumb.is-active::before {
-  border-color: rgba(255, 255, 255, 0.24);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04) 44%, rgba(255, 255, 255, 0.08) 100%);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 0 1px rgba(242, 250, 90, 0.24), 0 0 28px rgba(242, 250, 90, 0.2), 0 0 48px rgba(242, 250, 90, 0.12);
+  border-color: rgba(242, 250, 90, 0.28);
+  background: transparent;
+  opacity: 0.45;
+  box-shadow: none;
 }
 #brands .lisboa-thumb.is-active::after {
-  background: radial-gradient(closest-side, rgba(43, 41, 38, 0.18), rgba(43, 41, 38, 0)), radial-gradient(closest-side, rgba(242, 250, 90, 0.3), rgba(242, 250, 90, 0));
-  opacity: 0.62;
+  background: radial-gradient(closest-side, rgba(242, 250, 90, 0.35), rgba(242, 250, 90, 0));
+  opacity: 0.5;
   transform: translateY(0.28rem) scaleX(1.22);
 }
 #brands .lisboa-thumb__logo {
@@ -423,18 +426,22 @@
   letter-spacing: -0.04em;
 }
 #brands .lisboa-thumb.is-active .lisboa-thumb__logo {
-  transform: translateY(-0.05rem) scale(1.03);
-  filter: brightness(0) invert(1) drop-shadow(0 0 6px rgba(255, 255, 255, 0.46)) drop-shadow(0 0 14px rgba(242, 250, 90, 0.42)) drop-shadow(0 0 28px rgba(242, 250, 90, 0.26));
+  transform: translateY(-0.05rem) scale(1.05);
+  filter:
+    drop-shadow(0 3px 10px rgba(242, 250, 90, 0.38))
+    drop-shadow(0 6px 14px rgba(24, 24, 28, 0.12));
 }
 #brands .lisboa-thumb.is-active .lisboa-thumb__logo.lexus-mark {
-  transform: translateY(-0.05rem) scale(1.03);
-  color: #FFFFFF;
-  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.46)) drop-shadow(0 0 14px rgba(242, 250, 90, 0.42)) drop-shadow(0 0 28px rgba(242, 250, 90, 0.26));
+  transform: translateY(-0.05rem) scale(1.05);
+  color: rgba(17, 20, 26, 0.94);
+  filter:
+    drop-shadow(0 3px 10px rgba(242, 250, 90, 0.4))
+    drop-shadow(0 4px 12px rgba(24, 24, 28, 0.1));
 }
 #brands .lisboa-thumb.is-active .lisboa-thumb__label {
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(26, 28, 32, 0.92);
   transform: translateY(-0.03rem);
-  text-shadow: 0 0 12px rgba(242, 250, 90, 0.16);
+  text-shadow: none;
 }
 #brands .lisboa-slide.is-active,
 #brands .lisboa-slide.is-enter-right,
@@ -550,6 +557,28 @@
   }
   to {
     filter: drop-shadow(0 18px 30px rgba(21, 28, 38, 0.08));
+  }
+}
+
+/* 移动端：主舞台车标不做低透明度过场，避免「暗一下再亮」的闪感 */
+@keyframes hero-enter-right-mobile {
+  from {
+    opacity: 1;
+    transform: translateX(calc(var(--hero-shift) * 0.58)) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes hero-enter-left-mobile {
+  from {
+    opacity: 1;
+    transform: translateX(calc(var(--hero-shift) * -0.58)) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 @keyframes hero-exit-left {
@@ -707,6 +736,16 @@
     width: min(78vw, 18rem);
     max-height: 11rem;
     filter: drop-shadow(0 12px 20px rgba(21, 28, 38, 0.07));
+  }
+  #brands .lisboa-slide.is-enter-right .lisboa-slide__hero {
+    animation: hero-enter-right-mobile 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  #brands .lisboa-slide.is-enter-left .lisboa-slide__hero {
+    animation: hero-enter-left-mobile 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  #brands .lisboa-slide.is-enter-right .lisboa-slide__hero-logo,
+  #brands .lisboa-slide.is-enter-left .lisboa-slide__hero-logo {
+    animation: none;
   }
   #brands .lisboa-mobile-swipe-hint {
     display: inline-flex;
