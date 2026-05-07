@@ -222,6 +222,7 @@ html:lang(ja) .section-header h2,
 html:lang(ja) .v-card-name,
 html:lang(ja) .v-card-brand-line,
 html:lang(ja) .v-card-model-line,
+html:lang(ja) .v-card-grade,
 html:lang(ja) .news-body h3 {
   letter-spacing: 0;
 }
@@ -2152,6 +2153,30 @@ body.contact-popover-open {
   gap: 2px;
   min-width: 0;
   line-height: 1.2;
+}
+
+.v-card-name .v-card-model-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  min-width: 0;
+}
+
+.v-card-name .v-card-model-row .v-card-model-line {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.v-card-name .v-card-grade {
+  font-size: 13px;
+  font-weight: 600;
+  color: #7a7876;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .v-card-name .v-card-brand-line {

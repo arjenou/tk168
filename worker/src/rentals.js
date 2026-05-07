@@ -6,7 +6,7 @@
 import { createResource, insertInventoryStubIfMissing } from "./resource.js";
 
 const RENTAL_COLUMNS = [
-  "id", "brand_key", "name", "name_ja", "name_en", "year", "type", "icon",
+  "id", "brand_key", "name", "name_ja", "name_en", "grade", "year", "type", "icon",
   "mileage", "engine", "displacement", "cylinders", "fuel", "trans",
   "body_style", "drive", "body_color", "interior_color", "seats", "origin",
   "daily_rate", "deposit", "min_days", "rental_status",
@@ -29,6 +29,7 @@ const RENTAL_FIELD_MAP = {
   name: "name",
   nameJa: "name_ja",
   nameEn: "name_en",
+  grade: "grade",
   year: "year",
   type: "type",
   icon: "icon",

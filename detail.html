@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>車両詳細 — TK168 Premium Automotive</title>
-  <link rel="stylesheet" href="css/detail.css?v=20260610a">
+  <link rel="stylesheet" href="css/detail.css?v=20260613a">
   <link rel="stylesheet" href="css/skeleton.css?v=20260420h">
   <script src="js/skeleton-boot.js?v=20260420h"></script>
 </head>
@@ -19,21 +19,26 @@
 
         <!-- 车型 + 价格 -->
         <div class="detail-topbar">
-          <div class="detail-title-row">
-            <h1 class="detail-title" id="detailTitle">
-              <span class="detail-title-brand" id="detailTitleBrand"></span>
-              <span class="detail-title-model" id="detailTitleModel"></span>
-            </h1>
-            <button
-              class="detail-title-favorite"
-              id="detailFavoriteBtn"
-              type="button"
-              aria-pressed="false"
-              aria-label="お気に入り">
-              <svg class="detail-title-favorite-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 3.4c.4 0 .8.2 1 .6l2.1 4.2 4.7.7c.9.1 1.2 1.2.6 1.9l-3.4 3.3.8 4.7c.1.9-.8 1.6-1.6 1.2L12 17.6 7.8 20c-.8.4-1.7-.3-1.6-1.2l.8-4.7-3.4-3.3c-.6-.7-.3-1.8.6-1.9l4.7-.7L11 4c.2-.4.6-.6 1-.6z"></path>
-              </svg>
-            </button>
+          <div class="detail-title-col">
+            <div class="detail-title-row">
+              <h1 class="detail-title" id="detailTitle">
+                <span class="detail-title-brand" id="detailTitleBrand"></span>
+                <span class="detail-title-model-row">
+                  <span class="detail-title-model" id="detailTitleModel"></span>
+                  <span class="detail-title-grade" id="detailTitleGrade" hidden></span>
+                </span>
+              </h1>
+              <button
+                class="detail-title-favorite"
+                id="detailFavoriteBtn"
+                type="button"
+                aria-pressed="false"
+                aria-label="お気に入り">
+                <svg class="detail-title-favorite-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 3.4c.4 0 .8.2 1 .6l2.1 4.2 4.7.7c.9.1 1.2 1.2.6 1.9l-3.4 3.3.8 4.7c.1.9-.8 1.6-1.6 1.2L12 17.6 7.8 20c-.8.4-1.7-.3-1.6-1.2l.8-4.7-3.4-3.3c-.6-.7-.3-1.8.6-1.9l4.7-.7L11 4c.2-.4.6-.6 1-.6z"></path>
+                </svg>
+              </button>
+            </div>
           </div>
           <div class="detail-price">
             <div class="detail-price-main">
@@ -42,7 +47,7 @@
                 <span class="detail-price-tax" data-i18n="price.taxIncluded">（税込）</span>
                 <button class="detail-price-help" type="button" data-price-help="total" data-i18n-title="price.helpLabel" aria-label="価格の説明を見る">?</button>
               </div>
-              <strong class="detail-price-value" id="detailTotalPriceValue"><span class="detail-price-amount">3,200</span><span class="detail-price-unit">万円</span></strong>
+              <strong class="detail-price-value" id="detailTotalPriceValue"><span class="detail-price-amount">3,200</span><span class="detail-price-unit">JPY</span></strong>
             </div>
             <div class="detail-price-sub">
               <div class="detail-price-label-row is-sub">
@@ -50,7 +55,7 @@
                 <span class="detail-price-tax" data-i18n="price.taxIncluded">（税込）</span>
                 <button class="detail-price-help" type="button" data-price-help="base" data-i18n-title="price.helpLabel" aria-label="価格の説明を見る">?</button>
               </div>
-              <span class="detail-price-sub-value" id="detailBasePriceValue"><span class="detail-price-amount">2,980</span><span class="detail-price-unit">万円</span></span>
+              <span class="detail-price-sub-value" id="detailBasePriceValue"><span class="detail-price-amount">2,980</span><span class="detail-price-unit">JPY</span></span>
             </div>
           </div>
         </div>
@@ -362,13 +367,13 @@
   <script src="js/brand-logo-inventory.js?v=20260417i"></script>
   <script src="js/brand-library-data.js?v=20260420c"></script>
     <script src="js/api-hydrate.js?v=20260508c"></script>
-    <script src="js/data.js?v=20260611a"></script>
+    <script src="js/data.js?v=20260612a"></script>
   <script src="js/i18n.js?v=20260427d"></script>
   <script src="js/common-links.js?v=20260419a"></script>
   <script src="js/page-chrome.js?v=20260601a"></script>
   <script src="js/inventory-context.js?v=20260417i"></script>
-  <script src="js/renderers.js?v=20260609b"></script>
-    <script src="js/detail.js?v=20260610a"></script>
+  <script src="js/renderers.js?v=20260612a"></script>
+    <script src="js/detail.js?v=20260612a"></script>
 </body>
 
 </html>

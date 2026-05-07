@@ -215,7 +215,7 @@ const RESOURCES = {
       ["highlightChassisTail", "车台末尾号"],
     ],
     emptyDraft: () => ({
-      id: "", brandKey: "", name: "", nameJa: "", nameEn: "", year: "", type: "", icon: "",
+      id: "", brandKey: "", name: "", nameJa: "", nameEn: "", grade: "", year: "", type: "", icon: "",
       mileage: "", displacement: "", cylinders: "", fuel: "汽油", trans: "AT",
       totalPrice: "", basePrice: "",
       bodyStyle: "", drive: "", bodyColor: "", interiorColor: "", seats: "",
@@ -355,7 +355,7 @@ const RESOURCES = {
     ],
     presets: [],
     emptyDraft: () => ({
-      id: "", brandKey: "", name: "", nameJa: "", nameEn: "", year: "", type: "", icon: "",
+      id: "", brandKey: "", name: "", nameJa: "", nameEn: "", grade: "", year: "", type: "", icon: "",
       mileage: "", displacement: "", cylinders: "", fuel: "汽油", trans: "AT",
       bodyStyle: "", drive: "", bodyColor: "", interiorColor: "",
       seats: "2 座", origin: "",
@@ -784,7 +784,7 @@ function filteredItems() {
     );
   }
   return items.filter((v) =>
-    [v.id, v.name, v.nameJa, v.nameEn, v.brandKey, v.type, v.year].some((field) =>
+    [v.id, v.name, v.nameJa, v.nameEn, v.brandKey, v.type, v.year, v.grade].some((field) =>
       String(field || "").toLowerCase().includes(q),
     ),
   );
@@ -1642,7 +1642,14 @@ function renderContentTab(r, draft) {
   const overviewEn = Array.isArray(draft.overviewEn) ? draft.overviewEn.join("\n\n") : (draft.overviewEn || "");
 
   const brandFieldHtml = brandField
-    ? `<div class="admin-grid-12">${renderEditorField({ ...brandField, span: 12 }, draft)}</div>`
+    ? `<div class="admin-grid-12">
+         ${renderEditorField({ ...brandField, span: 6 }, draft)}
+         <div class="admin-field admin-col-6">
+           <label>グレード</label>
+           <input class="admin-input" type="text" data-draft="grade" value="${escapeAttr(draft.grade ?? "")}" placeholder="例：LP780-4 Ultimae">
+           <div class="admin-field-hint">配置・グレード（任意）。前台列表卡片副标题与详情页标题下方展示。</div>
+         </div>
+       </div>`
     : "";
 
   return `
@@ -1940,6 +1947,22 @@ function renderEditor() {
   bindEditor();
 }
 
+function readDataDraftValueFromInput(el) {
+  if (el.type === "checkbox") return el.checked;
+  if (el.type === "number") return Number(el.value);
+  return el.value;
+}
+
+/** 将当前页面上可见的 [data-draft] 写回草稿，避免仅依赖 input 事件导致保存时漏字段（自动填充、IME、change 等）。 */
+function syncEditingDraftFromDom() {
+  if (!state.editingDraft) return;
+  document.querySelectorAll("[data-draft]").forEach((el) => {
+    const key = el.dataset.draft;
+    if (!key) return;
+    state.editingDraft[key] = readDataDraftValueFromInput(el);
+  });
+}
+
 function imageTile(img, selectedPreviewId, reorderable) {
   const isSel =
     selectedPreviewId != null && Number(selectedPreviewId) === Number(img.id);
@@ -2008,9 +2031,7 @@ function bindEditor() {
 
   const applyDraftInput = (input) => {
     const key = input.dataset.draft;
-    if (input.type === "checkbox") state.editingDraft[key] = input.checked;
-    else if (input.type === "number") state.editingDraft[key] = Number(input.value);
-    else state.editingDraft[key] = input.value;
+    state.editingDraft[key] = readDataDraftValueFromInput(input);
   };
   const syncAdminIconPreview = () => {
     const img = document.getElementById("adminIconPreviewImg");
@@ -2027,15 +2048,20 @@ function bindEditor() {
     }
   };
   document.querySelectorAll("[data-draft]").forEach((input) => {
-    const evt = input.tagName === "SELECT" || input.type === "checkbox" ? "change" : "input";
-    input.addEventListener(evt, () => {
+    const onDraftField = () => {
       applyDraftInput(input);
       if (input.dataset.draft === "icon") syncAdminIconPreview();
       if (input.dataset.draft === "isPublished") {
         // Re-render so the header badge + switch label stay in sync.
         renderEditor();
       }
-    });
+    };
+    if (input.tagName === "SELECT" || input.type === "checkbox") {
+      input.addEventListener("change", onDraftField);
+    } else {
+      input.addEventListener("input", onDraftField);
+      input.addEventListener("change", onDraftField);
+    }
   });
 
   document
@@ -2320,6 +2346,7 @@ function bindEditor() {
 }
 
 async function saveItem() {
+  syncEditingDraftFromDom();
   const r = currentResource();
   const draft = state.editingDraft;
   if (r.listKind === "journal") {
@@ -2375,6 +2402,7 @@ async function saveItem() {
       }
       state.editingIsNew = false;
       const nextDraft = {
+        ...state.editingDraft,
         ...saved,
         images: saved.images || state.editingDraft.images || [],
       };
@@ -2390,6 +2418,7 @@ async function saveItem() {
       });
       const updated = res[r.itemKey];
       const nextUp = {
+        ...state.editingDraft,
         ...updated,
         images: updated.images || state.editingDraft.images,
       };

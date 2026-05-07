@@ -47,10 +47,18 @@ export function createResource({
   function rowToObject(row) {
     if (!row) return null;
     const out = {};
-    for (const [snake, value] of Object.entries(row)) {
+    // D1/SQLite bindings may omit keys for NULL columns; always walk the
+    // declared schema so API JSON includes every field (e.g. grade).
+    for (const snake of columns) {
+      let value = row[snake];
+      if (value === undefined) value = null;
       const camel = reverse[snake] || snake;
       if (jsonColumns.has(snake) && value != null) {
-        try { out[camel] = JSON.parse(value); } catch { out[camel] = value; }
+        try {
+          out[camel] = JSON.parse(value);
+        } catch {
+          out[camel] = value;
+        }
       } else {
         out[camel] = value;
       }

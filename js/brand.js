@@ -936,6 +936,7 @@ function vehicleMatchesCompareQuery(vehicle) {
   const searchable = [
     vehicle?.name || '',
     vehicle?.brandKey || '',
+    vehicle?.grade || '',
     getBrandLabel(brand || {}),
     vehicle?.bodyStyle || '',
     window.TK168_DATA?.getVehicleFieldLabel?.('bodyStyle', vehicle?.bodyStyle) || ''

@@ -39,6 +39,7 @@ const featuredSliderViewport = window.matchMedia('(max-width: 760px)');
 const detailTitle = document.getElementById('detailTitle');
 const detailTitleBrand = document.getElementById('detailTitleBrand');
 const detailTitleModel = document.getElementById('detailTitleModel');
+const detailTitleGrade = document.getElementById('detailTitleGrade');
 const detailFavoriteBtn = document.getElementById('detailFavoriteBtn');
 const detailTotalPriceValue = document.getElementById('detailTotalPriceValue');
 const detailBasePriceValue = document.getElementById('detailBasePriceValue');
@@ -353,7 +354,7 @@ function applyDetailStaffCard() {
 
 function formatPriceMarkup(displayPrice = '') {
   const trimmed = String(displayPrice || '').trim();
-  const match = trimmed.match(/^([\d,.]+)(万円|円|万元|元)$/);
+  const match = trimmed.match(/^([\d,.]+)\s*(万円|JPY|円|万元|元)$/);
   if (!match) return trimmed;
   const [, amount, unit] = match;
   return `<span class="detail-price-amount">${amount}</span><span class="detail-price-unit">${unit}</span>`;
@@ -527,6 +528,12 @@ function renderVehicleHeader() {
     detailTitleBrand.hidden = !brandTitle;
   } else if (detailTitle) {
     detailTitle.textContent = vehicleName;
+  }
+
+  const gradeLine = String(currentVehicle?.grade || '').trim();
+  if (detailTitleGrade) {
+    detailTitleGrade.textContent = gradeLine;
+    detailTitleGrade.hidden = !gradeLine;
   }
 
   const primaryImage = window.TK168_DATA.resolveVehicleMediaSource(currentVehicle.gallery?.[0] || currentVehicle.photo);

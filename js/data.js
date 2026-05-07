@@ -1836,9 +1836,9 @@ window.TK168_DATA = (() => {
         ...opts,
         minimumFractionDigits: fractionDigits,
         maximumFractionDigits: 1
-      })}万円`;
+      })} JPY`;
     }
-    return `${amountJpy.toLocaleString(numberLocale, opts)}円`;
+    return `${amountJpy.toLocaleString(numberLocale, opts)} JPY`;
   }
 
   function parseMileage(value) {

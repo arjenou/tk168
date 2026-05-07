@@ -7,13 +7,20 @@ window.TK168Renderers = (() => {
     return window.TK168I18N?.t(key, params) || key;
   }
 
+  function escapeHtmlText(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
   function getPriceLabel(key) {
     return `${t(key)} ${t('price.taxIncluded')}`.trim();
   }
 
   function formatCardPriceMarkup(displayPrice = '') {
     const trimmed = String(displayPrice || '').trim();
-    const match = trimmed.match(/^([\d,.]+)(万円|円|万元|元)$/);
+    const match = trimmed.match(/^([\d,.]+)\s*(万円|JPY|円|万元|元)$/);
     if (!match) return trimmed;
     const [, amount, unit] = match;
     return `<span class="card-price-amount">${amount}</span><span class="card-price-unit">${unit}</span>`;
@@ -227,15 +234,19 @@ window.TK168Renderers = (() => {
     const language = window.TK168I18N?.getLanguage?.() || 'ja';
     const vehicleName = getVehicleName(vehicle, language);
     const vehicleBrandLine = window.TK168_DATA.getVehicleBrandTitle(vehicle, language);
+    const gradeTrim = String(vehicle.grade || '').trim();
     const subtitleParts = [vehicle.year, getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle)].filter(Boolean);
     const vehicleModelLine = window.TK168_DATA.getVehicleModelDisplayName(vehicle, language)
       || window.TK168_DATA.getVehicleModelName(vehicle)
       || vehicleName;
+    const gradeInlineHtml = gradeTrim
+      ? `<span class="v-card-grade">${escapeHtmlText(gradeTrim)}</span>`
+      : '';
     const titleStackHtml = [
       vehicleBrandLine
         ? `<span class="v-card-brand-line">${vehicleBrandLine}</span>`
         : '',
-      `<span class="v-card-model-line">${vehicleModelLine}</span>`,
+      `<span class="v-card-model-row"><span class="v-card-model-line">${vehicleModelLine}</span>${gradeInlineHtml}</span>`,
     ].join('');
     const vehicleBrandIcon = (variant === variants.inventory)
       ? resolveVehicleCardBrandBadge(vehicle)

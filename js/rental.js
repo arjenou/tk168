@@ -340,7 +340,7 @@ function hydrateRentalVehicleCard(card, vehicle, language) {
 
   const meta = card.querySelector('.v-card-meta');
   if (meta) {
-    meta.textContent = [vehicle.year, bodyLine, copy('fleet.card.available', language)].filter(Boolean).join(' · ');
+    meta.textContent = [vehicle.year, bodyLine, vehicle.grade, copy('fleet.card.available', language)].filter(Boolean).join(' · ');
   }
 
   const specSpans = Array.from(card.querySelectorAll('.v-spec span'));
