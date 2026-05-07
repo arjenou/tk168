@@ -875,6 +875,7 @@
   }
 
   function shouldAutoplay() {
+    if (isMobileViewport()) return false;
     return !prefersReducedMotion.matches && autoplayVisible && document.visibilityState === 'visible';
   }
 
@@ -964,6 +965,7 @@
         renderThumbs();
       }
       updateView('right', true);
+      syncAutoplay();
     });
   }
 
