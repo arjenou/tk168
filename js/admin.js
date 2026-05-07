@@ -193,8 +193,8 @@ const RESOURCES = {
           { key: "mileage", label: "里程（万公里）", placeholder: "", span: 3, hint: "选填。存库为万公里量级约数（0.32≈3200km）；不必填精确公里数。可写「0.5万」或带小数点位数。" },
           { key: "fuel", label: "油種", type: "select", optionsCatalog: "fuel", span: 3 },
           { key: "trans", label: "变速箱", type: "select", optionsCatalog: "trans", span: 3 },
-          { key: "totalPrice", label: "支付总额", placeholder: "¥ 1,980,000", hint: "含手续费的显示总价；失焦或保存时自动按日式千分位排版。", span: 4 },
-          { key: "basePrice", label: "车辆本体价格", placeholder: "¥ 1,860,000", hint: "失焦或保存时自动按日式千分位排版。", span: 4 },
+          { key: "totalPrice", label: "支付总额", placeholder: "¥ 1,980,000", hint: "输入时自动按日式千分位排版（¥ 与逗号）。", span: 4 },
+          { key: "basePrice", label: "车辆本体价格", placeholder: "¥ 1,860,000", hint: "输入时自动按日式千分位排版。", span: 4 },
         ],
       },
     ],
@@ -338,7 +338,7 @@ const RESOURCES = {
             label: "日租金 (¥)",
             type: "text",
             placeholder: "¥ 5,600",
-            hint: "失焦或保存时自动按日式千分位排版；提交为整数元。",
+            hint: "输入时自动按日式千分位排版；提交为整数元。",
             span: 4,
           },
           {
@@ -346,7 +346,7 @@ const RESOURCES = {
             label: "押金 (¥)",
             type: "text",
             placeholder: "¥ 120,000",
-            hint: "失焦或保存时自动按日式千分位排版；提交为整数元。",
+            hint: "输入时自动按日式千分位排版；提交为整数元。",
             span: 4,
           },
           { key: "minDays", label: "最短租期 (天)", type: "number", placeholder: "2", span: 4 },
@@ -443,6 +443,58 @@ function formatInventoryPriceYenStyle(raw) {
   if (!/\d/.test(s)) return s;
   const n = parseInventoryPriceDigits(s);
   return `¥ ${n.toLocaleString("ja-JP", { useGrouping: true })}`;
+}
+
+/** `pos` 左侧（不含 pos）共有几位数字 */
+function countPriceDigitsLeftOfCaret(s, pos) {
+  const end = Math.max(0, Math.min(Number(pos) || 0, s.length));
+  let n = 0;
+  for (let i = 0; i < end; i++) {
+    if (/\d/.test(s[i])) n += 1;
+  }
+  return n;
+}
+
+/** 格式化后：左侧恰好有 `digitCount` 位数字时的插入点（光标落在该位数字之后） */
+function priceCaretIndexAfterFormat(formatted, digitCount) {
+  if (!formatted) return 0;
+  if (digitCount <= 0) {
+    const idx = formatted.search(/\d/);
+    return idx >= 0 ? idx : formatted.length;
+  }
+  let seen = 0;
+  for (let i = 0; i < formatted.length; i++) {
+    if (/\d/.test(formatted[i])) {
+      seen += 1;
+      if (seen === digitCount) return i + 1;
+    }
+  }
+  return formatted.length;
+}
+
+/** 库存类价格输入：边输入边排版，并尽量保持光标相对「已输入位数」的位置 */
+function applyInventoryPriceFormatLive(input) {
+  if (!input || !state.editingDraft) return;
+  const key = input.dataset.draft;
+  if (!key) return;
+  const raw = input.value;
+  const selStart = input.selectionStart ?? raw.length;
+  const digitsLeft = countPriceDigitsLeftOfCaret(raw, selStart);
+  const formatted = formatInventoryPriceYenStyle(raw);
+  if (input.value !== formatted) {
+    input.value = formatted;
+  }
+  state.editingDraft[key] = formatted;
+  const pos = priceCaretIndexAfterFormat(formatted, digitsLeft);
+  requestAnimationFrame(() => {
+    try {
+      if (document.activeElement === input) {
+        input.setSelectionRange(pos, pos);
+      }
+    } catch {
+      /* ignore */
+    }
+  });
 }
 
 function normalizeInventoryDraftForEngine(draft) {
@@ -2069,13 +2121,10 @@ function bindEditor() {
       '[data-draft="totalPrice"], [data-draft="basePrice"], [data-draft="dailyRate"], [data-draft="deposit"]',
     )
     .forEach((input) => {
-    input.addEventListener("blur", () => {
-      const key = input.dataset.draft;
-      const formatted = formatInventoryPriceYenStyle(input.value);
-      input.value = formatted;
-      state.editingDraft[key] = formatted;
+      const run = () => applyInventoryPriceFormatLive(input);
+      input.addEventListener("input", run);
+      input.addEventListener("blur", run);
     });
-  });
 
   document.querySelectorAll("[data-preset]").forEach((input) => {
     input.addEventListener("input", () => {
