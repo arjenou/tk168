@@ -500,6 +500,9 @@ const state = {
   toast: null,
 };
 
+/** 缩略图拖拽排序后忽略紧随的 click，避免误切换大图预览 */
+let suppressImageThumbClickAfterReorder = false;
+
 /** 右侧「封面与图片」大图预览：优先手动选中的缩略图，否则封面（isPrimary） */
 function resolveAsidePreviewImage(draft) {
   const imgs = draft?.images || [];
@@ -926,6 +929,46 @@ async function persistHomeDisplayOrderAfterDrop(fromId, toId) {
     showToast(`保存顺序失败：${err.message}`, "error");
     await refreshItems();
     render();
+  }
+}
+
+async function persistEditorImagesOrderAfterDrop(fromImageId, toImageId) {
+  const r = currentResource();
+  if (typeof r.apiImagesReorder !== "function") return;
+  const imgs = [...(state.editingDraft.images || [])];
+  const fromIdx = imgs.findIndex((i) => Number(i.id) === Number(fromImageId));
+  const toIdx = imgs.findIndex((i) => Number(i.id) === Number(toImageId));
+  if (fromIdx < 0 || toIdx < 0) return;
+  const [removed] = imgs.splice(fromIdx, 1);
+  imgs.splice(toIdx, 0, removed);
+  const order = imgs.map((i) => i.id);
+  try {
+    await api(r.apiImagesReorder(state.editingId), { method: "POST", body: { order } });
+    const res = await api(r.apiItem(state.editingId));
+    const item = res[r.itemKey];
+    const merged = { ...state.editingDraft, ...item, images: item.images };
+    state.editingDraft =
+      r.key === "vehicles" || r.key === "rentals"
+        ? normalizeInventoryDraftForEngine(merged)
+        : merged;
+    const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
+    if (cached) Object.assign(cached, state.editingDraft);
+    renderEditor();
+    showToast("图片顺序已保存");
+  } catch (err) {
+    showToast(`保存顺序失败：${err.message}`, "error");
+    try {
+      const res = await api(r.apiItem(state.editingId));
+      const item = res[r.itemKey];
+      const merged = { ...state.editingDraft, ...item, images: item.images };
+      state.editingDraft =
+        r.key === "vehicles" || r.key === "rentals"
+          ? normalizeInventoryDraftForEngine(merged)
+          : merged;
+    } catch (_) {
+      /* ignore */
+    }
+    renderEditor();
   }
 }
 
@@ -1797,6 +1840,7 @@ function renderEditor() {
 
   const primaryImage = (draft.images || []).find((i) => i.isPrimary) || (draft.images || [])[0];
   const imageCount = (draft.images || []).length;
+  const imagesReorderable = typeof r.apiImagesReorder === "function";
   const asidePreview = r.listKind === "journal" ? null : resolveAsidePreviewImage(draft);
   const selectedThumbId = asidePreview?.id;
   const editorTitle = isNew
@@ -1856,9 +1900,9 @@ function renderEditor() {
                 : `<div class="admin-image-main-frame admin-cover-empty">暂未上传图片</div>`
             }
           </div>
-          <div class="admin-cover-meta">共 ${imageCount} 张 · 点缩略图切换大图 · 可指定任一张为首页封面</div>
+          <div class="admin-cover-meta">共 ${imageCount} 张 · 点缩略图切换大图 · 拖拽缩略图排序 · 可指定任一张为首页封面</div>
           <div class="admin-images admin-images--thumbs" id="imagesGrid">
-            ${(draft.images || []).map((im) => imageTile(im, selectedThumbId)).join("")}
+            ${(draft.images || []).map((im) => imageTile(im, selectedThumbId, imagesReorderable)).join("")}
           </div>
           <div class="admin-upload">
             <input id="imageUpload" type="file" accept="image/*" multiple>
@@ -1896,14 +1940,17 @@ function renderEditor() {
   bindEditor();
 }
 
-function imageTile(img, selectedPreviewId) {
+function imageTile(img, selectedPreviewId, reorderable) {
   const isSel =
     selectedPreviewId != null && Number(selectedPreviewId) === Number(img.id);
+  const reorderCls = reorderable ? " admin-image-tile--reorderable" : "";
+  const dragAttr = reorderable ? ' draggable="true"' : "";
+  const tileTitle = reorderable ? "拖拽排序 · 点击在上方预览" : "点击在上方预览";
   return `
-    <div class="admin-image-tile${isSel ? " is-selected" : ""}" data-image="${img.id}" role="button" tabindex="0" title="点击在上方预览">
-      <img src="${escapeAttr(resolveMediaUrlForImg(img.url))}" alt="${escapeAttr(img.alt || "")}" loading="lazy" decoding="async">
+    <div class="admin-image-tile${isSel ? " is-selected" : ""}${reorderCls}" data-image="${img.id}" role="button" tabindex="0" title="${escapeAttr(tileTitle)}"${dragAttr}>
+      <img src="${escapeAttr(resolveMediaUrlForImg(img.url))}" alt="${escapeAttr(img.alt || "")}" loading="lazy" decoding="async" ${reorderable ? 'draggable="false"' : ""}>
       ${img.isPrimary ? '<span class="primary-flag">封面</span>' : ""}
-      <button type="button" class="remove" title="删除图片" data-remove-image="${img.id}">×</button>
+      <button type="button" class="remove" title="删除图片" data-remove-image="${img.id}" draggable="false">×</button>
     </div>
   `;
 }
@@ -2109,7 +2156,6 @@ function bindEditor() {
       btn.addEventListener("click", async (ev) => {
         ev.stopPropagation();
         const imageId = Number(btn.dataset.removeImage);
-        if (!confirm("删除这张图片？")) return;
         try {
           await api(r.apiImage(state.editingId, imageId), { method: "DELETE" });
           state.editingDraft.images = state.editingDraft.images.filter((i) => i.id !== imageId);
@@ -2150,7 +2196,66 @@ function bindEditor() {
         }
       });
 
-      document.getElementById("imagesGrid")?.addEventListener("click", (e) => {
+      const imagesGridEl = document.getElementById("imagesGrid");
+      let dragThumbSourceId = null;
+      let lastDragOverThumb = null;
+
+      const clearThumbDragOver = () => {
+        imagesGridEl?.querySelectorAll(".admin-image-tile.is-drag-over").forEach((el) =>
+          el.classList.remove("is-drag-over"),
+        );
+        lastDragOverThumb = null;
+      };
+
+      imagesGridEl?.addEventListener("dragstart", (e) => {
+        const tile = e.target.closest(".admin-image-tile[data-image]");
+        if (!tile || e.target.closest(".remove")) {
+          e.preventDefault();
+          return;
+        }
+        dragThumbSourceId = Number(tile.dataset.image);
+        e.dataTransfer.setData("text/plain", String(dragThumbSourceId));
+        e.dataTransfer.effectAllowed = "move";
+        tile.classList.add("is-dragging-source");
+      });
+
+      imagesGridEl?.addEventListener("dragend", () => {
+        imagesGridEl?.querySelectorAll(".admin-image-tile.is-dragging-source").forEach((el) =>
+          el.classList.remove("is-dragging-source"),
+        );
+        clearThumbDragOver();
+        dragThumbSourceId = null;
+      });
+
+      imagesGridEl?.addEventListener("dragover", (e) => {
+        if (dragThumbSourceId == null) return;
+        const tile = e.target.closest(".admin-image-tile[data-image]");
+        if (!tile) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        if (lastDragOverThumb && lastDragOverThumb !== tile)
+          lastDragOverThumb.classList.remove("is-drag-over");
+        tile.classList.add("is-drag-over");
+        lastDragOverThumb = tile;
+      });
+
+      imagesGridEl?.addEventListener("drop", (e) => {
+        const tile = e.target.closest(".admin-image-tile[data-image]");
+        if (!tile) return;
+        e.preventDefault();
+        clearThumbDragOver();
+        const fromId = Number(e.dataTransfer.getData("text/plain"));
+        const toId = Number(tile.dataset.image);
+        if (!Number.isFinite(fromId) || !Number.isFinite(toId) || fromId === toId) return;
+        suppressImageThumbClickAfterReorder = true;
+        void persistEditorImagesOrderAfterDrop(fromId, toId);
+      });
+
+      imagesGridEl?.addEventListener("click", (e) => {
+        if (suppressImageThumbClickAfterReorder) {
+          suppressImageThumbClickAfterReorder = false;
+          return;
+        }
         if (e.target.closest("[data-remove-image], .remove")) return;
         const tile = e.target.closest(".admin-image-tile[data-image]");
         if (!tile) return;
