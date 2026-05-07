@@ -468,42 +468,81 @@
     return slide;
   }
 
-  function createThumb(item, index) {
+  function ensureThumbLabel(button) {
+    let label = button.querySelector('.lisboa-thumb__label');
+    if (!label) {
+      label = document.createElement('span');
+      label.className = 'lisboa-thumb__label';
+      button.appendChild(label);
+    }
+    return label;
+  }
+
+  function bindThumbClick(button) {
+    if (button.dataset.thumbClickBound === '1') return;
+    button.dataset.thumbClickBound = '1';
+    button.addEventListener('click', () => {
+      if (Date.now() < thumbSwipeState.suppressClickUntil) return;
+      const idx = Number(button.dataset.index);
+      if (Number.isFinite(idx)) setActive(idx);
+    });
+  }
+
+  function applyThumbContent(button, item, index) {
     const copy = getUiCopy();
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'lisboa-thumb';
     button.dataset.index = String(index);
     button.dataset.brand = item.id;
     button.setAttribute('aria-label', copy.thumbAria(item.name));
 
-    const logoMarkup = item.id === 'lexus'
-      ? `
-        <svg class="lisboa-thumb__logo lexus-mark" viewBox="16 16 134 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-          <path d="${LEXUS_MARK_PATH}" fill="currentColor"></path>
-        </svg>
-      `
-      : `<img class="lisboa-thumb__logo" src="${getThumbLogo(item)}" alt="" loading="lazy" decoding="async">`;
-
-    button.innerHTML = `
-      ${logoMarkup}
-      <span class="lisboa-thumb__label">${item.name}</span>
-    `;
-
-    const label = button.querySelector('.lisboa-thumb__label');
-    if (label) {
-      if (item.name.length >= 13) {
-        label.classList.add('is-tighter');
-      } else if (item.name.length >= 10) {
-        label.classList.add('is-tight');
+    const first = button.firstElementChild;
+    if (item.id === 'lexus') {
+      const isLexusSvg = first?.tagName === 'SVG' && first.classList.contains('lisboa-thumb__logo');
+      if (!isLexusSvg) {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', 'lisboa-thumb__logo lexus-mark');
+        svg.setAttribute('viewBox', '16 16 134 100');
+        svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        svg.setAttribute('aria-hidden', 'true');
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', LEXUS_MARK_PATH);
+        path.setAttribute('fill', 'currentColor');
+        svg.appendChild(path);
+        if (first) button.replaceChild(svg, first);
+        else button.prepend(svg);
+      }
+    } else {
+      const url = getThumbLogo(item);
+      let img = first?.tagName === 'IMG' && first.classList.contains('lisboa-thumb__logo') ? first : null;
+      if (!img) {
+        img = document.createElement('img');
+        img.className = 'lisboa-thumb__logo';
+        img.alt = '';
+        img.loading = 'eager';
+        img.decoding = 'sync';
+        if (first) button.replaceChild(img, first);
+        else button.prepend(img);
+      }
+      if (img.getAttribute('src') !== url) {
+        img.setAttribute('src', url);
       }
     }
 
-    button.addEventListener('click', () => {
-      if (Date.now() < thumbSwipeState.suppressClickUntil) return;
-      setActive(index);
-    });
+    const label = ensureThumbLabel(button);
+    label.textContent = item.name;
+    label.classList.remove('is-tight', 'is-tighter');
+    if (item.name.length >= 13) {
+      label.classList.add('is-tighter');
+    } else if (item.name.length >= 10) {
+      label.classList.add('is-tight');
+    }
+  }
 
+  function createThumb(item, index) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'lisboa-thumb';
+    applyThumbContent(button, item, index);
+    bindThumbClick(button);
     return button;
   }
 
@@ -519,18 +558,36 @@
     });
   }
 
-  function renderThumbs() {
+  function tearDownMobileThumbs() {
     shell.querySelectorAll('.lisboa-thumb--mobile').forEach((node) => node.remove());
-    thumbs.innerHTML = '';
+  }
 
-    if (isMobileViewport()) {
-      const visibleIndexes = getVisibleThumbIndexes();
+  function syncMobileThumbs() {
+    const visibleIndexes = getVisibleThumbIndexes();
+    const nodes = [...shell.querySelectorAll('.lisboa-thumb--mobile')];
+    if (nodes.length !== visibleIndexes.length) {
+      tearDownMobileThumbs();
       visibleIndexes.forEach((index, slot) => {
         const thumb = createThumb(slides[index], index);
         thumb.classList.add('lisboa-thumb--mobile');
         thumb.style.setProperty('--mobile-thumb-slot', String(slot));
         shell.appendChild(thumb);
       });
+      return;
+    }
+
+    visibleIndexes.forEach((index, slot) => {
+      applyThumbContent(nodes[slot], slides[index], index);
+      nodes[slot].style.setProperty('--mobile-thumb-slot', String(slot));
+    });
+  }
+
+  function renderThumbs() {
+    tearDownMobileThumbs();
+    thumbs.innerHTML = '';
+
+    if (isMobileViewport()) {
+      syncMobileThumbs();
       return;
     }
 
@@ -611,7 +668,7 @@
     }
 
     if (isMobileViewport()) {
-      renderThumbs();
+      syncMobileThumbs();
     }
     updateThumbState();
     if (!isMobileViewport()) {
