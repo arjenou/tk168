@@ -2,7 +2,6 @@
   brands,
   vehicles,
   getBrandLabel,
-  buildInventoryUrl,
   buildDetailUrl
 } = window.TK168_DATA;
 
@@ -87,18 +86,14 @@ let focusBrandKey = resolveFocusBrandKey(initialUrlParams.get('focusBrand') || '
 
 const ITEMS_PER_PAGE = 6;
 const inventoryContext = window.TK168InventoryContext.createInventoryContext(window.location.search, vehicles);
-const initialFilters = inventoryContext.filters;
 const currentBrand = inventoryContext.currentBrand;
 if (!focusBrandKey && currentBrand?.key) {
   focusBrandKey = currentBrand.key;
 }
-const effectiveBrandKey = currentBrand?.key || focusBrandKey || '';
-const sourceVehicles = effectiveBrandKey
-  ? inventoryContext.filteredVehicles.filter((vehicle) => vehicle.brandKey === effectiveBrandKey)
-  : inventoryContext.filteredVehicles;
-const activeFilterCount = inventoryContext.activeFilterCount;
+let sourceVehicles = [];
+
 let currentPage = 0;
-let brandHeroPreviewKey = (!currentBrand && focusBrandKey) ? focusBrandKey : '';
+let brandHeroPreviewKey = '';
 let brandHeroTitleFxTimer = 0;
 const brandVehicleGrid = document.getElementById('vehicleGrid');
 const brandVehicleSliderViewport = window.matchMedia('(max-width: 760px)');
@@ -108,153 +103,6 @@ let brandVehicleSliderScrollFrame = 0;
 let brandVehicleSliderResizeFrame = 0;
 let brandVehicleSliderInteractionTimer = 0;
 let brandVehicleRenderMode = brandVehicleSliderViewport.matches ? 'mobile' : 'desktop';
-let compareFilteredVehicles = [...sourceVehicles];
-let isCompareCollapsed = true;
-
-const compareFilterDefaults = Object.freeze({
-  query: '',
-  power: 'all',
-  category: 'all',
-  price: 'all',
-  year: 'all',
-  mileage: 'all',
-  displacement: 'all',
-  inspection: 'all',
-  repair: 'all'
-});
-
-const compareFilterState = {
-  ...compareFilterDefaults
-};
-
-const COMPARE_COPY = Object.freeze({
-  zh: {
-    placeholder: '请输入品牌或车型',
-    apply: '筛选',
-    reset: '重置',
-    collapse: '收起',
-    expand: '展开',
-    groups: {
-      power: '动力',
-      category: '类别',
-      price: '价格',
-      year: '上牌年份',
-      mileage: '里程',
-      displacement: '排量',
-      inspection: '车检',
-      repair: '修复历史'
-    },
-    options: {
-      all: '全部',
-      'fuel-gas': '汽油',
-      'fuel-hybrid': '混动',
-      'fuel-ev': '纯电',
-      suv: 'SUV',
-      sport: '跑车',
-      sedan: '轿车',
-      'price-low': '100万内',
-      'price-mid': '100-300万',
-      'price-high': '300万+',
-      'year-new': '2023+',
-      'year-mid': '2020-2022',
-      'year-old': '2020前',
-      'mileage-low': '1万内',
-      'mileage-mid': '1-5万',
-      'mileage-high': '5万+',
-      'disp-low': '3.0L内',
-      'disp-mid': '3.0-5.0L',
-      'disp-high': '5.0L+',
-      'inspection-has': '有',
-      'inspection-none': '无',
-      'repair-none': '无',
-      'repair-has': '有'
-    }
-  },
-  ja: {
-    placeholder: 'ブランド名または車種を入力',
-    apply: '絞り込み',
-    reset: 'リセット',
-    collapse: '閉じる',
-    expand: '展開',
-    groups: {
-      power: '動力',
-      category: 'カテゴリ',
-      price: '価格',
-      year: '年式',
-      mileage: '走行距離',
-      displacement: '排気量',
-      inspection: '車検',
-      repair: '修復歴'
-    },
-    options: {
-      all: '全部',
-      'fuel-gas': 'ガソリン',
-      'fuel-hybrid': 'ハイブリッド',
-      'fuel-ev': 'EV',
-      suv: 'SUV',
-      sport: 'スポーツ',
-      sedan: 'セダン',
-      'price-low': '100万以下',
-      'price-mid': '100-300万',
-      'price-high': '300万以上',
-      'year-new': '2023以降',
-      'year-mid': '2020-2022',
-      'year-old': '2020以前',
-      'mileage-low': '1万km以下',
-      'mileage-mid': '1-5万km',
-      'mileage-high': '5万km以上',
-      'disp-low': '3.0L以下',
-      'disp-mid': '3.0-5.0L',
-      'disp-high': '5.0L以上',
-      'inspection-has': '有',
-      'inspection-none': '無',
-      'repair-none': '無',
-      'repair-has': '有'
-    }
-  },
-  en: {
-    placeholder: 'Enter a brand or model',
-    apply: 'Apply filters',
-    reset: 'Reset',
-    collapse: 'Close',
-    expand: 'Expand',
-    groups: {
-      power: 'Powertrain',
-      category: 'Category',
-      price: 'Price',
-      year: 'Year',
-      mileage: 'Mileage',
-      displacement: 'Displacement',
-      inspection: 'Inspection',
-      repair: 'Repair history'
-    },
-    options: {
-      all: 'All',
-      'fuel-gas': 'Gasoline',
-      'fuel-hybrid': 'Hybrid',
-      'fuel-ev': 'EV',
-      suv: 'SUV',
-      sport: 'Sports',
-      sedan: 'Sedan',
-      'price-low': 'Under 1M',
-      'price-mid': '1M-3M',
-      'price-high': '3M+',
-      'year-new': '2023+',
-      'year-mid': '2020-2022',
-      'year-old': 'Before 2020',
-      'mileage-low': 'Under 10k km',
-      'mileage-mid': '10k-50k km',
-      'mileage-high': '50k km+',
-      'disp-low': 'Under 3.0L',
-      'disp-mid': '3.0-5.0L',
-      'disp-high': '5.0L+',
-      'inspection-has': 'Yes',
-      'inspection-none': 'No',
-      'repair-none': 'None',
-      'repair-has': 'Has history'
-    }
-  }
-});
 
 const canonicalInventoryUrl = inventoryContext.canonicalInventoryUrl;
 const canonicalInventoryTarget = new URL(canonicalInventoryUrl, window.location.href);
@@ -268,9 +116,21 @@ if (`${window.location.pathname.split('/').pop()}${window.location.search}` !== 
   window.history.replaceState({}, '', canonicalInventoryPathAndQuery);
 }
 
+function recomputeSourceVehicles() {
+  const filters = window.TK168_DATA.parseInventoryFilters(window.location.search);
+  const params = new URLSearchParams(window.location.search);
+  const fb = resolveFocusBrandKey(params.get('focusBrand') || '');
+  const b = filters.brand ? resolveFocusBrandKey(filters.brand) : '';
+  focusBrandKey = fb || b || '';
+  sourceVehicles = window.TK168_DATA.filterVehicles(vehicles, filters);
+}
+
+recomputeSourceVehicles();
+
+const inventoryHrefForChrome = `${window.location.pathname.split('/').pop()}${window.location.search}`;
 window.TK168PageChrome?.applyPageChrome({
   pageKey: 'inventory',
-  inventoryHref: canonicalInventoryPathAndQuery
+  inventoryHref: inventoryHrefForChrome
 });
 
 function getBrandHeroDefaultTitle() {
@@ -289,19 +149,48 @@ function getBrandNavVisibleCount() {
 }
 
 function getPinnedBrandKey() {
-  return currentBrand?.key || focusBrandKey || '';
+  const filters = window.TK168_DATA.parseInventoryFilters(window.location.search);
+  const params = new URLSearchParams(window.location.search);
+  const fb = resolveFocusBrandKey(params.get('focusBrand') || '');
+  const b = filters.brand ? resolveFocusBrandKey(filters.brand) : '';
+  return fb || b || '';
+}
+
+function finishBrandNavClientUpdate() {
+  const inventoryPathAndQuery = `${window.location.pathname.split('/').pop()}${window.location.search}`;
+  window.TK168PageChrome?.applyPageChrome({
+    pageKey: 'inventory',
+    inventoryHref: inventoryPathAndQuery
+  });
+  currentPage = 0;
+  setBrandHeroPreview('');
+  syncBrandHeader();
+  buildBrandNav();
+  renderPage();
+}
+
+function navigateBrandWithoutReload(brandKey) {
+  const resolved = resolveFocusBrandKey(brandKey);
+  if (!resolved) return;
+  const href = buildBrandNavHref(brandKey);
+  const u = new URL(href, window.location.href);
+  if (u.pathname !== window.location.pathname) return;
+  window.history.pushState({}, '', `${u.pathname}${u.search}`);
+  recomputeSourceVehicles();
+  finishBrandNavClientUpdate();
+}
+
+function navigateClearBrandFilterWithoutReload() {
+  const href = buildBrandNavHref('');
+  const u = new URL(href, window.location.href);
+  if (u.pathname !== window.location.pathname) return;
+  window.history.pushState({}, '', `${u.pathname}${u.search}`);
+  recomputeSourceVehicles();
+  finishBrandNavClientUpdate();
 }
 
 function getOrderedBrandNavCatalog() {
-  const pinnedKey = getPinnedBrandKey();
-  if (!pinnedKey) return fullBrandNavCatalog;
-  const pinnedIndex = fullBrandNavCatalog.findIndex((brand) => brand.key === pinnedKey);
-  if (pinnedIndex <= 0) return fullBrandNavCatalog;
-  return [
-    fullBrandNavCatalog[pinnedIndex],
-    ...fullBrandNavCatalog.slice(0, pinnedIndex),
-    ...fullBrandNavCatalog.slice(pinnedIndex + 1)
-  ];
+  return fullBrandNavCatalog;
 }
 
 function getBrandNavLoopSlice(orderedCatalog) {
@@ -331,12 +220,18 @@ function getBrandNavLabelSizeClass(brand) {
 }
 
 function buildBrandNavHref(brandKey) {
-  const baseUrl = buildInventoryUrl({
-    ...initialFilters,
-    brand: brandKey
-  });
-  const separator = baseUrl.includes('?') ? '&' : '?';
-  return `${baseUrl}${separator}focusBrand=${encodeURIComponent(brandKey)}`;
+  const cur = window.TK168_DATA.parseInventoryFilters(window.location.search);
+  const raw = String(brandKey ?? '').trim();
+  const resolved = raw ? resolveFocusBrandKey(brandKey) : '';
+  const next = { ...cur, brand: resolved || '' };
+  const pathAndQuery = window.TK168_DATA.buildInventoryUrl(next);
+  const u = new URL(pathAndQuery, window.location.href);
+  if (resolved) {
+    u.searchParams.set('focusBrand', resolved);
+  } else {
+    u.searchParams.delete('focusBrand');
+  }
+  return `${u.pathname.split('/').pop()}${u.search}`;
 }
 
 function buildBrandLandingHref(brandKey) {
@@ -366,32 +261,31 @@ function bindBrandNavThumbInteractions(node) {
   node.addEventListener('click', (event) => {
     const brandKey = node.dataset.brandKey;
     if (!brandKey) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (event.button !== 0) return;
 
     const nextUrl = new URL(buildBrandLandingHref(brandKey), window.location.href);
     const currentUrl = new URL(window.location.href);
-    const nextPathAndQuery = `${nextUrl.pathname}${nextUrl.search}`;
-    const currentPathAndQuery = `${currentUrl.pathname}${currentUrl.search}`;
-    if (nextPathAndQuery === currentPathAndQuery) {
+    if (nextUrl.pathname !== currentUrl.pathname) return;
+
+    const resolved = resolveFocusBrandKey(brandKey);
+    const pinned = getPinnedBrandKey();
+    if (resolved && pinned === resolved) {
       event.preventDefault();
-      focusBrandKey = brandKey;
-      brandNavCycleIndex = 0;
-      syncFocusBrandQuery(brandKey);
-      setBrandHeroPreview(brandKey);
-      syncBrandHeader();
-      syncBrandInventoryState();
-      buildBrandNav();
-      renderPage(currentPage);
+      navigateClearBrandFilterWithoutReload();
+      return;
     }
+
+    event.preventDefault();
+    navigateBrandWithoutReload(brandKey);
   });
 }
 
 function updateBrandNavThumb(node, brand, slotIndex) {
   if (!node || !brand) return;
 
-  const isCurrentOrFocused = Boolean(
-    (currentBrand && brand.key === currentBrand.key)
-    || (!currentBrand && focusBrandKey && brand.key === focusBrandKey)
-  );
+  const pinnedKey = getPinnedBrandKey();
+  const isCurrentOrFocused = Boolean(pinnedKey && brand.key === pinnedKey);
 
   node.className = `bn-thumb${isCurrentOrFocused ? ' is-active' : ''}`;
   node.href = buildBrandLandingHref(brand.key);
@@ -416,17 +310,6 @@ function updateBrandNavThumb(node, brand, slotIndex) {
   bindBrandNavThumbInteractions(node);
 }
 
-function syncFocusBrandQuery(brandKey) {
-  const nextKey = resolveFocusBrandKey(brandKey);
-  const nextUrl = new URL(window.location.href);
-  if (nextKey) {
-    nextUrl.searchParams.set('focusBrand', nextKey);
-  } else {
-    nextUrl.searchParams.delete('focusBrand');
-  }
-  window.history.replaceState({}, '', `${nextUrl.pathname}${nextUrl.search}`);
-}
-
 function pulseBrandHeroTitle() {
   const title = document.getElementById('brandHeroTitle');
   if (!title) return;
@@ -447,13 +330,6 @@ function setBrandHeroPreview(previewKey = '') {
   brandHeroPreviewKey = nextPreviewKey;
   syncBrandHeader();
   pulseBrandHeroTitle();
-}
-
-function syncBrandInventoryState() {
-  const comparePanel = document.getElementById('comparePanel');
-  if (!comparePanel) return;
-  const shouldHideCompare = Boolean(getPinnedBrandKey()) && sourceVehicles.length === 0;
-  comparePanel.hidden = shouldHideCompare;
 }
 
 function buildBrandNav() {
@@ -505,17 +381,19 @@ function shiftBrandNav(step) {
 
 function syncBrandHeader() {
   const title = document.getElementById('brandHeroTitle');
-  const focusedBrand = !currentBrand && focusBrandKey ? getBrandNavItemByKey(focusBrandKey) : null;
-  const currentBrandLabel = currentBrand
-    ? getBrandLabel(currentBrand)
-    : (focusedBrand ? getBrandLabel(focusedBrand) : getBrandHeroDefaultTitle());
+  const pinnedKey = getPinnedBrandKey();
+  const selectedBrand = pinnedKey ? getBrandNavItemByKey(pinnedKey) : null;
+  const currentBrandLabel = selectedBrand
+    ? getBrandLabel(selectedBrand)
+    : getBrandHeroDefaultTitle();
+
   const previewBrand = getBrandNavItemByKey(brandHeroPreviewKey);
-  const heroDisplayBrand = previewBrand || currentBrand || null;
+  const heroDisplayBrand = previewBrand || selectedBrand || null;
   const heroDisplayLabel = heroDisplayBrand ? getBrandLabel(heroDisplayBrand) : getBrandHeroDefaultTitle();
   const language = getCompareLanguage();
   const countLabel = language === 'en'
-    ? `${compareFilteredVehicles.length} vehicles`
-    : (language === 'zh' ? `${compareFilteredVehicles.length} 辆` : `${compareFilteredVehicles.length}台`);
+    ? `${sourceVehicles.length} vehicles`
+    : (language === 'zh' ? `${sourceVehicles.length} 辆` : `${sourceVehicles.length}台`);
 
   document.title = `${currentBrandLabel} · ${countLabel} — TK168 Premium Automotive`;
   if (title) {
@@ -531,7 +409,7 @@ function syncBrandHeader() {
 function buildCardHTML(v) {
   return window.TK168Renderers.buildInventoryCardHTML(
     v,
-    buildDetailUrl(v.id, initialFilters)
+    buildDetailUrl(v.id, window.TK168_DATA.parseInventoryFilters(window.location.search))
   );
 }
 
@@ -828,7 +706,7 @@ function applyMiniBrandIcon(card, vehicle) {
 }
 
 function getCompareTotalPages() {
-  return Math.max(1, Math.ceil(compareFilteredVehicles.length / ITEMS_PER_PAGE));
+  return Math.max(1, Math.ceil(sourceVehicles.length / ITEMS_PER_PAGE));
 }
 
 function getCompareLanguage() {
@@ -838,253 +716,6 @@ function getCompareLanguage() {
   if (docLang.startsWith('en')) return 'en';
   if (docLang.startsWith('zh')) return 'zh';
   return 'ja';
-}
-
-function parseNumericValue(rawValue) {
-  const normalized = String(rawValue || '').replace(/[^0-9.]/g, '');
-  const parsed = Number.parseFloat(normalized);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function parseIntegerValue(rawValue) {
-  const normalized = String(rawValue || '').replace(/[^0-9]/g, '');
-  const parsed = Number.parseInt(normalized, 10);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function getVehicleFuelToken(vehicle) {
-  const fuel = String(vehicle?.fuel || '');
-  if (!fuel.trim()) return 'fuel-gas';
-  if (/FCEV|氢燃料|燃料電池|fuel\s*cell/i.test(fuel)) return 'fuel-ev';
-  if (/BEV|纯电动|純電|battery\s*electric/i.test(fuel)) return 'fuel-ev';
-  if (/EREV|增程式|レンジエクステンダー|extended[- ]range/i.test(fuel)) return 'fuel-ev';
-  if (/PHEV|插电|プラグイン|plug[- ]?in/i.test(fuel)) return 'fuel-hybrid';
-  if (/HEV|混动|ハイブリッド|hybrid/i.test(fuel)) return 'fuel-hybrid';
-  if (/(electric|纯电|電気|^\s*ev\s*$)/i.test(fuel)) return 'fuel-ev';
-  return 'fuel-gas';
-}
-
-function getVehicleCategoryToken(vehicle) {
-  const haystack = `${vehicle?.bodyStyle || ''} ${vehicle?.name || ''}`.toLowerCase();
-  if (/(suv|越野|ＳＵＶ)/i.test(haystack)) return 'suv';
-  if (/(跑|sport|spyder|coupe|gt|ロードスター|クーペ)/i.test(haystack)) return 'sport';
-  if (/(轿|sedan|セダン)/i.test(haystack)) return 'sedan';
-  return 'other';
-}
-
-function getVehicleConditionText(vehicle, fieldKey) {
-  const readField = window.TK168_DATA?.getVehicleConditionField;
-  if (typeof readField !== 'function') return '';
-  const zhValue = readField(vehicle, fieldKey, 'zh') || '';
-  const jaValue = readField(vehicle, fieldKey, 'ja') || '';
-  return `${zhValue} ${jaValue}`.trim();
-}
-
-function hasVehicleInspection(vehicle) {
-  const text = getVehicleConditionText(vehicle, 'vehicleInspection').replace(/\s+/g, '');
-  if (!text) return false;
-  return !/(无|なし|無し|none|未|^-$)/i.test(text);
-}
-
-function hasVehicleRepairHistory(vehicle) {
-  const text = getVehicleConditionText(vehicle, 'repairHistory').replace(/\s+/g, '');
-  if (!text) return false;
-  return !/(无|なし|無し|none|no|^-$)/i.test(text);
-}
-
-function vehicleMatchesCompareFilter(vehicle) {
-  const state = compareFilterState;
-
-  if (state.power !== 'all' && getVehicleFuelToken(vehicle) !== state.power) return false;
-  if (state.category !== 'all' && getVehicleCategoryToken(vehicle) !== state.category) return false;
-
-  const totalPrice = parseNumericValue(vehicle?.totalPrice);
-  if (state.price === 'price-low' && totalPrice > 1000000) return false;
-  if (state.price === 'price-mid' && (totalPrice <= 1000000 || totalPrice > 3000000)) return false;
-  if (state.price === 'price-high' && totalPrice <= 3000000) return false;
-
-  const year = parseIntegerValue(vehicle?.year);
-  if (state.year === 'year-new' && year < 2023) return false;
-  if (state.year === 'year-mid' && (year < 2020 || year > 2022)) return false;
-  if (state.year === 'year-old' && year >= 2020) return false;
-
-  const mileage = window.TK168_DATA?.parseMileage
-    ? window.TK168_DATA.parseMileage(vehicle?.mileage)
-    : parseNumericValue(vehicle?.mileage);
-  if (state.mileage === 'mileage-low' && mileage > 10000) return false;
-  if (state.mileage === 'mileage-mid' && (mileage <= 10000 || mileage > 50000)) return false;
-  if (state.mileage === 'mileage-high' && mileage <= 50000) return false;
-
-  const displacement = parseNumericValue(vehicle?.displacement || vehicle?.engine);
-  if (state.displacement === 'disp-low' && displacement > 3.0) return false;
-  if (state.displacement === 'disp-mid' && (displacement <= 3.0 || displacement > 5.0)) return false;
-  if (state.displacement === 'disp-high' && displacement <= 5.0) return false;
-
-  if (state.inspection === 'inspection-has' && !hasVehicleInspection(vehicle)) return false;
-  if (state.inspection === 'inspection-none' && hasVehicleInspection(vehicle)) return false;
-
-  if (state.repair === 'repair-none' && hasVehicleRepairHistory(vehicle)) return false;
-  if (state.repair === 'repair-has' && !hasVehicleRepairHistory(vehicle)) return false;
-
-  return true;
-}
-
-function vehicleMatchesCompareQuery(vehicle) {
-  const query = String(compareFilterState.query || '').trim().toLowerCase();
-  if (!query) return true;
-  const brand = window.TK168_DATA.getBrandByKey?.(vehicle?.brandKey || '');
-  const searchable = [
-    vehicle?.name || '',
-    vehicle?.brandKey || '',
-    vehicle?.grade || '',
-    getBrandLabel(brand || {}),
-    vehicle?.bodyStyle || '',
-    window.TK168_DATA?.getVehicleFieldLabel?.('bodyStyle', vehicle?.bodyStyle) || ''
-  ].join(' ').toLowerCase();
-  return query.split(/\s+/).every((token) => searchable.includes(token));
-}
-
-function getCompareCustomFilterCount() {
-  let count = 0;
-  if (String(compareFilterState.query || '').trim()) count += 1;
-  Object.keys(compareFilterDefaults).forEach((key) => {
-    if (key === 'query') return;
-    if (compareFilterState[key] !== compareFilterDefaults[key]) {
-      count += 1;
-    }
-  });
-  return count;
-}
-
-function syncCompareButtonStates() {
-  document.querySelectorAll('.compare-btn').forEach((button) => {
-    const group = button.dataset.group;
-    const value = button.dataset.value;
-    const isActive = compareFilterState[group] === value;
-    button.classList.toggle('is-active', isActive);
-    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-  });
-}
-
-function syncCompareCollapseToggleLabel() {
-  const button = document.getElementById('compareCollapseToggle');
-  if (!button) return;
-  const language = getCompareLanguage();
-  const copy = COMPARE_COPY[language] || COMPARE_COPY.ja || COMPARE_COPY.zh;
-  button.textContent = isCompareCollapsed ? copy.expand : copy.collapse;
-  button.setAttribute('aria-expanded', isCompareCollapsed ? 'false' : 'true');
-}
-
-function setCompareCollapsed(collapsed) {
-  isCompareCollapsed = Boolean(collapsed);
-  const panel = document.getElementById('comparePanel');
-  if (panel) {
-    panel.classList.toggle('is-collapsed', isCompareCollapsed);
-  }
-  syncCompareCollapseToggleLabel();
-}
-
-function syncCompareCopy() {
-  const language = getCompareLanguage();
-  const copy = COMPARE_COPY[language] || COMPARE_COPY.ja || COMPARE_COPY.zh;
-  if (!copy) return;
-
-  const searchInput = document.getElementById('compareSearchInput');
-  const applyButton = document.getElementById('compareApplyBtn');
-  const resetButton = document.getElementById('compareResetBtn');
-
-  if (searchInput) searchInput.placeholder = copy.placeholder;
-  if (applyButton) applyButton.textContent = copy.apply;
-  if (resetButton) resetButton.textContent = copy.reset;
-
-  document.querySelectorAll('[data-group-title]').forEach((titleNode) => {
-    const key = titleNode.dataset.groupTitle;
-    titleNode.textContent = copy.groups[key] || '';
-  });
-
-  document.querySelectorAll('.compare-btn').forEach((button) => {
-    const value = button.dataset.value;
-    button.textContent = copy.options[value] || '';
-  });
-
-  syncCompareCollapseToggleLabel();
-}
-
-function applyCompareFilters({ resetPage = true } = {}) {
-  compareFilteredVehicles = sourceVehicles.filter((vehicle) => (
-    vehicleMatchesCompareQuery(vehicle) && vehicleMatchesCompareFilter(vehicle)
-  ));
-
-  const maxPage = Math.max(0, (isBrandVehicleMobileView() ? compareFilteredVehicles.length : getCompareTotalPages()) - 1);
-  currentPage = resetPage ? 0 : Math.min(currentPage, maxPage);
-  syncBrandHeader();
-  renderPage(currentPage);
-}
-
-function resetCompareFilters() {
-  Object.assign(compareFilterState, compareFilterDefaults);
-  const searchInput = document.getElementById('compareSearchInput');
-  if (searchInput) searchInput.value = '';
-  syncCompareButtonStates();
-  applyCompareFilters();
-}
-
-function bindComparePanelInteractions() {
-  const panel = document.getElementById('comparePanel');
-  if (!panel || panel.dataset.bound === '1') return;
-  panel.dataset.bound = '1';
-
-  const searchInput = document.getElementById('compareSearchInput');
-  const applyButton = document.getElementById('compareApplyBtn');
-  const resetButton = document.getElementById('compareResetBtn');
-  const collapseToggle = document.getElementById('compareCollapseToggle');
-
-  if (searchInput) {
-    searchInput.addEventListener('input', (event) => {
-      compareFilterState.query = event.target.value || '';
-    });
-    searchInput.addEventListener('keydown', (event) => {
-      if (event.key !== 'Enter') return;
-      event.preventDefault();
-      applyCompareFilters();
-    });
-  }
-
-  if (applyButton) {
-    applyButton.addEventListener('click', () => {
-      applyCompareFilters();
-    });
-  }
-
-  if (resetButton) {
-    resetButton.addEventListener('click', () => {
-      resetCompareFilters();
-    });
-  }
-
-  panel.querySelectorAll('.compare-btn').forEach((button) => {
-    button.addEventListener('click', () => {
-      const group = button.dataset.group;
-      const value = button.dataset.value;
-      if (!group || !value) return;
-      compareFilterState[group] = value;
-      syncCompareButtonStates();
-      applyCompareFilters();
-    });
-  });
-
-  if (collapseToggle) {
-    collapseToggle.addEventListener('click', () => {
-      setCompareCollapsed(!isCompareCollapsed);
-    });
-  }
-}
-
-function initComparePanel() {
-  syncCompareCopy();
-  syncCompareButtonStates();
-  setCompareCollapsed(true);
-  bindComparePanelInteractions();
 }
 
 function renderPage() {
@@ -1112,7 +743,7 @@ function renderPage() {
     grid.innerHTML = '';
     delete grid.dataset.mobilePaged;
 
-    if (!compareFilteredVehicles.length) {
+    if (!sourceVehicles.length) {
       const emptyState = document.createElement('div');
       emptyState.className = 'bn-empty';
 
@@ -1120,13 +751,17 @@ function renderPage() {
       icon.textContent = '🔍';
       emptyState.appendChild(icon);
 
-      const emptyMessage = (activeFilterCount > 0 || getCompareCustomFilterCount() > 0)
-        ? (() => {
-          return window.TK168I18N?.t('inventory.emptyFilteredSimple')
-            || (getCompareLanguage() === 'ja'
-              ? '現在の条件に一致する在庫車両がありません'
-              : '未找到符合当前筛选条件的在库车辆');
-        })()
+      const urlFilterCount = window.TK168_DATA.countActiveFilters(
+        window.TK168_DATA.parseInventoryFilters(window.location.search)
+      );
+
+      const emptyMessage = urlFilterCount > 0
+        ? (window.TK168I18N?.t('inventory.emptyAfterFilter')
+          || (getCompareLanguage() === 'en'
+            ? 'No vehicles match your current filters. Try widening them or reset.'
+            : (getCompareLanguage() === 'ja'
+              ? '現在の絞り込み条件に一致する在庫車がありません。条件を変更するかリセットしてください。'
+              : '当前筛选条件下暂无在库车辆，可尝试放宽或重置条件。')))
         : ((Boolean(getPinnedBrandKey()) && sourceVehicles.length === 0)
           ? (window.TK168I18N?.t('brand.noStockMessage')
             || (getCompareLanguage() === 'ja'
@@ -1143,14 +778,14 @@ function renderPage() {
       return;
     }
 
-    const totalDesktopPages = Math.max(1, Math.ceil(compareFilteredVehicles.length / ITEMS_PER_PAGE));
+    const totalDesktopPages = Math.max(1, Math.ceil(sourceVehicles.length / ITEMS_PER_PAGE));
     currentPage = renderMode === 'mobile'
-      ? Math.max(0, Math.min(compareFilteredVehicles.length - 1, leadIndex))
+      ? Math.max(0, Math.min(sourceVehicles.length - 1, leadIndex))
       : Math.max(0, Math.min(totalDesktopPages - 1, Math.floor(leadIndex / ITEMS_PER_PAGE)));
 
     const slice = renderMode === 'mobile'
-      ? compareFilteredVehicles
-      : compareFilteredVehicles.slice(currentPage * ITEMS_PER_PAGE, (currentPage * ITEMS_PER_PAGE) + ITEMS_PER_PAGE);
+      ? sourceVehicles
+      : sourceVehicles.slice(currentPage * ITEMS_PER_PAGE, (currentPage * ITEMS_PER_PAGE) + ITEMS_PER_PAGE);
 
     if (renderMode === 'mobile') {
       grid.dataset.mobilePaged = 'true';
@@ -1196,7 +831,7 @@ function updatePagination() {
   const prevBtn  = document.getElementById('vpnPrev');
   const nextBtn  = document.getElementById('vpnNext');
   const mobilePaged = isBrandVehicleMobileView();
-  const totalPages = Math.max(1, mobilePaged ? compareFilteredVehicles.length : getCompareTotalPages());
+  const totalPages = Math.max(1, mobilePaged ? sourceVehicles.length : getCompareTotalPages());
   if (!pagination || !dotsWrap || !prevBtn || !nextBtn) return;
   const shouldHidePagination = (Boolean(getPinnedBrandKey()) && sourceVehicles.length === 0) || totalPages <= 1;
   pagination.style.display = shouldHidePagination ? 'none' : '';
@@ -1218,7 +853,7 @@ function updatePagination() {
 
 function goToPage(page) {
   const mobilePaged = isBrandVehicleMobileView();
-  const totalPages = Math.max(1, mobilePaged ? compareFilteredVehicles.length : getCompareTotalPages());
+  const totalPages = Math.max(1, mobilePaged ? sourceVehicles.length : getCompareTotalPages());
   if (totalPages <= 0) return;
 
   if (mobilePaged) {
@@ -1258,18 +893,19 @@ if (typeof brandNavNarrowViewport.addEventListener === 'function') {
 
 syncBrandHeader();
 buildBrandNav();
-initComparePanel();
 bindBrandVehicleMobilePager();
-syncBrandInventoryState();
-applyCompareFilters();
+renderPage();
 
 window.addEventListener('tk168:languagechange', () => {
-  setBrandHeroPreview((!currentBrand && focusBrandKey) ? focusBrandKey : '');
+  setBrandHeroPreview('');
   syncBrandHeader();
   buildBrandNav();
-  syncCompareCopy();
-  syncBrandInventoryState();
-  renderPage(currentPage);
+  renderPage();
+});
+
+window.addEventListener('popstate', () => {
+  recomputeSourceVehicles();
+  finishBrandNavClientUpdate();
 });
 
 // 当首次进入页面时缓存为空（展示了骨架卡），等到 API 把车辆数据回灌后重新加载
