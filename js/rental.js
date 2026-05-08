@@ -464,6 +464,18 @@ function renderRentableVehicles(language = getLanguage()) {
 
   const rentableVehicles = getRentableVehicles();
   if (!rentableVehicles.length) {
+    // 数据尚未到达：API 既无缓存也无回包时使用骨架卡占位，避免空白闪烁。
+    const dataNotHydrated = !Array.isArray(window.TK168_API_VEHICLES)
+      && !Array.isArray(window.TK168_API_RENTALS);
+    if (dataNotHydrated) {
+      delete grid.dataset.mobilePaged;
+      empty.hidden = true;
+      const placeholder = renderMode === 'mobile' ? 4 : RENTAL_FLEET_PAGE_SIZE;
+      window.TK168Renderers?.renderVehicleSkeletons?.(grid, placeholder);
+      rentalFleetRenderMode = renderMode;
+      updateFleetPagination(1, 1, language, false);
+      return;
+    }
     rentalFleetCurrentPage = 1;
     delete grid.dataset.mobilePaged;
     grid.innerHTML = '';
@@ -597,7 +609,10 @@ window.addEventListener('tk168:languagechange', (event) => {
 });
 
 document.addEventListener('tk168:data-updated', (event) => {
-  if (event.detail?.rentals) {
+  if (event.detail?.vehicles) {
+    window.TK168_DATA?.refreshVehiclesFromApiHydrate?.();
+  }
+  if (event.detail?.rentals || event.detail?.vehicles) {
     renderRentableVehicles(getLanguage());
   }
 });

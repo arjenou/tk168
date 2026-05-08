@@ -329,6 +329,65 @@ window.TK168Renderers = (() => {
     return buildVehicleCardMarkup(vehicle, detailUrl, 'inventory');
   }
 
+  /**
+   * 构造骨架卡片内部 HTML（不含 .v-card 外壳）。
+   * 调用方需自行创建容器 element 并加上 `v-card is-skeleton` class。
+   * 结构与 buildVehicleCardMarkup('inventory') 对齐，保证占位高度一致。
+   */
+  function buildVehicleSkeletonCardHTML() {
+    const metaItem = `
+      <div class="v-skeleton-meta-item">
+        <span class="v-skeleton-block v-skeleton-circle" style="width:22px;height:22px;"></span>
+        <span class="v-skeleton-block" style="width:60%;height:10px;"></span>
+      </div>
+    `;
+    return `
+      <div class="v-skeleton-header">
+        <span class="v-skeleton-block" style="width:44px;height:44px;border-radius:10px;"></span>
+        <div class="v-skeleton-text-stack">
+          <span class="v-skeleton-block" style="width:55%;height:11px;"></span>
+          <span class="v-skeleton-block" style="width:80%;height:14px;"></span>
+          <span class="v-skeleton-block" style="width:40%;height:10px;"></span>
+        </div>
+      </div>
+      <div class="v-skeleton-cover v-skeleton-block"></div>
+      <div class="v-skeleton-meta">
+        ${metaItem}${metaItem}${metaItem}${metaItem}
+      </div>
+      <div class="v-skeleton-price">
+        <div class="v-skeleton-price-row">
+          <span class="v-skeleton-block" style="width:30%;height:11px;"></span>
+          <span class="v-skeleton-block" style="width:42%;height:18px;justify-self:end;"></span>
+        </div>
+        <div class="v-skeleton-price-row">
+          <span class="v-skeleton-block" style="width:36%;height:10px;"></span>
+          <span class="v-skeleton-block" style="width:34%;height:14px;justify-self:end;"></span>
+        </div>
+      </div>
+      <span class="v-skeleton-block v-skeleton-button"></span>
+    `;
+  }
+
+  /**
+   * 在指定 grid 容器内填充 N 张骨架卡片。
+   * - container: grid 容器（如 #vehicleGrid / #rentalVehicleGrid）
+   * - count: 数量（默认按容器列数 × 2 行估算，最多 6）
+   */
+  function renderVehicleSkeletons(container, count) {
+    if (!container) return;
+    const total = Math.max(1, count || 6);
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < total; i += 1) {
+      const card = document.createElement('div');
+      card.className = 'v-card is-skeleton visible';
+      card.setAttribute('aria-hidden', 'true');
+      card.dataset.skeleton = '1';
+      card.innerHTML = buildVehicleSkeletonCardHTML();
+      frag.appendChild(card);
+    }
+    container.replaceChildren(frag);
+  }
+
   function buildFeaturedCardHTML(vehicle, detailUrl) {
     return buildVehicleCardMarkup(vehicle, detailUrl, 'featured');
   }
@@ -463,6 +522,8 @@ window.TK168Renderers = (() => {
   return {
     buildInventoryCardHTML,
     buildFeaturedCardHTML,
+    buildVehicleSkeletonCardHTML,
+    renderVehicleSkeletons,
     buildDetailGalleryHTML,
     buildDetailSpecsHTML,
     buildDetailOverviewHTML,

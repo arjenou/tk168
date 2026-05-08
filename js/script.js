@@ -505,14 +505,24 @@ function getHomeVehicleTotalPages() {
 function renderHomeVehiclePages() {
   if (!homeVehicleGrid) return;
 
+  currentHomeVehicleColumns = getHomeVehicleColumns();
+  homeVehicleGrid.style.setProperty('--home-vehicle-columns', String(currentHomeVehicleColumns));
+
+  // 数据未到达时（既无缓存又无 API 回包），用骨架卡占位避免版式跳动 / 空白闪烁。
+  if (homeVehicles.length === 0 && !Array.isArray(window.TK168_API_VEHICLES)) {
+    const placeholderCount = currentHomeVehicleColumns * 2;
+    window.TK168Renderers?.renderVehicleSkeletons?.(homeVehicleGrid, placeholderCount);
+    homeVehicleGrid.dataset.homeVehiclePage = '0';
+    if (homeVehiclePagination) homeVehiclePagination.style.display = 'none';
+    return;
+  }
+
   const displayed = getHomeVehiclesDisplayed();
   const pages = chunkHomeVehicles(displayed, getHomeVehiclesPerPage());
   const totalPages = Math.max(1, pages.length);
   currentHomeVehiclePage = Math.max(0, Math.min(totalPages - 1, currentHomeVehiclePage));
-  currentHomeVehicleColumns = getHomeVehicleColumns();
   homeVehicleGrid.dataset.homeVehiclePage = String(currentHomeVehiclePage);
   homeVehicleGrid.innerHTML = '';
-  homeVehicleGrid.style.setProperty('--home-vehicle-columns', String(currentHomeVehicleColumns));
 
   (pages[currentHomeVehiclePage] || []).forEach((vehicle, index) => {
     const card = document.createElement('div');

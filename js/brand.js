@@ -1093,6 +1093,17 @@ function renderPage() {
   const renderMode = isBrandVehicleMobileView() ? 'mobile' : 'desktop';
   const leadIndex = getBrandVehicleLeadIndex();
 
+  // 数据尚未到达（既无缓存又无 API 回包）：直接渲染骨架卡，避免空白状态闪烁。
+  const dataPoolEmpty = !Array.isArray(vehicles) || vehicles.length === 0;
+  if (dataPoolEmpty && !Array.isArray(window.TK168_API_VEHICLES)) {
+    delete grid.dataset.mobilePaged;
+    const placeholder = renderMode === 'mobile' ? 4 : ITEMS_PER_PAGE;
+    window.TK168Renderers?.renderVehicleSkeletons?.(grid, placeholder);
+    brandVehicleRenderMode = renderMode;
+    updatePagination();
+    return;
+  }
+
   // Fade out existing cards
   const existing = grid.querySelectorAll('.v-card');
   existing.forEach(c => { c.style.opacity = '0'; c.style.transform = 'translateY(16px)'; });
@@ -1260,3 +1271,18 @@ window.addEventListener('tk168:languagechange', () => {
   syncBrandInventoryState();
   renderPage(currentPage);
 });
+
+// 当首次进入页面时缓存为空（展示了骨架卡），等到 API 把车辆数据回灌后重新加载
+// 一次以让模块作用域内的 inventoryContext / sourceVehicles 重新构建。仅在确实需要时
+// （没有缓存导致页面初始为空）触发，避免有缓存的访客被打扰。
+(() => {
+  const cameInEmpty = !Array.isArray(vehicles) || vehicles.length === 0;
+  if (!cameInEmpty) return;
+  let consumed = false;
+  document.addEventListener('tk168:data-updated', (event) => {
+    if (consumed) return;
+    if (!event?.detail?.vehicles) return;
+    consumed = true;
+    window.location.reload();
+  });
+})();
