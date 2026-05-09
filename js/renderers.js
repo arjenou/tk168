@@ -271,7 +271,7 @@ window.TK168Renderers = (() => {
       return base;
     })();
     const mileageDisplay =
-      window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, language)
+      window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, language, vehicle.mileageUnit)
       || '';
     const metaItems = [
       { key: 'mileage', icon: 'v1.svg', alt: 'Mileage', value: mileageDisplay || '-' },
@@ -486,7 +486,7 @@ window.TK168Renderers = (() => {
           : `${minDaysNum} 天`;
     const leftColumn = [
       [specLabels.year, formatRegistrationYear(vehicle.year) || `${vehicle.year}${language === 'en' ? '' : (language === 'ja' ? '年' : ' 年')}`],
-      [specLabels.mileage, window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, language) || emptyValue],
+      [specLabels.mileage, window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, language, vehicle.mileageUnit) || emptyValue],
       ...(rentalDetail ? [[t('rental.minDays'), minDaysDisplay]] : []),
       ...(rentalDetail
         ? []

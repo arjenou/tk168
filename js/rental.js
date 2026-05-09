@@ -212,9 +212,9 @@ function escapeHtml(value) {
     .replaceAll("'", '&#39;');
 }
 
-function formatMileage(value, language) {
+function formatMileage(value, language, mileageUnit) {
   const lang = language ?? (window.TK168I18N?.getLanguage?.() || 'ja');
-  const formatted = window.TK168_DATA?.formatVehicleMileageDisplay?.(value, lang);
+  const formatted = window.TK168_DATA?.formatVehicleMileageDisplay?.(value, lang, mileageUnit);
   if (formatted) return formatted;
   const raw = String(value ?? '').trim();
   if (raw && !/\d/.test(raw)) return raw;
@@ -320,7 +320,7 @@ function buildVehicleCardHtml(vehicle, language) {
         <div class="rental-card-facts">
           <div class="rental-fact">
             <span class="rental-fact-label">${escapeHtml(copy('fleet.card.mileage', language))}</span>
-            <span class="rental-fact-value">${escapeHtml(formatMileage(vehicle.mileage, language))}</span>
+            <span class="rental-fact-value">${escapeHtml(formatMileage(vehicle.mileage, language, vehicle.mileageUnit))}</span>
           </div>
           <div class="rental-fact">
             <span class="rental-fact-label">${escapeHtml(copy('fleet.card.dailyRate', language))}</span>
@@ -368,7 +368,7 @@ function hydrateRentalVehicleCard(card, vehicle, language) {
 
   const specSpans = Array.from(card.querySelectorAll('.v-spec span'));
   const specRows = [
-    { label: copy('fleet.card.mileage', language), value: formatMileage(vehicle.mileage, language) },
+    { label: copy('fleet.card.mileage', language), value: formatMileage(vehicle.mileage, language, vehicle.mileageUnit) },
     { label: copy('fleet.card.fuel', language), value: fuel },
     { label: copy('fleet.card.dailyRate', language), value: formatRate(profile.dailyRate, language) },
     {

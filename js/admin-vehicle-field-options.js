@@ -79,19 +79,6 @@
     { value: "6.5L", label: "6.5L" }
   ];
 
-  /** 气缸形式 / 缸数布局（V8、L4 等） */
-  const cylinders = [
-    { value: "L3", label: "L3" },
-    { value: "L4", label: "L4" },
-    { value: "V6", label: "V6" },
-    { value: "V8", label: "V8" },
-    { value: "V10", label: "V10" },
-    { value: "V12", label: "V12" },
-    { value: "W12", label: "W12" },
-    { value: "H6", label: "水平对置 6 缸（H6）" },
-    { value: "电动", label: "电动驱动单元" }
-  ];
-
   /** 与 js/data.js standardBodyStyleValues 顺序、存库中文值一致 */
   const bodyStyle = [
     { value: "SUV", label: "SUV" },
@@ -138,7 +125,6 @@
     fuel,
     trans,
     displacement,
-    cylinders,
     bodyColor: vehicleColorPalette,
     interiorColor: vehicleColorPalette
   };

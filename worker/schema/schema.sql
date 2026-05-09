@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS vehicles (
   type            TEXT,
   icon            TEXT,
   mileage         TEXT,
+  mileage_unit    TEXT DEFAULT 'wan',   -- wan=万公里小数；km=公里整数（可与千分位）
   engine          TEXT,           -- legacy combined display; kept in sync with displacement + cylinders
   displacement    TEXT,
   cylinders       TEXT,
@@ -34,7 +35,6 @@ CREATE TABLE IF NOT EXISTS vehicles (
   interior_color  TEXT,
   seats           TEXT,
   service_record  TEXT,
-  origin          TEXT,
   overview_zh     TEXT,            -- JSON array of strings
   overview_ja     TEXT,            -- JSON array of strings
   overview_en     TEXT,            -- JSON array of strings
@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS rentals (
   type            TEXT,
   icon            TEXT,
   mileage         TEXT,
+  mileage_unit    TEXT DEFAULT 'wan',
   engine          TEXT,           -- legacy combined display; kept in sync with displacement + cylinders
   displacement    TEXT,
   cylinders       TEXT,
@@ -102,7 +103,6 @@ CREATE TABLE IF NOT EXISTS rentals (
   body_color      TEXT,
   interior_color  TEXT,
   seats           TEXT,
-  origin          TEXT,
   daily_rate      INTEGER NOT NULL DEFAULT 0,   -- JPY per day
   deposit         INTEGER NOT NULL DEFAULT 0,   -- JPY
   min_days        INTEGER NOT NULL DEFAULT 1,

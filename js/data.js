@@ -268,24 +268,6 @@ window.TK168_DATA = (() => {
     'Fast delivery'
   ];
 
-  const libraryVehicleOrigins = {
-    astonmartin: '英国进口',
-    audi: '德国进口',
-    bentley: '英国进口',
-    bmw: '德国进口',
-    cadillac: '美国进口',
-    ferrari: '意大利进口',
-    jaguar: '英国进口',
-    lamborghini: '意大利进口',
-    landrover: '英国进口',
-    lexus: '日本进口',
-    maserati: '意大利进口',
-    mclaren: '英国进口',
-    mercedes: '德国进口',
-    porsche: '德国进口',
-    'rolls-royce': '英国进口'
-  };
-
   const libraryVehicleCatalogPresets = {
     exotic: {
       typeOptions: ['中置跑车', 'GT跑车', 'V12超跑'],
@@ -470,7 +452,6 @@ window.TK168_DATA = (() => {
       interiorColor: pickCatalogValue(libraryVehicleInteriors, seed + 7),
       seats: preset.seats,
       serviceRecord: '完整在册',
-      origin: libraryVehicleOrigins[brand.key] || '日本进口',
       overview: overview.zh,
       overviewJa: overview.ja,
       benefits: defaultBenefits,
@@ -524,7 +505,6 @@ window.TK168_DATA = (() => {
       interiorColor: '黑色真皮',
       seats: '5 座',
       serviceRecord: '完整在册',
-      origin: '意大利进口',
       overview: [
         '这台 Lamborghini Urus 保持了完整保养记录与出色的整体状态，在高性能 SUV 的张力之外，也保留了足够从容的日常使用感。',
         '车身姿态、内饰质感与机械完成度都处于很整齐的水准，适合被当作兼顾性能表达与通勤场景的一台主力座驾。'
@@ -558,7 +538,6 @@ window.TK168_DATA = (() => {
       interiorColor: '棕色真皮',
       seats: '2 座',
       serviceRecord: '完整在册',
-      origin: '德国进口',
       overview: [
         '这台奥迪 R8 保持了低里程与完整保养记录，低伏车身与中置布局让整车始终带着很鲜明的超跑比例。',
         '无论是漆面状态、机械质感还是敞篷姿态，都呈现出相当完整的完成度，兼具驾驶乐趣与日常使用的稳定感。'
@@ -592,7 +571,6 @@ window.TK168_DATA = (() => {
       interiorColor: '黑红拼色真皮',
       seats: '2 座',
       serviceRecord: '完整在册',
-      origin: '意大利进口',
       overview: [
         'Ferrari 458 Italia 保留了自然吸气时代极具代表性的声浪与比例，是法拉利车系里辨识度很高的一代作品。',
         '这台车的整体状态干净利落，既有足够鲜明的收藏气质，也保留了很纯粹的驾驶表达。'
@@ -626,7 +604,6 @@ window.TK168_DATA = (() => {
       interiorColor: '黑色真皮',
       seats: '5 座',
       serviceRecord: '完整在册',
-      origin: '德国进口',
       overview: [
         'BMW X6 M 将轿跑 SUV 的线条与高性能动力结合得很直接，整车视觉重心低，气场也足够鲜明。',
         '低里程与整齐的车况让它更像一台完成度很高的性能日用车，在通勤与长途场景里都保持着稳定质感。'
@@ -660,7 +637,6 @@ window.TK168_DATA = (() => {
       interiorColor: '深棕真皮',
       seats: '2 座',
       serviceRecord: '完整在册',
-      origin: '意大利进口',
       overview: [
         'Ferrari 488 GTB 有着很成熟的空气动力学比例，车身线条紧凑而克制，是法拉利近代设计语言里很完整的一台作品。',
         '这台车的状态收得很整齐，既保留了性能车应有的锋利感，也维持了足够清爽的日常可驾性。'
@@ -694,7 +670,6 @@ window.TK168_DATA = (() => {
       interiorColor: '黑色 Alcantara',
       seats: '2 座',
       serviceRecord: '完整在册',
-      origin: '意大利进口',
       overview: [
         'Aventador 保留了兰博基尼最具代表性的楔形姿态与 V12 气场，整车的存在感几乎不需要额外修饰。',
         '从比例、声浪到细节完成度，它都更接近一台具有象征意味的旗舰超跑，而不只是单纯的性能机器。'
@@ -728,7 +703,6 @@ window.TK168_DATA = (() => {
       interiorColor: '黑黄拼色',
       seats: '2 座',
       serviceRecord: '完整在册',
-      origin: '意大利进口',
       overview: [
         'Huracan EVO 以极低里程保留了很新鲜的状态，车身比例紧凑直接，带着典型的兰博基尼视觉张力。',
         '它的动态表达比外形更轻快，既适合城市环境中的展示感，也保留了周末驾驶时应有的灵活回应。'
@@ -762,7 +736,6 @@ window.TK168_DATA = (() => {
       interiorColor: '黑橙拼色',
       seats: '5 座',
       serviceRecord: '完整在册',
-      origin: '意大利进口',
       overview: [
         'Urus S 在保留实用性的同时，依然维持了很强的品牌辨识度与性能氛围，是一台边界感很少的高性能 SUV。',
         '整车状态新、配置完整，外观与座舱都呈现出相当统一的完成度，适合被放进更高频的日常使用场景里。'
@@ -796,7 +769,6 @@ window.TK168_DATA = (() => {
       interiorColor: '黑色 Alcantara',
       seats: '2 座',
       serviceRecord: '完整在册',
-      origin: '意大利进口',
       overview: [
         'Huracan STO 的设定明显更偏赛道取向，空气动力学细节与车身姿态都带着非常直接的功能性表达。',
         '它保留了更纯粹的操控导向，同时也让整车在静止状态下就有很强的收藏与展示意味。'
@@ -830,7 +802,6 @@ window.TK168_DATA = (() => {
       interiorColor: '黑色真皮',
       seats: '2 座',
       serviceRecord: '完整在册',
-      origin: '意大利进口',
       overview: [
         'Gallardo 保留了兰博基尼早期非常鲜明的车身比例，线条更简洁，也更容易让人联想到品牌过去的设计阶段。',
         '这台车的状态干净稳定，既有经典时期的气质，也带着很明确的品牌历史感。'
@@ -864,7 +835,6 @@ window.TK168_DATA = (() => {
       interiorColor: '黑金拼色',
       seats: '2 座',
       serviceRecord: '完整在册',
-      origin: '意大利进口',
       overview: [
         'Sian FKP 37 兼具极高稀缺性与技术象征性，视觉表达和机械规格都处在品牌体系里非常特殊的位置。',
         '相比常规量产超跑，它更像一件带有明确时代印记的收藏级作品，存在感和话题性都非常完整。'
@@ -898,7 +868,6 @@ window.TK168_DATA = (() => {
       interiorColor: '黑红拼色',
       seats: '5 座',
       serviceRecord: '完整在册',
-      origin: '意大利进口',
       overview: [
         'Urus Performante 在实用轮廓之上进一步强化了性能感，整车姿态、细节处理和运动氛围都更鲜明一些。',
         '低里程让它保留了很完整的新鲜度，无论从外观状态还是驾驶预期来看，都处在很利落的区间里。'
@@ -932,7 +901,6 @@ window.TK168_DATA = (() => {
       interiorColor: '黑色真皮',
       seats: '2 座',
       serviceRecord: '完整在册',
-      origin: '意大利进口',
       overview: [
         'Huracan EVO RWD 有着更直接的转向与车尾反馈，整车动态更轻快，也更接近传统后驱跑车的驾驶语气。',
         '它在状态上保持得很整齐，既保留了兰博基尼应有的视觉张力，也多了一层更纯粹的操控趣味。'
@@ -1574,35 +1542,6 @@ window.TK168_DATA = (() => {
         完整在册: 'Full service records'
       }
     },
-    origin: {
-      zh: {
-        意大利进口: '意大利进口',
-        德国进口: '德国进口',
-        日本进口: '日本进口',
-        英国进口: '英国进口',
-        美国进口: '美国进口',
-        法国进口: '法国进口',
-        瑞典进口: '瑞典进口'
-      },
-      ja: {
-        意大利进口: 'イタリア輸入',
-        德国进口: 'ドイツ輸入',
-        日本进口: '日本輸入',
-        英国进口: 'イギリス輸入',
-        美国进口: 'アメリカ輸入',
-        法国进口: 'フランス輸入',
-        瑞典进口: 'スウェーデン輸入'
-      },
-      en: {
-        意大利进口: 'Italy import',
-        德国进口: 'Germany import',
-        日本进口: 'Japan import',
-        英国进口: 'United Kingdom import',
-        美国进口: 'United States import',
-        法国进口: 'France import',
-        瑞典进口: 'Sweden import'
-      }
-    },
     bodyColor: {
       zh: {
         白色: '白色',
@@ -1823,6 +1762,12 @@ window.TK168_DATA = (() => {
     return `${amountJpy.toLocaleString(numberLocale, { useGrouping: true })} JPY`;
   }
 
+  function normalizeMileageUnit(u) {
+    const s = String(u ?? '').trim().toLowerCase();
+    if (s === 'km' || s === 'kilometer' || s === 'kilometres' || s === 'kilometre') return 'km';
+    return 'wan';
+  }
+
   function parseMileage(value) {
     const raw = String(value ?? '').trim();
     if (!raw) return 0;
@@ -1838,11 +1783,37 @@ window.TK168_DATA = (() => {
     return Math.round(n);
   }
 
-  /** 展示用：有有效里程则 zh/ja 为「X万公里」，en 为「N km」；纯文字或无数字则原样返回 */
-  function formatVehicleMileageDisplay(value, language = getCurrentLanguage()) {
+  /** 换算为公里整数；尊重 vehicle.mileageUnit（wan|km） */
+  function parseVehicleMileageKm(vehicle) {
+    const raw = String(vehicle?.mileage ?? '').trim();
+    if (!raw) return 0;
+    if (normalizeMileageUnit(vehicle?.mileageUnit) === 'km') {
+      const compact = raw.replace(/[,，\s]/g, '');
+      if (!/^[\d.]+$/.test(compact)) return 0;
+      const n = parseFloat(compact);
+      return Number.isFinite(n) ? Math.round(n) : 0;
+    }
+    return parseMileage(raw);
+  }
+
+  /**
+   * 展示里程。第三参 mileageUnit：wan=万公里小数存库；km=公里整数存库。
+   * 英文统一「N km」；中文 wan→「X万公里」、km→「N 公里」；日文 km→「N km」、wan→「X万公里」（与历史文案一致）。
+   */
+  function formatVehicleMileageDisplay(value, language = getCurrentLanguage(), mileageUnit) {
     const raw = String(value ?? '').trim();
     if (!raw) return '';
     if (!/\d/.test(raw)) return raw;
+    const unit = normalizeMileageUnit(mileageUnit);
+    if (unit === 'km') {
+      const compact = raw.replace(/[,，\s]/g, '');
+      const n = parseFloat(compact);
+      const km = Number.isFinite(n) ? Math.round(n) : 0;
+      if (!km) return raw;
+      if (language === 'en') return `${km.toLocaleString('en-US')} km`;
+      if (language === 'ja') return `${km.toLocaleString('ja-JP')} km`;
+      return `${km.toLocaleString('zh-CN')} 公里`;
+    }
     const km = parseMileage(raw);
     if (!km) return raw;
     if (language === 'en') {
@@ -2052,7 +2023,7 @@ window.TK168_DATA = (() => {
     const driveLabel = getVehicleFieldLabel('drive', vehicle.drive, 'en') || 'road-ready';
     const bodyColorLabel = getVehicleFieldLabel('bodyColor', vehicle.bodyColor, 'en') || 'well-kept';
     const interiorLabel = getVehicleFieldLabel('interiorColor', vehicle.interiorColor, 'en') || 'refined';
-    const mileageLabel = formatVehicleMileageDisplay(vehicle.mileage, 'en') || 'a well-kept mileage record';
+    const mileageLabel = formatVehicleMileageDisplay(vehicle.mileage, 'en', vehicle.mileageUnit) || 'a well-kept mileage record';
 
     return [
       `${brandName} is presented here as a ${typeLabel.toLowerCase()}, pairing ${formatVehicleEngineLine(vehicle)} output with ${fuelLabel.toLowerCase()} power and ${driveLabel} traction.`,
@@ -2558,6 +2529,7 @@ window.TK168_DATA = (() => {
       type: rental.type || '',
       icon: rental.icon && String(rental.icon).trim() ? String(rental.icon).trim() : '',
       mileage: rental.mileage || '',
+      mileageUnit: rental.mileageUnit || '',
       displacement: mergedEngine.displacement,
       cylinders: mergedEngine.cylinders,
       engine: formatVehicleEngineLine(mergedEngine),
@@ -2568,7 +2540,6 @@ window.TK168_DATA = (() => {
       bodyColor: rental.bodyColor || '',
       interiorColor: rental.interiorColor || '',
       seats: rental.seats || '',
-      origin: rental.origin || '',
       totalPrice: '',
       basePrice: '',
       overview: rental.overview || rental.overviewZh || [],
@@ -2733,7 +2704,7 @@ window.TK168_DATA = (() => {
         if (!priceOption.match(amount)) return false;
       }
       if (yearOption && !yearOption.match(parseYear(vehicle.year))) return false;
-      if (mileageOption && !mileageOption.match(parseMileage(vehicle.mileage))) return false;
+      if (mileageOption && !mileageOption.match(parseVehicleMileageKm(vehicle))) return false;
 
       if (keyword) {
         const brand = getBrandByKey(vehicle.brandKey);
@@ -2922,6 +2893,7 @@ window.TK168_DATA = (() => {
     buildDetailUrl,
     mergeApiVehicleWithBase,
     parseMileage,
+    parseVehicleMileageKm,
     formatVehicleMileageDisplay,
     getRentalVehicleDetailById,
     mergeApiRentalWithBase,

@@ -115,7 +115,7 @@ baseVehicles.forEach((v, index) => {
   const insert = `INSERT INTO vehicles (
     id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, displacement, cylinders, fuel, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
-    seats, service_record, origin,
+    seats, service_record,
     overview_zh, overview_ja, overview_en, benefits, features,
     cond_dealer_warranty, cond_one_owner,
     listing_repair_history, listing_vehicle_inspection, listing_legal_maintenance,
@@ -127,7 +127,7 @@ baseVehicles.forEach((v, index) => {
     ${esc(v.id)}, ${esc(v.brandKey)}, ${esc(v.name)}, ${esc(v.nameJa)}, ${esc(v.nameEn)}, ${esc(v.year)}, ${esc(v.type)},
     ${esc(v.icon)}, ${esc(v.mileage)}, ${esc(engineCombined(v))}, ${esc(v.displacement)}, ${esc(v.cylinders)}, ${esc(v.fuel)}, ${esc(v.trans)},
     ${esc(v.totalPrice)}, ${esc(v.basePrice)}, ${esc(v.bodyStyle)}, ${esc(v.drive)},
-    ${esc(v.bodyColor)}, ${esc(v.interiorColor)}, ${esc(v.seats)}, ${esc(v.serviceRecord)}, ${esc(v.origin)},
+    ${esc(v.bodyColor)}, ${esc(v.interiorColor)}, ${esc(v.seats)}, ${esc(v.serviceRecord)},
     ${escJson(v.overview)}, ${escJson(v.overviewJa)}, ${escJson(v.overviewEn || null)},
     ${escJson(v.benefits)}, ${escJson(v.features)},
     ${presetJson(cond.dealerWarranty)}, ${presetJson(cond.oneOwner)},

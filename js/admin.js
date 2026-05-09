@@ -181,16 +181,22 @@ const RESOURCES = {
             hint: "与车身颜色共用同一套标准色；存库为中文，前台多语言自动展示对应译名。",
           },
           { key: "seats", label: "座位", type: "select", optionsCatalog: "seats", span: 4 },
-          { key: "origin", label: "产地", placeholder: "意大利进口", span: 4 },
         ],
       },
       {
         id: "power",
         label: "动力与价格",
         fields: [
-          { key: "displacement", label: "排量", type: "select", optionsCatalog: "displacement", span: 3, hint: "如 4.0L、2.0L Turbo；不在列表中会显示为「当前值」。" },
-          { key: "cylinders", label: "发动机缸数", type: "select", optionsCatalog: "cylinders", span: 3, hint: "如 V8、V12；可与排量分开维护。" },
-          { key: "mileage", label: "里程（万公里）", placeholder: "", span: 3, hint: "选填。存库为万公里量级约数（0.32≈3200km）；不必填精确公里数。可写「0.5万」或带小数点位数。" },
+          {
+            key: "displacement",
+            label: "排量",
+            type: "litersInput",
+            span: 3,
+            placeholder: "4.0",
+            hint: "手动填写升数（小数点可为英文句号）；存库为如 4.0L，单位 L 固定。",
+          },
+          { key: "cylinders", label: "发动机缸数", type: "text", span: 3, placeholder: "如 V8、L6、水平对置4缸", hint: "手动填写缸数或气缸布局（如 V8）；可与排量分开维护。" },
+          { key: "mileage", label: "里程", type: "mileageWithUnit", span: 3, placeholder: "", hint: "选填。单位「万公里」填小数（如 0.32≈3200km）；单位「公里」填整数公里（可含千分位逗号）。前台按所选单位展示。" },
           { key: "fuel", label: "油種", type: "select", optionsCatalog: "fuel", span: 3 },
           { key: "trans", label: "变速箱", type: "select", optionsCatalog: "trans", span: 3 },
           { key: "totalPrice", label: "支付总额", placeholder: "1,980,000 JPY", hint: "输入时自动按日式千分位排版（末尾 JPY）。", span: 4 },
@@ -216,10 +222,10 @@ const RESOURCES = {
     ],
     emptyDraft: () => ({
       id: "", brandKey: "", name: "", nameJa: "", nameEn: "", grade: "", year: "", type: "", icon: "",
-      mileage: "", displacement: "", cylinders: "", fuel: "汽油", trans: "AT",
+      mileage: "", mileageUnit: "wan", displacement: "", cylinders: "", fuel: "汽油", trans: "AT",
       totalPrice: "", basePrice: "",
       bodyStyle: "", drive: "", bodyColor: "", interiorColor: "", seats: "",
-      serviceRecord: "", origin: "",
+      serviceRecord: "",
       overviewZh: [""], overviewJa: [""], overviewEn: null,
       benefits: null, features: null,
       condDealerWarranty: { zh: "", ja: "", en: "" },
@@ -303,16 +309,22 @@ const RESOURCES = {
             hint: "与车身颜色共用同一套标准色；存库为中文，前台多语言自动展示对应译名。",
           },
           { key: "seats", label: "座位", type: "select", optionsCatalog: "seats", span: 4 },
-          { key: "origin", label: "产地", placeholder: "德国进口", span: 4 },
         ],
       },
       {
         id: "power",
         label: "动力",
         fields: [
-          { key: "displacement", label: "排量", type: "select", optionsCatalog: "displacement", span: 3, hint: "如 4.0L、2.0L Turbo；不在列表中会显示为「当前值」。" },
-          { key: "cylinders", label: "发动机缸数", type: "select", optionsCatalog: "cylinders", span: 3, hint: "如 V8、V12；可与排量分开维护。" },
-          { key: "mileage", label: "里程（万公里）", placeholder: "", span: 3, hint: "选填。存库为万公里量级约数（0.32≈3200km）；不必填精确公里数。可写「0.5万」或带小数点位数。" },
+          {
+            key: "displacement",
+            label: "排量",
+            type: "litersInput",
+            span: 3,
+            placeholder: "4.0",
+            hint: "手动填写升数（小数点可为英文句号）；存库为如 4.0L，单位 L 固定。",
+          },
+          { key: "cylinders", label: "发动机缸数", type: "text", span: 3, placeholder: "如 V8、L6、水平对置4缸", hint: "手动填写缸数或气缸布局（如 V8）；可与排量分开维护。" },
+          { key: "mileage", label: "里程", type: "mileageWithUnit", span: 3, placeholder: "", hint: "选填。单位「万公里」填小数（如 0.32≈3200km）；单位「公里」填整数公里（可含千分位逗号）。前台按所选单位展示。" },
           { key: "fuel", label: "油種", type: "select", optionsCatalog: "fuel", span: 3 },
           { key: "trans", label: "变速箱", type: "select", optionsCatalog: "trans", span: 3 },
         ],
@@ -356,9 +368,9 @@ const RESOURCES = {
     presets: [],
     emptyDraft: () => ({
       id: "", brandKey: "", name: "", nameJa: "", nameEn: "", grade: "", year: "", type: "", icon: "",
-      mileage: "", displacement: "", cylinders: "", fuel: "汽油", trans: "AT",
+      mileage: "", mileageUnit: "wan", displacement: "", cylinders: "", fuel: "汽油", trans: "AT",
       bodyStyle: "", drive: "", bodyColor: "", interiorColor: "",
-      seats: "2 座", origin: "",
+      seats: "2 座",
       dailyRate: "",
       deposit: "",
       minDays: 1,
@@ -526,6 +538,22 @@ function combinedEngineFromDraft(draft) {
   const d = String(draft?.displacement ?? "").trim();
   const c = String(draft?.cylinders ?? "").trim();
   return [d, c].filter(Boolean).join(" ").trim();
+}
+
+/** 首页车辆 / レンタル车辆排量：编辑框只填数字，右侧固定单位 L；纯数字存库为「nL」，其余原文保留（兼容旧数据）。 */
+function displacementLitersInputDisplay(stored) {
+  const t = String(stored ?? "").trim();
+  if (!t) return "";
+  const m = /^(\d+(?:\.\d+)?)\s*[lL]\s*$/i.exec(t);
+  if (m) return m[1];
+  return t;
+}
+
+function normalizeDisplacementLitersStorage(raw) {
+  const t = String(raw ?? "").trim();
+  if (!t) return "";
+  if (/^\d+(?:\.\d+)?$/i.test(t)) return `${t}L`;
+  return t;
 }
 
 // -------------------- App state --------------------
@@ -1350,6 +1378,16 @@ function brandLogoIconLabelZh(storedPath) {
 }
 
 /**
+ * 品牌 Key 选单展示：去掉「ランボルギーニ (593)」类参考台数括注（半角/全角括号），value 仍为英文 slug。
+ */
+function stripBrandKeyDropdownLabel(label) {
+  return String(label ?? "")
+    .replace(/\s*[\(（]\d[\d,]*[\)）]/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+/**
  * 品牌 Key：按国家分组；存库为英文 slug，与 `admin-brand-key-options.js` 一致。
  */
 function buildBrandKeySelectHtml(draftKey, rawValue) {
@@ -1371,7 +1409,7 @@ function buildBrandKeySelectHtml(draftKey, rawValue) {
     const body = (g.options || [])
       .map((o) => {
         const sel = o.value === cur ? " selected" : "";
-        return `<option value="${escapeAttr(o.value)}"${sel}>${escapeHtml(o.label)}</option>`;
+        return `<option value="${escapeAttr(o.value)}"${sel}>${escapeHtml(stripBrandKeyDropdownLabel(o.label))}</option>`;
       })
       .join("");
     if (!body) continue;
@@ -1476,6 +1514,23 @@ function renderEditorField(field, draft) {
       control = `<select class="admin-input" data-draft="${key}">${opts}</select>`;
     }
     }
+  } else if (field.type === "mileageWithUnit") {
+    const mu = String(draft.mileageUnit ?? "wan").trim() || "wan";
+    control = `
+    <div class="admin-mileage-unit-row">
+      <input class="admin-input admin-mileage-unit-row__value" type="text" autocomplete="off" data-draft="mileage" value="${escapeAttr(String(draft.mileage ?? "").trim())}" placeholder="${escapeAttr(field.placeholder || "")}">
+      <select class="admin-input admin-mileage-unit-row__unit" data-draft="mileageUnit">
+        <option value="wan"${mu === "wan" ? " selected" : ""}>万公里</option>
+        <option value="km"${mu === "km" ? " selected" : ""}>公里</option>
+      </select>
+    </div>`;
+  } else if (field.type === "litersInput") {
+    const displayVal = displacementLitersInputDisplay(value);
+    control = `
+    <div class="admin-input-suffix-row">
+      <input class="admin-input admin-input--suffix-cell" type="text" inputmode="decimal" autocomplete="off" data-draft="${key}" data-liters-input="1" value="${escapeAttr(displayVal)}" placeholder="${escapeAttr(field.placeholder || "")}">
+      <span class="admin-input-suffix" aria-hidden="true">L</span>
+    </div>`;
   } else if (field.type === "number") {
     control = `<input class="admin-input" type="number" data-draft="${key}" value="${escapeAttr(value ?? 0)}" placeholder="${escapeAttr(field.placeholder || "")}">`;
   } else {
@@ -1484,7 +1539,11 @@ function renderEditorField(field, draft) {
 
   const wrapClass = field.iconCatalog
     ? " admin-field--icon-row"
-    : (field.brandKeyCatalog ? " admin-field--brand-key" : "");
+    : field.brandKeyCatalog
+      ? " admin-field--brand-key"
+      : field.type === "mileageWithUnit"
+        ? " admin-field--mileage-unit"
+        : "";
   return `
     <div class="admin-field admin-col-${span}${wrapClass}">
       <label>${escapeHtml(field.label)}${requiredMark}</label>
@@ -2001,7 +2060,14 @@ function renderEditor() {
 
 function readDataDraftValueFromInput(el) {
   if (el.type === "checkbox") return el.checked;
+  if (el.dataset?.draft === "mileageUnit") {
+    const v = String(el.value ?? "").trim().toLowerCase();
+    return v === "km" ? "km" : "wan";
+  }
   if (el.type === "number") return Number(el.value);
+  if (el.dataset && el.dataset.litersInput === "1") {
+    return normalizeDisplacementLitersStorage(el.value);
+  }
   return el.value;
 }
 

@@ -502,7 +502,7 @@
     const type = sanitize(getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, language) || '');
     const fuel = sanitize(getVehicleFieldLabel('fuel', vehicle.fuel, language));
     const mileageDisplay =
-      window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, language) || '';
+      window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, language, vehicle.mileageUnit) || '';
 
     refs.vehicleThumb.src = image;
     refs.vehicleThumb.alt = getVehicleName(vehicle, language);

@@ -128,6 +128,90 @@ button { font: inherit; cursor: pointer; }
   max-width: 100%;
 }
 
+/* 排量：输入数字 + 固定单位 L */
+.admin-input-suffix-row {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-sm);
+  background: var(--admin-panel-soft);
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.admin-input-suffix-row:focus-within {
+  border-color: var(--admin-accent);
+  box-shadow: 0 0 0 2px rgba(242, 250, 90, 0.25);
+}
+
+.admin-input-suffix-row .admin-input--suffix-cell {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.admin-input-suffix-row .admin-input--suffix-cell:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.admin-input-suffix {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  font-weight: 600;
+  color: var(--admin-text-muted);
+  border-left: 1px solid var(--admin-border);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+/* 里程：数值 + 单位下拉（万公里 / 公里） */
+.admin-mileage-unit-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-sm);
+  background: var(--admin-panel-soft);
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.admin-mileage-unit-row:focus-within {
+  border-color: var(--admin-accent);
+  box-shadow: 0 0 0 2px rgba(242, 250, 90, 0.25);
+}
+
+/* 覆盖全局 .admin-input { width:100% }，否则 flex 子项会被撑成「下拉抢满、输入极窄」 */
+.admin-mileage-unit-row__value {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.admin-mileage-unit-row__value:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.admin-mileage-unit-row__unit {
+  border: 0;
+  border-left: 1px solid var(--admin-border);
+  border-radius: 0;
+  box-shadow: none;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.admin-mileage-unit-row__unit:focus {
+  outline: none;
+  box-shadow: none;
+}
+
 .admin-input,
 .admin-textarea,
 .admin-select {
@@ -147,6 +231,20 @@ button { font: inherit; cursor: pointer; }
   outline: none;
   border-color: var(--admin-accent);
   box-shadow: 0 0 0 2px rgba(242, 250, 90, 0.25);
+}
+
+/* 里程行：必须在 .admin-input{width:100%} 之后覆盖，否则数字框极窄、下跳过宽 */
+.admin-mileage-unit-row > .admin-mileage-unit-row__value {
+  flex: 1 1 0%;
+  min-width: min(100%, 9rem);
+  width: auto;
+  max-width: none;
+}
+.admin-mileage-unit-row > .admin-mileage-unit-row__unit {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 0;
+  max-width: 7rem;
 }
 
 .admin-textarea {

@@ -7,8 +7,8 @@ import { createResource, insertInventoryStubIfMissing } from "./resource.js";
 
 const RENTAL_COLUMNS = [
   "id", "brand_key", "name", "name_ja", "name_en", "grade", "year", "type", "icon",
-  "mileage", "engine", "displacement", "cylinders", "fuel", "trans",
-  "body_style", "drive", "body_color", "interior_color", "seats", "origin",
+  "mileage", "mileage_unit", "engine", "displacement", "cylinders", "fuel", "trans",
+  "body_style", "drive", "body_color", "interior_color", "seats",
   "daily_rate", "deposit", "min_days", "rental_status",
   "overview_zh", "overview_ja", "overview_en",
   "benefits", "features",
@@ -34,6 +34,7 @@ const RENTAL_FIELD_MAP = {
   type: "type",
   icon: "icon",
   mileage: "mileage",
+  mileageUnit: "mileage_unit",
   engine: "engine",
   displacement: "displacement",
   cylinders: "cylinders",
@@ -44,7 +45,6 @@ const RENTAL_FIELD_MAP = {
   bodyColor: "body_color",
   interiorColor: "interior_color",
   seats: "seats",
-  origin: "origin",
   dailyRate: "daily_rate",
   deposit: "deposit",
   minDays: "min_days",

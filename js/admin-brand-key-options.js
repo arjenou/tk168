@@ -1,7 +1,7 @@
 /**
  * 管理端「品牌 Key」下拉里使用的分组选项。
  * - value: 存库用英文 slug（小写、连字符），与前台筛选/品牌逻辑兼容。
- * - label: 日文表记 + 参考台数（与用户提供列表一致，仅作选单展示）。
+ * - label: 日文表记 + 参考台数括注（源数据保留；admin/search 选单渲染时会省略括注）。
  * - i18nKey: 前台 / 语言切换时 `TK168I18N.t('…')` 用（见 i18n.js `search.makerGroup.*`）
  * @type {{ label: string, i18nKey?: string, options: { value: string, label: string }[] }[]}
  */

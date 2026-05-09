@@ -356,7 +356,7 @@
     const typeLabel = sanitize(getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, language) || '');
     const engineLine = window.TK168_DATA?.formatVehicleEngineLine?.(vehicle) || sanitize(vehicle.engine);
     const mileageDisplay =
-      window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, language) || '';
+      window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, language, vehicle.mileageUnit) || '';
     const statusText = currentCopy().vehicleStatus;
 
     if (refs.vehicleThumb) {

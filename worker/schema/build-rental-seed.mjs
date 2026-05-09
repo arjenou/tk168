@@ -96,7 +96,6 @@ for (const [id, profile] of Object.entries(rentalProfiles)) {
     body_color: v.bodyColor || "",
     interior_color: v.interiorColor || "",
     seats: v.seats || "",
-    origin: v.origin || "",
     daily_rate: sqlInt(profile.dailyRate),
     deposit: sqlInt(profile.deposit),
     min_days: sqlInt(profile.minDays) || 1,
@@ -123,7 +122,7 @@ for (const r of rows) {
   const cols = [
     "id", "brand_key", "name", "name_ja", "name_en", "year", "type", "icon",
     "mileage", "engine", "displacement", "cylinders", "fuel", "trans",
-    "body_style", "drive", "body_color", "interior_color", "seats", "origin",
+    "body_style", "drive", "body_color", "interior_color", "seats",
     "daily_rate", "deposit", "min_days", "rental_status",
     "overview_zh", "overview_ja", "overview_en",
     "benefits", "features",

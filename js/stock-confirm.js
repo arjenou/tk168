@@ -358,7 +358,7 @@
     const yearLabel = sanitize(vehicle.year);
     const typeLabel = getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, lang) || '';
     const distance =
-      window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, lang) || '';
+      window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, lang, vehicle.mileageUnit) || '';
     refs.vehicleThumb.src = image;
     refs.vehicleThumb.alt = getVehicleName(vehicle, lang);
     refs.vehicleBrand.textContent = getBrandLabel(vehicle.brandKey, lang).toUpperCase();

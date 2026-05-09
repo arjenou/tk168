@@ -47,21 +47,37 @@ window.TK168SearchUI = (() => {
     return regionJa;
   }
 
-  /** メーカー选项：与当前语言下的品牌名 + 台数（与 i18n / brand-key-name-i18n 一致） */
+  /** メーカー选单行文案末尾参考台数括注（半角/全角括号与数字）；多处兜底剥离 */
+  function stripMakerInventoryParenCounts(label) {
+    const asciiParenNums = /\s*[\(（]\s*\d[\d,]*\s*[\)）]/g;
+    const fwDigitsInsideParen =
+      /\s*[\(（]\s*[０-９][０-９,\u3000]*\s*[\)）]/gu;
+    return String(label ?? '')
+      .replace(asciiParenNums, '')
+      .replace(fwDigitsInsideParen, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  }
+
+  /** メーカー选项：当前语言品牌名；不附带参考台数括注 */
   function formatMakerMenuOptionLabel(o) {
     const b = window.TK168_DATA.getBrandByKey(o.value);
-    if (!b) return o.label;
-    const lang = window.TK168I18N?.getLanguage?.() || 'ja';
-    const name = window.TK168_DATA.getBrandLabel(b, lang);
-    const m = String(o.label).match(/[（(]([0-9,]+)[）)]/);
-    const count = m ? m[1] : '';
-    const raw = String(o.label);
+    const raw = String(o.label ?? '');
     if (raw.includes('—') || raw.includes('–')) {
       const rja = raw.split(/[—–]/)[1]?.trim() || '';
-      if (count) return `${name} (${count}) — ${formatRegionSuffixFromJa(rja)}`;
+      if (rja) {
+        const head = stripMakerInventoryParenCounts(raw.split(/[—–]/)[0]?.trim() || raw);
+        const name = b
+          ? window.TK168_DATA.getBrandLabel(b, window.TK168I18N?.getLanguage?.() || 'ja')
+          : head;
+        return stripMakerInventoryParenCounts(`${name} — ${formatRegionSuffixFromJa(rja)}`);
+      }
     }
-    if (count) return `${name} (${count})`;
-    return name;
+    if (b) {
+      const lang = window.TK168I18N?.getLanguage?.() || 'ja';
+      return stripMakerInventoryParenCounts(window.TK168_DATA.getBrandLabel(b, lang));
+    }
+    return stripMakerInventoryParenCounts(raw);
   }
 
   function getMakerGroupTitle(g) {

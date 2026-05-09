@@ -6,10 +6,10 @@ import { createResource, insertInventoryStubIfMissing } from "./resource.js";
 
 const VEHICLE_COLUMNS = [
   "id", "brand_key", "name", "name_ja", "name_en", "grade", "year", "type", "icon",
-  "mileage", "engine", "displacement", "cylinders", "fuel", "trans",
+  "mileage", "mileage_unit", "engine", "displacement", "cylinders", "fuel", "trans",
   "total_price", "base_price",
   "body_style", "drive", "body_color", "interior_color", "seats",
-  "service_record", "origin",
+  "service_record",
   "overview_zh", "overview_ja", "overview_en",
   "benefits", "features",
   "cond_dealer_warranty",
@@ -42,6 +42,7 @@ const VEHICLE_FIELD_MAP = {
   type: "type",
   icon: "icon",
   mileage: "mileage",
+  mileageUnit: "mileage_unit",
   engine: "engine",
   displacement: "displacement",
   cylinders: "cylinders",
@@ -55,7 +56,6 @@ const VEHICLE_FIELD_MAP = {
   interiorColor: "interior_color",
   seats: "seats",
   serviceRecord: "service_record",
-  origin: "origin",
   overviewZh: "overview_zh",
   overviewJa: "overview_ja",
   overviewEn: "overview_en",
