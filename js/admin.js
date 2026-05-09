@@ -2272,6 +2272,104 @@ function renderEditor() {
   bindEditor();
 }
 
+/**
+ * 保存库存车/租赁车后从接口再读一行，确保表单与 D1 一致。
+ * 但增压字段做兜底：若 GET 回来为空、而本次 PUT 提交了非空值，则保留 PUT 值并提示，
+ * 避免「填了 T/2 → 保存 → 表单变空」这种 D1 列缺失/迁移未跑导致的回退。
+ */
+async function reloadInventoryEditorDraftFromApi(r, submittedPayload) {
+  if (r.key !== "vehicles" && r.key !== "rentals") return;
+  if (!state.editingId) return;
+  try {
+    const fr = await api(r.apiItem(state.editingId));
+    const it = fr[r.itemKey];
+    if (!it) return;
+    const imgs = it.images;
+    const prev = state.editingDraft?.images || [];
+
+    const submittedFiText = String(submittedPayload?.forcedInductionText ?? "").trim();
+    const submittedFiUnit = String(submittedPayload?.forcedInductionUnit ?? "").trim();
+    const apiFiText = String(it.forcedInductionText ?? it.forcedInductionZh ?? "").trim();
+    const apiFiUnit = String(it.forcedInductionUnit ?? "").trim();
+    const lostText = submittedFiText !== "" && apiFiText === "";
+    const lostUnit = submittedFiUnit !== "" && apiFiUnit === "";
+    try {
+      console.debug("[admin] GET forced_induction ←", {
+        text: apiFiText,
+        unit: apiFiUnit,
+        submittedText: submittedFiText,
+        submittedUnit: submittedFiUnit,
+      });
+    } catch {
+      /* noop */
+    }
+
+    const merged = { ...it };
+    if (lostText) {
+      merged.forcedInductionText = submittedFiText;
+      merged.forcedInductionZh = submittedFiText;
+    }
+    if (lostUnit) {
+      merged.forcedInductionUnit = submittedFiUnit;
+    }
+    if (lostText || lostUnit) {
+      showToast(
+        "增压字段未能持久化到数据库，已暂时保留输入值。请确认 D1 已执行 forced_induction 迁移。",
+        "error",
+      );
+    }
+
+    state.editingDraft = normalizeInventoryDraftForEngine({
+      ...merged,
+      images: Array.isArray(imgs) && imgs.length > 0 ? imgs : prev,
+    });
+  } catch {
+    /* 保持保存前草稿；刷新列表后用户可再试 */
+  }
+}
+
+/** 增压系统：保存时必须以当前 DOM 为准（草稿可能缺 key，JSON.stringify 会丢字段导致 Worker 不写库）。 */
+function readForcedInductionPairFromDom() {
+  const row = document.querySelector(".admin-forced-induction-row");
+  if (!row) return null;
+  const textEl = row.querySelector('[data-draft="forcedInductionText"]');
+  const unitEl = row.querySelector('[data-draft="forcedInductionUnit"]');
+  return {
+    text: textEl ? String(readDataDraftValueFromInput(textEl) ?? "").trim() : "",
+    unit: unitEl ? String(readDataDraftValueFromInput(unitEl) ?? "").trim() : "",
+  };
+}
+
+/** 首页车辆与レンタル车辆共用：与 `saveItem` 中增压处理一致（DOM 优先、zh 与 text 同值）。 */
+function attachForcedInductionToInventoryPayload(payload, draft) {
+  delete payload.forcedInductionJa;
+  delete payload.forcedInductionEn;
+  const domFi = readForcedInductionPairFromDom();
+  const fiText = domFi
+    ? domFi.text
+    : draft.forcedInductionText == null
+      ? ""
+      : String(draft.forcedInductionText).trim();
+  const fiUnit = domFi
+    ? domFi.unit
+    : draft.forcedInductionUnit == null
+      ? ""
+      : String(draft.forcedInductionUnit).trim();
+  // 显式写入 own property，避免 undefined 被 JSON.stringify 丢弃导致 Worker 不更新列
+  payload.forcedInductionText = fiText;
+  payload.forcedInductionZh = fiText;
+  payload.forcedInductionUnit = fiUnit;
+  try {
+    console.debug("[admin] PUT forced_induction →", {
+      text: fiText,
+      unit: fiUnit,
+      domHit: Boolean(domFi),
+    });
+  } catch {
+    /* noop */
+  }
+}
+
 /** 增压系统组合控件：保存前再从 DOM 取一遍，避免与其它 [data-draft] 遍历顺序或重绘边缘情况导致草稿未同步。 */
 function applyVehicleForcedInductionFromMountedRow() {
   const key = currentResource().key;
@@ -2710,6 +2808,7 @@ async function saveItem() {
   delete payload.images;
   if (r.key === "vehicles" || r.key === "rentals") {
     payload.engine = combinedEngineFromDraft(payload);
+    attachForcedInductionToInventoryPayload(payload, draft);
   }
   if (r.key === "vehicles") {
     if (Object.prototype.hasOwnProperty.call(payload, "totalPrice")) {
@@ -2718,17 +2817,6 @@ async function saveItem() {
     if (Object.prototype.hasOwnProperty.call(payload, "basePrice")) {
       payload.basePrice = formatInventoryPriceYenStyle(payload.basePrice);
     }
-  }
-  if (r.key === "vehicles" || r.key === "rentals") {
-    delete payload.forcedInductionJa;
-    delete payload.forcedInductionEn;
-    const fiText =
-      draft.forcedInductionText == null ? "" : String(draft.forcedInductionText).trim();
-    const fiUnit =
-      draft.forcedInductionUnit == null ? "" : String(draft.forcedInductionUnit).trim();
-    payload.forcedInductionText = fiText;
-    payload.forcedInductionZh = fiText;
-    payload.forcedInductionUnit = fiUnit;
   }
   if (r.key === "rentals") {
     if (Object.prototype.hasOwnProperty.call(payload, "dailyRate")) {
@@ -2754,31 +2842,33 @@ async function saveItem() {
         }
       }
       state.editingIsNew = false;
-      const nextDraft = {
-        ...state.editingDraft,
-        ...saved,
-        images: saved.images || state.editingDraft.images || [],
-      };
-      state.editingDraft =
-        r.key === "vehicles" || r.key === "rentals"
-          ? normalizeInventoryDraftForEngine(nextDraft)
-          : nextDraft;
+      if (r.key === "vehicles" || r.key === "rentals") {
+        await reloadInventoryEditorDraftFromApi(r, payload);
+      } else {
+        const nextDraft = {
+          ...state.editingDraft,
+          ...saved,
+          images: saved.images || state.editingDraft.images || [],
+        };
+        state.editingDraft = nextDraft;
+      }
       showToast("已创建");
     } else {
-      const res = await api(r.apiItem(state.editingId), {
-        method: "PUT",
-        body: payload,
-      });
-      const updated = res[r.itemKey];
-      const nextUp = {
-        ...state.editingDraft,
-        ...updated,
-        images: updated.images || state.editingDraft.images,
-      };
-      state.editingDraft =
-        r.key === "vehicles" || r.key === "rentals"
-          ? normalizeInventoryDraftForEngine(nextUp)
-          : nextUp;
+      if (r.key === "vehicles" || r.key === "rentals") {
+        await api(r.apiItem(state.editingId), { method: "PUT", body: payload });
+        await reloadInventoryEditorDraftFromApi(r, payload);
+      } else {
+        const res = await api(r.apiItem(state.editingId), {
+          method: "PUT",
+          body: payload,
+        });
+        const updated = res[r.itemKey];
+        state.editingDraft = {
+          ...state.editingDraft,
+          ...updated,
+          images: updated.images || state.editingDraft.images,
+        };
+      }
       showToast("已保存");
     }
     await refreshItems();
