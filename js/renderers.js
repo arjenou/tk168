@@ -20,7 +20,15 @@ window.TK168Renderers = (() => {
 
   function formatCardPriceMarkup(displayPrice = '') {
     const trimmed = String(displayPrice || '').trim();
-    const match = trimmed.match(/^([\d,.]+)\s*(万円|JPY|円|万元|元)$/);
+    let match = trimmed.match(/^JPY\s+([\d,.]+)$/i);
+    if (match) {
+      return `<span class="card-price-amount">${match[1]}</span><span class="card-price-unit">JPY</span>`;
+    }
+    match = trimmed.match(/^¥\s*([\d,.]+)$/);
+    if (match) {
+      return `<span class="card-price-amount">${match[1]}</span><span class="card-price-unit">JPY</span>`;
+    }
+    match = trimmed.match(/^([\d,.]+)\s*(万\s*JPY|万元|万円|JPY|円|元)$/);
     if (!match) return trimmed;
     const [, amount, unit] = match;
     return `<span class="card-price-amount">${amount}</span><span class="card-price-unit">${unit}</span>`;
@@ -229,6 +237,7 @@ window.TK168Renderers = (() => {
     };
 
     const variant = variants[variantKey] || variants.inventory;
+    const isRentalFleetCard = variantKey === 'rentalInventory';
     const totalPrice = getVehicleTotalPrice(vehicle);
     const basePrice = getVehicleBasePrice(vehicle);
     const language = window.TK168I18N?.getLanguage?.() || 'ja';
@@ -288,6 +297,8 @@ window.TK168Renderers = (() => {
     const brandUrl = window.TK168_DATA?.buildBrandUrl
       ? window.TK168_DATA.buildBrandUrl(vehicle.brandKey)
       : 'brand.html';
+    const primaryPriceLabel = isRentalFleetCard ? t('rental.priceDaily') : getPriceLabel('price.total');
+    const secondaryPriceLabel = isRentalFleetCard ? t('rental.priceDeposit') : getPriceLabel('price.base');
     const bodyMarkup = `
       <div class="${variant.header}">
         <div class="${brandWrapClass}">
@@ -309,11 +320,11 @@ window.TK168Renderers = (() => {
         </div>
         <div class="${variant.priceWrap}">
           <div class="${variant.priceRow}">
-            <span class="${variant.priceLabel}">${getPriceLabel('price.total')}</span>
+            <span class="${variant.priceLabel}">${primaryPriceLabel}</span>
             <span class="${variant.priceValue}">${formatCardPriceMarkup(totalPrice)}</span>
           </div>
           <div class="${variant.priceRow} is-sub">
-            <span class="${variant.priceSubLabel}">${getPriceLabel('price.base')}</span>
+            <span class="${variant.priceSubLabel}">${secondaryPriceLabel}</span>
             <span class="${variant.priceSubValue}">${formatCardPriceMarkup(basePrice)}</span>
           </div>
         </div>
@@ -325,8 +336,9 @@ window.TK168Renderers = (() => {
     return `<${variant.wrapperTag} class="${variant.wrapperClass}">${bodyMarkup}</${variant.wrapperTag}>`;
   }
 
-  function buildInventoryCardHTML(vehicle, detailUrl) {
-    return buildVehicleCardMarkup(vehicle, detailUrl, 'inventory');
+  function buildInventoryCardHTML(vehicle, detailUrl, options = {}) {
+    const variantKey = options.rentalFleet ? 'rentalInventory' : 'inventory';
+    return buildVehicleCardMarkup(vehicle, detailUrl, variantKey);
   }
 
   /**

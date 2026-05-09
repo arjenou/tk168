@@ -400,7 +400,8 @@ window.TK168_DATA = (() => {
   }
 
   function formatCatalogPrice(amount) {
-    return `¥ ${Number(amount || 0).toLocaleString('ja-JP', { useGrouping: true })}`;
+    const n = Number(amount || 0);
+    return `${n.toLocaleString('ja-JP', { useGrouping: true })} JPY`;
   }
 
   function resolveLibraryVehicleCategory(brandKey, modelSlug, modelName) {
@@ -515,8 +516,8 @@ window.TK168_DATA = (() => {
       cylinders: 'V8',
       fuel: '汽油',
       trans: 'AT',
-      totalPrice: '¥ 1,980,000',
-      basePrice: '¥ 1,860,000',
+      totalPrice: '1,980,000 JPY',
+      basePrice: '1,860,000 JPY',
       bodyStyle: 'SUV',
       drive: 'AWD',
       bodyColor: '曜石黑',
@@ -549,8 +550,8 @@ window.TK168_DATA = (() => {
       cylinders: 'V10',
       fuel: '汽油',
       trans: 'AT',
-      totalPrice: '¥ 1,600,000',
-      basePrice: '¥ 1,490,000',
+      totalPrice: '1,600,000 JPY',
+      basePrice: '1,490,000 JPY',
       bodyStyle: '跑车',
       drive: 'AWD',
       bodyColor: '曜石黑',
@@ -583,8 +584,8 @@ window.TK168_DATA = (() => {
       cylinders: 'V8',
       fuel: '汽油',
       trans: 'AT',
-      totalPrice: '¥ 1,750,000',
-      basePrice: '¥ 1,640,000',
+      totalPrice: '1,750,000 JPY',
+      basePrice: '1,640,000 JPY',
       bodyStyle: '跑车',
       drive: 'RWD',
       bodyColor: '竞技红',
@@ -617,8 +618,8 @@ window.TK168_DATA = (() => {
       cylinders: 'V8',
       fuel: '汽油',
       trans: 'AT',
-      totalPrice: '¥ 750,000',
-      basePrice: '¥ 698,000',
+      totalPrice: '750,000 JPY',
+      basePrice: '698,000 JPY',
       bodyStyle: 'SUV',
       drive: 'AWD',
       bodyColor: '矿石白',
@@ -651,8 +652,8 @@ window.TK168_DATA = (() => {
       cylinders: 'V8',
       fuel: '汽油',
       trans: 'AT',
-      totalPrice: '¥ 2,250,000',
-      basePrice: '¥ 2,120,000',
+      totalPrice: '2,250,000 JPY',
+      basePrice: '2,120,000 JPY',
       bodyStyle: '跑车',
       drive: 'RWD',
       bodyColor: '亮银灰',
@@ -685,8 +686,8 @@ window.TK168_DATA = (() => {
       cylinders: 'V12',
       fuel: '汽油',
       trans: 'AT',
-      totalPrice: '¥ 4,000,000',
-      basePrice: '¥ 3,780,000',
+      totalPrice: '4,000,000 JPY',
+      basePrice: '3,780,000 JPY',
       bodyStyle: '跑车',
       drive: 'AWD',
       bodyColor: '珍珠白',
@@ -719,8 +720,8 @@ window.TK168_DATA = (() => {
       cylinders: 'V10',
       fuel: '汽油',
       trans: 'AT',
-      totalPrice: '¥ 2,680,000',
-      basePrice: '¥ 2,520,000',
+      totalPrice: '2,680,000 JPY',
+      basePrice: '2,520,000 JPY',
       bodyStyle: '跑车',
       drive: 'AWD',
       bodyColor: '珍珠黄',
@@ -753,8 +754,8 @@ window.TK168_DATA = (() => {
       cylinders: 'V8',
       fuel: '汽油',
       trans: 'AT',
-      totalPrice: '¥ 2,280,000',
-      basePrice: '¥ 2,140,000',
+      totalPrice: '2,280,000 JPY',
+      basePrice: '2,140,000 JPY',
       bodyStyle: 'SUV',
       drive: 'AWD',
       bodyColor: '石墨灰',
@@ -787,8 +788,8 @@ window.TK168_DATA = (() => {
       cylinders: 'V10',
       fuel: '汽油',
       trans: 'AT',
-      totalPrice: '¥ 3,150,000',
-      basePrice: '¥ 2,960,000',
+      totalPrice: '3,150,000 JPY',
+      basePrice: '2,960,000 JPY',
       bodyStyle: '跑车',
       drive: 'RWD',
       bodyColor: '赛道灰',
@@ -821,8 +822,8 @@ window.TK168_DATA = (() => {
       cylinders: 'V10',
       fuel: '汽油',
       trans: 'AT',
-      totalPrice: '¥ 1,480,000',
-      basePrice: '¥ 1,360,000',
+      totalPrice: '1,480,000 JPY',
+      basePrice: '1,360,000 JPY',
       bodyStyle: '跑车',
       drive: 'AWD',
       bodyColor: '黑曜石',
@@ -855,8 +856,8 @@ window.TK168_DATA = (() => {
       cylinders: 'V12',
       fuel: 'HEV（混动）',
       trans: 'AT',
-      totalPrice: '¥ 8,800,000',
-      basePrice: '¥ 8,320,000',
+      totalPrice: '8,800,000 JPY',
+      basePrice: '8,320,000 JPY',
       bodyStyle: '跑车',
       drive: 'AWD',
       bodyColor: '金属绿',
@@ -889,8 +890,8 @@ window.TK168_DATA = (() => {
       cylinders: 'V8',
       fuel: '汽油',
       trans: 'AT',
-      totalPrice: '¥ 2,650,000',
-      basePrice: '¥ 2,490,000',
+      totalPrice: '2,650,000 JPY',
+      basePrice: '2,490,000 JPY',
       bodyStyle: 'SUV',
       drive: 'AWD',
       bodyColor: '哑光灰',
@@ -923,8 +924,8 @@ window.TK168_DATA = (() => {
       cylinders: 'V10',
       fuel: '汽油',
       trans: 'AT',
-      totalPrice: '¥ 2,100,000',
-      basePrice: '¥ 1,960,000',
+      totalPrice: '2,100,000 JPY',
+      basePrice: '1,960,000 JPY',
       bodyStyle: '跑车',
       drive: 'RWD',
       bodyColor: '珍珠白',
@@ -1259,10 +1260,10 @@ window.TK168_DATA = (() => {
   };
 
   const priceOptions = [
-    { value: 'under-100', label: '100万元以下', labelJa: '2,000万円以下', labelEn: 'Under JPY 20M', match: (amount) => amount < 1000000 },
-    { value: '100-200', label: '100-200万元', labelJa: '2,000万-4,000万円', labelEn: 'JPY 20M-40M', match: (amount) => amount >= 1000000 && amount < 2000000 },
-    { value: '200-300', label: '200-300万元', labelJa: '4,000万-6,000万円', labelEn: 'JPY 40M-60M', match: (amount) => amount >= 2000000 && amount < 3000000 },
-    { value: '300-plus', label: '300万元以上', labelJa: '6,000万円以上', labelEn: 'JPY 60M+', match: (amount) => amount >= 3000000 }
+    { value: 'under-100', label: '低于 JPY 20M', labelJa: 'JPY 20M 未満', labelEn: 'Under JPY 20M', match: (amount) => amount < 1000000 },
+    { value: '100-200', label: 'JPY 20M–40M', labelJa: 'JPY 20M〜40M', labelEn: 'JPY 20M–40M', match: (amount) => amount >= 1000000 && amount < 2000000 },
+    { value: '200-300', label: 'JPY 40M–60M', labelJa: 'JPY 40M〜60M', labelEn: 'JPY 40M–60M', match: (amount) => amount >= 2000000 && amount < 3000000 },
+    { value: '300-plus', label: 'JPY 60M 以上', labelJa: 'JPY 60M 以上', labelEn: 'JPY 60M+', match: (amount) => amount >= 3000000 }
   ];
 
   const yearOptions = [
@@ -1814,31 +1815,12 @@ window.TK168_DATA = (() => {
 
   function formatRmbPrice(amount) {
     const opts = { useGrouping: true };
-    if (amount >= 10000) {
-      const wan = amount / 10000;
-      const fractionDigits = Number.isInteger(wan) ? 0 : 1;
-      return `${wan.toLocaleString('zh-CN', {
-        ...opts,
-        minimumFractionDigits: fractionDigits,
-        maximumFractionDigits: 1
-      })}万元`;
-    }
-    return `${amount.toLocaleString('zh-CN', opts)}元`;
+    return `${Number(amount || 0).toLocaleString('zh-CN', opts)} JPY`;
   }
 
   function formatJpyPrice(amountRmb, numberLocale = 'ja-JP') {
     const amountJpy = amountRmb * RMB_TO_JPY_RATE;
-    const opts = { useGrouping: true };
-    if (amountJpy >= 10000) {
-      const man = amountJpy / 10000;
-      const fractionDigits = Number.isInteger(man) ? 0 : 1;
-      return `${man.toLocaleString(numberLocale, {
-        ...opts,
-        minimumFractionDigits: fractionDigits,
-        maximumFractionDigits: 1
-      })} JPY`;
-    }
-    return `${amountJpy.toLocaleString(numberLocale, opts)} JPY`;
+    return `${amountJpy.toLocaleString(numberLocale, { useGrouping: true })} JPY`;
   }
 
   function parseMileage(value) {
@@ -2473,7 +2455,7 @@ window.TK168_DATA = (() => {
     if (!flat || !flat.id) return null;
     const list = getApiRentals();
     if (list) {
-      const next = list.map((r) => (r && r.id === flat.id ? { ...r, ...flat } : r));
+      const next = list.map((r) => (r && r.id === flat.id ? { ...flat } : r));
       if (!next.some((r) => r && r.id === flat.id)) {
         next.push(flat);
       }
@@ -2525,7 +2507,26 @@ window.TK168_DATA = (() => {
 
   function isVehicleRentable(vehicle) {
     const profile = getVehicleRentalProfile(vehicle);
-    return profile.rentable && profile.rentalStatus === 'available';
+    const status = String(profile.rentalStatus || 'available').trim().toLowerCase();
+    return profile.rentable && status === 'available';
+  }
+
+  /** 后台租赁档期状态 → 前台排序与标签用标准 slug */
+  function normalizeRentalFleetStatus(status) {
+    const s = String(status || 'available').trim().toLowerCase();
+    if (s === 'available' || s === 'reserved' || s === 'rented' || s === 'unavailable') return s;
+    return 'unavailable';
+  }
+
+  /** 可租 → 已预订 → 出租中 → 不可租，同状态按 id 稳定排序 */
+  function sortRentalFleetRecordsByStatus(records) {
+    const rank = { available: 0, reserved: 1, rented: 2, unavailable: 3 };
+    return records.slice().sort((a, b) => {
+      const da = rank[normalizeRentalFleetStatus(a.rentalStatus)] ?? 99;
+      const db = rank[normalizeRentalFleetStatus(b.rentalStatus)] ?? 99;
+      if (da !== db) return da - db;
+      return String(a.id || '').localeCompare(String(b.id || ''));
+    });
   }
 
   // When the API has rentals, build the rental fleet directly from that
@@ -2546,6 +2547,7 @@ window.TK168_DATA = (() => {
       name: rental.name || rental.id,
       nameJa: rental.nameJa,
       nameEn: rental.nameEn,
+      grade: rental.grade || '',
       year: rental.year || '',
       type: rental.type || '',
       icon: rental.icon && String(rental.icon).trim() ? String(rental.icon).trim() : '',
@@ -2574,18 +2576,33 @@ window.TK168_DATA = (() => {
       staffMessage: rental.staffMessage,
       staffPhone: rental.staffPhone,
       staffPhoto: rental.staffPhoto,
+      rentalStatus: normalizeRentalFleetStatus(rental.rentalStatus),
     };
     return fallback;
   }
 
   function getRentableVehicles() {
     const apiRentals = getApiRentals();
+    const rentalApiIds = new Set();
+    const combined = [];
+
     if (apiRentals && apiRentals.length) {
-      return apiRentals
-        .filter((r) => (r.rentalStatus || 'available') === 'available')
-        .map(buildRentalVehicleRecord);
+      const fromApi = apiRentals.map(buildRentalVehicleRecord);
+      fromApi.forEach((v) => {
+        if (v && v.id) rentalApiIds.add(v.id);
+      });
+      combined.push(...fromApi);
     }
-    return vehicles.filter((vehicle) => isVehicleRentable(vehicle));
+
+    const fromInventory = vehicles
+      .filter((vehicle) => vehicle.id && !rentalApiIds.has(vehicle.id) && rentalProfiles[vehicle.id])
+      .map((vehicle) => ({
+        ...vehicle,
+        rentalStatus: normalizeRentalFleetStatus(getVehicleRentalProfile(vehicle).rentalStatus),
+      }));
+
+    combined.push(...fromInventory);
+    return sortRentalFleetRecordsByStatus(combined);
   }
 
   function getDisplayPrice(value, language = getCurrentLanguage()) {
@@ -2879,6 +2896,7 @@ window.TK168_DATA = (() => {
     getVehicleBasePriceDisplay,
     getVehicleRentalProfile,
     isVehicleRentable,
+    normalizeRentalFleetStatus,
     getRentableVehicles,
     getDisplayPrice,
     getNewsItems,

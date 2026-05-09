@@ -26,6 +26,24 @@ window.TK168PageChrome?.applyPageChrome({
 const detailShell = document.querySelector('.detail-shell');
 detailShell?.classList.add('detail-shell--hydrating');
 
+(function configureRentalDetailPriceChrome() {
+  if (!isRentalDetail) return;
+  detailShell?.classList.add('detail-shell--rental');
+  const priceRoot = document.querySelector('.detail-price');
+  if (!priceRoot) return;
+  const mainLabel = priceRoot.querySelector('.detail-price-main .detail-price-label');
+  const subLabel = priceRoot.querySelector('.detail-price-sub .detail-price-sub-label');
+  if (mainLabel) mainLabel.setAttribute('data-i18n', 'rental.priceDaily');
+  if (subLabel) subLabel.setAttribute('data-i18n', 'rental.priceDeposit');
+  priceRoot.querySelectorAll('.detail-price-tax').forEach((el) => {
+    el.setAttribute('hidden', '');
+  });
+  priceRoot.querySelectorAll('.detail-price-help').forEach((el) => {
+    el.setAttribute('hidden', '');
+  });
+  window.TK168I18N?.applyTranslations?.(priceRoot);
+})();
+
 const thumbGrid = document.getElementById('thumbGrid');
 const detailMainImage = document.getElementById('detailMainImage');
 const spinViewerModal = document.getElementById('spinViewerModal');
@@ -354,7 +372,15 @@ function applyDetailStaffCard() {
 
 function formatPriceMarkup(displayPrice = '') {
   const trimmed = String(displayPrice || '').trim();
-  const match = trimmed.match(/^([\d,.]+)\s*(万円|JPY|円|万元|元)$/);
+  let match = trimmed.match(/^JPY\s+([\d,.]+)$/i);
+  if (match) {
+    return `<span class="detail-price-amount">${match[1]}</span><span class="detail-price-unit">JPY</span>`;
+  }
+  match = trimmed.match(/^¥\s*([\d,.]+)$/);
+  if (match) {
+    return `<span class="detail-price-amount">${match[1]}</span><span class="detail-price-unit">JPY</span>`;
+  }
+  match = trimmed.match(/^([\d,.]+)\s*(万\s*JPY|万元|万円|JPY|円|元)$/);
   if (!match) return trimmed;
   const [, amount, unit] = match;
   return `<span class="detail-price-amount">${amount}</span><span class="detail-price-unit">${unit}</span>`;
@@ -536,9 +562,19 @@ function renderVehicleHeader() {
     detailTitleGrade.hidden = !gradeLine;
   }
 
+  if (isRentalDetail) {
+    const profile = window.TK168_DATA.getVehicleRentalProfile(currentVehicle);
+    detailTotalPriceValue.innerHTML = formatPriceMarkup(
+      window.TK168_DATA.getDisplayPrice(profile.dailyRate, language),
+    );
+    detailBasePriceValue.innerHTML = formatPriceMarkup(
+      window.TK168_DATA.getDisplayPrice(profile.deposit, language),
+    );
+  } else {
+    detailTotalPriceValue.innerHTML = formatPriceMarkup(window.TK168_DATA.getVehicleTotalPriceDisplay(currentVehicle));
+    detailBasePriceValue.innerHTML = formatPriceMarkup(window.TK168_DATA.getVehicleBasePriceDisplay(currentVehicle));
+  }
   const primaryImage = window.TK168_DATA.resolveVehicleMediaSource(currentVehicle.gallery?.[0] || currentVehicle.photo);
-  detailTotalPriceValue.innerHTML = formatPriceMarkup(window.TK168_DATA.getVehicleTotalPriceDisplay(currentVehicle));
-  detailBasePriceValue.innerHTML = formatPriceMarkup(window.TK168_DATA.getVehicleBasePriceDisplay(currentVehicle));
   setMainGalleryImage(primaryImage, `${vehicleName} ${window.TK168I18N?.t('gallery.main') || '主图'}`);
   if (detailBackToBrand && activeFilterCount > 0) {
     detailBackToBrand.textContent = window.TK168I18N?.t('detail.backToResults') || '返回筛选结果';
@@ -1133,6 +1169,51 @@ function syncFeaturedSlider() {
   updateFeaturedSliderNavState();
 }
 
+function applyCanonicalDetailUrl() {
+  if (!currentVehicle) return;
+  if (requestedVehicleId && currentVehicle.id !== requestedVehicleId) {
+    const urlFilters = isRentalDetail ? { ...currentFilters, from: 'rental' } : currentFilters;
+    window.history.replaceState(
+      {},
+      '',
+      window.TK168_DATA.buildDetailUrl(currentVehicle.id, urlFilters)
+    );
+  }
+}
+
+function renderDetailShellAll() {
+  if (!currentVehicle) return;
+  try {
+    applyCanonicalDetailUrl();
+    renderVehicleHeader();
+    renderGallery();
+    renderSpecs();
+    renderOverview();
+    renderBenefits();
+    applyDetailStaffCard();
+    syncLinks();
+    renderFeaturedCars();
+  } finally {
+    detailShell?.classList.remove('detail-shell--hydrating');
+  }
+}
+
+document.addEventListener('tk168:data-updated', (event) => {
+  if (
+    !isRentalDetail ||
+    !requestedVehicleId ||
+    String(requestedVehicleId).endsWith('-catalog')
+  ) {
+    return;
+  }
+  if (!event.detail?.rentals) return;
+  if (!window.TK168_DATA?.getRentalVehicleDetailById) return;
+  const refreshed = window.TK168_DATA.getRentalVehicleDetailById(requestedVehicleId);
+  if (!refreshed) return;
+  currentVehicle = refreshed;
+  renderDetailShellAll();
+});
+
 async function bootstrapDetailPage() {
   const tryLive =
     /^https?:$/.test(location.protocol) &&
@@ -1142,47 +1223,18 @@ async function bootstrapDetailPage() {
   const hasLocalMatch =
     Boolean(requestedVehicleId) && currentVehicle?.id === requestedVehicleId;
 
-  function applyCanonicalUrl() {
-    if (!currentVehicle) return;
-    if (requestedVehicleId && currentVehicle.id !== requestedVehicleId) {
-      const urlFilters = isRentalDetail ? { ...currentFilters, from: 'rental' } : currentFilters;
-      window.history.replaceState(
-        {},
-        '',
-        window.TK168_DATA.buildDetailUrl(currentVehicle.id, urlFilters)
-      );
-    }
-  }
-
-  function renderAll() {
-    if (!currentVehicle) return;
-    try {
-      applyCanonicalUrl();
-      renderVehicleHeader();
-      renderGallery();
-      renderSpecs();
-      renderOverview();
-      renderBenefits();
-      applyDetailStaffCard();
-      syncLinks();
-      renderFeaturedCars();
-    } finally {
-      detailShell?.classList.remove('detail-shell--hydrating');
-    }
-  }
-
   if (isRentalDetail) {
     if (tryLive) {
       const flat = await window.TK168ApiHydrate?.fetchPublishedRentalById?.(requestedVehicleId);
       const merged = flat && window.TK168_DATA.mergeApiRentalWithBase?.(flat);
       if (merged) {
         currentVehicle = merged;
-        renderAll();
+        renderDetailShellAll();
         return;
       }
     }
     if (hasLocalMatch) {
-      renderAll();
+      renderDetailShellAll();
     } else {
       detailShell?.classList.remove('detail-shell--hydrating');
     }
@@ -1190,7 +1242,7 @@ async function bootstrapDetailPage() {
   }
 
   if (hasLocalMatch) {
-    renderAll();
+    renderDetailShellAll();
   }
 
   if (tryLive) {
@@ -1198,12 +1250,12 @@ async function bootstrapDetailPage() {
     const merged = flat && window.TK168_DATA.mergeApiVehicleWithBase?.(flat);
     if (merged) {
       currentVehicle = merged;
-      renderAll();
+      renderDetailShellAll();
     } else if (!hasLocalMatch) {
-      renderAll();
+      renderDetailShellAll();
     }
   } else if (!hasLocalMatch) {
-    renderAll();
+    renderDetailShellAll();
   }
 }
 

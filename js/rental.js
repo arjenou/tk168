@@ -19,10 +19,14 @@ const RENTAL_COPY = {
     'overview.metric4.value': '短租 / 指定日程',
     'overview.note': '是否可租、具体价格和取车时间，以实际确认结果为准。',
     'fleet.kicker': 'RENTABLE STOCK',
-    'fleet.title': '当前可租车辆',
-    'fleet.subtitle': '先看目前可谈的车，具体档期和条款再人工确认。',
-    'fleet.empty': '当前暂无可立即租赁车辆，请先联系顾问确认最新状态。',
+    'fleet.title': '租赁车辆',
+    'fleet.subtitle': '按档期状态排序：可租 · 已预订 · 出租中 · 不可租。具体可否承租以人工确认为准。',
+    'fleet.empty': '暂无租赁车辆展示，请联系顾问了解最新情况。',
     'fleet.card.available': '可立即租',
+    'fleet.card.status.available': '可租',
+    'fleet.card.status.reserved': '已预订',
+    'fleet.card.status.rented': '出租中',
+    'fleet.card.status.unavailable': '不可租',
     'fleet.card.fuel': '油種',
     'fleet.card.mileage': '里程',
     'fleet.card.dailyRate': '日租金',
@@ -72,10 +76,14 @@ const RENTAL_COPY = {
     'overview.metric4.value': '短期 / 日程指定',
     'overview.note': '貸出可否、料金、受け取り時間は実際の確認結果を基準とします。',
     'fleet.kicker': 'RENTABLE STOCK',
-    'fleet.title': '現在相談できる車両',
-    'fleet.subtitle': 'まず候補車を見て、実際の日程と条件はその後に確認します。',
-    'fleet.empty': '現在すぐに貸し出せる車両はありません。スタッフへお問い合わせください。',
+    'fleet.title': 'レンタル車両',
+    'fleet.subtitle': 'ステータス順：貸出可 → 予約済み → レンタル中 → 貸出不可。実際の可否は確認後に決まります。',
+    'fleet.empty': '表示できるレンタル車両がありません。スタッフまでお問い合わせください。',
     'fleet.card.available': '即日相談可',
+    'fleet.card.status.available': '貸出可',
+    'fleet.card.status.reserved': '予約済み',
+    'fleet.card.status.rented': 'レンタル中',
+    'fleet.card.status.unavailable': '貸出不可',
     'fleet.card.fuel': '油種',
     'fleet.card.mileage': '走行距離',
     'fleet.card.dailyRate': '1日料金',
@@ -125,10 +133,14 @@ const RENTAL_COPY = {
     'overview.metric4.value': 'Short term / fixed dates',
     'overview.note': 'Availability, pricing, and pickup timing depend on actual confirmation.',
     'fleet.kicker': 'RENTABLE STOCK',
-    'fleet.title': 'Vehicles currently open for rental inquiry',
-    'fleet.subtitle': 'Review the vehicles first; exact dates and terms are confirmed afterward.',
-    'fleet.empty': 'No vehicles are immediately available for rental right now. Please contact an advisor for the latest status.',
+    'fleet.title': 'Rental fleet',
+    'fleet.subtitle': 'Sorted by status: available → reserved → on rent → unavailable. Final availability is confirmed manually.',
+    'fleet.empty': 'No rental vehicles to display. Please contact us for the latest availability.',
     'fleet.card.available': 'Available now',
+    'fleet.card.status.available': 'Available',
+    'fleet.card.status.reserved': 'Reserved',
+    'fleet.card.status.rented': 'On rent',
+    'fleet.card.status.unavailable': 'Unavailable',
     'fleet.card.fuel': 'Fuel',
     'fleet.card.mileage': 'Mileage',
     'fleet.card.dailyRate': 'Daily rate',
@@ -166,6 +178,7 @@ const {
   getVehicleFieldLabel,
   getVehicleRentalProfile,
   getRentableVehicles,
+  normalizeRentalFleetStatus,
   buildDetailUrl
 } = window.TK168_DATA;
 const { buildInventoryCardHTML, bindVehicleCardLikes } = window.TK168Renderers || {};
@@ -184,6 +197,12 @@ function copy(key, language = getLanguage()) {
   return RENTAL_COPY[language]?.[key] || RENTAL_COPY.ja[key] || RENTAL_COPY.zh[key] || key;
 }
 
+function fleetCardStatusLabel(language, vehicle) {
+  const st = normalizeRentalFleetStatus(getVehicleRentalProfile(vehicle).rentalStatus);
+  const text = copy(`fleet.card.status.${st}`, language);
+  return text || copy('fleet.card.status.unavailable', language);
+}
+
 function escapeHtml(value) {
   return String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -194,7 +213,7 @@ function escapeHtml(value) {
 }
 
 function formatMileage(value, language) {
-  const lang = language ?? window.TK168I18N?.getLanguage?.() || 'ja';
+  const lang = language ?? (window.TK168I18N?.getLanguage?.() || 'ja');
   const formatted = window.TK168_DATA?.formatVehicleMileageDisplay?.(value, lang);
   if (formatted) return formatted;
   const raw = String(value ?? '').trim();
@@ -272,10 +291,12 @@ function buildVehicleCardHtml(vehicle, language) {
     ? buildDetailUrl(vehicle.id, { from: 'rental' })
     : `detail.html?id=${encodeURIComponent(vehicle.id)}&from=rental`;
 
+  const statusSlug = normalizeRentalFleetStatus(getVehicleRentalProfile(vehicle).rentalStatus);
+
   if (typeof buildInventoryCardHTML === 'function') {
     return `
-      <article class="v-card rental-v-card" data-vehicle-id="${escapeHtml(vehicle.id)}" data-detail-url="${escapeHtml(detailUrl)}">
-        ${buildInventoryCardHTML(vehicle, detailUrl)}
+      <article class="v-card rental-v-card" data-vehicle-id="${escapeHtml(vehicle.id)}" data-rental-status="${escapeHtml(statusSlug)}" data-detail-url="${escapeHtml(detailUrl)}">
+        ${buildInventoryCardHTML(vehicle, detailUrl, { rentalFleet: true })}
       </article>
     `;
   }
@@ -287,14 +308,14 @@ function buildVehicleCardHtml(vehicle, language) {
   const inquiryHref = buildInquiryHref(vehicle);
 
   return `
-    <article class="rental-card">
+    <article class="rental-card" data-rental-status="${escapeHtml(statusSlug)}">
       <div class="rental-card-media">
         <img src="assets/images/${escapeHtml(vehicle.photo)}" alt="${escapeHtml(title)}">
       </div>
       <div class="rental-card-body">
         <div class="rental-card-head">
           <h3 class="rental-card-name">${escapeHtml(title)}</h3>
-          <p class="rental-card-meta">${escapeHtml(`${vehicle.year} · ${type} · ${copy('fleet.card.available', language)}`)}</p>
+          <p class="rental-card-meta">${escapeHtml(`${vehicle.year} · ${type} · ${fleetCardStatusLabel(language, vehicle)}`)}</p>
         </div>
         <div class="rental-card-facts">
           <div class="rental-fact">
@@ -315,6 +336,8 @@ function buildVehicleCardHtml(vehicle, language) {
 function hydrateRentalVehicleCard(card, vehicle, language) {
   if (!card || !card.classList.contains('v-card')) return;
   const profile = getVehicleRentalProfile(vehicle);
+  const statusSlug = normalizeRentalFleetStatus(profile.rentalStatus);
+  card.dataset.rentalStatus = statusSlug;
   const bodyLine = getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, language);
   const fuel = getVehicleFieldLabel('fuel', vehicle.fuel, language);
   const inquiryHref = buildInquiryHref(vehicle);
@@ -340,7 +363,7 @@ function hydrateRentalVehicleCard(card, vehicle, language) {
 
   const meta = card.querySelector('.v-card-meta');
   if (meta) {
-    meta.textContent = [vehicle.year, bodyLine, vehicle.grade, copy('fleet.card.available', language)].filter(Boolean).join(' · ');
+    meta.textContent = [vehicle.year, bodyLine, vehicle.grade, fleetCardStatusLabel(language, vehicle)].filter(Boolean).join(' · ');
   }
 
   const specSpans = Array.from(card.querySelectorAll('.v-spec span'));
@@ -509,7 +532,11 @@ function renderRentableVehicles(language = getLanguage()) {
 
   const cards = Array.from(grid.querySelectorAll('.v-card'));
   pagedVehicles.forEach((vehicle, index) => {
-    hydrateRentalVehicleCard(cards[index], vehicle, language);
+    try {
+      hydrateRentalVehicleCard(cards[index], vehicle, language);
+    } catch (err) {
+      console.error('[TK168 rental] fleet card hydrate failed', vehicle?.id, err);
+    }
   });
 
   cards.forEach((card, index) => {

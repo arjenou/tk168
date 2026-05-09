@@ -193,8 +193,8 @@ const RESOURCES = {
           { key: "mileage", label: "里程（万公里）", placeholder: "", span: 3, hint: "选填。存库为万公里量级约数（0.32≈3200km）；不必填精确公里数。可写「0.5万」或带小数点位数。" },
           { key: "fuel", label: "油種", type: "select", optionsCatalog: "fuel", span: 3 },
           { key: "trans", label: "变速箱", type: "select", optionsCatalog: "trans", span: 3 },
-          { key: "totalPrice", label: "支付总额", placeholder: "¥ 1,980,000", hint: "输入时自动按日式千分位排版（¥ 与逗号）。", span: 4 },
-          { key: "basePrice", label: "车辆本体价格", placeholder: "¥ 1,860,000", hint: "输入时自动按日式千分位排版。", span: 4 },
+          { key: "totalPrice", label: "支付总额", placeholder: "1,980,000 JPY", hint: "输入时自动按日式千分位排版（末尾 JPY）。", span: 4 },
+          { key: "basePrice", label: "车辆本体价格", placeholder: "1,860,000 JPY", hint: "输入时自动按日式千分位排版。", span: 4 },
         ],
       },
     ],
@@ -257,7 +257,7 @@ const RESOURCES = {
     homeDragSort: true,
     homeDragSortHint:
       "拖拽左侧手柄可调整租赁页（rental.html）车辆展示顺序（保存后立即生效）。搜索时会暂时隐藏手柄。",
-    priceColumn: { key: "dailyRate", label: "日租金(¥)" },
+    priceColumn: { key: "dailyRate", label: "日租金(JPY)" },
     extraColumns: [
       { key: "rentalStatus", label: "状态", render: (v) => statusLabel(v) },
     ],
@@ -335,18 +335,18 @@ const RESOURCES = {
           },
           {
             key: "dailyRate",
-            label: "日租金 (¥)",
+            label: "日租金 (JPY)",
             type: "text",
-            placeholder: "¥ 5,600",
-            hint: "输入时自动按日式千分位排版；提交为整数元。",
+            placeholder: "5,600 JPY",
+            hint: "输入时自动按日式千分位排版；提交为整数金额。",
             span: 4,
           },
           {
             key: "deposit",
-            label: "押金 (¥)",
+            label: "押金 (JPY)",
             type: "text",
-            placeholder: "¥ 120,000",
-            hint: "输入时自动按日式千分位排版；提交为整数元。",
+            placeholder: "120,000 JPY",
+            hint: "输入时自动按日式千分位排版；提交为整数金额。",
             span: 4,
           },
           { key: "minDays", label: "最短租期 (天)", type: "number", placeholder: "2", span: 4 },
@@ -431,18 +431,18 @@ function splitLegacyEngineCombined(engine) {
   return { displacement: t, cylinders: "" };
 }
 
-/** 与前台 parseCurrency 一致：只取整数金额（元） */
+/** 与前台 parseCurrency 一致：只取整数金额 */
 function parseInventoryPriceDigits(raw) {
   return Number(String(raw ?? "").replace(/[^\d]/g, "")) || 0;
 }
 
-/** 日式千分位：¥ 1,980,000（含 0 → ¥ 0） */
+/** 日式千分位：1,980,000 JPY（含 0 → 0 JPY） */
 function formatInventoryPriceYenStyle(raw) {
   const s = String(raw ?? "").trim();
   if (!s) return "";
   if (!/\d/.test(s)) return s;
   const n = parseInventoryPriceDigits(s);
-  return `¥ ${n.toLocaleString("ja-JP", { useGrouping: true })}`;
+  return `${n.toLocaleString("ja-JP", { useGrouping: true })} JPY`;
 }
 
 /** `pos` 左侧（不含 pos）共有几位数字 */

@@ -22,10 +22,25 @@
 
   // Default API host for the production site.  Pages can override by
   // setting `window.TK168_API_BASE` before loading this script.
-  const API_BASE = (typeof window.TK168_API_BASE === "string"
-    ? window.TK168_API_BASE
-    : "https://api.tk168.co.jp"
-  ).replace(/\/+$/, "");
+  // On tk168.co.jp the edge proxies `/api/*` to the Worker; same-origin
+  // fetch avoids browser quirks around cross-site requests and matches
+  // how `<img src="/api/media/…">` resolves on www.
+  function resolveApiBase() {
+    if (typeof window.TK168_API_BASE === "string") {
+      return window.TK168_API_BASE.replace(/\/+$/, "");
+    }
+    try {
+      const host = String(location.hostname || "").toLowerCase();
+      if (host === "tk168.co.jp" || host === "www.tk168.co.jp") {
+        return "";
+      }
+    } catch {
+      /* ignore */
+    }
+    return "https://api.tk168.co.jp";
+  }
+
+  const API_BASE = resolveApiBase();
 
   function readCache(storageKey, listKey) {
     try {
@@ -138,50 +153,59 @@
     return { vehicle: out, condition: cond, listing, highlight };
   }
 
+  /** Rentals: always emit every display field so merge/list refresh clears stale session cache (keepMeaningful omits null → spread-merge kept old copy). */
+  function adaptRentalImages(r) {
+    const urls =
+      Array.isArray(r.images) && r.images.length
+        ? r.images.map((img) => toAbsoluteMedia(img.url)).filter(Boolean)
+        : [];
+    return { gallery: urls, photo: urls[0] || "" };
+  }
+
   function adaptRental(r) {
-    const { gallery, photo } = adaptImages(r);
-    const raw = {
+    const { gallery, photo } = adaptRentalImages(r);
+    const str = (v) => (v == null ? "" : String(v).trim());
+    const jsonCol = (v) => (v == null ? null : v);
+
+    return {
       id: r.id,
-      brandKey: keepMeaningful(r.brandKey),
-      name: keepMeaningful(r.name),
-      nameJa: keepMeaningful(r.nameJa),
-      nameEn: keepMeaningful(r.nameEn),
-      grade: keepMeaningful(r.grade),
-      year: keepMeaningful(r.year),
-      type: keepMeaningful(r.type),
-      icon: keepMeaningful(r.icon),
+      brandKey: str(r.brandKey),
+      name: str(r.name),
+      nameJa: str(r.nameJa),
+      nameEn: str(r.nameEn),
+      grade: str(r.grade),
+      year: str(r.year),
+      type: str(r.type),
+      icon: str(r.icon),
       photo,
       gallery,
-      mileage: keepMeaningful(r.mileage),
-      engine: keepMeaningful(r.engine),
-      displacement: keepMeaningful(r.displacement),
-      cylinders: keepMeaningful(r.cylinders),
-      fuel: keepMeaningful(r.fuel),
-      trans: keepMeaningful(r.trans),
-      bodyStyle: keepMeaningful(r.bodyStyle),
-      drive: keepMeaningful(r.drive),
-      bodyColor: keepMeaningful(r.bodyColor),
-      interiorColor: keepMeaningful(r.interiorColor),
-      seats: keepMeaningful(r.seats),
-      origin: keepMeaningful(r.origin),
+      mileage: str(r.mileage),
+      engine: str(r.engine),
+      displacement: str(r.displacement),
+      cylinders: str(r.cylinders),
+      fuel: str(r.fuel),
+      trans: str(r.trans),
+      bodyStyle: str(r.bodyStyle),
+      drive: str(r.drive),
+      bodyColor: str(r.bodyColor),
+      interiorColor: str(r.interiorColor),
+      seats: str(r.seats),
+      origin: str(r.origin),
       dailyRate: Number(r.dailyRate) || 0,
       deposit: Number(r.deposit) || 0,
       minDays: Number(r.minDays) || 1,
       rentalStatus: r.rentalStatus || "available",
       rentable: true,
-      overview: keepMeaningful(r.overviewZh),
-      overviewZh: keepMeaningful(r.overviewZh),
-      overviewJa: keepMeaningful(r.overviewJa),
-      overviewEn: keepMeaningful(r.overviewEn),
-      benefits: keepMeaningful(r.benefits),
-      features: keepMeaningful(r.features),
-      staffPhoto: keepMeaningful(toAbsoluteMedia(r.staffPhotoUrl)),
-      staffMessage: keepMeaningful(r.staffMessage),
-      staffPhone: keepMeaningful(r.staffPhone),
+      overview: jsonCol(r.overviewZh),
+      overviewZh: jsonCol(r.overviewZh),
+      overviewJa: jsonCol(r.overviewJa),
+      overviewEn: jsonCol(r.overviewEn),
+      benefits: jsonCol(r.benefits),
+      features: jsonCol(r.features),
+      staffPhoto: r.staffPhotoUrl ? str(toAbsoluteMedia(r.staffPhotoUrl)) : "",
+      staffMessage: str(r.staffMessage),
+      staffPhone: str(r.staffPhone),
     };
-    const out = {};
-    for (const [k, val] of Object.entries(raw)) if (val !== undefined) out[k] = val;
-    return out;
   }
 
   function installVehicles(vehicles) {
