@@ -66,6 +66,7 @@ body.is-home-landing {
 .about-main > .about-section,
 .about-main .about-cta-panel,
 .service-main > .service-section,
+.home-contact,
 .site-footer .footer-inner {
   zoom: var(--ui-scale);
 }

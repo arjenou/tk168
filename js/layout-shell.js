@@ -31,7 +31,7 @@
             </div>
           </div>
 
-          <a href="inquiry.html" class="nav-cta" data-i18n="nav.contact">お問い合わせ</a>
+          <a href="contact.html" class="nav-cta" data-i18n="nav.contact">お問い合わせ</a>
           <div class="nav-mobile-menu"><span class="nav-mobile-lines" aria-hidden="true"></span></div>
         </div>
       </div>

@@ -12,6 +12,8 @@
        「自定义域」或 r2.dev 公开桶，再设: window.TK168_MEDIA_BASE = "https://你的公开根"; -->
   <link rel="stylesheet" href="css/style.css?v=20260508a">
   <link rel="stylesheet" href="css/home-cube.css?v=20260507f">
+  <link rel="stylesheet" href="css/inquiry.css?v=20260601f">
+  <link rel="stylesheet" href="css/contact.css?v=20260618b">
 </head>
 
 <body class="is-home-landing" data-i18n-page-title="page.landingTitle">
@@ -140,6 +142,283 @@
       <div class="news-grid" aria-live="polite"></div>
     </section>
 
+    <!-- ─ お問い合わせ（ホーム下部・フッター直上） ─ -->
+    <section id="home-contact" class="home-contact" data-contact-no-url-sync data-i18n-aria-label="contact.title">
+      <div class="home-contact__main">
+        <section class="inq-shell contact-shell">
+          <header class="inq-header">
+            <div class="inq-header-main">
+              <p class="inq-eyebrow" data-i18n="contact.eyebrow">TK168 CONTACT</p>
+              <h2 class="inq-title" data-i18n="contact.title">お問い合わせ</h2>
+              <p class="inq-subtitle" data-i18n="contact.subtitle">ご希望の内容を選択して、必要事項をご記入ください。担当アドバイザーから折り返しご連絡いたします。</p>
+            </div>
+          </header>
+
+          <div class="contact-tabs" role="tablist" aria-label="Contact category">
+            <button type="button" class="contact-tab is-active" role="tab" aria-selected="true" data-tab="sell-general">
+              <span class="contact-tab-eyebrow" data-i18n="contact.tabs.sellGeneralEyebrow">買いたい</span>
+              <span class="contact-tab-title" data-i18n="contact.tabs.sellGeneral">大まかな希望</span>
+            </button>
+            <button type="button" class="contact-tab" role="tab" aria-selected="false" data-tab="sell-specific">
+              <span class="contact-tab-eyebrow" data-i18n="contact.tabs.sellSpecificEyebrow">買いたい</span>
+              <span class="contact-tab-title" data-i18n="contact.tabs.sellSpecific">具体的な車種</span>
+            </button>
+            <button type="button" class="contact-tab" role="tab" aria-selected="false" data-tab="rental">
+              <span class="contact-tab-eyebrow" data-i18n="contact.tabs.rentalEyebrow">借りたい</span>
+              <span class="contact-tab-title" data-i18n="contact.tabs.rental">レンタル相談</span>
+            </button>
+          </div>
+
+          <!-- ========== Form 1: Sell — General ========== -->
+          <form class="contact-board is-active" data-form="sell-general" novalidate>
+            <p class="contact-lead" data-i18n="contact.sellGeneral.lead">どんな一台をお探しですか？大まかなご希望を教えてください。</p>
+
+            <div class="contact-grid">
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.bodyType">希望タイプ</span>
+                <select name="bodyType">
+                  <option value="" data-i18n="contact.option.selectPlaceholder">選択してください</option>
+                  <option value="sedan" data-i18n="contact.bodyType.sedan">セダン</option>
+                  <option value="suv" data-i18n="contact.bodyType.suv">SUV</option>
+                  <option value="coupe" data-i18n="contact.bodyType.coupe">クーペ / スポーツ</option>
+                  <option value="convertible" data-i18n="contact.bodyType.convertible">オープン / カブリオレ</option>
+                  <option value="wagon" data-i18n="contact.bodyType.wagon">ワゴン</option>
+                  <option value="minivan" data-i18n="contact.bodyType.minivan">ミニバン</option>
+                  <option value="kei" data-i18n="contact.bodyType.kei">軽自動車</option>
+                  <option value="other" data-i18n="contact.bodyType.other">その他 / 未定</option>
+                </select>
+              </label>
+
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.brand">希望ブランド</span>
+                <input type="text" name="brand" data-i18n-placeholder="contact.placeholder.brand" placeholder="例: Lamborghini / Porsche / 未定">
+              </label>
+
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.budget">予算</span>
+                <select name="budget">
+                  <option value="" data-i18n="contact.option.selectPlaceholder">選択してください</option>
+                  <option value="lt-3m" data-i18n="contact.budget.lt3m">300万円以下</option>
+                  <option value="3m-5m" data-i18n="contact.budget.3to5m">300万 - 500万円</option>
+                  <option value="5m-10m" data-i18n="contact.budget.5to10m">500万 - 1,000万円</option>
+                  <option value="10m-20m" data-i18n="contact.budget.10to20m">1,000万 - 2,000万円</option>
+                  <option value="20m-plus" data-i18n="contact.budget.20mPlus">2,000万円以上</option>
+                  <option value="undecided" data-i18n="contact.budget.undecided">相談したい</option>
+                </select>
+              </label>
+
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.condition">希望条件</span>
+                <input type="text" name="condition" data-i18n-placeholder="contact.placeholder.condition" placeholder="例: 修復歴なし / 低走行 / カラー指定 など">
+              </label>
+            </div>
+
+            <label class="contact-field contact-field--full">
+              <span class="contact-label" data-i18n="contact.field.note">ご要望（任意）</span>
+              <textarea name="note" rows="3" data-i18n-placeholder="contact.placeholder.noteSell" placeholder="納期希望、用途、その他のご要望などをご自由にお書きください。"></textarea>
+            </label>
+
+            <div class="contact-section-divider"></div>
+            <p class="contact-section-title" data-i18n="contact.section.contactInfo">お客様情報</p>
+
+            <div class="contact-grid">
+              <label class="contact-field">
+                <span class="contact-label">
+                  <span data-i18n="contact.field.email">メールアドレス</span>
+                  <b class="inq-required" data-i18n="contact.required">必須</b>
+                </span>
+                <input type="email" name="email" required data-i18n-placeholder="contact.placeholder.email" placeholder="name@example.com">
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.name">お名前（任意）</span>
+                <input type="text" name="name" data-i18n-placeholder="contact.placeholder.name" placeholder="山田 太郎">
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.phone">電話番号（任意）</span>
+                <input type="tel" name="phone" data-i18n-placeholder="contact.placeholder.phone" placeholder="09012345678">
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.preferredLanguage">希望言語</span>
+                <select name="lang">
+                  <option value="ja" data-i18n="contact.language.ja">日本語</option>
+                  <option value="zh" data-i18n="contact.language.zh">中文</option>
+                  <option value="en" data-i18n="contact.language.en">English</option>
+                </select>
+              </label>
+            </div>
+
+            <p class="contact-message" aria-live="polite" data-message></p>
+
+            <div class="contact-actions">
+              <button type="submit" class="inq-btn inq-btn--primary contact-submit" data-i18n="contact.submit">送信する</button>
+            </div>
+          </form>
+
+          <!-- ========== Form 2: Sell — Specific ========== -->
+          <form class="contact-board" data-form="sell-specific" novalidate>
+            <p class="contact-lead" data-i18n="contact.sellSpecific.lead">具体的なご希望車両があれば、車種・年式・走行距離などを教えてください。</p>
+
+            <div class="contact-grid">
+              <label class="contact-field">
+                <span class="contact-label">
+                  <span data-i18n="contact.field.model">希望車種</span>
+                  <b class="inq-required" data-i18n="contact.required">必須</b>
+                </span>
+                <input type="text" name="model" required data-i18n-placeholder="contact.placeholder.model" placeholder="例: Lamborghini Urus Performante">
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.year">年式</span>
+                <input type="text" name="year" data-i18n-placeholder="contact.placeholder.year" placeholder="例: 2020 - 2024">
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.mileage">走行距離</span>
+                <input type="text" name="mileage" data-i18n-placeholder="contact.placeholder.mileage" placeholder="例: 30,000 km 以下">
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.color">希望カラー</span>
+                <input type="text" name="color" data-i18n-placeholder="contact.placeholder.color" placeholder="例: ホワイト / ブラック / 指定なし">
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.transmission">トランスミッション</span>
+                <select name="transmission">
+                  <option value="" data-i18n="contact.option.noPreference">こだわらない</option>
+                  <option value="at" data-i18n="contact.transmission.at">AT</option>
+                  <option value="mt" data-i18n="contact.transmission.mt">MT</option>
+                  <option value="dct" data-i18n="contact.transmission.dct">DCT / セミAT</option>
+                </select>
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.budget">予算</span>
+                <input type="text" name="budget" data-i18n-placeholder="contact.placeholder.budgetSpecific" placeholder="例: 1,500万円前後">
+              </label>
+            </div>
+
+            <label class="contact-field contact-field--full">
+              <span class="contact-label" data-i18n="contact.field.note">ご要望（任意）</span>
+              <textarea name="note" rows="3" data-i18n-placeholder="contact.placeholder.noteSellSpecific" placeholder="グレード、オプション、修復歴の可否、納期希望など"></textarea>
+            </label>
+
+            <div class="contact-section-divider"></div>
+            <p class="contact-section-title" data-i18n="contact.section.contactInfo">お客様情報</p>
+
+            <div class="contact-grid">
+              <label class="contact-field">
+                <span class="contact-label">
+                  <span data-i18n="contact.field.email">メールアドレス</span>
+                  <b class="inq-required" data-i18n="contact.required">必須</b>
+                </span>
+                <input type="email" name="email" required data-i18n-placeholder="contact.placeholder.email" placeholder="name@example.com">
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.name">お名前（任意）</span>
+                <input type="text" name="name" data-i18n-placeholder="contact.placeholder.name" placeholder="山田 太郎">
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.phone">電話番号（任意）</span>
+                <input type="tel" name="phone" data-i18n-placeholder="contact.placeholder.phone" placeholder="09012345678">
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.preferredLanguage">希望言語</span>
+                <select name="lang">
+                  <option value="ja" data-i18n="contact.language.ja">日本語</option>
+                  <option value="zh" data-i18n="contact.language.zh">中文</option>
+                  <option value="en" data-i18n="contact.language.en">English</option>
+                </select>
+              </label>
+            </div>
+
+            <p class="contact-message" aria-live="polite" data-message></p>
+
+            <div class="contact-actions">
+              <button type="submit" class="inq-btn inq-btn--primary contact-submit" data-i18n="contact.submit">送信する</button>
+            </div>
+          </form>
+
+          <!-- ========== Form 3: Rental ========== -->
+          <form class="contact-board" data-form="rental" novalidate>
+            <p class="contact-lead" data-i18n="contact.rental.lead">どんな車をレンタルしたいですか？利用予定とあわせてお聞かせください。</p>
+
+            <div class="contact-grid">
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.rentalCar">借りたい車</span>
+                <input type="text" name="rentalCar" data-i18n-placeholder="contact.placeholder.rentalCar" placeholder="例: Lamborghini Urus / SUV / 高級セダン">
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.usage">主な用途</span>
+                <select name="usage">
+                  <option value="" data-i18n="contact.option.selectPlaceholder">選択してください</option>
+                  <option value="city" data-i18n="contact.usage.city">市内移動</option>
+                  <option value="business" data-i18n="contact.usage.business">商用 / 接待</option>
+                  <option value="trip" data-i18n="contact.usage.trip">近郊ドライブ</option>
+                  <option value="cross" data-i18n="contact.usage.cross">長距離 / 県外</option>
+                  <option value="shoot" data-i18n="contact.usage.shoot">撮影 / イベント</option>
+                  <option value="other" data-i18n="contact.usage.other">その他 / 相談</option>
+                </select>
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.rentalDate">利用希望日</span>
+                <input type="date" name="rentalDate">
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.rentalDays">利用日数</span>
+                <input type="number" name="rentalDays" min="1" step="1" data-i18n-placeholder="contact.placeholder.rentalDays" placeholder="例: 3">
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.pickup">受け取り希望地</span>
+                <input type="text" name="pickup" data-i18n-placeholder="contact.placeholder.pickup" placeholder="例: 東京 / 大阪 / さいたま">
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.budget">予算（1日）</span>
+                <input type="text" name="budget" data-i18n-placeholder="contact.placeholder.budgetRental" placeholder="例: 50,000円 / 日">
+              </label>
+            </div>
+
+            <label class="contact-field contact-field--full">
+              <span class="contact-label" data-i18n="contact.field.note">ご要望（任意）</span>
+              <textarea name="note" rows="3" data-i18n-placeholder="contact.placeholder.noteRental" placeholder="人数、ルート、その他のご要望などをご記入ください。"></textarea>
+            </label>
+
+            <div class="contact-section-divider"></div>
+            <p class="contact-section-title" data-i18n="contact.section.contactInfo">お客様情報</p>
+
+            <div class="contact-grid">
+              <label class="contact-field">
+                <span class="contact-label">
+                  <span data-i18n="contact.field.email">メールアドレス</span>
+                  <b class="inq-required" data-i18n="contact.required">必須</b>
+                </span>
+                <input type="email" name="email" required data-i18n-placeholder="contact.placeholder.email" placeholder="name@example.com">
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.name">お名前（任意）</span>
+                <input type="text" name="name" data-i18n-placeholder="contact.placeholder.name" placeholder="山田 太郎">
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.phone">電話番号（任意）</span>
+                <input type="tel" name="phone" data-i18n-placeholder="contact.placeholder.phone" placeholder="09012345678">
+              </label>
+              <label class="contact-field">
+                <span class="contact-label" data-i18n="contact.field.preferredLanguage">希望言語</span>
+                <select name="lang">
+                  <option value="ja" data-i18n="contact.language.ja">日本語</option>
+                  <option value="zh" data-i18n="contact.language.zh">中文</option>
+                  <option value="en" data-i18n="contact.language.en">English</option>
+                </select>
+              </label>
+            </div>
+
+            <p class="contact-message" aria-live="polite" data-message></p>
+
+            <div class="contact-actions">
+              <button type="submit" class="inq-btn inq-btn--primary contact-submit" data-i18n="contact.submit">送信する</button>
+            </div>
+          </form>
+
+          <p class="contact-foot" data-i18n="contact.foot">送信後、担当より 1 営業日以内にご返信いたします。お急ぎの方はお電話でも承ります。</p>
+        </section>
+      </div>
+    </section>
+
     <!-- ─ 尾页：Footer ─ -->
     <div data-layout-footer></div>
 
@@ -179,7 +458,8 @@
   <script src="js/admin-brand-key-options.js?v=20260425a"></script>
   <script src="js/brand-key-name-i18n.js?v=20260426a"></script>
   <script src="js/data.js?v=20260511g"></script>
-  <script src="js/i18n.js?v=20260510f"></script>
+  <script src="js/i18n.js?v=20260618a"></script>
+  <script src="js/contact.js?v=20260618b"></script>
   <script src="js/common-links.js?v=20260419a"></script>
   <script src="js/home-scroll-restore.js?v=20260425a"></script>
   <script src="js/page-chrome.js?v=20260601a"></script>

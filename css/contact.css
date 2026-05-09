@@ -1,0 +1,300 @@
+/* ================================================================
+   contact.css — お問い合わせ（買いたい・大まか / 買いたい・具体 / 借りたい）
+   inquiry.css のトーンを踏襲しつつ、タブ切替の単票フォームを構築。
+   ================================================================ */
+
+/* ─── ホーム（index）下部埋め込み：body.inquiry-page なしでも変数が効くよう定義 ─── */
+.home-contact {
+  --inq-accent: var(--cyan, #f2fa5a);
+  --inq-accent-strong: #dce84f;
+  --inq-accent-ink: #232708;
+  --inq-text: #171717;
+  --inq-muted: rgba(43, 41, 38, 0.6);
+  --inq-line: rgba(43, 41, 38, 0.1);
+  --inq-line-strong: rgba(43, 41, 38, 0.18);
+  --inq-soft: #ececee;
+  --inq-card: #f7f7f8;
+  --inq-white: #ffffff;
+  --inq-shadow-soft: 0 22px 62px rgba(15, 15, 15, 0.12), 0 3px 14px rgba(15, 15, 15, 0.08);
+  --inq-shadow-float: 0 16px 36px rgba(27, 25, 22, 0.12), 0 2px 10px rgba(27, 25, 22, 0.06);
+  --inq-shadow-accent: 0 12px 28px rgba(242, 250, 90, 0.22), 0 2px 8px rgba(242, 250, 90, 0.14);
+  position: relative;
+  z-index: 1;
+  background:
+    radial-gradient(1100px 600px at 72% 0%, rgba(242, 250, 90, 0.12), rgba(242, 250, 90, 0) 55%),
+    linear-gradient(180deg, #f5f5f7 0%, #eae9ed 100%);
+  border-top: 1px solid rgba(43, 41, 38, 0.06);
+}
+
+.home-contact__main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 64px var(--page-gutter-desktop, 48px) 56px;
+}
+
+@media (max-width: 680px) {
+  .home-contact__main {
+    padding: 48px var(--page-gutter-mobile, 20px) 40px;
+  }
+}
+
+.contact-shell {
+  padding: 18px 18px 22px;
+}
+
+.contact-shell .inq-header {
+  margin-bottom: 6px;
+}
+
+/* ────────── タブヘッダー ────────── */
+.contact-tabs {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 14px 0 0;
+}
+
+.contact-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 14px;
+  border: 1px solid rgba(40, 38, 35, 0.18);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #eef0f3 100%);
+  color: rgba(43, 41, 38, 0.7);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82), 0 4px 10px rgba(23, 23, 23, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.contact-tab:hover {
+  transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88), 0 8px 16px rgba(23, 23, 23, 0.1);
+}
+
+.contact-tab.is-active {
+  border-color: rgba(242, 250, 90, 0.92);
+  color: #1b210f;
+  background: linear-gradient(180deg, rgba(242, 250, 90, 0.62), rgba(242, 250, 90, 0.26));
+  box-shadow: 0 10px 18px rgba(242, 250, 90, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.contact-tab-eyebrow {
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  opacity: 0.7;
+}
+
+.contact-tab-title {
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
+/* ────────── フォームボード ────────── */
+.contact-board {
+  position: relative;
+  display: none;
+  margin-top: 14px;
+  padding: 18px 18px 16px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 248, 249, 0.96));
+  border: 1px solid rgba(255, 255, 255, 0.84);
+  box-shadow: var(--inq-shadow-float);
+  overflow: hidden;
+}
+
+.contact-board.is-active {
+  display: block;
+}
+
+.contact-board::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(242, 250, 90, 0.86), rgba(242, 250, 90, 0.34));
+}
+
+.contact-lead {
+  margin: 0 0 14px;
+  font-size: 16px;
+  font-weight: 900;
+  color: #1b1f0f;
+  line-height: 1.4;
+}
+
+/* ────────── 入力グリッド ────────── */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.contact-field {
+  display: grid;
+  gap: 5px;
+}
+
+.contact-field--full {
+  margin-top: 12px;
+}
+
+.contact-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #2a3040;
+  letter-spacing: 0.01em;
+}
+
+.contact-label .inq-required {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  border-radius: 999px;
+  padding: 2px 7px;
+  color: var(--inq-accent-ink, #232708);
+  background: linear-gradient(180deg, #f4fb77, #e3ee55);
+  white-space: nowrap;
+}
+
+.contact-board input[type='text'],
+.contact-board input[type='email'],
+.contact-board input[type='tel'],
+.contact-board input[type='number'],
+.contact-board input[type='date'],
+.contact-board select,
+.contact-board textarea {
+  width: 100%;
+  border: 1px solid rgba(43, 41, 38, 0.16);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 9px 10px;
+  font-size: 13px;
+  color: #1d2331;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-board textarea {
+  resize: vertical;
+  min-height: 72px;
+}
+
+.contact-board input:focus,
+.contact-board select:focus,
+.contact-board textarea:focus {
+  outline: none;
+  border-color: rgba(242, 250, 90, 0.86);
+  box-shadow: 0 0 0 3px rgba(242, 250, 90, 0.2);
+}
+
+.contact-board input.has-error,
+.contact-board select.has-error,
+.contact-board textarea.has-error {
+  border-color: rgba(198, 71, 47, 0.7);
+  box-shadow: 0 0 0 3px rgba(198, 71, 47, 0.14);
+}
+
+/* ────────── セクション区切り ────────── */
+.contact-section-divider {
+  margin: 18px 0 12px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(43, 41, 38, 0) 0%, rgba(43, 41, 38, 0.12) 30%, rgba(43, 41, 38, 0.12) 70%, rgba(43, 41, 38, 0) 100%);
+}
+
+.contact-section-title {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 900;
+  color: #1b1f0f;
+  letter-spacing: 0.04em;
+}
+
+/* ────────── メッセージ・送信 ────────── */
+.contact-message {
+  min-height: 22px;
+  margin: 14px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #c6472f;
+}
+
+.contact-message.is-success {
+  color: #2f7a2f;
+}
+
+.contact-actions {
+  margin-top: 6px;
+  display: flex;
+  justify-content: center;
+}
+
+.contact-submit {
+  min-width: 180px;
+}
+
+.contact-submit[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.contact-foot {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 11px;
+  color: rgba(43, 41, 38, 0.6);
+  line-height: 1.5;
+}
+
+/* ────────── レスポンシブ ────────── */
+@media (max-width: 760px) {
+  .contact-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-tab {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 48px;
+    padding: 10px 14px;
+  }
+
+  .contact-tab-title {
+    font-size: 13px;
+  }
+
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-board {
+    padding: 14px;
+  }
+
+  .contact-shell {
+    padding: 14px;
+  }
+
+  .contact-submit {
+    width: 100%;
+  }
+}
