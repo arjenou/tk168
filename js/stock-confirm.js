@@ -214,6 +214,24 @@
 
   const vehicleContext = createVehicleContext();
 
+  function navigateStockConfirmBack() {
+    try {
+      const ref = document.referrer || '';
+      if (ref.startsWith(window.location.origin) && window.history.length > 1) {
+        window.history.back();
+        return;
+      }
+    } catch {
+      /* ignore */
+    }
+    const id = vehicleContext.currentVehicle?.id;
+    if (id && typeof window.TK168_DATA?.buildDetailUrl === 'function') {
+      window.location.assign(window.TK168_DATA.buildDetailUrl(id));
+      return;
+    }
+    window.location.assign(vehicleContext.inventoryHref || 'brand.html');
+  }
+
   window.TK168CommonLinks?.applyCommonLinks();
   window.TK168PageChrome?.applyPageChrome({
     pageKey: 'inventory',
@@ -548,6 +566,7 @@
     renderVehicle();
     bindInputEvents();
     bindStepEvents();
+    document.getElementById('scBackNavBtn')?.addEventListener('click', navigateStockConfirmBack);
     render();
   }
 

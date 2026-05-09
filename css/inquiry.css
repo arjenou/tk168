@@ -85,7 +85,47 @@
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
-  gap: 16px;
+  gap: 14px;
+}
+
+.inq-header-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.inq-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0;
+  border: 1px solid rgba(43, 41, 38, 0.14);
+  border-radius: 12px;
+  background: linear-gradient(160deg, #ffffff 0%, #f1f2f4 100%);
+  color: rgba(23, 23, 23, 0.82);
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease;
+}
+
+.inq-back-btn:hover,
+.inq-back-btn:focus-visible {
+  outline: none;
+  border-color: rgba(242, 250, 90, 0.65);
+  background: linear-gradient(160deg, rgba(252, 253, 236, 1) 0%, rgba(242, 250, 90, 0.28) 100%);
+  color: #171717;
+}
+
+.inq-back-btn:active {
+  transform: scale(0.96);
+}
+
+.inq-back-icon {
+  width: 22px;
+  height: 22px;
+  color: inherit;
 }
 
 .inq-eyebrow {
@@ -506,5 +546,16 @@
 
   .inq-btn {
     width: 100%;
+  }
+
+  .inq-back-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+  }
+
+  .inq-back-icon {
+    width: 24px;
+    height: 24px;
   }
 }

@@ -65,6 +65,7 @@ const specTable = document.getElementById('specTable');
 const detailOverview = document.getElementById('detailOverview');
 const benefitBars = document.getElementById('benefitBars');
 const detailBackToBrand = document.getElementById('detailBackToBrand');
+const detailBackBtn = document.getElementById('detailBackBtn');
 const detailPhoneLink = document.getElementById('detailPhoneLink');
 const detailEmailLink = document.getElementById('detailEmailLink');
 const detailStoreVisitLink = document.getElementById('detailStoreVisitLink');
@@ -695,7 +696,9 @@ function renderGallery() {
 }
 
 function renderSpecs() {
-  specTable.innerHTML = window.TK168Renderers.buildDetailSpecsHTML(currentVehicle);
+  specTable.innerHTML = window.TK168Renderers.buildDetailSpecsHTML(currentVehicle, {
+    rentalDetail: isRentalDetail
+  });
 }
 
 function renderOverview() {
@@ -703,7 +706,9 @@ function renderOverview() {
 }
 
 function renderBenefits() {
-  benefitBars.innerHTML = window.TK168Renderers.buildDetailBenefitsHTML(currentVehicle);
+  benefitBars.innerHTML = window.TK168Renderers.buildDetailBenefitsHTML(currentVehicle, {
+    rentalDetail: isRentalDetail
+  });
 }
 
 function syncLinks() {
@@ -936,8 +941,37 @@ window.addEventListener('keydown', (event) => {
 window.addEventListener('resize', updateThumbRail);
 window.addEventListener('favorites:changed', syncDetailFavoriteButton);
 
+function navigateDetailBackLayer() {
+  try {
+    const ref = document.referrer || '';
+    if (ref.startsWith(window.location.origin) && window.history.length > 1) {
+      window.history.back();
+      return;
+    }
+  } catch {
+    /* ignore */
+  }
+  if (isRentalDetail) {
+    window.location.assign('rental.html');
+    return;
+  }
+  window.location.assign(inventoryHref || 'brand.html');
+}
+
+detailBackBtn?.addEventListener('click', navigateDetailBackLayer);
+
 function renderFeaturedCars() {
   if (!featuredGrid) return;
+
+  const featuredSection = featuredGrid.closest('.featured-section');
+
+  if (isRentalDetail) {
+    featuredSection?.setAttribute('hidden', '');
+    featuredGrid.innerHTML = '';
+    return;
+  }
+
+  featuredSection?.removeAttribute('hidden');
 
   const featuredCars = getVehiclesByBrand(currentVehicle.brandKey)
     .filter((vehicle) => vehicle.id !== currentVehicle.id)

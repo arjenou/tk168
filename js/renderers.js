@@ -434,7 +434,8 @@ window.TK168Renderers = (() => {
     return `${spinThumbMarkup}${imageThumbMarkup}`;
   }
 
-  function buildDetailSpecsHTML(vehicle) {
+  function buildDetailSpecsHTML(vehicle, options = {}) {
+    const rentalDetail = Boolean(options.rentalDetail);
     const language = window.TK168I18N?.getLanguage?.() || 'ja';
     const emptyValue = '-';
     const specLabels = language === 'en'
@@ -470,17 +471,36 @@ window.TK168Renderers = (() => {
             oneOwner: '一手车主'
           });
     /* 两列交错排版（与现有 .spec-table 样式一致）；已下线：禁煙車、正規輸入車、エコカー減税、レンタカーアップ、定期点検記録簿 */
+    /* 租赁 inventory 无 listing repairHistory / API 字段 → detail.html + from=rental 時不展示修復歴 */
+    const minDaysNum = Math.max(
+      1,
+      Number(vehicle.minDays) ||
+        Number(window.TK168_DATA?.getVehicleRentalProfile?.(vehicle)?.minDays) ||
+        1,
+    );
+    const minDaysDisplay =
+      language === 'en'
+        ? `${minDaysNum} day${minDaysNum === 1 ? '' : 's'}`
+        : language === 'ja'
+          ? `${minDaysNum}日`
+          : `${minDaysNum} 天`;
     const leftColumn = [
       [specLabels.year, formatRegistrationYear(vehicle.year) || `${vehicle.year}${language === 'en' ? '' : (language === 'ja' ? '年' : ' 年')}`],
       [specLabels.mileage, window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, language) || emptyValue],
-      [specLabels.repair, getVehicleListingField(vehicle, 'repairHistory') || emptyValue],
+      ...(rentalDetail ? [[t('rental.minDays'), minDaysDisplay]] : []),
+      ...(rentalDetail
+        ? []
+        : [[specLabels.repair, getVehicleListingField(vehicle, 'repairHistory') || emptyValue]]),
       [specLabels.inspection, getVehicleListingField(vehicle, 'vehicleInspection') || emptyValue],
       [specLabels.legalMaintenance, getVehicleListingField(vehicle, 'legalMaintenance') || emptyValue]
     ];
+    const fuelGradeSpecRow = rentalDetail
+      ? [t('rental.fuelType'), getVehicleFieldLabel('fuel', vehicle.fuel) || emptyValue]
+      : [specLabels.fuelGrade, getVehicleListingField(vehicle, 'fuelGrade') || emptyValue];
     const rightColumn = [
       [specLabels.dealerWarranty, getVehicleConditionField(vehicle, 'dealerWarranty') || emptyValue],
       [specLabels.oneOwner, getVehicleConditionField(vehicle, 'oneOwner') || emptyValue],
-      [specLabels.fuelGrade, getVehicleListingField(vehicle, 'fuelGrade') || emptyValue]
+      fuelGradeSpecRow
     ];
     const specs = [];
     for (let i = 0; i < leftColumn.length; i++) {
@@ -500,13 +520,21 @@ window.TK168Renderers = (() => {
     return getVehicleOverview(vehicle).map((paragraph) => `<p>${paragraph}</p>`).join('');
   }
 
-  function buildDetailBenefitsHTML(vehicle) {
+  function buildDetailBenefitsHTML(vehicle, options = {}) {
+    const rentalDetail = Boolean(options.rentalDetail);
     const language = window.TK168I18N?.getLanguage?.() || 'ja';
     const dash = '-';
+    const fuelRowLabel = rentalDetail
+      ? t('rental.fuelType')
+      : language === 'en'
+        ? 'Fuel type'
+        : language === 'ja'
+          ? '油種'
+          : '燃油类型';
     const basicSpecs = [
       [language === 'en' ? 'Body type' : (language === 'ja' ? 'ボディタイプ' : '车身类型'), getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle)],
       [language === 'en' ? 'Color' : (language === 'ja' ? '色' : '颜色'), getVehicleFieldLabel('bodyColor', vehicle.bodyColor)],
-      [language === 'en' ? 'Fuel type' : '油種', getVehicleFieldLabel('fuel', vehicle.fuel)],
+      [fuelRowLabel, getVehicleFieldLabel('fuel', vehicle.fuel)],
       [language === 'en' ? 'Transmission' : (language === 'ja' ? 'ミッション' : '变速箱'), getVehicleFieldLabel('trans', vehicle.trans)]
     ];
     const highlightSpecs = [

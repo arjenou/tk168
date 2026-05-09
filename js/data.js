@@ -1984,7 +1984,13 @@ window.TK168_DATA = (() => {
     if (field === 'bodyStyle') return getBodyStyleFieldLabel(value, language);
     const fieldCatalog = vehicleFieldTranslations[field] || {};
     const catalog = fieldCatalog[language] || fieldCatalog.ja || fieldCatalog.zh;
-    return catalog?.[value] || value;
+    let raw = String(value ?? '').trim();
+    if (field === 'fuel' && raw) {
+      const normalizedKey = raw.replace(/\(/g, '（').replace(/\)/g, '）');
+      const translated = catalog?.[normalizedKey] ?? catalog?.[raw];
+      return translated !== undefined && translated !== null && translated !== '' ? translated : raw;
+    }
+    return catalog?.[raw] ?? raw;
   }
 
   function formatEnglishWarranty(value) {
@@ -2577,6 +2583,7 @@ window.TK168_DATA = (() => {
       staffPhone: rental.staffPhone,
       staffPhoto: rental.staffPhoto,
       rentalStatus: normalizeRentalFleetStatus(rental.rentalStatus),
+      minDays: Number(rental.minDays) > 0 ? Number(rental.minDays) : 1,
     };
     return fallback;
   }
@@ -2599,6 +2606,7 @@ window.TK168_DATA = (() => {
       .map((vehicle) => ({
         ...vehicle,
         rentalStatus: normalizeRentalFleetStatus(getVehicleRentalProfile(vehicle).rentalStatus),
+        minDays: getVehicleRentalProfile(vehicle).minDays,
       }));
 
     combined.push(...fromInventory);
