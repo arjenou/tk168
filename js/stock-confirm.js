@@ -532,6 +532,15 @@
         if (target >= 0) moveStep(target);
       });
     });
+
+    refs.rows.forEach((row) => {
+      row.addEventListener('click', (event) => {
+        if (event.target.closest('.inq-editor')) return;
+        const rowKey = row.dataset.row || '';
+        const target = getSteps().findIndex((step) => step.key === rowKey);
+        if (target >= 0) moveStep(target);
+      });
+    });
   }
 
   function init() {

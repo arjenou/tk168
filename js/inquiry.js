@@ -563,6 +563,15 @@
         if (target >= 0) moveStep(target);
       });
     });
+
+    refs.rows.forEach((row) => {
+      row.addEventListener('click', (event) => {
+        if (event.target.closest('.inq-editor')) return;
+        const rowKey = row.dataset.row || '';
+        const target = STEP_KEYS.indexOf(rowKey);
+        if (target >= 0) moveStep(target);
+      });
+    });
   }
 
   function initDefaultDate() {
