@@ -113,7 +113,10 @@ baseVehicles.forEach((v, index) => {
   const highlight = vehicleHighlightPresets[v.id] || {};
 
   const insert = `INSERT INTO vehicles (
-    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, displacement, cylinders, fuel, trans,
+    id, brand_key, name, name_ja, name_en, year, type, icon, mileage, engine, displacement, cylinders,
+    forced_induction_text, forced_induction_unit,
+    forced_induction_zh, forced_induction_ja, forced_induction_en,
+    fuel, fuel_oil_type, trans,
     total_price, base_price, body_style, drive, body_color, interior_color,
     seats, service_record,
     overview_zh, overview_ja, overview_en, benefits, features,
@@ -125,7 +128,10 @@ baseVehicles.forEach((v, index) => {
     display_order, is_published
   ) VALUES (
     ${esc(v.id)}, ${esc(v.brandKey)}, ${esc(v.name)}, ${esc(v.nameJa)}, ${esc(v.nameEn)}, ${esc(v.year)}, ${esc(v.type)},
-    ${esc(v.icon)}, ${esc(v.mileage)}, ${esc(engineCombined(v))}, ${esc(v.displacement)}, ${esc(v.cylinders)}, ${esc(v.fuel)}, ${esc(v.trans)},
+    ${esc(v.icon)}, ${esc(v.mileage)}, ${esc(engineCombined(v))}, ${esc(v.displacement)}, ${esc(v.cylinders)},
+    ${esc(v.forcedInductionText)}, ${esc(v.forcedInductionUnit)},
+    NULL, NULL, NULL,
+    ${esc(v.fuel)}, ${esc(v.fuelOilType)}, ${esc(v.trans)},
     ${esc(v.totalPrice)}, ${esc(v.basePrice)}, ${esc(v.bodyStyle)}, ${esc(v.drive)},
     ${esc(v.bodyColor)}, ${esc(v.interiorColor)}, ${esc(v.seats)}, ${esc(v.serviceRecord)},
     ${escJson(v.overview)}, ${escJson(v.overviewJa)}, ${escJson(v.overviewEn || null)},

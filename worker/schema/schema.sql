@@ -25,7 +25,13 @@ CREATE TABLE IF NOT EXISTS vehicles (
   engine          TEXT,           -- legacy combined display; kept in sync with displacement + cylinders
   displacement    TEXT,
   cylinders       TEXT,
+  forced_induction_text TEXT,    -- 与 forced_induction_unit 组合前台展示（单语存库，日英后缀自动译）
+  forced_induction_unit TEXT,    -- T | S | other（其它）；空=仅展示正文（兼容旧数据）
+  forced_induction_zh TEXT,      -- 旧版多列文案；暂无 text 时 API/前台回退用（新数据写 text）
+  forced_induction_ja TEXT,
+  forced_induction_en TEXT,
   fuel            TEXT,
+  fuel_oil_type   TEXT,           -- 油種（泵/标号）：存库中文，前台译日英
   trans           TEXT,
   total_price     TEXT,
   base_price      TEXT,
@@ -97,6 +103,7 @@ CREATE TABLE IF NOT EXISTS rentals (
   displacement    TEXT,
   cylinders       TEXT,
   fuel            TEXT,
+  fuel_oil_type   TEXT,
   trans           TEXT,
   body_style      TEXT,
   drive           TEXT,

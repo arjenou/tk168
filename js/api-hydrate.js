@@ -78,6 +78,27 @@
     return value;
   }
 
+  /** 增压文案：优先新列，其次旧版 zh/ja/en 或 snake_case（与 Worker / 缓存条目不一时兜底）。 */
+  function pickForcedInductionText(v) {
+    if (!v || typeof v !== "object") return undefined;
+    const parts = [
+      v.forcedInductionText,
+      v.forced_induction_text,
+      v.forcedInductionZh,
+      v.forced_induction_zh,
+      v.forcedInductionJa,
+      v.forced_induction_ja,
+      v.forcedInductionEn,
+      v.forced_induction_en,
+    ];
+    for (const p of parts) {
+      if (p == null) continue;
+      const s = String(p).trim();
+      if (s !== "") return s;
+    }
+    return undefined;
+  }
+
   function adaptImages(v) {
     const gallery = Array.isArray(v.images) && v.images.length
       ? v.images.map((img) => toAbsoluteMedia(img.url)).filter(Boolean)
@@ -107,7 +128,10 @@
       engine: keepMeaningful(v.engine),
       displacement: keepMeaningful(v.displacement),
       cylinders: keepMeaningful(v.cylinders),
+      forcedInductionText: keepMeaningful(pickForcedInductionText(v)),
+      forcedInductionUnit: keepMeaningful(v.forcedInductionUnit ?? v.forced_induction_unit),
       fuel: keepMeaningful(v.fuel),
+      fuelOilType: keepMeaningful(v.fuelOilType),
       trans: keepMeaningful(v.trans),
       totalPrice: keepMeaningful(v.totalPrice),
       basePrice: keepMeaningful(v.basePrice),
@@ -185,6 +209,7 @@
       displacement: str(r.displacement),
       cylinders: str(r.cylinders),
       fuel: str(r.fuel),
+      fuelOilType: str(r.fuelOilType),
       trans: str(r.trans),
       bodyStyle: str(r.bodyStyle),
       drive: str(r.drive),

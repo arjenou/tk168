@@ -73,6 +73,7 @@ export function createResource({
     for (const [camel, snake] of Object.entries(fieldMap)) {
       if (!(camel in body)) continue;
       let value = body[camel];
+      if (value === undefined) continue;
       if (value === "") value = null;
       if (snake === "is_published") {
         value = value === true || value === 1 || value === "1" ? 1 : 0;

@@ -443,6 +443,7 @@ window.TK168_DATA = (() => {
       displacement: pickCatalogValue(preset.displacementOptions, seed + 2),
       cylinders: pickCatalogValue(preset.cylinderOptions, seed + 3),
       fuel: pickCatalogValue(preset.fuelOptions, seed + 4),
+      fuelOilType: '高辛烷汽油',
       trans: 'AT',
       totalPrice: formatCatalogPrice(totalAmount),
       basePrice: formatCatalogPrice(baseAmount),
@@ -496,6 +497,7 @@ window.TK168_DATA = (() => {
       displacement: '4.0L',
       cylinders: 'V8',
       fuel: '汽油',
+      fuelOilType: '高辛烷汽油',
       trans: 'AT',
       totalPrice: '1,980,000 JPY',
       basePrice: '1,860,000 JPY',
@@ -529,6 +531,7 @@ window.TK168_DATA = (() => {
       displacement: '5.2L',
       cylinders: 'V10',
       fuel: '汽油',
+      fuelOilType: '高辛烷汽油',
       trans: 'AT',
       totalPrice: '1,600,000 JPY',
       basePrice: '1,490,000 JPY',
@@ -562,6 +565,7 @@ window.TK168_DATA = (() => {
       displacement: '4.5L',
       cylinders: 'V8',
       fuel: '汽油',
+      fuelOilType: '高辛烷汽油',
       trans: 'AT',
       totalPrice: '1,750,000 JPY',
       basePrice: '1,640,000 JPY',
@@ -595,6 +599,7 @@ window.TK168_DATA = (() => {
       displacement: '4.4L',
       cylinders: 'V8',
       fuel: '汽油',
+      fuelOilType: '高辛烷汽油',
       trans: 'AT',
       totalPrice: '750,000 JPY',
       basePrice: '698,000 JPY',
@@ -628,6 +633,7 @@ window.TK168_DATA = (() => {
       displacement: '3.9L',
       cylinders: 'V8',
       fuel: '汽油',
+      fuelOilType: '高辛烷汽油',
       trans: 'AT',
       totalPrice: '2,250,000 JPY',
       basePrice: '2,120,000 JPY',
@@ -661,6 +667,7 @@ window.TK168_DATA = (() => {
       displacement: '6.5L',
       cylinders: 'V12',
       fuel: '汽油',
+      fuelOilType: '高辛烷汽油',
       trans: 'AT',
       totalPrice: '4,000,000 JPY',
       basePrice: '3,780,000 JPY',
@@ -694,6 +701,7 @@ window.TK168_DATA = (() => {
       displacement: '5.2L',
       cylinders: 'V10',
       fuel: '汽油',
+      fuelOilType: '高辛烷汽油',
       trans: 'AT',
       totalPrice: '2,680,000 JPY',
       basePrice: '2,520,000 JPY',
@@ -727,6 +735,7 @@ window.TK168_DATA = (() => {
       displacement: '4.0L',
       cylinders: 'V8',
       fuel: '汽油',
+      fuelOilType: '高辛烷汽油',
       trans: 'AT',
       totalPrice: '2,280,000 JPY',
       basePrice: '2,140,000 JPY',
@@ -760,6 +769,7 @@ window.TK168_DATA = (() => {
       displacement: '5.2L',
       cylinders: 'V10',
       fuel: '汽油',
+      fuelOilType: '高辛烷汽油',
       trans: 'AT',
       totalPrice: '3,150,000 JPY',
       basePrice: '2,960,000 JPY',
@@ -793,6 +803,7 @@ window.TK168_DATA = (() => {
       displacement: '5.0L',
       cylinders: 'V10',
       fuel: '汽油',
+      fuelOilType: '高辛烷汽油',
       trans: 'AT',
       totalPrice: '1,480,000 JPY',
       basePrice: '1,360,000 JPY',
@@ -826,6 +837,7 @@ window.TK168_DATA = (() => {
       displacement: '6.5L',
       cylinders: 'V12',
       fuel: 'HEV（混动）',
+      fuelOilType: '高辛烷汽油',
       trans: 'AT',
       totalPrice: '8,800,000 JPY',
       basePrice: '8,320,000 JPY',
@@ -859,6 +871,7 @@ window.TK168_DATA = (() => {
       displacement: '4.0L',
       cylinders: 'V8',
       fuel: '汽油',
+      fuelOilType: '高辛烷汽油',
       trans: 'AT',
       totalPrice: '2,650,000 JPY',
       basePrice: '2,490,000 JPY',
@@ -892,6 +905,7 @@ window.TK168_DATA = (() => {
       displacement: '5.2L',
       cylinders: 'V10',
       fuel: '汽油',
+      fuelOilType: '高辛烷汽油',
       trans: 'AT',
       totalPrice: '2,100,000 JPY',
       basePrice: '1,960,000 JPY',
@@ -1270,7 +1284,10 @@ window.TK168_DATA = (() => {
         纯电动: 'BEV（纯电动车）',
         增程式: 'EREV（增程式电动车）',
         Hybrid: 'HEV（混动）',
-        EV: 'BEV（纯电动车）'
+        EV: 'BEV（纯电动车）',
+        普通汽油: '汽油',
+        高辛烷汽油: '汽油',
+        电动: 'BEV（纯电动车）',
       },
       ja: {
         汽油: 'ガソリン',
@@ -1285,7 +1302,10 @@ window.TK168_DATA = (() => {
         纯电动: 'BEV（純電気）',
         增程式: 'EREV（レンジエクステンダー）',
         Hybrid: 'HEV（ハイブリッド）',
-        EV: 'BEV（純電気）'
+        EV: 'BEV（純電気）',
+        普通汽油: 'ガソリン',
+        高辛烷汽油: 'ガソリン',
+        电动: 'BEV（純電気）',
       },
       en: {
         汽油: 'Gasoline',
@@ -1300,8 +1320,31 @@ window.TK168_DATA = (() => {
         纯电动: 'BEV (battery electric)',
         增程式: 'EREV (extended-range EV)',
         Hybrid: 'HEV (hybrid)',
-        EV: 'BEV (battery electric)'
-      }
+        EV: 'BEV (battery electric)',
+        普通汽油: 'Gasoline',
+        高辛烷汽油: 'Gasoline',
+        电动: 'BEV (battery electric)',
+      },
+    },
+    fuelOilType: {
+      zh: {
+        普通汽油: '普通汽油',
+        高辛烷汽油: '高辛烷汽油',
+        柴油: '柴油',
+        电动: '电动',
+      },
+      ja: {
+        普通汽油: 'レギュラー',
+        高辛烷汽油: 'ハイオク',
+        柴油: '軽油',
+        电动: '電気',
+      },
+      en: {
+        普通汽油: 'Regular',
+        高辛烷汽油: 'Premium',
+        柴油: 'Diesel',
+        电动: 'Electric',
+      },
     },
     trans: {
       zh: {
@@ -1956,7 +1999,7 @@ window.TK168_DATA = (() => {
     const fieldCatalog = vehicleFieldTranslations[field] || {};
     const catalog = fieldCatalog[language] || fieldCatalog.ja || fieldCatalog.zh;
     let raw = String(value ?? '').trim();
-    if (field === 'fuel' && raw) {
+    if ((field === 'fuel' || field === 'fuelOilType') && raw) {
       const normalizedKey = raw.replace(/\(/g, '（').replace(/\)/g, '）');
       const translated = catalog?.[normalizedKey] ?? catalog?.[raw];
       return translated !== undefined && translated !== null && translated !== '' ? translated : raw;
@@ -2088,6 +2131,52 @@ window.TK168_DATA = (() => {
       const c = String(vehicle.cylinders || '').trim();
       if (c) return c;
       return splitLegacyEngineSpec(vehicle.engine).cylinders;
+    }
+    if (key === 'forcedInduction') {
+      let text = String(
+        vehicle.forcedInductionText || vehicle.forced_induction_text || '',
+      ).trim();
+      if (!text) {
+        text = String(
+          vehicle.forcedInductionZh ||
+            vehicle.forcedInductionJa ||
+            vehicle.forcedInductionEn ||
+            vehicle.forced_induction_zh ||
+            vehicle.forced_induction_ja ||
+            vehicle.forced_induction_en ||
+            '',
+        ).trim();
+      }
+      const uRaw = String(vehicle.forcedInductionUnit || '').trim();
+      const isOther = /^other$/i.test(uRaw) || uRaw === '其它';
+      const u = uRaw.toUpperCase();
+      let turboWord = '涡轮增压';
+      let scWord = '机械增压';
+      if (language === 'en') {
+        turboWord = 'turbocharged';
+        scWord = 'supercharged';
+      } else if (language === 'ja') {
+        turboWord = 'ターボ';
+        scWord = 'スーパーチャージャー';
+      }
+      if (!uRaw) {
+        if (!text) return '';
+        return text;
+      }
+      if (isOther) {
+        if (!text) return '';
+        return `${text} -`;
+      }
+      if (u === 'T') {
+        if (!text) return `T ${turboWord}`;
+        return `${text}T ${turboWord}`;
+      }
+      if (u === 'S') {
+        if (!text) return `S ${scWord}`;
+        return `${text}S ${scWord}`;
+      }
+      if (!text) return '';
+      return text;
     }
     if (key === 'drive') return getVehicleFieldLabel('drive', vehicle.drive, language);
     if (key === 'seats') return getVehicleFieldLabel('seats', vehicle.seats, language);
@@ -2534,6 +2623,7 @@ window.TK168_DATA = (() => {
       cylinders: mergedEngine.cylinders,
       engine: formatVehicleEngineLine(mergedEngine),
       fuel: rental.fuel || '',
+      fuelOilType: rental.fuelOilType || '',
       trans: rental.trans || '',
       bodyStyle: rental.bodyStyle || '',
       drive: rental.drive || '',
@@ -2718,8 +2808,14 @@ window.TK168_DATA = (() => {
           formatVehicleEngineLine(vehicle),
           vehicle.displacement,
           vehicle.cylinders,
+          vehicle.forcedInductionText,
+          vehicle.forcedInductionZh,
+          vehicle.forcedInductionJa,
+          vehicle.forcedInductionEn,
+          vehicle.forcedInductionUnit,
           vehicle.fuel,
           getVehicleFieldLabel('fuel', vehicle.fuel, 'ja'),
+          getVehicleFieldLabel('fuelOilType', vehicle.fuelOilType, 'ja'),
           vehicle.trans,
           getVehicleFieldLabel('trans', vehicle.trans, 'ja'),
           vehicle.bodyStyle,

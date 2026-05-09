@@ -196,8 +196,17 @@ const RESOURCES = {
             hint: "手动填写升数（小数点可为英文句号）；存库为如 4.0L，单位 L 固定。",
           },
           { key: "cylinders", label: "发动机缸数", type: "text", span: 3, placeholder: "如 V8、L6、水平对置4缸", hint: "手动填写缸数或气缸布局（如 V8）；可与排量分开维护。" },
+          {
+            key: "forcedInductionText",
+            label: "增压系统",
+            type: "forcedInductionCombo",
+            span: 4,
+            placeholder: "如 2.0、双涡轮增压",
+            hint: "前选 T / S / 其它，后填排量或说明。前台示例：T→「2.0T 涡轮增压」；S→「2.0S 机械增压」；其它→「2.0 -」。未选形式时仅展示正文（兼容旧数据）。日英界面后缀自动翻译。",
+          },
           { key: "mileage", label: "里程", type: "mileageWithUnit", span: 3, placeholder: "", hint: "选填。单位「万公里」填小数（如 0.32≈3200km）；单位「公里」填整数公里（可含千分位逗号）。前台按所选单位展示。" },
-          { key: "fuel", label: "油種", type: "select", optionsCatalog: "fuel", span: 3 },
+          { key: "fuel", label: "燃料", type: "select", optionsCatalog: "fuel", span: 3, hint: "动力类型（汽油/柴油/混动等七种），存库中文；前台日/英自动翻译。" },
+          { key: "fuelOilType", label: "油種", type: "select", optionsCatalog: "fuelOilType", span: 3, hint: "泵用标号：レギュラー/ハイオク/軽油/電気；存库中文值，前台多语言展示。" },
           { key: "trans", label: "变速箱", type: "select", optionsCatalog: "trans", span: 3 },
           { key: "totalPrice", label: "支付总额", placeholder: "1,980,000 JPY", hint: "输入时自动按日式千分位排版（末尾 JPY）。", span: 4 },
           { key: "basePrice", label: "车辆本体价格", placeholder: "1,860,000 JPY", hint: "输入时自动按日式千分位排版。", span: 4 },
@@ -216,13 +225,18 @@ const RESOURCES = {
       ["listingRepairHistory", "修复历", "select", YES_NO_DASH],
       ["listingVehicleInspection", "车检", "select", YES_NO_DASH],
       ["listingLegalMaintenance", "法定整备", "select", YES_NO_DASH],
-      ["listingFuelGrade", "油种", "select", FUEL_GRADE_OPTIONS],
+      ["listingFuelGrade", "挂牌油种", "select", FUEL_GRADE_OPTIONS],
       ["highlightSteering", "方向盘", "select", STEERING_OPTIONS],
       ["highlightChassisTail", "车台末尾号"],
     ],
     emptyDraft: () => ({
       id: "", brandKey: "", name: "", nameJa: "", nameEn: "", grade: "", year: "", type: "", icon: "",
-      mileage: "", mileageUnit: "wan", displacement: "", cylinders: "", fuel: "汽油", trans: "AT",
+      mileage: "", mileageUnit: "wan", displacement: "", cylinders: "",
+      forcedInductionUnit: "",
+      forcedInductionText: "",
+      fuel: "汽油",
+      fuelOilType: "高辛烷汽油",
+      trans: "AT",
       totalPrice: "", basePrice: "",
       bodyStyle: "", drive: "", bodyColor: "", interiorColor: "", seats: "",
       serviceRecord: "",
@@ -325,7 +339,8 @@ const RESOURCES = {
           },
           { key: "cylinders", label: "发动机缸数", type: "text", span: 3, placeholder: "如 V8、L6、水平对置4缸", hint: "手动填写缸数或气缸布局（如 V8）；可与排量分开维护。" },
           { key: "mileage", label: "里程", type: "mileageWithUnit", span: 3, placeholder: "", hint: "选填。单位「万公里」填小数（如 0.32≈3200km）；单位「公里」填整数公里（可含千分位逗号）。前台按所选单位展示。" },
-          { key: "fuel", label: "油種", type: "select", optionsCatalog: "fuel", span: 3 },
+          { key: "fuel", label: "燃料", type: "select", optionsCatalog: "fuel", span: 3, hint: "动力类型七种；存库中文。" },
+          { key: "fuelOilType", label: "油種", type: "select", optionsCatalog: "fuelOilType", span: 3, hint: "レギュラー・ハイオク・軽油・電気（存库中文）。" },
           { key: "trans", label: "变速箱", type: "select", optionsCatalog: "trans", span: 3 },
         ],
       },
@@ -368,7 +383,10 @@ const RESOURCES = {
     presets: [],
     emptyDraft: () => ({
       id: "", brandKey: "", name: "", nameJa: "", nameEn: "", grade: "", year: "", type: "", icon: "",
-      mileage: "", mileageUnit: "wan", displacement: "", cylinders: "", fuel: "汽油", trans: "AT",
+      mileage: "", mileageUnit: "wan", displacement: "", cylinders: "",
+      fuel: "汽油",
+      fuelOilType: "高辛烷汽油",
+      trans: "AT",
       bodyStyle: "", drive: "", bodyColor: "", interiorColor: "",
       seats: "2 座",
       dailyRate: "",
@@ -518,7 +536,31 @@ function normalizeInventoryDraftForEngine(draft) {
     displacement = sp.displacement;
     cylinders = sp.cylinders;
   }
-  const next = { ...draft, displacement, cylinders };
+  let forcedInductionText = String(draft.forcedInductionText ?? "").trim();
+  if (!forcedInductionText) {
+    forcedInductionText = String(
+      draft.forcedInductionZh ?? draft.forcedInductionJa ?? draft.forcedInductionEn ?? "",
+    ).trim();
+  }
+  let forcedInductionUnit = String(draft.forcedInductionUnit ?? "").trim();
+  const u = forcedInductionUnit.toUpperCase();
+  if (u === "T" || u === "S") {
+    forcedInductionUnit = u;
+  } else if (/^other$/i.test(forcedInductionUnit) || forcedInductionUnit === "其它") {
+    forcedInductionUnit = "other";
+  } else {
+    forcedInductionUnit = "";
+  }
+  const next = {
+    ...draft,
+    displacement,
+    cylinders,
+    forcedInductionText,
+    forcedInductionUnit,
+  };
+  delete next.forcedInductionZh;
+  delete next.forcedInductionJa;
+  delete next.forcedInductionEn;
   if (Object.prototype.hasOwnProperty.call(draft, "totalPrice")) {
     next.totalPrice = formatInventoryPriceYenStyle(draft.totalPrice);
   }
@@ -1514,6 +1556,28 @@ function renderEditorField(field, draft) {
       control = `<select class="admin-input" data-draft="${key}">${opts}</select>`;
     }
     }
+  } else if (field.type === "forcedInductionCombo") {
+    const uStored = String(draft.forcedInductionUnit ?? "").trim();
+    const uLow = uStored.toLowerCase();
+    const sel =
+      uLow === "other" || uStored === "其它"
+        ? "other"
+        : uStored.toUpperCase() === "S"
+          ? "S"
+          : uStored.toUpperCase() === "T"
+            ? "T"
+            : "";
+    const textVal = escapeAttr(String(draft.forcedInductionText ?? "").trim());
+    control = `
+    <div class="admin-forced-induction-row">
+      <select class="admin-input admin-forced-induction-row__unit" data-draft="forcedInductionUnit">
+        <option value=""${sel === "" ? " selected" : ""}>— 未选择 —</option>
+        <option value="T"${sel === "T" ? " selected" : ""}>T（涡轮）</option>
+        <option value="S"${sel === "S" ? " selected" : ""}>S（机械增压）</option>
+        <option value="other"${sel === "other" ? " selected" : ""}>其它</option>
+      </select>
+      <input class="admin-input admin-forced-induction-row__text" type="text" autocomplete="off" data-draft="forcedInductionText" value="${textVal}" placeholder="${escapeAttr(field.placeholder || "")}">
+    </div>`;
   } else if (field.type === "mileageWithUnit") {
     const mu = String(draft.mileageUnit ?? "wan").trim() || "wan";
     control = `
@@ -1543,7 +1607,9 @@ function renderEditorField(field, draft) {
       ? " admin-field--brand-key"
       : field.type === "mileageWithUnit"
         ? " admin-field--mileage-unit"
-        : "";
+        : field.type === "forcedInductionCombo"
+          ? " admin-field--forced-induction-combo"
+          : "";
   return `
     <div class="admin-field admin-col-${span}${wrapClass}">
       <label>${escapeHtml(field.label)}${requiredMark}</label>
@@ -2039,7 +2105,7 @@ function renderEditor() {
       </div>
       <div class="admin-toolbar">
         <span class="admin-badge ${draft.isPublished ? "is-on" : "is-off"}">${draft.isPublished ? "已发布" : "已下架"}</span>
-        <button class="admin-btn admin-btn-primary" id="saveEdit">保存</button>
+        <button type="button" class="admin-btn admin-btn-primary" id="saveEdit">保存</button>
       </div>
     </div>
 
@@ -2056,6 +2122,17 @@ function renderEditor() {
   ROOT.innerHTML = appShell(inner);
   bindShell();
   bindEditor();
+}
+
+/** 增压系统组合控件：保存前再从 DOM 取一遍，避免与其它 [data-draft] 遍历顺序或重绘边缘情况导致草稿未同步。 */
+function applyVehicleForcedInductionFromMountedRow() {
+  if (!state.editingDraft || currentResource().key !== "vehicles") return;
+  const row = document.querySelector(".admin-forced-induction-row");
+  if (!row) return;
+  const textEl = row.querySelector('[data-draft="forcedInductionText"]');
+  const unitEl = row.querySelector('[data-draft="forcedInductionUnit"]');
+  if (textEl) state.editingDraft.forcedInductionText = readDataDraftValueFromInput(textEl);
+  if (unitEl) state.editingDraft.forcedInductionUnit = readDataDraftValueFromInput(unitEl);
 }
 
 function readDataDraftValueFromInput(el) {
@@ -2462,6 +2539,7 @@ function bindEditor() {
 
 async function saveItem() {
   syncEditingDraftFromDom();
+  applyVehicleForcedInductionFromMountedRow();
   const r = currentResource();
   const draft = state.editingDraft;
   if (r.listKind === "journal") {
@@ -2491,6 +2569,15 @@ async function saveItem() {
     if (Object.prototype.hasOwnProperty.call(payload, "basePrice")) {
       payload.basePrice = formatInventoryPriceYenStyle(payload.basePrice);
     }
+    delete payload.forcedInductionJa;
+    delete payload.forcedInductionEn;
+    const fiText =
+      draft.forcedInductionText == null ? "" : String(draft.forcedInductionText).trim();
+    const fiUnit =
+      draft.forcedInductionUnit == null ? "" : String(draft.forcedInductionUnit).trim();
+    payload.forcedInductionText = fiText;
+    payload.forcedInductionZh = fiText;
+    payload.forcedInductionUnit = fiUnit;
   }
   if (r.key === "rentals") {
     if (Object.prototype.hasOwnProperty.call(payload, "dailyRate")) {

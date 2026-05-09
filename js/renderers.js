@@ -526,20 +526,20 @@ window.TK168Renderers = (() => {
     const dash = '-';
     const fuelRowLabel = rentalDetail
       ? t('rental.fuelType')
-      : language === 'en'
-        ? 'Fuel type'
-        : language === 'ja'
-          ? '油種'
-          : '燃油类型';
+      : (language === 'en' ? 'Fuel type' : '燃料');
+    const oilRowLabel =
+      language === 'en' ? 'Octane / fuel grade' : '油種';
     const basicSpecs = [
       [language === 'en' ? 'Body type' : (language === 'ja' ? 'ボディタイプ' : '车身类型'), getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle)],
       [language === 'en' ? 'Color' : (language === 'ja' ? '色' : '颜色'), getVehicleFieldLabel('bodyColor', vehicle.bodyColor)],
       [fuelRowLabel, getVehicleFieldLabel('fuel', vehicle.fuel)],
+      [oilRowLabel, getVehicleFieldLabel('fuelOilType', vehicle.fuelOilType)],
       [language === 'en' ? 'Transmission' : (language === 'ja' ? 'ミッション' : '变速箱'), getVehicleFieldLabel('trans', vehicle.trans)]
     ];
     const highlightSpecs = [
       [language === 'en' ? 'Displacement' : (language === 'ja' ? '排気量' : '排气量'), getVehicleHighlightField(vehicle, 'displacement')],
       [language === 'en' ? 'Cylinder layout' : (language === 'ja' ? 'シリンダー' : '发动机缸数'), getVehicleHighlightField(vehicle, 'cylinders')],
+      [language === 'en' ? 'Forced induction' : (language === 'ja' ? '過給' : '增压系统'), getVehicleHighlightField(vehicle, 'forcedInduction')],
       [language === 'en' ? 'Drive' : (language === 'ja' ? '駆動方式' : '驱动方式'), getVehicleHighlightField(vehicle, 'drive')],
       [language === 'en' ? 'Steering' : (language === 'ja' ? 'ハンドル' : '方向盘'), getVehicleHighlightField(vehicle, 'steering')],
       [language === 'en' ? 'Seats' : (language === 'ja' ? '乗車定員' : '乘车定员'), getVehicleHighlightField(vehicle, 'seats')],

@@ -6,7 +6,10 @@ import { createResource, insertInventoryStubIfMissing } from "./resource.js";
 
 const VEHICLE_COLUMNS = [
   "id", "brand_key", "name", "name_ja", "name_en", "grade", "year", "type", "icon",
-  "mileage", "mileage_unit", "engine", "displacement", "cylinders", "fuel", "trans",
+  "mileage", "mileage_unit", "engine", "displacement", "cylinders",
+  "forced_induction_text", "forced_induction_unit",
+  "forced_induction_zh", "forced_induction_ja", "forced_induction_en",
+  "fuel", "fuel_oil_type", "trans",
   "total_price", "base_price",
   "body_style", "drive", "body_color", "interior_color", "seats",
   "service_record",
@@ -46,7 +49,13 @@ const VEHICLE_FIELD_MAP = {
   engine: "engine",
   displacement: "displacement",
   cylinders: "cylinders",
+  forcedInductionText: "forced_induction_text",
+  forcedInductionUnit: "forced_induction_unit",
+  forcedInductionZh: "forced_induction_zh",
+  forcedInductionJa: "forced_induction_ja",
+  forcedInductionEn: "forced_induction_en",
   fuel: "fuel",
+  fuelOilType: "fuel_oil_type",
   trans: "trans",
   totalPrice: "total_price",
   basePrice: "base_price",
@@ -91,10 +100,34 @@ const vehicleResource = createResource({
   stubBeforeUpload: true,
 });
 
+/**
+ * 增压文案：`forced_induction_text` 与旧列 `forced_induction_zh` 同时写入同一字符串。
+ * 避免线上仍存在只认 `forcedInductionZh` 的旧 Worker / 旧数据路径时保存「成功」但库里为空。
+ */
+function coerceForcedInductionFieldsForWrite(body) {
+  if (!body || typeof body !== "object") return body;
+  const hasText = Object.prototype.hasOwnProperty.call(body, "forcedInductionText");
+  const hasZh = Object.prototype.hasOwnProperty.call(body, "forcedInductionZh");
+  if (!hasText && !hasZh) return body;
+  const rawT = hasText ? body.forcedInductionText : null;
+  const rawZ = hasZh ? body.forcedInductionZh : null;
+  const t =
+    rawT != null && String(rawT).trim() !== ""
+      ? String(rawT).trim()
+      : rawZ != null && String(rawZ).trim() !== ""
+        ? String(rawZ).trim()
+        : "";
+  return { ...body, forcedInductionText: t, forcedInductionZh: t };
+}
+
 export const listVehicles = vehicleResource.list;
 export const getVehicle = vehicleResource.get;
-export const createVehicle = vehicleResource.create;
-export const updateVehicle = vehicleResource.update;
+export async function createVehicle(env, body) {
+  return vehicleResource.create(env, coerceForcedInductionFieldsForWrite(body));
+}
+export async function updateVehicle(env, id, body) {
+  return vehicleResource.update(env, id, coerceForcedInductionFieldsForWrite(body));
+}
 export async function deleteVehicle(env, id) {
   const row = await env.DB.prepare("SELECT staff_photo_r2_key FROM vehicles WHERE id = ?")
     .bind(id)

@@ -43,6 +43,7 @@
     { value: "8 座及以上", label: "8 座及以上" }
   ];
 
+  /** 燃料（动力类型）存库中文；与油種 fuel_oil_type 分立 */
   const fuel = [
     { value: "汽油", label: "汽油" },
     { value: "柴油", label: "柴油" },
@@ -50,7 +51,15 @@
     { value: "PHEV（插电混动）", label: "PHEV（插电混动）" },
     { value: "BEV（纯电动车）", label: "BEV（纯电动车）" },
     { value: "EREV（增程式电动车）", label: "EREV（增程式电动车）" },
-    { value: "FCEV（氢燃料电池车）", label: "FCEV（氢燃料电池车）" }
+    { value: "FCEV（氢燃料电池车）", label: "FCEV（氢燃料电池车）" },
+  ];
+
+  /** 油種（泵用标号）存库中文；前台日：レギュラー/ハイオク/軽油/電気 */
+  const fuelOilType = [
+    { value: "普通汽油", label: "レギュラー（普通汽油）" },
+    { value: "高辛烷汽油", label: "ハイオク（高辛烷汽油）" },
+    { value: "柴油", label: "軽油（柴油）" },
+    { value: "电动", label: "電気（电动）" },
   ];
 
   const trans = [
@@ -123,6 +132,7 @@
     drive,
     seats,
     fuel,
+    fuelOilType,
     trans,
     displacement,
     bodyColor: vehicleColorPalette,
