@@ -7,7 +7,9 @@ import { createResource, insertInventoryStubIfMissing } from "./resource.js";
 
 const RENTAL_COLUMNS = [
   "id", "brand_key", "name", "name_ja", "name_en", "grade", "year", "type", "icon",
-  "mileage", "mileage_unit", "engine", "displacement", "cylinders", "fuel", "fuel_oil_type", "trans",
+  "mileage", "mileage_unit", "engine", "displacement", "cylinders",
+  "forced_induction_text", "forced_induction_unit", "forced_induction_zh", "forced_induction_ja", "forced_induction_en",
+  "fuel", "fuel_oil_type", "trans",
   "body_style", "drive", "body_color", "interior_color", "seats",
   "daily_rate", "deposit", "min_days", "rental_status",
   "overview_zh", "overview_ja", "overview_en",
@@ -38,6 +40,11 @@ const RENTAL_FIELD_MAP = {
   engine: "engine",
   displacement: "displacement",
   cylinders: "cylinders",
+  forcedInductionText: "forced_induction_text",
+  forcedInductionUnit: "forced_induction_unit",
+  forcedInductionZh: "forced_induction_zh",
+  forcedInductionJa: "forced_induction_ja",
+  forcedInductionEn: "forced_induction_en",
   fuel: "fuel",
   fuelOilType: "fuel_oil_type",
   trans: "trans",
@@ -78,10 +85,31 @@ const rentalResource = createResource({
   stubBeforeUpload: true,
 });
 
+/** 与 `vehicles` 相同：`forced_induction_text` 与 `forced_induction_zh` 同步写入。 */
+function coerceForcedInductionFieldsForWrite(body) {
+  if (!body || typeof body !== "object") return body;
+  const hasText = Object.prototype.hasOwnProperty.call(body, "forcedInductionText");
+  const hasZh = Object.prototype.hasOwnProperty.call(body, "forcedInductionZh");
+  if (!hasText && !hasZh) return body;
+  const rawT = hasText ? body.forcedInductionText : null;
+  const rawZ = hasZh ? body.forcedInductionZh : null;
+  const t =
+    rawT != null && String(rawT).trim() !== ""
+      ? String(rawT).trim()
+      : rawZ != null && String(rawZ).trim() !== ""
+        ? String(rawZ).trim()
+        : "";
+  return { ...body, forcedInductionText: t, forcedInductionZh: t };
+}
+
 export const listRentals = rentalResource.list;
 export const getRental = rentalResource.get;
-export const createRental = rentalResource.create;
-export const updateRental = rentalResource.update;
+export async function createRental(env, body) {
+  return rentalResource.create(env, coerceForcedInductionFieldsForWrite(body));
+}
+export async function updateRental(env, id, body) {
+  return rentalResource.update(env, id, coerceForcedInductionFieldsForWrite(body));
+}
 export const uploadRentalImage = rentalResource.uploadImage;
 export const deleteRentalImage = rentalResource.deleteImage;
 export const reorderRentalImages = rentalResource.reorderImages;

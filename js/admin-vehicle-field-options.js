@@ -51,7 +51,6 @@
     { value: "PHEV（插电混动）", label: "PHEV（插电混动）" },
     { value: "BEV（纯电动车）", label: "BEV（纯电动车）" },
     { value: "EREV（增程式电动车）", label: "EREV（增程式电动车）" },
-    { value: "FCEV（氢燃料电池车）", label: "FCEV（氢燃料电池车）" },
   ];
 
   /** 油種（泵用标号）存库中文；前台日：レギュラー/ハイオク/軽油/電気 */

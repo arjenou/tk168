@@ -201,7 +201,7 @@ const RESOURCES = {
             label: "增压系统",
             type: "forcedInductionCombo",
             span: 4,
-            placeholder: "如 2.0、双涡轮增压",
+            placeholder: "如 2.0",
             hint: "前选 T / S / 其它，后填排量或说明。前台示例：T→「2.0T 涡轮增压」；S→「2.0S 机械增压」；其它→「2.0 -」。未选形式时仅展示正文（兼容旧数据）。日英界面后缀自动翻译。",
           },
           { key: "mileage", label: "里程", type: "mileageWithUnit", span: 3, placeholder: "", hint: "选填。单位「万公里」填小数（如 0.32≈3200km）；单位「公里」填整数公里（可含千分位逗号）。前台按所选单位展示。" },
@@ -338,7 +338,14 @@ const RESOURCES = {
             hint: "手动填写升数（小数点可为英文句号）；存库为如 4.0L，单位 L 固定。",
           },
           { key: "cylinders", label: "发动机缸数", type: "text", span: 3, placeholder: "如 V8、L6、水平对置4缸", hint: "手动填写缸数或气缸布局（如 V8）；可与排量分开维护。" },
-          { key: "mileage", label: "里程", type: "mileageWithUnit", span: 3, placeholder: "", hint: "选填。单位「万公里」填小数（如 0.32≈3200km）；单位「公里」填整数公里（可含千分位逗号）。前台按所选单位展示。" },
+          {
+            key: "forcedInductionText",
+            label: "增压系统",
+            type: "forcedInductionCombo",
+            span: 4,
+            placeholder: "如 2.0",
+            hint: "前选 T / S / 其它，后填排量或说明。前台示例：T→「2.0T 涡轮增压」；S→「2.0S 机械增压」；其它→「2.0 -」。未选形式时仅展示正文（兼容旧数据）。日英界面后缀自动翻译。",
+          },
           { key: "fuel", label: "燃料", type: "select", optionsCatalog: "fuel", span: 3, hint: "动力类型七种；存库中文。" },
           { key: "fuelOilType", label: "油種", type: "select", optionsCatalog: "fuelOilType", span: 3, hint: "レギュラー・ハイオク・軽油・電気（存库中文）。" },
           { key: "trans", label: "变速箱", type: "select", optionsCatalog: "trans", span: 3 },
@@ -383,7 +390,9 @@ const RESOURCES = {
     presets: [],
     emptyDraft: () => ({
       id: "", brandKey: "", name: "", nameJa: "", nameEn: "", grade: "", year: "", type: "", icon: "",
-      mileage: "", mileageUnit: "wan", displacement: "", cylinders: "",
+      displacement: "", cylinders: "",
+      forcedInductionUnit: "",
+      forcedInductionText: "",
       fuel: "汽油",
       fuelOilType: "高辛烷汽油",
       trans: "AT",
@@ -709,17 +718,154 @@ function renderToasts() {
   container.appendChild(el);
 }
 
+// -------------------- Admin route (refresh survives) --------------------
+
+const ADMIN_ROUTE_KEY_PREFIX = "tk168:admin:route:";
+
+function adminRouteStorageKey(username) {
+  return `${ADMIN_ROUTE_KEY_PREFIX}${String(username || "").trim()}`;
+}
+
+function loadPersistedAdminRoute(user) {
+  const key = adminRouteStorageKey(user?.username);
+  if (!key || key === ADMIN_ROUTE_KEY_PREFIX) return null;
+  try {
+    const raw = sessionStorage.getItem(key);
+    if (!raw) return null;
+    const o = JSON.parse(raw);
+    return o && typeof o === "object" ? o : null;
+  } catch {
+    return null;
+  }
+}
+
+function persistAdminRoute() {
+  if (state._bootRestore || !state.user?.username) return;
+  const key = adminRouteStorageKey(state.user.username);
+  try {
+    sessionStorage.setItem(
+      key,
+      JSON.stringify({
+        view: state.view,
+        resource: state.resource,
+        editingId: state.editingId,
+        editorTab: state.editorTab,
+        editingIsNew: state.editingIsNew,
+        filter: state.filter,
+      }),
+    );
+  } catch {
+    /* ignore quota / private mode */
+  }
+}
+
+function clearPersistedAdminRoute(username) {
+  const key = adminRouteStorageKey(username);
+  try {
+    if (key && key !== ADMIN_ROUTE_KEY_PREFIX) sessionStorage.removeItem(key);
+  } catch {
+    /* ignore */
+  }
+}
+
+async function loadItemsIntoState() {
+  const r = currentResource();
+  state.loading = true;
+  try {
+    const res = await api(r.apiList);
+    state.items[r.key] = res[r.listKey] || [];
+  } catch (err) {
+    showToast(`载入${r.label}失败：${err.message}`, "error");
+  } finally {
+    state.loading = false;
+  }
+}
+
+async function loadUsersIntoState() {
+  try {
+    const res = await api("/admin/users");
+    state.users = res.users;
+  } catch (err) {
+    showToast(`载入用户失败：${err.message}`, "error");
+  }
+}
+
+async function hydrateEditorFromPersistedId(id, isNewGuess) {
+  const editId = id == null ? "" : String(id).trim();
+  if (!editId) {
+    state.view = "list";
+    state.editingId = null;
+    state.editingDraft = null;
+    state.editingIsNew = false;
+    clearPersistedAdminRoute(state.user?.username);
+    return;
+  }
+  const r = currentResource();
+  try {
+    const res = await api(r.apiItem(editId));
+    const item = res[r.itemKey];
+    if (!item) throw new Error("missing");
+    state.editingId = editId;
+    state.editingIsNew = Boolean(isNewGuess);
+    state.editingDraft = normalizeInventoryDraftForEngine({
+      ...item,
+      images: [...(item.images || [])],
+    });
+    state.editingImagePreviewId = null;
+    state.view = "editor";
+  } catch {
+    state.view = "list";
+    state.editingId = null;
+    state.editingDraft = null;
+    state.editingIsNew = false;
+    clearPersistedAdminRoute(state.user?.username);
+    showToast("无法恢复编辑页，已返回列表", "error");
+    await loadItemsIntoState();
+  }
+}
+
 // -------------------- Auth boot --------------------
 
 async function boot() {
+  state._bootRestore = true;
   try {
     const res = await api("/auth/me");
     state.user = res.user;
-    state.view = "list";
-    await refreshItems();
+    const saved = loadPersistedAdminRoute(state.user);
+    if (saved?.view === "users") {
+      state.view = "users";
+      state.resource = saved.resource && RESOURCES[saved.resource] ? saved.resource : "vehicles";
+      state.editorTab = "content";
+      state.editingId = null;
+      state.editingDraft = null;
+      state.editingIsNew = false;
+      state.filter = typeof saved.filter === "string" ? saved.filter : "";
+      await loadUsersIntoState();
+    } else if (saved?.view === "editor" && saved.editingId) {
+      state.resource = saved.resource && RESOURCES[saved.resource] ? saved.resource : "vehicles";
+      state.editorTab = saved.editorTab || "content";
+      state.filter = typeof saved.filter === "string" ? saved.filter : "";
+      state.editingId = null;
+      state.editingDraft = null;
+      state.editingIsNew = false;
+      state.view = "list";
+      await loadItemsIntoState();
+      await hydrateEditorFromPersistedId(saved.editingId, saved.editingIsNew);
+    } else {
+      state.view = "list";
+      state.resource = saved?.resource && RESOURCES[saved.resource] ? saved.resource : "vehicles";
+      state.editorTab = "content";
+      state.editingId = null;
+      state.editingDraft = null;
+      state.editingIsNew = false;
+      state.filter = typeof saved.filter === "string" ? saved.filter : "";
+      await loadItemsIntoState();
+    }
   } catch (err) {
     state.user = null;
     state.view = "login";
+  } finally {
+    state._bootRestore = false;
   }
   ensureHomeInventoryDragDelegate();
   render();
@@ -885,8 +1031,10 @@ function bindShell() {
     try {
       await api("/auth/logout", { method: "POST" });
     } catch {}
+    const u = state.user?.username;
     state.user = null;
     state.view = "login";
+    clearPersistedAdminRoute(u);
     render();
   });
 }
@@ -2126,7 +2274,8 @@ function renderEditor() {
 
 /** 增压系统组合控件：保存前再从 DOM 取一遍，避免与其它 [data-draft] 遍历顺序或重绘边缘情况导致草稿未同步。 */
 function applyVehicleForcedInductionFromMountedRow() {
-  if (!state.editingDraft || currentResource().key !== "vehicles") return;
+  const key = currentResource().key;
+  if (!state.editingDraft || (key !== "vehicles" && key !== "rentals")) return;
   const row = document.querySelector(".admin-forced-induction-row");
   if (!row) return;
   const textEl = row.querySelector('[data-draft="forcedInductionText"]');
@@ -2569,6 +2718,8 @@ async function saveItem() {
     if (Object.prototype.hasOwnProperty.call(payload, "basePrice")) {
       payload.basePrice = formatInventoryPriceYenStyle(payload.basePrice);
     }
+  }
+  if (r.key === "vehicles" || r.key === "rentals") {
     delete payload.forcedInductionJa;
     delete payload.forcedInductionEn;
     const fiText =
@@ -2753,10 +2904,18 @@ function renderUsers() {
 // -------------------- Render dispatcher --------------------
 
 function render() {
-  if (!state.user) return renderLogin();
-  if (state.view === "editor" && state.editingDraft) return renderEditor();
-  if (state.view === "users") return renderUsers();
-  return renderList();
+  if (!state.user) {
+    renderLogin();
+    return;
+  }
+  if (state.view === "editor" && state.editingDraft) {
+    renderEditor();
+  } else if (state.view === "users") {
+    renderUsers();
+  } else {
+    renderList();
+  }
+  persistAdminRoute();
 }
 
 // -------------------- Utils --------------------

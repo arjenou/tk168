@@ -28,6 +28,7 @@ const RENTAL_COPY = {
     'fleet.card.status.rented': '出租中',
     'fleet.card.status.unavailable': '不可租',
     'fleet.card.fuel': '燃料',
+    'fleet.card.powertrain': '排气 · 增压',
     'fleet.card.mileage': '里程',
     'fleet.card.dailyRate': '日租金',
     'fleet.card.deposit': '押金',
@@ -85,6 +86,7 @@ const RENTAL_COPY = {
     'fleet.card.status.rented': 'レンタル中',
     'fleet.card.status.unavailable': '貸出不可',
     'fleet.card.fuel': '燃料',
+    'fleet.card.powertrain': '排気・過給',
     'fleet.card.mileage': '走行距離',
     'fleet.card.dailyRate': '1日料金',
     'fleet.card.deposit': '保証金',
@@ -142,6 +144,7 @@ const RENTAL_COPY = {
     'fleet.card.status.rented': 'On rent',
     'fleet.card.status.unavailable': 'Unavailable',
     'fleet.card.fuel': 'Fuel',
+    'fleet.card.powertrain': 'Engine / boost',
     'fleet.card.mileage': 'Mileage',
     'fleet.card.dailyRate': 'Daily rate',
     'fleet.card.deposit': 'Deposit',
@@ -367,10 +370,14 @@ function hydrateRentalVehicleCard(card, vehicle, language) {
   }
 
   const specSpans = Array.from(card.querySelectorAll('.v-spec span'));
+  const powertrain =
+    (window.TK168_DATA?.formatVehicleEngineAndForcedInductionLine?.(vehicle, language)
+      || window.TK168_DATA?.formatVehicleEngineLine?.(vehicle)
+      || '').trim() || '—';
   const specRows = [
     { label: copy('fleet.card.mileage', language), value: formatMileage(vehicle.mileage, language, vehicle.mileageUnit) },
+    { label: copy('fleet.card.powertrain', language), value: powertrain },
     { label: copy('fleet.card.fuel', language), value: fuel },
-    { label: copy('fleet.card.dailyRate', language), value: formatRate(profile.dailyRate, language) },
     {
       label: copy('fleet.card.minDays', language),
       value: language === 'ja'

@@ -102,6 +102,11 @@ CREATE TABLE IF NOT EXISTS rentals (
   engine          TEXT,           -- legacy combined display; kept in sync with displacement + cylinders
   displacement    TEXT,
   cylinders       TEXT,
+  forced_induction_text TEXT,
+  forced_induction_unit TEXT,
+  forced_induction_zh TEXT,
+  forced_induction_ja TEXT,
+  forced_induction_en TEXT,
   fuel            TEXT,
   fuel_oil_type   TEXT,
   trans           TEXT,

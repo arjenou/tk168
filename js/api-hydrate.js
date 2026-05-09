@@ -190,6 +190,10 @@
     const { gallery, photo } = adaptRentalImages(r);
     const str = (v) => (v == null ? "" : String(v).trim());
     const jsonCol = (v) => (v == null ? null : v);
+    const fiPicked = pickForcedInductionText(r);
+    const forcedInductionText =
+      fiPicked != null && String(fiPicked).trim() !== "" ? String(fiPicked).trim() : "";
+    const forcedInductionUnit = str(r.forcedInductionUnit ?? r.forced_induction_unit);
 
     return {
       id: r.id,
@@ -208,6 +212,8 @@
       engine: str(r.engine),
       displacement: str(r.displacement),
       cylinders: str(r.cylinders),
+      forcedInductionText,
+      forcedInductionUnit,
       fuel: str(r.fuel),
       fuelOilType: str(r.fuelOilType),
       trans: str(r.trans),

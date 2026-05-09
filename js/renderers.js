@@ -273,9 +273,15 @@ window.TK168Renderers = (() => {
     const mileageDisplay =
       window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, language, vehicle.mileageUnit)
       || '';
+    const engineMetaValue = isRentalFleetCard
+      ? (window.TK168_DATA?.formatVehicleEngineAndForcedInductionLine?.(vehicle, language)
+        || window.TK168_DATA?.formatVehicleEngineLine?.(vehicle)
+        || vehicle.engine
+        || '-')
+      : (window.TK168_DATA?.formatVehicleEngineLine?.(vehicle) || vehicle.engine);
     const metaItems = [
       { key: 'mileage', icon: 'v1.svg', alt: 'Mileage', value: mileageDisplay || '-' },
-      { key: 'engine', icon: 'v2.svg', alt: 'Engine', value: window.TK168_DATA?.formatVehicleEngineLine?.(vehicle) || vehicle.engine },
+      { key: 'engine', icon: 'v2.svg', alt: 'Engine', value: engineMetaValue || '-' },
       { key: 'fuel', icon: 'v3.svg', alt: 'Fuel', value: getVehicleFieldLabel('fuel', vehicle.fuel) },
       { key: 'transmission', icon: 'v4.svg', alt: 'Transmission', value: getVehicleFieldLabel('trans', vehicle.trans) }
     ];

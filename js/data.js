@@ -369,6 +369,16 @@ window.TK168_DATA = (() => {
     return String(vehicle.engine || '').trim();
   }
 
+  function formatVehicleEngineAndForcedInductionLine(vehicle, language = getCurrentLanguage()) {
+    const base = formatVehicleEngineLine(vehicle);
+    const fi = getVehicleHighlightField(vehicle, 'forcedInduction', language);
+    const parts = [base, fi].map((s) => String(s || '').trim()).filter(Boolean);
+    if (!parts.length) return '';
+    if (parts.length === 1) return parts[0];
+    const sep = language === 'en' ? ', ' : ' · ';
+    return parts.join(sep);
+  }
+
   function normalizeVehicleEngineFields(vehicle) {
     if (!vehicle || typeof vehicle !== 'object') return vehicle;
     let d = String(vehicle.displacement ?? '').trim();
@@ -1278,7 +1288,6 @@ window.TK168_DATA = (() => {
         'PHEV（插电混动）': 'PHEV（插电混动）',
         'BEV（纯电动车）': 'BEV（纯电动车）',
         'EREV（增程式电动车）': 'EREV（增程式电动车）',
-        'FCEV（氢燃料电池车）': 'FCEV（氢燃料电池车）',
         油电混动: 'HEV（混动）',
         插电混动: 'PHEV（插电混动）',
         纯电动: 'BEV（纯电动车）',
@@ -1296,7 +1305,6 @@ window.TK168_DATA = (() => {
         'PHEV（插电混动）': 'PHEV（プラグイン）',
         'BEV（纯电动车）': 'BEV（純電気）',
         'EREV（增程式电动车）': 'EREV（レンジエクステンダー）',
-        'FCEV（氢燃料电池车）': 'FCEV（燃料電池）',
         油电混动: 'HEV（ハイブリッド）',
         插电混动: 'PHEV（プラグイン）',
         纯电动: 'BEV（純電気）',
@@ -1314,7 +1322,6 @@ window.TK168_DATA = (() => {
         'PHEV（插电混动）': 'PHEV (plug-in hybrid)',
         'BEV（纯电动车）': 'BEV (battery electric)',
         'EREV（增程式电动车）': 'EREV (extended-range EV)',
-        'FCEV（氢燃料电池车）': 'FCEV (fuel cell)',
         油电混动: 'HEV (hybrid)',
         插电混动: 'PHEV (plug-in hybrid)',
         纯电动: 'BEV (battery electric)',
@@ -2521,7 +2528,10 @@ window.TK168_DATA = (() => {
     if (!flat || !flat.id) return null;
     const list = getApiRentals();
     if (list) {
-      const next = list.map((r) => (r && r.id === flat.id ? { ...flat } : r));
+      const next = list.map((r) => {
+        if (!r || r.id !== flat.id) return r;
+        return { ...r, ...flat };
+      });
       if (!next.some((r) => r && r.id === flat.id)) {
         next.push(flat);
       }
@@ -2599,6 +2609,26 @@ window.TK168_DATA = (() => {
   // list so the rental page shows exactly what the admin manages under
   // the レンタル板块 — independent from the on-sale `vehicles` inventory.
   // Each rental is adapted into the shape vehicle cards expect.
+  function pickForcedInductionTextFromRecord(v) {
+    if (!v || typeof v !== 'object') return '';
+    const parts = [
+      v.forcedInductionText,
+      v.forced_induction_text,
+      v.forcedInductionZh,
+      v.forced_induction_zh,
+      v.forcedInductionJa,
+      v.forced_induction_ja,
+      v.forcedInductionEn,
+      v.forced_induction_en
+    ];
+    for (const p of parts) {
+      if (p == null) continue;
+      const s = String(p).trim();
+      if (s !== '') return s;
+    }
+    return '';
+  }
+
   function buildRentalVehicleRecord(rental) {
     const rawBrand = rental.brandKey || '';
     const brandKey = resolveCanonicalBrandKey(rawBrand) || rawBrand;
@@ -2622,6 +2652,11 @@ window.TK168_DATA = (() => {
       displacement: mergedEngine.displacement,
       cylinders: mergedEngine.cylinders,
       engine: formatVehicleEngineLine(mergedEngine),
+      forcedInductionText: pickForcedInductionTextFromRecord(rental),
+      forcedInductionUnit: String(rental.forcedInductionUnit ?? rental.forced_induction_unit ?? '').trim(),
+      forcedInductionZh: rental.forcedInductionZh ?? rental.forced_induction_zh,
+      forcedInductionJa: rental.forcedInductionJa ?? rental.forced_induction_ja,
+      forcedInductionEn: rental.forcedInductionEn ?? rental.forced_induction_en,
       fuel: rental.fuel || '',
       fuelOilType: rental.fuelOilType || '',
       trans: rental.trans || '',
@@ -2995,6 +3030,7 @@ window.TK168_DATA = (() => {
     mergeApiRentalWithBase,
     refreshVehiclesFromApiHydrate,
     refreshJournalFromApiHydrate,
-    formatVehicleEngineLine
+    formatVehicleEngineLine,
+    formatVehicleEngineAndForcedInductionLine
   };
 })();
