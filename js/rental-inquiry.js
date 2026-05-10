@@ -1,6 +1,7 @@
 ﻿(function () {
   const {
     getVehicleById,
+    getRentalVehicleDetailById,
     getVehicleName,
     getBrandLabel,
     getVehicleFieldLabel,
@@ -270,12 +271,60 @@
     return language === 'ja' ? `${days}日` : `${days}天`;
   }
 
-  function createVehicleContext() {
+  function resolveInquiryVehicle(requestedVehicleId) {
+    const id = String(requestedVehicleId || '').trim();
+    if (!id) return null;
+
+    const fleet = getRentableVehicles();
+    const fromFleet = fleet.find((v) => v && v.id === id);
+    if (fromFleet) return fromFleet;
+
+    const fromRentalApi = getRentalVehicleDetailById(id);
+    if (fromRentalApi) return fromRentalApi;
+
+    const fromInventory = getVehicleById(id);
+    if (fromInventory) return fromInventory;
+
+    return null;
+  }
+
+  const RIQ_STASH_KEY = 'tk168:rentalInquiryVehicleId';
+
+  function getRequestedVehicleId() {
     const params = new URLSearchParams(window.location.search);
-    const requestedVehicleId = params.get('id') || '';
-    const currentVehicle = getVehicleById(requestedVehicleId) || getRentableVehicles()[0] || null;
+    let id = (params.get('id') || '').trim();
+    if (!id) {
+      try {
+        id = (sessionStorage.getItem(RIQ_STASH_KEY) || '').trim();
+      } catch (_) {
+        id = '';
+      }
+      if (id) {
+        try {
+          sessionStorage.removeItem(RIQ_STASH_KEY);
+        } catch (_) {
+          /* ignore */
+        }
+        try {
+          const u = new URL(window.location.href);
+          if (!u.searchParams.get('id')) {
+            u.searchParams.set('id', id);
+            history.replaceState({}, '', u);
+          }
+        } catch (_) {
+          /* ignore */
+        }
+      }
+    }
+    return id;
+  }
+
+  function createVehicleContext() {
+    const requestedVehicleId = getRequestedVehicleId();
+    const currentVehicle = requestedVehicleId ? resolveInquiryVehicle(requestedVehicleId) : null;
     const inventoryHref = currentVehicle?.brandKey ? buildBrandUrl(currentVehicle.brandKey) : 'rental.html';
     return {
+      requestedVehicleId,
       currentVehicle,
       inventoryHref
     };
@@ -763,6 +812,24 @@
     applyLanguageCopy();
     syncStateFromInputs();
     render();
+  });
+
+  function refreshVehicleFromHydrate() {
+    const id = vehicleContext.requestedVehicleId || getRequestedVehicleId();
+    const next = resolveInquiryVehicle(id);
+    if (!next) return;
+    const prev = vehicleContext.currentVehicle;
+    if (prev && next.id === prev.id && prev.name === next.name) return;
+    vehicleContext.currentVehicle = next;
+    vehicleContext.inventoryHref = next.brandKey ? buildBrandUrl(next.brandKey) : 'rental.html';
+    renderVehicleCard();
+    render();
+  }
+
+  document.addEventListener('tk168:data-updated', (event) => {
+    const detail = event?.detail || {};
+    if (!detail.rentals && !detail.vehicles) return;
+    refreshVehicleFromHydrate();
   });
 
   if (document.readyState === 'loading') {

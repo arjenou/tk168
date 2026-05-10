@@ -2,6 +2,7 @@
   const {
     vehicles,
     getVehicleById,
+    getInventoryVehicleById,
     getVehicleName,
     getBrandLabel,
     getVehicleFieldLabel,
@@ -186,8 +187,10 @@
 
   function createVehicleContext() {
     const params = new URLSearchParams(window.location.search);
-    const requestedVehicleId = params.get('id') || vehicles[0]?.id || '';
-    const currentVehicle = getVehicleById(requestedVehicleId) || vehicles[0] || null;
+    const requestedId = (params.get('id') || '').trim();
+    const currentVehicle = requestedId
+      ? (getInventoryVehicleById(requestedId) || null)
+      : (vehicles[0] || null);
     const inventoryHref = currentVehicle?.brandKey ? buildBrandUrl(currentVehicle.brandKey) : 'brand.html';
     return {
       currentVehicle,

@@ -185,6 +185,36 @@ const {
   buildDetailUrl
 } = window.TK168_DATA;
 const { buildInventoryCardHTML, bindVehicleCardLikes } = window.TK168Renderers || {};
+
+/** Fallback when query string is dropped during navigation (static server / transitions). Matched in rental-inquiry.js */
+const RENTAL_INQUIRY_ID_KEY = 'tk168:rentalInquiryVehicleId';
+
+function stashRentalInquiryVehicleIdFromAnchor(anchor) {
+  if (!anchor) return;
+  try {
+    const url = new URL(anchor.getAttribute('href') || '', window.location.href);
+    if (!url.pathname.toLowerCase().includes('rental-inquiry')) return;
+    const id = (url.searchParams.get('id') || '').trim();
+    if (!id) return;
+    sessionStorage.setItem(RENTAL_INQUIRY_ID_KEY, id);
+  } catch (_) {
+    /* ignore */
+  }
+}
+
+function wireRentalInquiryIdStash() {
+  const grid = document.getElementById('rentalVehicleGrid');
+  if (!grid || grid.dataset.inquiryStashBound === '1') return;
+  grid.dataset.inquiryStashBound = '1';
+  grid.addEventListener(
+    'pointerdown',
+    (event) => {
+      const a = event.target.closest?.('a[href*="rental-inquiry"]');
+      stashRentalInquiryVehicleIdFromAnchor(a);
+    },
+    true,
+  );
+}
 const RENTAL_FLEET_PAGE_SIZE = 6;
 let rentalFleetCurrentPage = 1;
 const rentalFleetMobileViewport = window.matchMedia('(max-width: 760px)');
@@ -284,9 +314,8 @@ function scrollToRentalFleetCard(index, behavior = 'smooth') {
 }
 
 function buildInquiryHref(vehicle) {
-  const params = new URLSearchParams();
-  params.set('id', vehicle.id);
-  return `rental-inquiry.html?${params.toString()}`;
+  const id = String(vehicle?.id || '').trim();
+  return `rental-inquiry.html?id=${encodeURIComponent(id)}`;
 }
 
 function buildVehicleCardHtml(vehicle, language) {
@@ -405,10 +434,14 @@ function hydrateRentalVehicleCard(card, vehicle, language) {
   const subValue = card.querySelector('.v-price-sub');
   if (subValue) subValue.textContent = getDisplayPrice(profile.deposit, language) || '-';
 
+  const vehicleId = String(vehicle?.id || '').trim();
+  card.dataset.rentalVehicleId = vehicleId;
+
   const detailBtn = card.querySelector('.v-detail-btn');
   if (detailBtn) {
     detailBtn.textContent = copy('fleet.card.action', language);
     detailBtn.setAttribute('href', inquiryHref);
+    detailBtn.dataset.rentalVehicleId = vehicleId;
     detailBtn.setAttribute('aria-label', `${copy('fleet.card.action', language)} ${getVehicleName(vehicle, language)}`);
   }
 
@@ -633,6 +666,7 @@ function initRentalPage() {
   applyRentalCopy(language);
   wireFleetPagination();
   bindRentalFleetMobilePager();
+  wireRentalInquiryIdStash();
   renderRentableVehicles(language);
 }
 

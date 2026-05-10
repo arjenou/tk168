@@ -2,11 +2,16 @@
   const {
     vehicles,
     getVehicleById,
+    getInventoryVehicleById,
+    getRentalVehicleDetailById,
+    getRentableVehicles,
     getVehicleName,
     getBrandLabel,
     getVehicleFieldLabel,
     buildBrandUrl
   } = window.TK168_DATA;
+
+  const STOCK_CONFIRM_ID_KEY = 'tk168:stockConfirmVehicleId';
 
   const COPY = {
     zh: {
@@ -201,14 +206,70 @@
     return String(value || '').trim();
   }
 
-  function createVehicleContext() {
+  function resolveStockVehicle(requestedVehicleId, isRentalFlow) {
+    const id = String(requestedVehicleId || '').trim();
+    if (isRentalFlow) {
+      const fleet = getRentableVehicles();
+      if (!id) return fleet[0] || vehicles[0] || null;
+      const fromFleet = fleet.find((v) => v && v.id === id);
+      if (fromFleet) return fromFleet;
+      const fromRentalApi = getRentalVehicleDetailById(id);
+      if (fromRentalApi) return fromRentalApi;
+      const fromInventory = getVehicleById(id);
+      if (fromInventory) return fromInventory;
+      return getInventoryVehicleById(id);
+    }
+    if (!id) return vehicles[0] || null;
+    return getInventoryVehicleById(id) || null;
+  }
+
+  function getRequestedStockVehicleId() {
     const params = new URLSearchParams(window.location.search);
-    const requestedVehicleId = params.get('id') || vehicles[0]?.id || '';
-    const currentVehicle = getVehicleById(requestedVehicleId) || vehicles[0];
-    const inventoryHref = currentVehicle?.brandKey ? buildBrandUrl(currentVehicle.brandKey) : 'brand.html';
+    let id = (params.get('id') || '').trim();
+    if (!id) {
+      try {
+        id = (sessionStorage.getItem(STOCK_CONFIRM_ID_KEY) || '').trim();
+      } catch (_) {
+        id = '';
+      }
+      if (id) {
+        try {
+          sessionStorage.removeItem(STOCK_CONFIRM_ID_KEY);
+        } catch (_) {
+          /* ignore */
+        }
+        try {
+          const u = new URL(window.location.href);
+          if (!u.searchParams.get('id')) {
+            u.searchParams.set('id', id);
+            history.replaceState({}, '', u);
+          }
+        } catch (_) {
+          /* ignore */
+        }
+      }
+    }
+    return id;
+  }
+
+  function readUrlContext() {
     return {
+      requestedVehicleId: getRequestedStockVehicleId(),
+      isRentalDetail: new URLSearchParams(window.location.search).get('from') === 'rental'
+    };
+  }
+
+  function createVehicleContext() {
+    const { requestedVehicleId, isRentalDetail } = readUrlContext();
+    const currentVehicle = resolveStockVehicle(requestedVehicleId, isRentalDetail);
+    let inventoryHref = 'brand.html';
+    if (currentVehicle?.brandKey) inventoryHref = buildBrandUrl(currentVehicle.brandKey);
+    else if (isRentalDetail) inventoryHref = 'rental.html';
+    return {
+      requestedVehicleId,
       currentVehicle,
-      inventoryHref
+      inventoryHref,
+      isRentalDetail
     };
   }
 
@@ -226,10 +287,13 @@
     }
     const id = vehicleContext.currentVehicle?.id;
     if (id && typeof window.TK168_DATA?.buildDetailUrl === 'function') {
-      window.location.assign(window.TK168_DATA.buildDetailUrl(id));
+      const filters = vehicleContext.isRentalDetail ? { from: 'rental' } : {};
+      window.location.assign(window.TK168_DATA.buildDetailUrl(id, filters));
       return;
     }
-    window.location.assign(vehicleContext.inventoryHref || 'brand.html');
+    window.location.assign(
+      vehicleContext.isRentalDetail ? 'rental.html' : (vehicleContext.inventoryHref || 'brand.html'),
+    );
   }
 
   window.TK168CommonLinks?.applyCommonLinks();
@@ -574,6 +638,28 @@
     applyLanguageCopy();
     renderVehicle();
     render();
+  });
+
+  function refreshVehicleFromHydrate() {
+    const id = vehicleContext.requestedVehicleId || getRequestedStockVehicleId();
+    const next = resolveStockVehicle(id, vehicleContext.isRentalDetail);
+    if (!next) return;
+    const prev = vehicleContext.currentVehicle;
+    if (prev && next.id === prev.id && prev.name === next.name) return;
+    vehicleContext.currentVehicle = next;
+    if (next.brandKey) vehicleContext.inventoryHref = buildBrandUrl(next.brandKey);
+    renderVehicle();
+    render();
+  }
+
+  document.addEventListener('tk168:data-updated', (event) => {
+    const detail = event?.detail || {};
+    if (vehicleContext.isRentalDetail) {
+      if (!detail.rentals && !detail.vehicles) return;
+    } else {
+      if (!detail.vehicles) return;
+    }
+    refreshVehicleFromHydrate();
   });
 
   if (document.readyState === 'loading') {

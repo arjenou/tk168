@@ -2476,6 +2476,29 @@ window.TK168_DATA = (() => {
     return vehicles.find((vehicle) => vehicle.id === id) || null;
   }
 
+  /** Single-row merge for forms when `vehicles` list has not yet refreshed from API (same rules as buildMergedVehicleListFromHydrate). */
+  function buildInventoryVehicleFromApiRow(apiV) {
+    if (!apiV || !apiV.id) return null;
+    const baseById = new Map(baseVehicles.map((v) => [v.id, v]));
+    let vehicle = mergeVehicleData(baseById.get(apiV.id), apiV);
+    const canonicalBrandKey = resolveCanonicalBrandKey(vehicle.brandKey);
+    vehicle = canonicalBrandKey ? { ...vehicle, brandKey: canonicalBrandKey } : { ...vehicle };
+    return normalizeVehicleEngineFields(vehicle);
+  }
+
+  /** Resolve inventory vehicle by id for detail/stock-confirm/inquiry even before `vehicles` array picks up async hydrate. */
+  function getInventoryVehicleById(id) {
+    const clean = String(id || '').trim();
+    if (!clean) return null;
+    const listed = getVehicleById(clean);
+    if (listed) return listed;
+    const apiList = window.TK168_API_VEHICLES;
+    if (!Array.isArray(apiList)) return null;
+    const apiV = apiList.find((v) => v && v.id === clean);
+    if (!apiV) return null;
+    return buildInventoryVehicleFromApiRow(apiV);
+  }
+
   function getVehiclesByBrand(brandKey) {
     const canonicalKey = resolveCanonicalBrandKey(brandKey) || String(brandKey || '').trim().toLowerCase();
     return vehicles.filter((vehicle) => vehicle.brandKey === canonicalKey);
@@ -2983,6 +3006,7 @@ window.TK168_DATA = (() => {
     getBrandAccentColor,
     getBrandAccentFilter,
     getVehicleById,
+    getInventoryVehicleById,
     getVehiclesByBrand,
     getBrandLabel,
     getVehicleBrandTitle,

@@ -714,12 +714,27 @@ function renderBenefits() {
 function syncLinks() {
   const params = new URLSearchParams();
   params.set('id', currentVehicle.id);
+  if (isRentalDetail) params.set('from', 'rental');
   const telHref = `tel:${site.phone.replace(/\s+/g, '')}`;
+  const consultFormBase = isRentalDetail ? 'rental-inquiry.html' : 'inquiry.html';
   detailBackToBrand.href = inventoryHref;
   detailPhoneLink.href = telHref;
   detailEmailLink.href = `stock-confirm.html?${params.toString()}`;
+  if (!isRentalDetail && currentVehicle?.id && detailEmailLink) {
+    const stashStockId = () => {
+      try {
+        sessionStorage.setItem('tk168:stockConfirmVehicleId', currentVehicle.id);
+      } catch (_) {
+        /* ignore */
+      }
+    };
+    if (detailEmailLink.dataset.stockStashBound !== '1') {
+      detailEmailLink.dataset.stockStashBound = '1';
+      detailEmailLink.addEventListener('pointerdown', stashStockId, { passive: true });
+    }
+  }
   if (detailStoreVisitLink) {
-    detailStoreVisitLink.href = `inquiry.html?${params.toString()}`;
+    detailStoreVisitLink.href = `${consultFormBase}?id=${encodeURIComponent(currentVehicle.id)}`;
   }
   if (detailAdvisorCallNow) {
     detailAdvisorCallNow.href = telHref;
@@ -728,7 +743,21 @@ function syncLinks() {
     detailAdvisorWhatsapp.href = buildWhatsappHref(site.phone);
   }
   if (detailAdvisorBookLink) {
-    detailAdvisorBookLink.href = `inquiry.html?${params.toString()}`;
+    detailAdvisorBookLink.href = `${consultFormBase}?id=${encodeURIComponent(currentVehicle.id)}`;
+  }
+  if (isRentalDetail && currentVehicle?.id) {
+    const stashId = () => {
+      try {
+        sessionStorage.setItem('tk168:rentalInquiryVehicleId', currentVehicle.id);
+      } catch (_) {
+        /* ignore */
+      }
+    };
+    [detailStoreVisitLink, detailAdvisorBookLink].forEach((el) => {
+      if (!el || el.dataset.riqStashBound === '1') return;
+      el.dataset.riqStashBound = '1';
+      el.addEventListener('pointerdown', stashId, { passive: true });
+    });
   }
   syncAdvisorPanelCopy();
   if (detailPhoneLink) {
