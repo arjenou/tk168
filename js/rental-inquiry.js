@@ -12,14 +12,14 @@
     buildBrandUrl
   } = window.TK168_DATA;
 
-  const STEP_KEYS = ['appointment', 'plan', 'name', 'contact', 'confirm'];
+  const STEP_KEYS = ['appointment', 'name', 'contact', 'confirm'];
 
   const COPY = {
     zh: {
       pageTitle: '租车咨询 — TK168 Premium Automotive',
       eyebrow: 'TK168 RENTAL CONSULT',
       title: '租车咨询单',
-      subtitle: '按来店预约的 5 步结构整理租车需求，整理完成后继续与顾问确认。',
+      subtitle: '按来店预约的 4 步结构整理租车需求，整理完成后继续与顾问确认。',
       progressAria: '租车咨询步骤',
       vehicleStatus: '当前可租',
       metrics: {
@@ -29,10 +29,9 @@
       },
       steps: {
         appointment: { tab: '用车时间', row: '希望用车时间', lead: '先确认希望用车日期、取车时间和预计租期。' },
-        plan: { tab: '使用计划', row: '使用计划', lead: '说明主要用途和行程范围，顾问才能更快判断是否合适。' },
         name: { tab: '联系人', row: '联系人信息', lead: '填写联系人姓名和偏好语言。' },
         contact: { tab: '联系方式', row: '邮箱 / 电话', lead: '请留下方便回访的邮箱和电话。' },
-        confirm: { tab: '确认', row: '内容确认', lead: '最后确认取车城市与条款同意，完成咨询内容整理。' }
+        confirm: { tab: '交车', row: '车辆交付方式', lead: '选择来店或送车，填写门店或送车地址，并同意条款后完成确认。' }
       },
       required: '必填',
       edit: '修改',
@@ -41,22 +40,6 @@
         time: '取车时间',
         timePlaceholder: '请选择',
         days: '预计租期',
-        usage: '主要用途',
-        usagePlaceholder: '请选择',
-        usageCity: '市区代步',
-        usageBusiness: '商务接待',
-        usageTrip: '近郊出行',
-        usageCross: '跨地区行程',
-        usageShoot: '拍摄 / 活动',
-        usageOther: '还不确定，先咨询',
-        route: '行程范围',
-        routePlaceholder: '请选择',
-        routeUrban: '市区内',
-        routeSuburban: '近郊往返',
-        routeCrossCity: '跨城市',
-        routeUndecided: '还未确定',
-        planNote: '补充说明（选填）',
-        planNotePlaceholder: '例如：人数、行李、预计路线、是否需要当日往返',
         name: '姓名',
         namePlaceholder: '张三',
         language: '偏好语言',
@@ -66,16 +49,24 @@
         languageEn: '英语',
         email: '邮箱地址',
         phone: '电话号码',
-        pickup: '取车城市 / 地区',
-        pickupPlaceholder: '例如：东京 / 大阪 / 埼玉',
+        deliveryMethodLabel: '车辆交付方式',
+        deliveryVisit: '来店',
+        deliveryShip: '送车',
+        storeLabel: '选择门店',
+        storePlaceholder: '请选择',
+        storeTokyo: 'TK168 东京展厅',
+        storeYokohama: 'TK168 横滨服务中心',
+        storeOsaka: 'TK168 大阪展厅',
+        deliveryAddressLabel: '送车地址',
+        deliveryAddressPlaceholder: '请填写详细地址（都道府县、市区町村、番地、建筑名等）',
         consentNews: '接收档期更新与新车源通知',
         consentPolicy: '同意使用条款与隐私政策'
       },
       summary: {
         empty: '未填写',
         unconfirmed: '未确认',
-        pendingPolicy: '地区 {pickup} / 待同意条款',
-        readyToSend: '地区 {pickup} / 内容已确认'
+        pendingPolicy: '{detail} / 待同意条款',
+        readyToSend: '{detail} / 内容已确认'
       },
       actions: {
         prev: '上一步',
@@ -84,10 +75,11 @@
       },
       message: {
         appointmentRequired: '请填写日期、取车时间和预计租期。',
-        planRequired: '请选择主要用途和行程范围。',
         nameRequired: '请输入联系人姓名。',
         contactRequired: '请填写邮箱和电话号码。',
-        pickupRequired: '请输入取车城市 / 地区。',
+        deliveryMethodRequired: '请选择车辆交付方式。',
+        storeRequired: '请选择门店。',
+        addressRequired: '请填写送车地址。',
         consentRequired: '请先同意使用条款与隐私政策。',
         submitSuccess: '租车咨询内容已整理完成，请按填写的联系方式继续与顾问沟通。'
       }
@@ -96,7 +88,7 @@
       pageTitle: 'レンタル相談 — TK168 Premium Automotive',
       eyebrow: 'TK168 RENTAL CONSULT',
       title: 'レンタル相談フォーム',
-      subtitle: '来店予約と同じ 5 ステップ構成で、車両・日程・用途を整理し、内容確認へ進めます。',
+      subtitle: '来店予約と同じ 4 ステップ構成で、車両・日程を整理し、内容確認へ進めます。',
       progressAria: 'レンタル相談ステップ',
       vehicleStatus: '相談可能',
       metrics: {
@@ -106,10 +98,9 @@
       },
       steps: {
         appointment: { tab: '利用日時', row: '希望利用日時', lead: '希望利用日、受取時間、予定日数を入力してください。' },
-        plan: { tab: '利用計画', row: '利用計画', lead: '用途と移動範囲を共有いただくと、条件確認が早く進みます。' },
-        name: { tab: '担当者', row: '担当者情報', lead: 'お名前と希望言語を入力してください。' },
+        name: { tab: '運転者', row: '運転者氏名', lead: '運転者の氏名と希望言語を入力してください。' },
         contact: { tab: '連絡先', row: 'メール / 電話', lead: '折り返ししやすい連絡先を入力してください。' },
-        confirm: { tab: '確認', row: '内容確認', lead: '受取地域と規約同意を確認してから内容整理を完了してください。' }
+        confirm: { tab: '貸渡', row: '貸渡方法', lead: '来店または配達を選び、店舗またはお届け先を入力のうえ、規約に同意してください。' }
       },
       required: '必須',
       edit: '修正する',
@@ -118,22 +109,6 @@
         time: '受取時間',
         timePlaceholder: '選択してください',
         days: '予定日数',
-        usage: '主な用途',
-        usagePlaceholder: '選択してください',
-        usageCity: '市内移動',
-        usageBusiness: 'ビジネス利用',
-        usageTrip: '近郊ドライブ',
-        usageCross: '広域移動',
-        usageShoot: '撮影 / イベント',
-        usageOther: '未確定なので相談したい',
-        route: '移動範囲',
-        routePlaceholder: '選択してください',
-        routeUrban: '市内のみ',
-        routeSuburban: '近郊往復',
-        routeCrossCity: '都市間移動',
-        routeUndecided: '未定',
-        planNote: '補足内容（任意）',
-        planNotePlaceholder: '例：人数、荷物、予定ルート、当日往復の希望',
         name: '氏名',
         namePlaceholder: '山田 太郎',
         language: '希望言語',
@@ -143,16 +118,24 @@
         languageEn: '英語',
         email: 'メールアドレス',
         phone: '電話番号',
-        pickup: '受取都市 / 地域',
-        pickupPlaceholder: '例：東京 / 大阪 / 埼玉',
+        deliveryMethodLabel: '貸渡方法',
+        deliveryVisit: '来店',
+        deliveryShip: '配達',
+        storeLabel: '店舗を選択',
+        storePlaceholder: '選択してください',
+        storeTokyo: 'TK168 東京ショールーム',
+        storeYokohama: 'TK168 横浜サービスセンター',
+        storeOsaka: 'TK168 大阪ショールーム',
+        deliveryAddressLabel: '配達先住所',
+        deliveryAddressPlaceholder: '郵便番号、住所、建物名・部屋番号までご記入ください',
         consentNews: '空き状況や新着車両情報を受け取る',
         consentPolicy: '利用規約とプライバシーポリシーに同意する'
       },
       summary: {
         empty: '未入力',
         unconfirmed: '未確認',
-        pendingPolicy: '地域 {pickup} / 規約同意待ち',
-        readyToSend: '地域 {pickup} / 内容確認済み'
+        pendingPolicy: '{detail} / 規約同意待ち',
+        readyToSend: '{detail} / 内容確認済み'
       },
       actions: {
         prev: '戻る',
@@ -161,10 +144,11 @@
       },
       message: {
         appointmentRequired: '利用日、受取時間、予定日数を入力してください。',
-        planRequired: '用途と移動範囲を選択してください。',
-        nameRequired: '氏名を入力してください。',
+        nameRequired: '運転者の氏名を入力してください。',
         contactRequired: 'メールアドレスと電話番号を入力してください。',
-        pickupRequired: '受取都市 / 地域を入力してください。',
+        deliveryMethodRequired: '貸渡方法を選択してください。',
+        storeRequired: '店舗を選択してください。',
+        addressRequired: '配達先住所を入力してください。',
         consentRequired: '利用規約とプライバシーポリシーへの同意が必要です。',
         submitSuccess: 'レンタル相談内容の整理が完了しました。入力した連絡先をもとに担当窓口との確認を進めてください。'
       }
@@ -173,7 +157,7 @@
       pageTitle: 'Rental Inquiry — TK168 Premium Automotive',
       eyebrow: 'TK168 RENTAL CONSULT',
       title: 'Rental Inquiry Form',
-      subtitle: 'Using the same 5-step structure as the visit booking flow, this form helps you organize rental details before continuing with your advisor.',
+      subtitle: 'Using the same 4-step structure as the visit booking flow, this form helps you organize rental details before continuing with your advisor.',
       progressAria: 'Rental inquiry steps',
       vehicleStatus: 'Available for inquiry',
       metrics: {
@@ -183,10 +167,9 @@
       },
       steps: {
         appointment: { tab: 'Schedule', row: 'Preferred rental time', lead: 'Enter your preferred rental date, pickup time, and expected rental length.' },
-        plan: { tab: 'Plan', row: 'Usage plan', lead: 'Sharing your intended use and travel range helps the advisor confirm availability faster.' },
         name: { tab: 'Contact person', row: 'Contact details', lead: 'Enter your name and preferred language.' },
         contact: { tab: 'Contact', row: 'Email / phone', lead: 'Leave an email and phone number that is easy to reply to.' },
-        confirm: { tab: 'Confirm', row: 'Content review', lead: 'Confirm the pickup city and policy agreement before completing the inquiry summary.' }
+        confirm: { tab: 'Handover', row: 'Vehicle delivery method', lead: 'Choose visit or delivery, enter the store or address, then agree to the policies.' }
       },
       required: 'Required',
       edit: 'Edit',
@@ -195,22 +178,6 @@
         time: 'Pickup time',
         timePlaceholder: 'Select',
         days: 'Expected rental length',
-        usage: 'Main use',
-        usagePlaceholder: 'Select',
-        usageCity: 'City driving',
-        usageBusiness: 'Business use',
-        usageTrip: 'Short trip',
-        usageCross: 'Intercity travel',
-        usageShoot: 'Photo shoot / event',
-        usageOther: 'Not sure yet, inquire first',
-        route: 'Travel range',
-        routePlaceholder: 'Select',
-        routeUrban: 'Within the city',
-        routeSuburban: 'Suburban round trip',
-        routeCrossCity: 'Between cities',
-        routeUndecided: 'Not decided yet',
-        planNote: 'Notes (optional)',
-        planNotePlaceholder: 'For example: passenger count, luggage, route plan, or same-day return request',
         name: 'Full name',
         namePlaceholder: 'Taro Yamada',
         language: 'Preferred language',
@@ -220,16 +187,24 @@
         languageEn: 'English',
         email: 'Email address',
         phone: 'Phone number',
-        pickup: 'Pickup city / region',
-        pickupPlaceholder: 'For example: Tokyo / Osaka / Saitama',
+        deliveryMethodLabel: 'Vehicle delivery method',
+        deliveryVisit: 'Visit showroom',
+        deliveryShip: 'Delivery to you',
+        storeLabel: 'Select a store',
+        storePlaceholder: 'Select',
+        storeTokyo: 'TK168 Tokyo showroom',
+        storeYokohama: 'TK168 Yokohama service center',
+        storeOsaka: 'TK168 Osaka showroom',
+        deliveryAddressLabel: 'Delivery address',
+        deliveryAddressPlaceholder: 'Include prefecture, city, street, building name, and room if applicable',
         consentNews: 'Receive availability updates and new vehicle notifications',
         consentPolicy: 'I agree to the terms of use and privacy policy'
       },
       summary: {
         empty: 'Not provided',
         unconfirmed: 'Not confirmed',
-        pendingPolicy: 'Region {pickup} / policy consent pending',
-        readyToSend: 'Region {pickup} / details confirmed'
+        pendingPolicy: '{detail} / policy consent pending',
+        readyToSend: '{detail} / details confirmed'
       },
       actions: {
         prev: 'Back',
@@ -238,10 +213,11 @@
       },
       message: {
         appointmentRequired: 'Please enter the date, pickup time, and expected rental length.',
-        planRequired: 'Please select the main use and travel range.',
         nameRequired: 'Please enter the contact person name.',
         contactRequired: 'Please enter the email address and phone number.',
-        pickupRequired: 'Please enter the pickup city or region.',
+        deliveryMethodRequired: 'Please choose a vehicle delivery method.',
+        storeRequired: 'Please select a store.',
+        addressRequired: 'Please enter the delivery address.',
         consentRequired: 'You must agree to the terms of use and privacy policy first.',
         submitSuccess: 'The rental inquiry details are organized. Please continue the confirmation using the contact details you entered.'
       }
@@ -345,14 +321,13 @@
     date: '',
     time: '',
     days: '',
-    usage: '',
-    route: '',
-    planNote: '',
     name: '',
     language: '',
     email: '',
     phone: '',
-    pickup: '',
+    deliveryMethod: '',
+    store: '',
+    deliveryAddress: '',
     consentNews: false,
     consentPolicy: false
   };
@@ -378,18 +353,22 @@
     date: document.getElementById('riqDate'),
     time: document.getElementById('riqTime'),
     days: document.getElementById('riqDays'),
-    usage: document.getElementById('riqUsage'),
-    route: document.getElementById('riqRoute'),
-    planNote: document.getElementById('riqPlanNote'),
     name: document.getElementById('riqName'),
     language: document.getElementById('riqLanguage'),
     email: document.getElementById('riqEmail'),
     phone: document.getElementById('riqPhone'),
-    pickup: document.getElementById('riqPickup'),
+    deliveryVisit: document.getElementById('riqDeliveryVisit'),
+    deliveryShip: document.getElementById('riqDeliveryShip'),
+    deliveryMethodLabel: document.getElementById('riqDeliveryMethodLabel'),
+    deliveryVisitLabel: document.getElementById('riqDeliveryVisitLabel'),
+    deliveryShipLabel: document.getElementById('riqDeliveryShipLabel'),
+    storeWrap: document.getElementById('riqStoreWrap'),
+    addressWrap: document.getElementById('riqAddressWrap'),
+    store: document.getElementById('riqStore'),
+    deliveryAddress: document.getElementById('riqDeliveryAddress'),
     consentNews: document.getElementById('riqConsentNews'),
     consentPolicy: document.getElementById('riqConsentPolicy'),
     summaryAppointment: document.getElementById('riqSummaryAppointment'),
-    summaryPlan: document.getElementById('riqSummaryPlan'),
     summaryName: document.getElementById('riqSummaryName'),
     summaryContact: document.getElementById('riqSummaryContact'),
     summaryConfirm: document.getElementById('riqSummaryConfirm'),
@@ -405,21 +384,18 @@
     minDaysValue: document.getElementById('riqMinDaysValue'),
     stepLabels: {
       appointment: document.getElementById('riqStepAppointment'),
-      plan: document.getElementById('riqStepPlan'),
       name: document.getElementById('riqStepName'),
       contact: document.getElementById('riqStepContact'),
       confirm: document.getElementById('riqStepConfirm')
     },
     rowLabels: {
       appointment: document.getElementById('riqRowAppointment'),
-      plan: document.getElementById('riqRowPlan'),
       name: document.getElementById('riqRowName'),
       contact: document.getElementById('riqRowContact'),
       confirm: document.getElementById('riqRowConfirm')
     },
     editLabels: {
       appointment: document.getElementById('riqEditAppointment'),
-      plan: document.getElementById('riqEditPlan'),
       name: document.getElementById('riqEditName'),
       contact: document.getElementById('riqEditContact'),
       confirm: document.getElementById('riqEditConfirm')
@@ -428,31 +404,21 @@
       date: document.getElementById('riqDateLabel'),
       time: document.getElementById('riqTimeLabel'),
       days: document.getElementById('riqDaysLabel'),
-      usage: document.getElementById('riqUsageLabel'),
-      route: document.getElementById('riqRouteLabel'),
-      planNote: document.getElementById('riqPlanNoteLabel'),
       name: document.getElementById('riqNameLabel'),
       language: document.getElementById('riqLanguageLabel'),
       email: document.getElementById('riqEmailLabel'),
       phone: document.getElementById('riqPhoneLabel'),
-      pickup: document.getElementById('riqPickupLabel'),
+      store: document.getElementById('riqStoreLabel'),
+      deliveryAddress: document.getElementById('riqDeliveryAddressLabel'),
       consentNews: document.getElementById('riqConsentNewsLabel'),
       consentPolicy: document.getElementById('riqConsentPolicyLabel')
     },
     optionLabels: {
       timePlaceholder: document.getElementById('riqTimePlaceholder'),
-      usagePlaceholder: document.getElementById('riqUsagePlaceholder'),
-      usageCity: document.getElementById('riqUsageCity'),
-      usageBusiness: document.getElementById('riqUsageBusiness'),
-      usageTrip: document.getElementById('riqUsageTrip'),
-      usageCross: document.getElementById('riqUsageCross'),
-      usageShoot: document.getElementById('riqUsageShoot'),
-      usageOther: document.getElementById('riqUsageOther'),
-      routePlaceholder: document.getElementById('riqRoutePlaceholder'),
-      routeUrban: document.getElementById('riqRouteUrban'),
-      routeSuburban: document.getElementById('riqRouteSuburban'),
-      routeCrossCity: document.getElementById('riqRouteCrossCity'),
-      routeUndecided: document.getElementById('riqRouteUndecided'),
+      storePlaceholder: document.getElementById('riqStorePlaceholder'),
+      storeTokyo: document.getElementById('riqStoreTokyo'),
+      storeYokohama: document.getElementById('riqStoreYokohama'),
+      storeOsaka: document.getElementById('riqStoreOsaka'),
       languagePlaceholder: document.getElementById('riqLanguagePlaceholder'),
       languageZh: document.getElementById('riqLanguageZh'),
       languageJa: document.getElementById('riqLanguageJa'),
@@ -504,38 +470,31 @@
     setText(refs.fieldLabels.date, copy.fields.date);
     setText(refs.fieldLabels.time, copy.fields.time);
     setText(refs.fieldLabels.days, copy.fields.days);
-    setText(refs.fieldLabels.usage, copy.fields.usage);
-    setText(refs.fieldLabels.route, copy.fields.route);
-    setText(refs.fieldLabels.planNote, copy.fields.planNote);
     setText(refs.fieldLabels.name, copy.fields.name);
     setText(refs.fieldLabels.language, copy.fields.language);
     setText(refs.fieldLabels.email, copy.fields.email);
     setText(refs.fieldLabels.phone, copy.fields.phone);
-    setText(refs.fieldLabels.pickup, copy.fields.pickup);
+    setText(refs.fieldLabels.store, copy.fields.storeLabel);
+    setText(refs.fieldLabels.deliveryAddress, copy.fields.deliveryAddressLabel);
     setText(refs.fieldLabels.consentNews, copy.fields.consentNews);
     setText(refs.fieldLabels.consentPolicy, copy.fields.consentPolicy);
 
+    setText(refs.deliveryMethodLabel, copy.fields.deliveryMethodLabel);
+    setText(refs.deliveryVisitLabel, copy.fields.deliveryVisit);
+    setText(refs.deliveryShipLabel, copy.fields.deliveryShip);
+
     setText(refs.optionLabels.timePlaceholder, copy.fields.timePlaceholder);
-    setText(refs.optionLabels.usagePlaceholder, copy.fields.usagePlaceholder);
-    setText(refs.optionLabels.usageCity, copy.fields.usageCity);
-    setText(refs.optionLabels.usageBusiness, copy.fields.usageBusiness);
-    setText(refs.optionLabels.usageTrip, copy.fields.usageTrip);
-    setText(refs.optionLabels.usageCross, copy.fields.usageCross);
-    setText(refs.optionLabels.usageShoot, copy.fields.usageShoot);
-    setText(refs.optionLabels.usageOther, copy.fields.usageOther);
-    setText(refs.optionLabels.routePlaceholder, copy.fields.routePlaceholder);
-    setText(refs.optionLabels.routeUrban, copy.fields.routeUrban);
-    setText(refs.optionLabels.routeSuburban, copy.fields.routeSuburban);
-    setText(refs.optionLabels.routeCrossCity, copy.fields.routeCrossCity);
-    setText(refs.optionLabels.routeUndecided, copy.fields.routeUndecided);
+    setText(refs.optionLabels.storePlaceholder, copy.fields.storePlaceholder);
+    setText(refs.optionLabels.storeTokyo, copy.fields.storeTokyo);
+    setText(refs.optionLabels.storeYokohama, copy.fields.storeYokohama);
+    setText(refs.optionLabels.storeOsaka, copy.fields.storeOsaka);
     setText(refs.optionLabels.languagePlaceholder, copy.fields.languagePlaceholder);
     setText(refs.optionLabels.languageZh, copy.fields.languageZh);
     setText(refs.optionLabels.languageJa, copy.fields.languageJa);
     setText(refs.optionLabels.languageEn, copy.fields.languageEn);
 
-    setPlaceholder(refs.planNote, copy.fields.planNotePlaceholder);
     setPlaceholder(refs.name, copy.fields.namePlaceholder);
-    setPlaceholder(refs.pickup, copy.fields.pickupPlaceholder);
+    setPlaceholder(refs.deliveryAddress, copy.fields.deliveryAddressPlaceholder);
 
     setText(refs.prevBtn, copy.actions.prev);
     renderVehicleCard();
@@ -581,15 +540,6 @@
     return `${date} ${time} / ${formatMinDays(days, currentLanguage())}`;
   }
 
-  function buildPlanSummary() {
-    const usage = getSelectedText(refs.usage);
-    const route = getSelectedText(refs.route);
-    if (!usage && !route) return currentCopy().summary.empty;
-    if (!usage) return route;
-    if (!route) return usage;
-    return `${usage} / ${route}`;
-  }
-
   function buildNameSummary() {
     const name = sanitize(state.name);
     const language = getSelectedText(refs.language);
@@ -608,33 +558,55 @@
     return `${email} / ${phone}`;
   }
 
-  function buildConfirmSummary() {
-    const pickup = sanitize(state.pickup);
+  function buildDeliveryDetailSummary() {
     const copy = currentCopy();
-    if (!pickup) return copy.summary.unconfirmed;
-    if (!state.consentPolicy) return formatTemplate(copy.summary.pendingPolicy, { pickup });
-    return formatTemplate(copy.summary.readyToSend, { pickup });
+    const method = state.deliveryMethod;
+    if (!method) return '';
+    if (method === 'visit') {
+      const storeText = getSelectedText(refs.store);
+      return storeText ? `${copy.fields.deliveryVisit} · ${storeText}` : '';
+    }
+    const addr = sanitize(state.deliveryAddress);
+    if (!addr) return '';
+    const maxLen = currentLanguage() === 'en' ? 44 : 32;
+    const short = addr.length > maxLen ? `${addr.slice(0, maxLen)}…` : addr;
+    return `${copy.fields.deliveryShip} · ${short}`;
+  }
+
+  function buildConfirmSummary() {
+    const copy = currentCopy();
+    const detail = buildDeliveryDetailSummary();
+    if (!detail) return copy.summary.unconfirmed;
+    if (!state.consentPolicy) return formatTemplate(copy.summary.pendingPolicy, { detail });
+    return formatTemplate(copy.summary.readyToSend, { detail });
+  }
+
+  function updateDeliveryConditionalVisibility() {
+    const visit = refs.deliveryVisit?.checked;
+    const ship = refs.deliveryShip?.checked;
+    if (refs.storeWrap) refs.storeWrap.hidden = !visit;
+    if (refs.addressWrap) refs.addressWrap.hidden = !ship;
   }
 
   function syncStateFromInputs() {
     state.date = refs.date.value;
     state.time = refs.time.value;
     state.days = refs.days.value;
-    state.usage = refs.usage.value;
-    state.route = refs.route.value;
-    state.planNote = refs.planNote.value;
     state.name = refs.name.value;
     state.language = refs.language.value;
     state.email = refs.email.value;
     state.phone = refs.phone.value;
-    state.pickup = refs.pickup.value;
+    if (refs.deliveryVisit?.checked) state.deliveryMethod = 'visit';
+    else if (refs.deliveryShip?.checked) state.deliveryMethod = 'delivery';
+    else state.deliveryMethod = '';
+    state.store = refs.store?.value || '';
+    state.deliveryAddress = refs.deliveryAddress?.value || '';
     state.consentNews = refs.consentNews.checked;
     state.consentPolicy = refs.consentPolicy.checked;
   }
 
   function renderSummaries() {
     refs.summaryAppointment.textContent = buildAppointmentSummary();
-    refs.summaryPlan.textContent = buildPlanSummary();
     refs.summaryName.textContent = buildNameSummary();
     refs.summaryContact.textContent = buildContactSummary();
     refs.summaryConfirm.textContent = buildConfirmSummary();
@@ -681,10 +653,6 @@
       if (!sanitize(state.date) || !sanitize(state.time) || !sanitize(state.days)) return msg.appointmentRequired;
       return '';
     }
-    if (stepKey === 'plan') {
-      if (!sanitize(state.usage) || !sanitize(state.route)) return msg.planRequired;
-      return '';
-    }
     if (stepKey === 'name') {
       if (!sanitize(state.name)) return msg.nameRequired;
       return '';
@@ -694,7 +662,10 @@
       return '';
     }
     if (stepKey === 'confirm') {
-      if (!sanitize(state.pickup)) return msg.pickupRequired;
+      if (!state.deliveryMethod) return msg.deliveryMethodRequired;
+      if (state.deliveryMethod === 'visit') {
+        if (!sanitize(state.store)) return msg.storeRequired;
+      } else if (!sanitize(state.deliveryAddress)) return msg.addressRequired;
       if (!state.consentPolicy) return msg.consentRequired;
       return '';
     }
@@ -707,6 +678,7 @@
     renderRows();
     renderSummaries();
     renderActions();
+    updateDeliveryConditionalVisibility();
   }
 
   function moveStep(nextStep) {
@@ -716,21 +688,7 @@
   }
 
   function bindInputEvents() {
-    const inputKeys = [
-      'date',
-      'time',
-      'days',
-      'usage',
-      'route',
-      'planNote',
-      'name',
-      'language',
-      'email',
-      'phone',
-      'pickup',
-      'consentNews',
-      'consentPolicy'
-    ];
+    const inputKeys = ['date', 'time', 'days', 'name', 'language', 'email', 'phone', 'store', 'deliveryAddress', 'consentNews', 'consentPolicy'];
 
     inputKeys.forEach((key) => {
       const el = refs[key];
@@ -738,6 +696,17 @@
       const eventName = el.type === 'checkbox' || el.tagName === 'SELECT' ? 'change' : 'input';
       el.addEventListener(eventName, () => {
         syncStateFromInputs();
+        renderSummaries();
+        clearMessage();
+      });
+    });
+
+    ['deliveryVisit', 'deliveryShip'].forEach((key) => {
+      const el = refs[key];
+      if (!el) return;
+      el.addEventListener('change', () => {
+        syncStateFromInputs();
+        updateDeliveryConditionalVisibility();
         renderSummaries();
         clearMessage();
       });

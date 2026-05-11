@@ -47,6 +47,37 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.riq-delivery-block {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.riq-delivery-legend {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(43, 41, 38, 0.85);
+}
+
+.riq-delivery-radios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 20px;
+}
+
+.riq-radio-label {
+  align-items: center;
+}
+
+.riq-conditional-block {
+  margin-top: 12px;
+}
+
+.riq-conditional-block[hidden] {
+  display: none !important;
+}
+
 @media (max-width: 980px) {
   .riq-metric-row {
     grid-template-columns: 1fr;
