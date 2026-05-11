@@ -570,6 +570,7 @@ function renderRentableVehicles(language = getLanguage()) {
   if (typeof bindVehicleCardLikes === 'function') {
     bindVehicleCardLikes(grid);
   }
+  window.TK168Renderers?.bindVehicleCardCoverSkeletons?.(grid);
 
   const cards = Array.from(grid.querySelectorAll('.v-card'));
   pagedVehicles.forEach((vehicle, index) => {

@@ -308,6 +308,16 @@ window.TK168Renderers = (() => {
     const brandUrl = window.TK168_DATA?.buildBrandUrl
       ? window.TK168_DATA.buildBrandUrl(vehicle.brandKey)
       : 'brand.html';
+    const coverPhotoSrc = resolveVehicleMediaSource(vehicle.photo);
+    const coverPhotoAlt = escapeHtmlText(vehicleName).replace(/"/g, '&quot;');
+    const coverMarkup = variant.cover === 'v-card-img'
+      ? `<div class="${variant.cover} v-card-img--skeleton-load">
+        <span class="v-card-img__skeleton v-skeleton-block" aria-hidden="true"></span>
+        <img src="${coverPhotoSrc}" alt="${coverPhotoAlt}">
+      </div>`
+      : `<div class="${variant.cover}">
+        <img src="${coverPhotoSrc}" alt="${coverPhotoAlt}">
+      </div>`;
     const primaryPriceLabel = isRentalFleetCard ? t('rental.priceDaily') : getPriceLabel('price.total');
     const secondaryPriceLabel = isRentalFleetCard ? t('rental.priceDeposit') : getPriceLabel('price.base');
     const primaryPriceHtml = `
@@ -334,9 +344,7 @@ window.TK168Renderers = (() => {
           <p class="${variant.subtitle}">${subtitleParts.join(' · ')}</p>
         </div>
       </div>
-      <div class="${variant.cover}">
-        <img src="${resolveVehicleMediaSource(vehicle.photo)}" alt="${vehicleName}">
-      </div>
+      ${coverMarkup}
       <div class="${variant.content}">
         <div class="${variant.meta}">
           ${metaMarkup}
@@ -410,6 +418,54 @@ window.TK168Renderers = (() => {
       frag.appendChild(card);
     }
     container.replaceChildren(frag);
+  }
+
+  /**
+   * 在库卡片主图：与全卡骨架相同的 v-skeleton-block 流光；最短展示一段时间避免磁盘缓存「一闪而过」；
+   * decode 完成后再揭盖，减少解码闪屏。
+   */
+  function bindVehicleCardCoverSkeletons(root) {
+    if (!root || typeof root.querySelectorAll !== 'function') return;
+    const prefersReduced =
+      typeof window.matchMedia === 'function'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const minMs = prefersReduced ? 0 : 380;
+
+    root.querySelectorAll('.v-card-img--skeleton-load').forEach((wrap) => {
+      if (wrap.dataset.coverSkeletonBound === '1') return;
+      wrap.dataset.coverSkeletonBound = '1';
+      const img = wrap.querySelector(':scope > img');
+      if (!img || !(img instanceof HTMLImageElement)) return;
+
+      const t0 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now();
+      let revealScheduled = false;
+
+      function armReveal() {
+        if (revealScheduled) return;
+        revealScheduled = true;
+        const now = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now();
+        const delay = Math.max(0, minMs - (now - t0));
+        window.setTimeout(() => {
+          wrap.classList.add('is-cover-loaded');
+        }, delay);
+      }
+
+      function afterNetworkReady() {
+        if (img.naturalWidth > 0 && typeof img.decode === 'function') {
+          img.decode().then(armReveal).catch(armReveal);
+        } else {
+          armReveal();
+        }
+      }
+
+      if (img.complete) {
+        afterNetworkReady();
+        return;
+      }
+
+      img.addEventListener('load', afterNetworkReady, { once: true });
+      img.addEventListener('error', armReveal, { once: true });
+    });
   }
 
   function buildFeaturedCardHTML(vehicle, detailUrl) {
@@ -581,6 +637,7 @@ window.TK168Renderers = (() => {
     buildDetailOverviewHTML,
     buildDetailBenefitsHTML,
     bindVehicleCardLikes,
+    bindVehicleCardCoverSkeletons,
     getFavoriteVehicleIds: readFavoriteIds,
     renderPaginationDots
   };

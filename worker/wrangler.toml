@@ -16,6 +16,13 @@ workers_dev = true
 directory = "../"
 binding = "ASSETS"
 not_found_handling = "single-page-application"
+# With SPA fallback + compatibility_date ≥ 2025-04-01, browser navigations
+# (address bar / new tab, Sec-Fetch-Mode: navigate) skip the Worker and get
+# /index.html for unknown paths — so /api/media/.../*.mp4 looked like the home
+# page instead of R2 media. Client-side fetch() still hit the Worker.
+# Requires Wrangler ≥ 4.20 (array form). See:
+# https://developers.cloudflare.com/workers/static-assets/routing/single-page-application/
+run_worker_first = ["/api/*"]
 
 # Custom domain: api.tk168.co.jp (tk168.co.jp zone is hosted on Cloudflare).
 # Cloudflare provisions the TLS cert and the DNS record automatically.

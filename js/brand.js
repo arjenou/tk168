@@ -814,6 +814,7 @@ function renderPage() {
 
     window.TK168CommonLinks?.enhanceClickableCards(grid);
     window.TK168Renderers?.bindVehicleCardLikes?.(grid);
+    window.TK168Renderers?.bindVehicleCardCoverSkeletons?.(grid);
     brandVehicleRenderMode = renderMode;
     updatePagination();
 

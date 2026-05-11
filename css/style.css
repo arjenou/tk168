@@ -2033,6 +2033,50 @@ body.contact-popover-open {
   transition: transform 0.5s ease;
 }
 
+/* 在库卡片主图：与 .v-skeleton-block 同款的 Shimmer；未揭盖前强制隐藏实图以免盖住骨架 */
+.v-card .v-card-img.v-card-img--skeleton-load .v-card-img__skeleton.v-skeleton-block {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border-radius: 10px;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.v-card .v-card-img.v-card-img--skeleton-load:not(.is-cover-loaded) > img {
+  opacity: 0;
+  pointer-events: none;
+  transform: none;
+  transition: opacity 0.4s ease;
+}
+
+.v-card .v-card-img.v-card-img--skeleton-load.is-cover-loaded > img {
+  opacity: 1;
+  transition: opacity 0.45s ease, transform 0.5s ease;
+}
+
+.v-card .v-card-img.v-card-img--skeleton-load.is-cover-loaded .v-card-img__skeleton {
+  opacity: 0;
+  transition: opacity 0.32s ease;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v-card .v-card-img.v-card-img--skeleton-load:not(.is-cover-loaded) > img {
+    transition: none;
+  }
+  .v-card .v-card-img.v-card-img--skeleton-load.is-cover-loaded > img {
+    transition: none;
+  }
+  .v-card .v-card-img.v-card-img--skeleton-load.is-cover-loaded .v-card-img__skeleton {
+    transition: none;
+  }
+}
+
 .v-card:hover .v-card-img img {
   transform: scale(1.06);
 }

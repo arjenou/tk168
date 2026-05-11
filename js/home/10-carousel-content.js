@@ -85,6 +85,7 @@ function renderHomeVehiclePages() {
 
   window.TK168CommonLinks?.enhanceClickableCards(homeVehicleGrid);
   window.TK168Renderers?.bindVehicleCardLikes?.(homeVehicleGrid);
+  window.TK168Renderers?.bindVehicleCardCoverSkeletons?.(homeVehicleGrid);
   updateHomeVehiclePagination();
 }
 
