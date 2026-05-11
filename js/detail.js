@@ -118,6 +118,79 @@ const detailStaffBio = document.getElementById('detailStaffBio');
 const detailStaffPhone = document.getElementById('detailStaffPhone');
 const detailStaffPhoneLink = document.getElementById('detailStaffPhoneLink');
 
+function buildDetailThumbSkeletonHTML(count = 4) {
+  return Array.from({ length: count }, (_, i) => `
+    <button type="button" class="thumb thumb--skeleton" disabled tabindex="-1" aria-hidden="true" data-index="${i}">
+      <span class="thumb-shot thumb-shot--skeleton detail-skel-shimmer" aria-hidden="true"></span>
+    </button>
+  `).join('');
+}
+
+function buildDetailSpecSkeletonHTML(rows = 7) {
+  return Array.from({ length: rows }, () => `
+    <div class="spec-row spec-row--skeleton" aria-hidden="true">
+      <span class="detail-skel-line detail-skel-shimmer"></span>
+      <strong><span class="detail-skel-line detail-skel-shimmer"></span></strong>
+    </div>
+  `).join('');
+}
+
+function buildDetailBenefitSkeletonHTML(rows = 9) {
+  return Array.from({ length: rows }, () => `
+    <div class="benefit-bar benefit-bar--spec benefit-bar--skeleton" aria-hidden="true">
+      <span class="benefit-spec-label detail-skel-line detail-skel-shimmer"></span>
+      <span class="benefit-spec-value detail-skel-line detail-skel-shimmer"></span>
+    </div>
+  `).join('');
+}
+
+function buildDetailOverviewSkeletonHTML() {
+  return `
+    <div class="detail-overview-skel" aria-hidden="true">
+      <span class="detail-skel-line detail-skel-shimmer"></span>
+      <span class="detail-skel-line detail-skel-shimmer"></span>
+      <span class="detail-skel-line detail-skel-shimmer is-med"></span>
+    </div>
+  `;
+}
+
+function installDetailSkeletonUi() {
+  if (!detailShell) return;
+  detailShell.classList.add('detail-shell--skeleton-ui');
+
+  if (galleryMainTrigger && !document.getElementById('detailSkelGalleryCover')) {
+    const cover = document.createElement('div');
+    cover.id = 'detailSkelGalleryCover';
+    cover.className = 'detail-skel-gallery-cover detail-skel-shimmer';
+    cover.setAttribute('aria-hidden', 'true');
+    galleryMainTrigger.appendChild(cover);
+  }
+
+  if (thumbGrid) thumbGrid.innerHTML = buildDetailThumbSkeletonHTML(4);
+  if (specTable) specTable.innerHTML = buildDetailSpecSkeletonHTML(8);
+  if (detailOverview) detailOverview.innerHTML = buildDetailOverviewSkeletonHTML();
+  if (benefitBars) benefitBars.innerHTML = buildDetailBenefitSkeletonHTML(10);
+
+  const actionGroup = document.querySelector('.lead-card .action-group');
+  if (actionGroup && !document.getElementById('detailSkelLeadOverlay')) {
+    const ov = document.createElement('div');
+    ov.id = 'detailSkelLeadOverlay';
+    ov.className = 'detail-skel-lead-overlay';
+    ov.setAttribute('aria-hidden', 'true');
+    ov.innerHTML =
+      '<span class="detail-skel-btn detail-skel-shimmer"></span><span class="detail-skel-btn detail-skel-shimmer"></span><span class="detail-skel-btn detail-skel-shimmer"></span>';
+    actionGroup.appendChild(ov);
+  }
+}
+
+function clearDetailSkeletonUi() {
+  document.getElementById('detailSkelGalleryCover')?.remove();
+  document.getElementById('detailSkelLeadOverlay')?.remove();
+  detailShell?.classList.remove('detail-shell--skeleton-ui');
+}
+
+installDetailSkeletonUi();
+
 let currentGalleryIndex = 0;
 let currentThumbOffset = 0;
 let activePriceHelp = '';
@@ -561,7 +634,8 @@ async function copyAdvisorPhone() {
 }
 
 function getGalleryItems() {
-  return [...thumbGrid.querySelectorAll('.thumb')].map((thumb, index) => ({
+  if (!thumbGrid) return [];
+  return [...thumbGrid.querySelectorAll('.thumb:not(.thumb--skeleton)')].map((thumb, index) => ({
     index,
     kind: thumb.dataset.kind || 'image',
     src: thumb.dataset.image,
@@ -1358,6 +1432,7 @@ function applyCanonicalDetailUrl() {
 
 function renderDetailShellAll() {
   if (!currentVehicle) return;
+  clearDetailSkeletonUi();
   try {
     applyCanonicalDetailUrl();
     renderVehicleHeader();
@@ -1411,6 +1486,7 @@ async function bootstrapDetailPage() {
     if (hasLocalMatch) {
       renderDetailShellAll();
     } else {
+      clearDetailSkeletonUi();
       detailShell?.classList.remove('detail-shell--hydrating');
     }
     return;
@@ -1435,6 +1511,7 @@ async function bootstrapDetailPage() {
 }
 
 bootstrapDetailPage().catch(() => {
+  clearDetailSkeletonUi();
   detailShell?.classList.remove('detail-shell--hydrating');
 });
 
