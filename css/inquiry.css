@@ -156,9 +156,14 @@
   margin: 14px 0 0;
   padding: 0;
   list-style: none;
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: nowrap;
   gap: 7px;
+}
+
+.inq-progress > li {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .inq-progress button {
@@ -528,7 +533,13 @@
   }
 
   .inq-progress {
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .inq-progress > li {
+    flex: unset;
+    min-width: 0;
   }
 
   .inq-inline-grid {
