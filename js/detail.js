@@ -745,6 +745,23 @@ function syncLinks() {
   if (detailAdvisorBookLink) {
     detailAdvisorBookLink.href = `${consultFormBase}?id=${encodeURIComponent(currentVehicle.id)}`;
   }
+  if (!isRentalDetail && currentVehicle?.id) {
+    const stashInquiryId = () => {
+      try {
+        sessionStorage.setItem('tk168:inquiryVehicleId', currentVehicle.id);
+      } catch (_) {
+        /* ignore */
+      }
+    };
+    [detailStoreVisitLink, detailAdvisorBookLink].forEach((el) => {
+      if (!el) return;
+      const href = el.getAttribute('href') || '';
+      if (!href.includes('inquiry.html') || href.includes('rental-inquiry')) return;
+      if (el.dataset.inqStashBound === '1') return;
+      el.dataset.inqStashBound = '1';
+      el.addEventListener('pointerdown', stashInquiryId, { passive: true });
+    });
+  }
   if (isRentalDetail && currentVehicle?.id) {
     const stashId = () => {
       try {

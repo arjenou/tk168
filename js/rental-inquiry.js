@@ -800,11 +800,30 @@
     syncStateFromInputs();
   }
 
+  function navigateRentalInquiryBack() {
+    try {
+      const ref = document.referrer || '';
+      if (ref.startsWith(window.location.origin) && window.history.length > 1) {
+        window.history.back();
+        return;
+      }
+    } catch {
+      /* ignore */
+    }
+    const id = vehicleContext.currentVehicle?.id;
+    if (id && typeof window.TK168_DATA?.buildDetailUrl === 'function') {
+      window.location.assign(window.TK168_DATA.buildDetailUrl(id, { from: 'rental' }));
+      return;
+    }
+    window.location.assign(vehicleContext.inventoryHref || 'rental.html');
+  }
+
   function init() {
     applyLanguageCopy();
     initDefaultDate();
     bindInputEvents();
     bindStepEvents();
+    document.getElementById('riqBackNavBtn')?.addEventListener('click', navigateRentalInquiryBack);
     render();
   }
 

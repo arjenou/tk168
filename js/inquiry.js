@@ -185,14 +185,45 @@
     return String(template || '').replace(/\{(\w+)\}/g, (_, key) => params?.[key] ?? '');
   }
 
-  function createVehicleContext() {
+  const INQUIRY_VEHICLE_ID_KEY = 'tk168:inquiryVehicleId';
+
+  function getRequestedInquiryVehicleId() {
     const params = new URLSearchParams(window.location.search);
-    const requestedId = (params.get('id') || '').trim();
-    const currentVehicle = requestedId
-      ? (getInventoryVehicleById(requestedId) || null)
+    let id = (params.get('id') || '').trim();
+    if (!id) {
+      try {
+        id = (sessionStorage.getItem(INQUIRY_VEHICLE_ID_KEY) || '').trim();
+      } catch (_) {
+        id = '';
+      }
+      if (id) {
+        try {
+          sessionStorage.removeItem(INQUIRY_VEHICLE_ID_KEY);
+        } catch (_) {
+          /* ignore */
+        }
+        try {
+          const u = new URL(window.location.href);
+          if (!u.searchParams.get('id')) {
+            u.searchParams.set('id', id);
+            history.replaceState({}, '', u);
+          }
+        } catch (_) {
+          /* ignore */
+        }
+      }
+    }
+    return id;
+  }
+
+  function createVehicleContext() {
+    const requestedVehicleId = getRequestedInquiryVehicleId();
+    const currentVehicle = requestedVehicleId
+      ? (getInventoryVehicleById(requestedVehicleId) || null)
       : (vehicles[0] || null);
     const inventoryHref = currentVehicle?.brandKey ? buildBrandUrl(currentVehicle.brandKey) : 'brand.html';
     return {
+      requestedVehicleId,
       currentVehicle,
       inventoryHref
     };
@@ -588,12 +619,31 @@
     syncStateFromInputs();
   }
 
+  function navigateInquiryBack() {
+    try {
+      const ref = document.referrer || '';
+      if (ref.startsWith(window.location.origin) && window.history.length > 1) {
+        window.history.back();
+        return;
+      }
+    } catch {
+      /* ignore */
+    }
+    const id = inquiryVehicleContext.currentVehicle?.id;
+    if (id && typeof window.TK168_DATA?.buildDetailUrl === 'function') {
+      window.location.assign(window.TK168_DATA.buildDetailUrl(id));
+      return;
+    }
+    window.location.assign(inquiryVehicleContext.inventoryHref || 'brand.html');
+  }
+
   function init() {
     applyLanguageCopy();
     renderVehicleCard();
     initDefaultDate();
     bindInputEvents();
     bindStepEvents();
+    document.getElementById('inqBackNavBtn')?.addEventListener('click', navigateInquiryBack);
     render();
   }
 
@@ -601,6 +651,23 @@
     applyLanguageCopy();
     renderVehicleCard();
     render();
+  });
+
+  function refreshVehicleFromHydrate() {
+    const id = inquiryVehicleContext.requestedVehicleId || getRequestedInquiryVehicleId();
+    const next = id ? getInventoryVehicleById(id) : null;
+    if (!next) return;
+    const prev = inquiryVehicleContext.currentVehicle;
+    if (prev && next.id === prev.id && prev.name === next.name) return;
+    inquiryVehicleContext.currentVehicle = next;
+    inquiryVehicleContext.inventoryHref = next.brandKey ? buildBrandUrl(next.brandKey) : 'brand.html';
+    renderVehicleCard();
+    render();
+  }
+
+  document.addEventListener('tk168:data-updated', (event) => {
+    if (!event?.detail?.vehicles) return;
+    refreshVehicleFromHydrate();
   });
 
   if (document.readyState === 'loading') {
