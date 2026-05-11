@@ -8,8 +8,7 @@
   const nextButton = document.querySelector('#brands [data-nav="next"]');
   const swipeHint = document.querySelector('#brands [data-swipe-hint]');
   const swipeHintText = swipeHint?.querySelector('.lisboa-mobile-swipe-hint__text');
-  /** 手机：奇数个槽位，当前选中项居中，配合循环取模轮播 */
-  const MOBILE_VISIBLE_THUMBS = 5;
+  const mobileGrid = document.querySelector('#brands [data-mobile-grid]');
 
   if (!shell || !stage || !thumbs) return;
 
@@ -437,6 +436,7 @@
     if (prevButton) prevButton.setAttribute('aria-label', copy.prev);
     if (nextButton) nextButton.setAttribute('aria-label', copy.next);
     if (thumbs) thumbs.setAttribute('aria-label', copy.thumbs);
+    if (mobileGrid) mobileGrid.setAttribute('aria-label', copy.thumbs);
     if (swipeHintText) swipeHintText.textContent = copy.swipe;
   }
 
@@ -562,48 +562,20 @@
     return button;
   }
 
-  function getVisibleThumbIndexes() {
-    const n = Math.min(MOBILE_VISIBLE_THUMBS, slides.length);
-    if (slides.length <= n) {
-      return slides.map((_, index) => index);
-    }
-    const half = Math.floor(n / 2);
-    return Array.from({ length: n }, (_, i) => {
-      const raw = activeIndex - half + i;
-      return ((raw % slides.length) + slides.length) % slides.length;
-    });
-  }
-
-  function tearDownMobileThumbs() {
-    shell.querySelectorAll('.lisboa-thumb--mobile').forEach((node) => node.remove());
-  }
-
-  function syncMobileThumbs() {
-    const visibleIndexes = getVisibleThumbIndexes();
-    const nodes = [...shell.querySelectorAll('.lisboa-thumb--mobile')];
-    if (nodes.length !== visibleIndexes.length) {
-      tearDownMobileThumbs();
-      visibleIndexes.forEach((index, slot) => {
-        const thumb = createThumb(slides[index], index);
-        thumb.classList.add('lisboa-thumb--mobile');
-        thumb.style.setProperty('--mobile-thumb-slot', String(slot));
-        shell.appendChild(thumb);
-      });
-      return;
-    }
-
-    visibleIndexes.forEach((index, slot) => {
-      applyThumbContent(nodes[slot], slides[index], index);
-      nodes[slot].style.setProperty('--mobile-thumb-slot', String(slot));
-    });
-  }
-
   function renderThumbs() {
-    tearDownMobileThumbs();
     thumbs.innerHTML = '';
+    if (mobileGrid) {
+      mobileGrid.innerHTML = '';
+    }
 
     if (isMobileViewport()) {
-      syncMobileThumbs();
+      if (mobileGrid) {
+        slides.forEach((item, index) => {
+          const thumb = createThumb(item, index);
+          thumb.classList.add('lisboa-thumb--grid');
+          mobileGrid.appendChild(thumb);
+        });
+      }
       return;
     }
 
@@ -619,7 +591,7 @@
 
   function updateThumbState() {
     const thumbButtons = isMobileViewport()
-      ? [...shell.querySelectorAll('.lisboa-thumb--mobile')]
+      ? (mobileGrid ? [...mobileGrid.querySelectorAll('.lisboa-thumb')] : [])
       : [...thumbs.querySelectorAll('.lisboa-thumb')];
 
     thumbButtons.forEach((thumb) => {
@@ -699,9 +671,6 @@
       isAnimating = false;
     }
 
-    if (isMobileViewport()) {
-      syncMobileThumbs();
-    }
     updateThumbState();
     if (!isMobileViewport()) {
       scrollActiveThumbIntoView();

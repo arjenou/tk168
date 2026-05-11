@@ -10,7 +10,9 @@
   --thumb-bottom: 0.78rem;
   --thumb-gap: 0.82rem;
   --thumb-nav-gap: max(1.12rem, calc(var(--thumb-gap) + 0.35rem));
-  --thumb-button-width: 2rem;
+  --thumb-button-width: 1.62rem;
+  --thumb-active-ring: rgba(232, 197, 71, 0.55);
+  --thumb-active-glow: rgba(255, 224, 130, 0.35);
   --section-padding-block: clamp(1.5rem, 2.8vw, 2.75rem);
   --section-padding-inline: clamp(1.25rem, 3vw, 2.75rem);
   --section-height: clamp(760px, 92svh, 900px);
@@ -128,25 +130,28 @@
 #brands .lisboa-mobile-swipe-hint {
   display: none;
 }
+#brands .lisboa-mobile-brand-grid {
+  display: none;
+}
 #brands .slide-panel-meta {
   display: flex;
   align-items: center;
   width: max-content;
-  gap: 0.95rem;
-  margin-bottom: 0.95rem;
+  gap: 0.72rem;
+  margin-bottom: 0.85rem;
 }
 #brands .slide-panel-flag {
   flex: 0 0 auto;
-  width: 3.9rem;
-  height: 3.9rem;
-  border-radius: 1rem;
+  width: 2.85rem;
+  height: 2.85rem;
+  border-radius: 0.72rem;
   overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: 1px solid rgba(43, 41, 38, 0.08);
   background: #FFFFFF;
-  box-shadow: 0 4px 20px rgba(43, 41, 38, 0.07);
+  box-shadow: 0 3px 14px rgba(43, 41, 38, 0.06);
   backdrop-filter: blur(10px);
 }
 #brands .slide-panel-flag-icon {
@@ -158,12 +163,12 @@
 }
 #brands .slide-panel-brand {
   margin: 0 0 1rem;
-  color: rgba(30, 38, 49, 0.96);
+  color: rgba(18, 22, 28, 0.98);
   font-size: clamp(2.16rem, 2.55vw, 2.72rem);
   line-height: 0.96;
   letter-spacing: -0.05em;
   font-weight: 760;
-  text-shadow: 0 10px 24px rgba(255, 255, 255, 0.16);
+  text-shadow: none;
   display: inline-block;
   max-width: 100%;
   white-space: nowrap;
@@ -171,18 +176,18 @@
 }
 #brands .slide-panel-country {
   margin: 0;
-  padding-top: 0.08rem;
-  color: rgba(74, 84, 96, 0.72);
-  font-size: 0.92rem;
-  line-height: 1.2;
-  letter-spacing: 0.16em;
-  font-weight: 700;
-  text-transform: uppercase;
+  padding-top: 0.06rem;
+  color: rgba(88, 96, 108, 0.78);
+  font-size: 0.9rem;
+  line-height: 1.25;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+  text-transform: none;
 }
 #brands .slide-panel-story {
   margin: 0;
-  color: rgba(74, 84, 96, 0.9);
-  max-width: 21rem;
+  color: rgba(74, 84, 96, 0.82);
+  max-width: 22rem;
   font-size: clamp(1rem, 1.05vw, 1.12rem);
   line-height: 1.74;
   letter-spacing: 0.01em;
@@ -193,13 +198,16 @@
   flex: 0 0 auto;
   width: var(--thumb-button-width);
   height: var(--thumb-height);
-  border: 1px solid rgba(43, 41, 38, 0.08);
-  border-radius: 0.68rem;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(240, 240, 242, 0.88)), rgba(240, 240, 242, 0.72);
+  border: 1px solid rgba(43, 41, 38, 0.07);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffffff, #f4f4f5);
   color: #171717;
-  backdrop-filter: blur(24px) saturate(1.08);
-  -webkit-backdrop-filter: blur(24px) saturate(1.08);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), inset 0 -1px 0 rgba(255, 255, 255, 0.22), 0 14px 34px rgba(43, 41, 38, 0.12), 0 28px 48px rgba(43, 41, 38, 0.05);
+  backdrop-filter: blur(12px) saturate(1.02);
+  -webkit-backdrop-filter: blur(12px) saturate(1.02);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 10px 28px rgba(43, 41, 38, 0.1),
+    0 22px 44px rgba(43, 41, 38, 0.05);
   cursor: pointer;
   pointer-events: auto;
   transform: translateY(-0.3rem);
@@ -232,8 +240,11 @@
 #brands .lisboa-control:hover,
 #brands .lisboa-control:focus-visible {
   transform: translateY(-0.42rem);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(246, 246, 247, 0.94)), rgba(246, 246, 247, 0.82);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(255, 255, 255, 0.24), 0 18px 42px rgba(43, 41, 38, 0.15), 0 34px 56px rgba(43, 41, 38, 0.07);
+  background: linear-gradient(180deg, #ffffff, #f8f8f9);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 14px 36px rgba(43, 41, 38, 0.12),
+    0 26px 52px rgba(43, 41, 38, 0.07);
 }
 #brands .lisboa-control:focus-visible {
   outline: 2px solid rgba(23, 23, 23, 0.16);
@@ -297,53 +308,53 @@
   max-width: 9.25rem;
   height: var(--thumb-height);
   margin-top: 0;
-  padding: 0.64rem 0.74rem 0.58rem;
-  border: 1px solid transparent;
-  border-radius: 1.4rem;
+  padding: 0.58rem 0.72rem 0.52rem;
+  border: 1px solid rgba(20, 24, 30, 0.06);
+  border-radius: 1.05rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.55rem;
+  gap: 0.48rem;
   isolation: isolate;
   z-index: 0;
   color: rgba(34, 40, 47, 0.88);
-  background: transparent;
+  background: #ffffff;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  box-shadow: none;
+  box-shadow: 0 4px 18px rgba(20, 24, 30, 0.06);
   cursor: pointer;
   pointer-events: auto;
   will-change: transform, box-shadow;
   transform: translateY(-0.28rem);
-  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease, border-color 180ms ease;
+  transition: transform 200ms ease, box-shadow 200ms ease, background-color 200ms ease, border-color 200ms ease;
 }
 #brands .lisboa-thumb::before {
   content: "";
   position: absolute;
-  inset: 1px;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
-  border: 1px solid transparent;
   border-radius: inherit;
+  border: 1px solid transparent;
   background: transparent;
   opacity: 0;
-  transition: border-color 180ms ease, opacity 180ms ease, background 220ms ease, box-shadow 220ms ease;
+  transition: opacity 200ms ease;
 }
 #brands .lisboa-thumb::after {
   content: "";
   position: absolute;
   z-index: -1;
-  left: 18%;
-  right: 18%;
-  bottom: -0.46rem;
-  height: 0.92rem;
+  left: 14%;
+  right: 14%;
+  bottom: -0.35rem;
+  height: 0.75rem;
   border-radius: 999px;
-  background: radial-gradient(closest-side, rgba(43, 41, 38, 0.1), rgba(43, 41, 38, 0));
-  filter: blur(11px);
+  background: radial-gradient(closest-side, rgba(20, 24, 30, 0.08), rgba(20, 24, 30, 0));
+  filter: blur(10px);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 180ms ease, transform 180ms ease;
+  transition: opacity 200ms ease, transform 200ms ease;
 }
 #brands .lisboa-thumb > * {
   position: relative;
@@ -353,16 +364,14 @@
 #brands .lisboa-thumb:focus-visible {
   margin-top: 0;
   z-index: 1;
-  border-color: rgba(242, 250, 90, 0.35);
-  transform: translateY(-0.38rem);
-  background: transparent;
-  box-shadow: 0 0 0 1px rgba(242, 250, 90, 0.22);
-  animation: lisboa-thumb-hover 1.55s ease-in-out infinite;
+  border-color: rgba(20, 24, 30, 0.1);
+  transform: translateY(-0.4rem);
+  box-shadow: 0 8px 26px rgba(20, 24, 30, 0.1);
 }
 #brands .lisboa-thumb:hover::after,
 #brands .lisboa-thumb:focus-visible::after {
-  opacity: 0.12;
-  transform: translateY(0.12rem) scaleX(1.04);
+  opacity: 0.14;
+  transform: translateY(0.08rem) scaleX(1.02);
 }
 #brands .lisboa-thumb:focus-visible {
   outline: 2px solid rgba(23, 23, 23, 0.16);
@@ -371,30 +380,28 @@
 #brands .lisboa-thumb.is-active {
   margin-top: 0;
   z-index: 2;
-  border-color: rgba(242, 250, 90, 0.55);
-  background: rgba(242, 250, 90, 0.08);
+  border-color: var(--thumb-active-ring);
+  background: #fffef8;
   box-shadow:
-    0 0 0 2px rgba(242, 250, 90, 0.34),
-    0 12px 32px rgba(242, 250, 90, 0.16);
-  transform: translateY(-0.52rem) scale(1.02);
-  animation: lisboa-thumb-active 1.85s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    0 0 0 2px var(--thumb-active-glow),
+    0 0 28px rgba(255, 214, 120, 0.22),
+    0 10px 28px rgba(20, 24, 30, 0.08);
+  transform: translateY(-0.48rem) scale(1.02);
 }
 #brands .lisboa-thumb.is-active::before {
-  border-color: rgba(242, 250, 90, 0.28);
-  background: transparent;
-  opacity: 0.45;
+  opacity: 0;
   box-shadow: none;
 }
 #brands .lisboa-thumb.is-active::after {
-  background: radial-gradient(closest-side, rgba(242, 250, 90, 0.35), rgba(242, 250, 90, 0));
-  opacity: 0.5;
-  transform: translateY(0.28rem) scaleX(1.22);
+  background: radial-gradient(closest-side, var(--thumb-active-glow), rgba(255, 214, 120, 0));
+  opacity: 0.45;
+  transform: translateY(0.22rem) scaleX(1.12);
 }
 #brands .lisboa-thumb__logo {
   width: 2.95rem;
   height: 2.95rem;
   object-fit: contain;
-  filter: drop-shadow(0 6px 10px rgba(24, 24, 28, 0.1));
+  filter: grayscale(1) contrast(0.95);
   transition: transform 220ms ease, filter 220ms ease;
 }
 #brands .lisboa-thumb__logo.lexus-mark {
@@ -402,20 +409,20 @@
   height: 2.45rem;
   display: block;
   overflow: visible;
-  color: rgba(17, 20, 26, 0.94);
-  filter: drop-shadow(0 6px 10px rgba(24, 24, 28, 0.08));
+  color: rgba(17, 20, 26, 0.88);
+  filter: grayscale(1) contrast(0.95);
 }
 #brands .lisboa-thumb__label {
   width: 100%;
   font-size: 0.82rem;
   line-height: 1.18;
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: rgba(43, 41, 38, 0.62);
+  color: rgba(60, 64, 72, 0.62);
   transition: color 220ms ease, transform 220ms ease;
 }
 #brands .lisboa-thumb__label.is-tight {
@@ -426,21 +433,17 @@
   letter-spacing: -0.04em;
 }
 #brands .lisboa-thumb.is-active .lisboa-thumb__logo {
-  transform: translateY(-0.05rem) scale(1.05);
-  filter:
-    drop-shadow(0 3px 10px rgba(242, 250, 90, 0.38))
-    drop-shadow(0 6px 14px rgba(24, 24, 28, 0.12));
+  transform: translateY(-0.04rem) scale(1.04);
+  filter: grayscale(0) contrast(1) drop-shadow(0 4px 12px rgba(20, 24, 30, 0.08));
 }
 #brands .lisboa-thumb.is-active .lisboa-thumb__logo.lexus-mark {
-  transform: translateY(-0.05rem) scale(1.05);
+  transform: translateY(-0.04rem) scale(1.04);
   color: rgba(17, 20, 26, 0.94);
-  filter:
-    drop-shadow(0 3px 10px rgba(242, 250, 90, 0.4))
-    drop-shadow(0 4px 12px rgba(24, 24, 28, 0.1));
+  filter: grayscale(0) contrast(1) drop-shadow(0 4px 12px rgba(20, 24, 30, 0.08));
 }
 #brands .lisboa-thumb.is-active .lisboa-thumb__label {
   color: rgba(26, 28, 32, 0.92);
-  transform: translateY(-0.03rem);
+  transform: translateY(-0.02rem);
   text-shadow: none;
 }
 #brands .lisboa-slide.is-active,
@@ -633,22 +636,6 @@
     transform: translateY(0.14rem) scaleX(0.95);
   }
 }
-@keyframes lisboa-thumb-hover {
-  0%, 100% {
-    transform: translateY(-0.38rem) scale(1);
-  }
-  50% {
-    transform: translateY(-0.52rem) scale(1.022);
-  }
-}
-@keyframes lisboa-thumb-active {
-  0%, 100% {
-    transform: translateY(-0.52rem) scale(1.02);
-  }
-  50% {
-    transform: translateY(-0.72rem) scale(1.052);
-  }
-}
 @media (max-width: 72rem) {
   #brands {
     --content-edge: 6.25rem;
@@ -669,7 +656,7 @@
   #brands .lisboa-control {
     width: var(--thumb-button-width);
     height: 6rem;
-    border-radius: 0.64rem;
+    border-radius: 999px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -693,13 +680,15 @@
     --mobile-top-gap: 3rem;
     --mobile-section-offset: 1rem;
     --mobile-bottom-safe: max(env(safe-area-inset-bottom, 0px), 2.125rem);
+    --brands-mobile-grid-h: 13.35rem;
+    --brands-mobile-hero-clear: 15.85rem;
     min-height: var(--mobile-frame-height);
     padding: 0 max(0px, (100vw - var(--mobile-frame-width)) / 2) 0;
   }
   #brands .lisboa-shell {
     width: var(--mobile-frame-width);
     min-height: var(--mobile-frame-height);
-    padding-bottom: calc(var(--mobile-bottom-safe) + 5.5rem);
+    padding-bottom: calc(var(--mobile-bottom-safe) + var(--brands-mobile-hero-clear) - 2.5rem);
   }
   /* pan-y：保留纵向跟页滚动；横向划动由脚本在确认水平拖动手势后 preventDefault */
   #brands .lisboa-stage {
@@ -712,7 +701,7 @@
     left: var(--mobile-side-gap);
     right: var(--mobile-side-gap);
     top: calc(var(--mobile-nav-height) + 9.5rem + var(--mobile-section-offset));
-    bottom: calc(var(--mobile-bottom-safe) + 6.4rem);
+    bottom: calc(var(--mobile-bottom-safe) + var(--brands-mobile-hero-clear));
     z-index: 8;
     pointer-events: auto;
     touch-action: pan-y;
@@ -729,7 +718,7 @@
     left: var(--mobile-side-gap);
     right: var(--mobile-side-gap);
     top: calc(var(--mobile-nav-height) + 16.75rem + var(--mobile-section-offset));
-    bottom: calc(var(--mobile-bottom-safe) + 6.95rem);
+    bottom: calc(var(--mobile-bottom-safe) + var(--brands-mobile-hero-clear));
     transform: translateY(0.75rem) scale(0.97);
   }
   #brands .lisboa-slide__hero-logo {
@@ -747,11 +736,77 @@
   #brands .lisboa-slide.is-enter-left .lisboa-slide__hero-logo {
     animation: none;
   }
+  #brands .lisboa-mobile-brand-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.48rem 0.36rem;
+    position: absolute;
+    z-index: 13;
+    left: var(--mobile-side-gap);
+    right: var(--mobile-side-gap);
+    bottom: calc(var(--mobile-bottom-safe) + 0.32rem);
+    min-height: var(--brands-mobile-grid-h);
+    align-content: start;
+  }
+  #brands .lisboa-mobile-brand-grid .lisboa-thumb {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    height: auto;
+    aspect-ratio: 1;
+    padding: 0.3rem 0.22rem 0.26rem;
+    border-radius: 0.78rem;
+    gap: 0.22rem;
+    transform: none;
+    margin-top: 0;
+    box-shadow: 0 2px 10px rgba(20, 24, 30, 0.06);
+  }
+  #brands .lisboa-mobile-brand-grid .lisboa-thumb:hover,
+  #brands .lisboa-mobile-brand-grid .lisboa-thumb:focus-visible {
+    transform: translateY(-0.06rem);
+  }
+  #brands .lisboa-mobile-brand-grid .lisboa-thumb.is-active {
+    background: #141414;
+    border-color: #141414;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
+    transform: none;
+  }
+  #brands .lisboa-mobile-brand-grid .lisboa-thumb.is-active::after {
+    opacity: 0;
+  }
+  #brands .lisboa-mobile-brand-grid .lisboa-thumb.is-active .lisboa-thumb__logo {
+    filter: brightness(0) invert(1);
+  }
+  #brands .lisboa-mobile-brand-grid .lisboa-thumb.is-active .lisboa-thumb__logo.lexus-mark {
+    filter: none;
+    color: #f4f4f4;
+  }
+  #brands .lisboa-mobile-brand-grid .lisboa-thumb.is-active .lisboa-thumb__label {
+    color: rgba(255, 255, 255, 0.88);
+  }
+  #brands .lisboa-mobile-brand-grid .lisboa-thumb__logo {
+    width: 1.68rem;
+    height: 1.68rem;
+  }
+  #brands .lisboa-mobile-brand-grid .lisboa-thumb__logo.lexus-mark {
+    width: 2.05rem;
+    height: 1.42rem;
+  }
+  #brands .lisboa-mobile-brand-grid .lisboa-thumb__label {
+    font-size: 0.56rem;
+    line-height: 1.08;
+  }
+  #brands .lisboa-mobile-brand-grid .lisboa-thumb__label.is-tight {
+    font-size: 0.52rem;
+  }
+  #brands .lisboa-mobile-brand-grid .lisboa-thumb__label.is-tighter {
+    font-size: 0.48rem;
+  }
   #brands .lisboa-mobile-swipe-hint {
     display: inline-flex;
     position: absolute;
     left: 50%;
-    bottom: calc(var(--mobile-bottom-safe) + 5.75rem);
+    bottom: calc(var(--mobile-bottom-safe) + var(--brands-mobile-grid-h) + 0.55rem);
     z-index: 11;
     align-items: center;
     justify-content: center;
@@ -797,9 +852,9 @@
     margin-bottom: 0.78rem;
   }
   #brands .slide-panel-flag {
-    width: 3.1rem;
-    height: 3.1rem;
-    border-radius: 0.82rem;
+    width: 2.65rem;
+    height: 2.65rem;
+    border-radius: 0.68rem;
   }
   #brands .slide-panel-brand {
     margin-bottom: 0.88rem;
@@ -807,8 +862,8 @@
     line-height: 0.94;
   }
   #brands .slide-panel-country {
-    font-size: 0.84rem;
-    letter-spacing: 0.08em;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
   }
   #brands .slide-panel-story {
     max-width: 14.5rem;
@@ -827,47 +882,6 @@
   }
   #brands .lisboa-thumbs {
     display: none;
-  }
-  #brands .lisboa-thumb {
-    height: 5rem;
-    min-width: 0;
-    padding: 0.55rem 0.46rem 0.5rem;
-    border-radius: 1.2rem;
-    transform: translateY(-0.08rem);
-  }
-  /* 5 枚横排、中央がアクティブ（スクリプト --mobile-thumb-slot 0…4） */
-  #brands .lisboa-thumb--mobile {
-    position: absolute;
-    z-index: 12;
-    left: calc(var(--mobile-side-gap) + var(--mobile-thumb-slot, 0) * ((100% - var(--mobile-side-gap) * 2 - 2.2rem) / 5 + 0.55rem));
-    bottom: calc(var(--mobile-bottom-safe) + 0.2rem);
-    width: calc((100% - var(--mobile-side-gap) * 2 - 2.2rem) / 5);
-    flex: none;
-    touch-action: pan-y;
-  }
-  #brands .lisboa-thumb__logo {
-    width: 2rem;
-    height: 2rem;
-  }
-  #brands .lisboa-thumb__logo.lexus-mark {
-    width: 2.55rem;
-    height: 1.85rem;
-  }
-  #brands .lisboa-thumb__label {
-    font-size: 0.68rem;
-  }
-  #brands .lisboa-thumb__label.is-tight {
-    font-size: 0.63rem;
-  }
-  #brands .lisboa-thumb__label.is-tighter {
-    font-size: 0.58rem;
-  }
-  #brands .lisboa-thumb:hover,
-  #brands .lisboa-thumb:focus-visible {
-    transform: translateY(-0.16rem);
-  }
-  #brands .lisboa-thumb.is-active {
-    transform: translateY(-0.28rem) scale(1.018);
   }
 }
 @keyframes copy-enter-mobile {
