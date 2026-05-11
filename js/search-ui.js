@@ -20,7 +20,6 @@ window.TK168SearchUI = (() => {
       brand: state.brand || '',
       bodyStyle: state.bodyStyle || '',
       price: state.price || '',
-      priceMetric: state.priceMetric === 'base' ? 'base' : 'total',
       year: state.year || '',
       mileage: state.mileage || '',
       keyword: state.keyword || ''
@@ -129,12 +128,7 @@ window.TK168SearchUI = (() => {
     function getPriceLabel() {
       const defaultLabel = window.TK168I18N?.t('search.price') || '价格';
       if (!state.price) return defaultLabel;
-      const optionLabel = window.TK168_DATA.getSearchFilterLabel('price', state.price);
-      if (state.priceMetric !== 'base') return optionLabel;
-      const basePrefix = window.TK168I18N?.getLanguage?.() === 'ja'
-        ? '本体 '
-        : '本体 ';
-      return `${basePrefix}${optionLabel}`;
+      return window.TK168_DATA.getSearchFilterLabel('price', state.price);
     }
 
     function closeMenu() {
@@ -306,50 +300,22 @@ window.TK168SearchUI = (() => {
       return menu;
     }
 
-    function getPriceMetricTabs() {
-      return [
-        { value: 'total', label: window.TK168I18N?.t('price.total') || '总价' },
-        { value: 'base', label: window.TK168I18N?.t('price.baseLong') || '车辆价格' }
-      ];
-    }
-
     function buildPriceMenu(root, button) {
       const menu = createDropdownMenu(root, button, 'fb-filter-menu--price', 280);
-      const metricTabs = getPriceMetricTabs();
       const options = getFieldOptions('price');
-      const baseNote = window.TK168I18N?.getLanguage?.() === 'ja' ? '本体価格で絞り込み' : '按车辆价格';
 
       menu.innerHTML = `
-        <div class="fb-filter-menu-head">
-          ${metricTabs.map((tab) => `
-            <button
-              type="button"
-              class="fb-filter-toggle${state.priceMetric === tab.value ? ' is-active' : ''}"
-              data-price-metric="${tab.value}"
-            >${escapeHtml(tab.label)}</button>
-          `).join('')}
-        </div>
         <div class="fb-filter-menu-body">
           ${options.map((option) => buildFilterOption({
             value: option.value,
             label: option.label,
             selected: option.value === state.price,
-            note: option.value && state.priceMetric === 'base' ? baseNote : ''
+            note: ''
           })).join('')}
         </div>
       `;
 
       menu.addEventListener('click', (event) => {
-        const metricButton = event.target.closest('[data-price-metric]');
-        if (metricButton) {
-          state.priceMetric = metricButton.dataset.priceMetric === 'base' ? 'base' : 'total';
-          const nextMenu = buildPriceMenu(root, button);
-          menu.replaceWith(nextMenu);
-          if (openMenuState?.menu === menu) openMenuState.menu = nextMenu;
-          notifyFiltersChange();
-          return;
-        }
-
         const option = event.target.closest('.fb-filter-option');
         if (!option) return;
         state.price = option.dataset.value || '';

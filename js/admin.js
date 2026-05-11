@@ -209,7 +209,6 @@ const RESOURCES = {
           { key: "fuelOilType", label: "油種", type: "select", optionsCatalog: "fuelOilType", span: 3, hint: "泵用标号：レギュラー/ハイオク/軽油/電気；存库中文值，前台多语言展示。" },
           { key: "trans", label: "变速箱", type: "select", optionsCatalog: "trans", span: 3 },
           { key: "totalPrice", label: "支付总额", placeholder: "1,980,000 JPY", hint: "输入时自动按日式千分位排版（末尾 JPY）。", span: 4 },
-          { key: "basePrice", label: "车辆本体价格", placeholder: "1,860,000 JPY", hint: "输入时自动按日式千分位排版。", span: 4 },
         ],
       },
     ],
@@ -237,7 +236,7 @@ const RESOURCES = {
       fuel: "汽油",
       fuelOilType: "高辛烷汽油",
       trans: "AT",
-      totalPrice: "", basePrice: "",
+      totalPrice: "",
       bodyStyle: "", drive: "", bodyColor: "", interiorColor: "", seats: "",
       serviceRecord: "",
       overviewZh: [""], overviewJa: [""], overviewEn: null,
@@ -572,9 +571,6 @@ function normalizeInventoryDraftForEngine(draft) {
   delete next.forcedInductionEn;
   if (Object.prototype.hasOwnProperty.call(draft, "totalPrice")) {
     next.totalPrice = formatInventoryPriceYenStyle(draft.totalPrice);
-  }
-  if (Object.prototype.hasOwnProperty.call(draft, "basePrice")) {
-    next.basePrice = formatInventoryPriceYenStyle(draft.basePrice);
   }
   if (Object.prototype.hasOwnProperty.call(draft, "dailyRate")) {
     next.dailyRate = formatInventoryPriceYenStyle(draft.dailyRate);
@@ -2508,7 +2504,7 @@ function bindEditor() {
 
   document
     .querySelectorAll(
-      '[data-draft="totalPrice"], [data-draft="basePrice"], [data-draft="dailyRate"], [data-draft="deposit"]',
+      '[data-draft="totalPrice"], [data-draft="dailyRate"], [data-draft="deposit"]',
     )
     .forEach((input) => {
       const run = () => applyInventoryPriceFormatLive(input);
@@ -2814,9 +2810,7 @@ async function saveItem() {
     if (Object.prototype.hasOwnProperty.call(payload, "totalPrice")) {
       payload.totalPrice = formatInventoryPriceYenStyle(payload.totalPrice);
     }
-    if (Object.prototype.hasOwnProperty.call(payload, "basePrice")) {
-      payload.basePrice = formatInventoryPriceYenStyle(payload.basePrice);
-    }
+    payload.basePrice = "";
   }
   if (r.key === "rentals") {
     if (Object.prototype.hasOwnProperty.call(payload, "dailyRate")) {

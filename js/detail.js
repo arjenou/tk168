@@ -38,10 +38,22 @@ detailShell?.classList.add('detail-shell--hydrating');
   priceRoot.querySelectorAll('.detail-price-tax').forEach((el) => {
     el.setAttribute('hidden', '');
   });
-  priceRoot.querySelectorAll('.detail-price-help').forEach((el) => {
-    el.setAttribute('hidden', '');
-  });
+  const mainHelp = priceRoot.querySelector('.detail-price-main .detail-price-help');
+  const subHelp = priceRoot.querySelector('.detail-price-sub .detail-price-help');
+  if (mainHelp) {
+    mainHelp.removeAttribute('hidden');
+    mainHelp.dataset.priceHelp = 'rentalDaily';
+  }
+  if (subHelp) {
+    subHelp.removeAttribute('hidden');
+    subHelp.dataset.priceHelp = 'rentalDeposit';
+  }
   window.TK168I18N?.applyTranslations?.(priceRoot);
+})();
+
+(function hideInventoryVehicleBasePriceRow() {
+  if (isRentalDetail) return;
+  document.querySelector('.detail-price-sub')?.setAttribute('hidden', '');
 })();
 
 const thumbGrid = document.getElementById('thumbGrid');
@@ -257,6 +269,33 @@ const PRICE_HELP_CONTENT = {
         '客户另行指定的升级项目与个别交付要求'
       ],
       note: '如页面同时标注总价，请以总价作为整体购入预算参考，车辆价格主要用于车型间横向比较。'
+    },
+    rentalDaily: {
+      title: '日租金说明',
+      summary: '此处「日租金」为每租用一个计费日的参考单价。中文与日文界面可能以「万円」展示：数字为日元金额÷1万（例如 0.06 万円表示约 600 日元/日）。英文界面为整笔日元（JPY）标价。均为参考，最终以门店或合约确认为准。',
+      included: [
+        '基本租金的展示口径（是否含税以最终报价为准）',
+        '可能受最短租期、旺季/周末、车型档期等影响的计费前提'
+      ],
+      excluded: [
+        '燃油、路桥与停车费、异地还车等实际发生费用',
+        '超里程、额外驾驶员、装备租赁等可选加价',
+        '事故车损、违章代办及罚金等按实结算项目'
+      ],
+      note: '计费周期（按日历日或 24 小时等）、取消与变更规则，请在预约前向顾问确认。'
+    },
+    rentalDeposit: {
+      title: '押金（保证金）说明',
+      summary: '「押金」用于担保还车时的车损修复、违章未结清扣款等风险。在合约条件满足、验车无争议的情况下，按约定期限无息退还（或按门店流程抵扣后退还余额）。',
+      included: [
+        '还车验车通过后的退还流程说明以门店为准',
+        '可与租金、免赔额条款一并写在租赁合约中'
+      ],
+      excluded: [
+        '已实际发生的修理费、违章罚金等可能从押金中抵扣的部分',
+        '因个人原因提前终止合约产生的违约金（依约）'
+      ],
+      note: '具体押金额度、冻结与解冻时间、信用卡预授权或转账方式，以签约时门店说明为准。'
     }
   },
   ja: {
@@ -290,6 +329,33 @@ const PRICE_HELP_CONTENT = {
         'お客様ご指定のオプション装着や個別対応費用'
       ],
       note: '支払総額の表示がある場合は、ご購入予算の目安として支払総額をご確認ください。車両本体価格は車両同士を比較する際の参考としてご覧いただけます。'
+    },
+    rentalDaily: {
+      title: '「1日料金」について',
+      summary: '掲載の1日料金は、レンタル基本料金の目安です。日本語・中国語表示では「万円」表記となる場合があります（表示値は日本円を1万で割った数字。例：0.06万円＝600円／日）。英語表示では JPY の金額で示されます。最終条件は店舗・契約書の内容をご確認ください。',
+      included: [
+        '税込／税抜の扱い、最短日数、繁忙期割増などはプランにより異なります',
+        '予約確定前の見積もり段階での参考表示であること'
+      ],
+      excluded: [
+        '燃料代、高速道路料金、駐車料金、ワンウェイ手数料などの実費',
+        '超過走行、追加ドライバー、チャイルドシート等のオプション料金',
+        '事故・違反に伴う修理代、反則金、事務手数料等の実費精算'
+      ],
+      note: '課金単位（カレンダー日／24時間など）やキャンセル規定は、予約時に担当へご確認ください。'
+    },
+    rentalDeposit: {
+      title: '「保証金」について',
+      summary: '保証金は、返却時の車両損傷や未精算の違反料金等に備えた担保として預かる金額です。契約条件を満たし、車両・書類に問題がない場合は、所定の手続きのうえ返金（または未使用分の返金）となります。',
+      included: [
+        '返却検査後の返金タイミング・方法は各店舗の規程に従います',
+        'クレジットカードの与信枠確保／銀行振込等、受け取り形態は店舗により異なります'
+      ],
+      excluded: [
+        '実際に発生した修理費・違反代行費用など、精算後に差し引かれる場合があります',
+        'お客様都合による途中解約に伴う違約金（契約に定める場合）'
+      ],
+      note: '保証金の額、留保期間、カード与信の解除目安などは、契約時の説明および約款をご確認ください。'
     }
   },
   en: {
@@ -323,6 +389,33 @@ const PRICE_HELP_CONTENT = {
         'Optional upgrades and individually requested delivery arrangements'
       ],
       note: 'If the page also shows a total purchase price, use that figure as the main budget reference. The base price is mainly for comparing vehicles side by side.'
+    },
+    rentalDaily: {
+      title: 'About the daily rental rate',
+      summary: 'The daily rate shown here is the reference rental price per billing day before optional charges. On Japanese and Chinese locales the amount may appear in 「万円」 (yen divided by 10,000; e.g. 0.06万円 ≈ ¥600 per day). English uses full-yen JPY formatting. Final pricing follows the store and your rental agreement.',
+      included: [
+        'May vary with minimum rental length, seasonality, and vehicle availability',
+        'Shown as a planning estimate until your booking is confirmed'
+      ],
+      excluded: [
+        'Fuel, tolls, parking, one-way fees, and other pass-through costs',
+        'Excess mileage, extra drivers, optional equipment fees',
+        'Damage repair, traffic fines, and related administrative charges settled separately'
+      ],
+      note: 'Ask your advisor how a “day” is counted (calendar day vs 24-hour clock) and how taxes are applied.'
+    },
+    rentalDeposit: {
+      title: 'About the security deposit',
+      summary: 'The deposit is a refundable hold to cover potential vehicle damage, unpaid traffic penalties, or similar contractual exposure. When return inspection is clean and contractual conditions are met, it is released or refunded according to the store’s process.',
+      included: [
+        'Refund timing and method (card authorization release, bank transfer, etc.) depend on the location',
+        'May be combined with deductible / insurance terms in your contract'
+      ],
+      excluded: [
+        'Actual repair costs or fines that are deducted before refund',
+        'Cancellation penalties for renter-caused early termination when applicable'
+      ],
+      note: 'Confirm the deposit amount, card pre-authorisation window, and any hold period before you sign.'
     }
   }
 };
@@ -572,8 +665,9 @@ function renderVehicleHeader() {
       window.TK168_DATA.getDisplayPrice(profile.deposit, language),
     );
   } else {
-    detailTotalPriceValue.innerHTML = formatPriceMarkup(window.TK168_DATA.getVehicleTotalPriceDisplay(currentVehicle));
-    detailBasePriceValue.innerHTML = formatPriceMarkup(window.TK168_DATA.getVehicleBasePriceDisplay(currentVehicle));
+    detailTotalPriceValue.innerHTML = formatPriceMarkup(
+      window.TK168_DATA.getVehicleTotalPriceDisplay(currentVehicle, language),
+    );
   }
   const primaryImage = window.TK168_DATA.resolveVehicleMediaSource(currentVehicle.gallery?.[0] || currentVehicle.photo);
   setMainGalleryImage(primaryImage, `${vehicleName} ${window.TK168I18N?.t('gallery.main') || '主图'}`);
@@ -787,11 +881,12 @@ function syncLinks() {
 
 function buildPriceHelpModalHTML(kind) {
   const language = getDetailLanguage();
+  let resolvedKind = kind === 'base' ? 'total' : kind;
   const content =
-    PRICE_HELP_CONTENT[language]?.[kind]
-    || PRICE_HELP_CONTENT.en?.[kind]
-    || PRICE_HELP_CONTENT.ja?.[kind]
-    || PRICE_HELP_CONTENT.zh?.[kind]
+    PRICE_HELP_CONTENT[language]?.[resolvedKind]
+    || PRICE_HELP_CONTENT.en?.[resolvedKind]
+    || PRICE_HELP_CONTENT.ja?.[resolvedKind]
+    || PRICE_HELP_CONTENT.zh?.[resolvedKind]
     || PRICE_HELP_CONTENT.en?.total
     || PRICE_HELP_CONTENT.ja?.total
     || PRICE_HELP_CONTENT.zh?.total;

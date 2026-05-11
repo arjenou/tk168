@@ -680,6 +680,15 @@ body.mobile-nav-open {
   container-type: inline-size;
 }
 
+/* 在售车辆详情不再展示「车辆本体价格」行；租赁详情保留日租金+押金双行 */
+.detail-shell:not(.detail-shell--rental) .detail-price-sub {
+  display: none !important;
+}
+
+.detail-shell:not(.detail-shell--rental) .detail-price {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .detail-price-main {
   padding-left: 12px;
 }

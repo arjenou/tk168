@@ -5,7 +5,6 @@ window.TK168_DATA = (() => {
     address: '339-0035埼玉県さいたま市岩槻区笹久保新田'
   };
 
-  const RMB_TO_JPY_RATE = 20;
   const activeBrandKeys = Array.isArray(window.TK168ActiveBrandKeys) && window.TK168ActiveBrandKeys.length
     ? [...window.TK168ActiveBrandKeys]
     : [
@@ -1802,14 +1801,20 @@ window.TK168_DATA = (() => {
     return Number(String(value || '').replace(/[^\d]/g, '')) || 0;
   }
 
-  function formatRmbPrice(amount) {
-    const opts = { useGrouping: true };
-    return `${Number(amount || 0).toLocaleString('zh-CN', opts)} JPY`;
+  /** Full-yen amount for English UI (matches detail/renderers price markup). */
+  function formatPriceJpyEnglish(amountJpy) {
+    const n = Number(amountJpy || 0);
+    if (!n) return '';
+    return `JPY ${n.toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 })}`;
   }
 
-  function formatJpyPrice(amountRmb, numberLocale = 'ja-JP') {
-    const amountJpy = amountRmb * RMB_TO_JPY_RATE;
-    return `${amountJpy.toLocaleString(numberLocale, { useGrouping: true })} JPY`;
+  /** 以「万円」展示整数日元（中文、日文同一单位）。 */
+  function formatPriceWanYen(amountJpy) {
+    const n = Number(amountJpy || 0);
+    if (!n) return '';
+    const wan = n / 10000;
+    let s = wan.toFixed(4).replace(/\.?0+$/, '');
+    return `${s}万円`;
   }
 
   function normalizeMileageUnit(u) {
@@ -2509,7 +2514,7 @@ window.TK168_DATA = (() => {
   }
 
   function getVehicleBasePrice(vehicle) {
-    return vehicle?.basePrice || getVehicleTotalPrice(vehicle);
+    return getVehicleTotalPrice(vehicle);
   }
 
   const rentalProfiles = {
@@ -2735,9 +2740,9 @@ window.TK168_DATA = (() => {
   function getDisplayPrice(value, language = getCurrentLanguage()) {
     const amount = parseCurrency(value);
     if (!amount) return '';
-    if (language === 'zh') return formatRmbPrice(amount);
-    if (language === 'en') return formatJpyPrice(amount, 'en-US');
-    return formatJpyPrice(amount, 'ja-JP');
+    if (language === 'en') return formatPriceJpyEnglish(amount);
+    if (language === 'zh' || language === 'ja') return formatPriceWanYen(amount);
+    return formatPriceWanYen(amount);
   }
 
   function getVehicleTotalPriceDisplay(vehicle, language = getCurrentLanguage()) {
@@ -2818,7 +2823,6 @@ window.TK168_DATA = (() => {
       brand: params.get('brand') || '',
       bodyStyle: params.get('bodyStyle') || '',
       price: params.get('price') || '',
-      priceMetric: params.get('priceMetric') === 'base' ? 'base' : 'total',
       year: params.get('year') || '',
       mileage: params.get('mileage') || '',
       keyword: (params.get('keyword') || '').trim(),
@@ -2838,7 +2842,6 @@ window.TK168_DATA = (() => {
   function filterVehicles(list, filters = {}) {
     const keyword = String(filters.keyword || '').trim().toLowerCase();
     const priceOption = priceOptions.find((item) => item.value === filters.price);
-    const priceMetric = filters.priceMetric === 'base' ? 'base' : 'total';
     const yearOption = yearOptions.find((item) => item.value === filters.year);
     const mileageOption = mileageOptions.find((item) => item.value === filters.mileage);
 
@@ -2846,9 +2849,7 @@ window.TK168_DATA = (() => {
       if (filters.brand && vehicle.brandKey !== filters.brand) return false;
       if (filters.bodyStyle && String(vehicle.bodyStyle || '').trim() !== filters.bodyStyle) return false;
       if (priceOption) {
-        const amount = priceMetric === 'base'
-          ? parseCurrency(getVehicleBasePrice(vehicle))
-          : parseCurrency(getVehicleTotalPrice(vehicle));
+        const amount = parseCurrency(getVehicleTotalPrice(vehicle));
         if (!priceOption.match(amount)) return false;
       }
       if (yearOption && !yearOption.match(parseYear(vehicle.year))) return false;
@@ -2900,7 +2901,6 @@ window.TK168_DATA = (() => {
       brand: filters.brand || '',
       bodyStyle: filters.bodyStyle || '',
       price: filters.price || '',
-      priceMetric: filters.price ? (filters.priceMetric === 'base' ? 'base' : '') : '',
       year: filters.year || '',
       mileage: filters.mileage || '',
       keyword: String(filters.keyword || '').trim()
@@ -2975,7 +2975,6 @@ window.TK168_DATA = (() => {
       brand: filters.brand || '',
       bodyStyle: filters.bodyStyle || '',
       price: filters.price || '',
-      priceMetric: filters.price ? (filters.priceMetric === 'base' ? 'base' : '') : '',
       year: filters.year || '',
       mileage: filters.mileage || '',
       keyword: String(filters.keyword || '').trim(),

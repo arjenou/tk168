@@ -305,6 +305,18 @@ window.TK168Renderers = (() => {
       : 'brand.html';
     const primaryPriceLabel = isRentalFleetCard ? t('rental.priceDaily') : getPriceLabel('price.total');
     const secondaryPriceLabel = isRentalFleetCard ? t('rental.priceDeposit') : getPriceLabel('price.base');
+    const primaryPriceHtml = `
+          <div class="${variant.priceRow}">
+            <span class="${variant.priceLabel}">${primaryPriceLabel}</span>
+            <span class="${variant.priceValue}">${formatCardPriceMarkup(totalPrice)}</span>
+          </div>`;
+    const secondaryPriceHtml = isRentalFleetCard
+      ? `
+          <div class="${variant.priceRow} is-sub">
+            <span class="${variant.priceSubLabel}">${secondaryPriceLabel}</span>
+            <span class="${variant.priceSubValue}">${formatCardPriceMarkup(basePrice)}</span>
+          </div>`
+      : '';
     const bodyMarkup = `
       <div class="${variant.header}">
         <div class="${brandWrapClass}">
@@ -325,14 +337,7 @@ window.TK168Renderers = (() => {
           ${metaMarkup}
         </div>
         <div class="${variant.priceWrap}">
-          <div class="${variant.priceRow}">
-            <span class="${variant.priceLabel}">${primaryPriceLabel}</span>
-            <span class="${variant.priceValue}">${formatCardPriceMarkup(totalPrice)}</span>
-          </div>
-          <div class="${variant.priceRow} is-sub">
-            <span class="${variant.priceSubLabel}">${secondaryPriceLabel}</span>
-            <span class="${variant.priceSubValue}">${formatCardPriceMarkup(basePrice)}</span>
-          </div>
+          ${primaryPriceHtml}${secondaryPriceHtml}
         </div>
         <a class="${variant.button}" href="${detailUrl}">${t('cta.viewDetail')}</a>
       </div>
@@ -376,10 +381,6 @@ window.TK168Renderers = (() => {
         <div class="v-skeleton-price-row">
           <span class="v-skeleton-block" style="width:30%;height:11px;"></span>
           <span class="v-skeleton-block" style="width:42%;height:18px;justify-self:end;"></span>
-        </div>
-        <div class="v-skeleton-price-row">
-          <span class="v-skeleton-block" style="width:36%;height:10px;"></span>
-          <span class="v-skeleton-block" style="width:34%;height:14px;justify-self:end;"></span>
         </div>
       </div>
       <span class="v-skeleton-block v-skeleton-button"></span>
