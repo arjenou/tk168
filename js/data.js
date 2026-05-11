@@ -1801,22 +1801,6 @@ window.TK168_DATA = (() => {
     return Number(String(value || '').replace(/[^\d]/g, '')) || 0;
   }
 
-  /** Full-yen amount for English UI (matches detail/renderers price markup). */
-  function formatPriceJpyEnglish(amountJpy) {
-    const n = Number(amountJpy || 0);
-    if (!n) return '';
-    return `JPY ${n.toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 })}`;
-  }
-
-  /** 以「万円」展示整数日元（中文、日文同一单位）。 */
-  function formatPriceWanYen(amountJpy) {
-    const n = Number(amountJpy || 0);
-    if (!n) return '';
-    const wan = n / 10000;
-    let s = wan.toFixed(4).replace(/\.?0+$/, '');
-    return `${s}万円`;
-  }
-
   function normalizeMileageUnit(u) {
     const s = String(u ?? '').trim().toLowerCase();
     if (s === 'km' || s === 'kilometer' || s === 'kilometres' || s === 'kilometre') return 'km';
@@ -2737,12 +2721,34 @@ window.TK168_DATA = (() => {
     return sortRentalFleetRecordsByStatus(combined);
   }
 
+  /** 前台标价：中日英统一「X万 JPY」（日本円÷1万）。用于买卖车源与租赁保証金。 */
   function getDisplayPrice(value, language = getCurrentLanguage()) {
     const amount = parseCurrency(value);
     if (!amount) return '';
-    if (language === 'en') return formatPriceJpyEnglish(amount);
-    if (language === 'zh' || language === 'ja') return formatPriceWanYen(amount);
-    return formatPriceWanYen(amount);
+    const wan = amount / 10000;
+    let s = wan.toFixed(4).replace(/\.?0+$/, '');
+    return `${s}万 JPY`;
+  }
+
+  /** 租赁「1日料金」：整数日元千分位，不用「万」；日文「円」、中文「日元」、英文「JPY」。保証金仍用 getRentalManJpyDisplayPrice（万 JPY）。 */
+  function getRentalDailyDisplayPrice(value, language = getCurrentLanguage()) {
+    const amount = parseCurrency(value);
+    if (!amount) return '';
+    if (language === 'en') {
+      return `JPY ${amount.toLocaleString('en-US', { useGrouping: true, maximumFractionDigits: 0 })}`;
+    }
+    if (language === 'ja') {
+      return `${amount.toLocaleString('ja-JP')}円`;
+    }
+    if (language === 'zh') {
+      return `${amount.toLocaleString('zh-CN')}日元`;
+    }
+    return `${amount.toLocaleString('ja-JP')}円`;
+  }
+
+  /** 租赁保証金等：与买卖车源同一「X万 JPY」口径。 */
+  function getRentalManJpyDisplayPrice(value) {
+    return getDisplayPrice(value);
   }
 
   function getVehicleTotalPriceDisplay(vehicle, language = getCurrentLanguage()) {
@@ -3032,6 +3038,8 @@ window.TK168_DATA = (() => {
     normalizeRentalFleetStatus,
     getRentableVehicles,
     getDisplayPrice,
+    getRentalDailyDisplayPrice,
+    getRentalManJpyDisplayPrice,
     getNewsItems,
     getNewsDetailRecord,
     getJournalDetailPageUrl,

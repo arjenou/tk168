@@ -3,10 +3,12 @@
   --page-text-soft: rgba(31, 38, 48, 0.68);
   --shadow-soft: 0 28px 90px rgba(11, 15, 22, 0.18);
   --content-edge: clamp(7rem, 8.5vw, 8.8rem);
-  --copy-edge: calc(var(--content-edge) + var(--thumb-button-width) + var(--thumb-gap) + 0.95rem);
+  --copy-edge: var(--content-edge);
+  /* 桌面两排品牌格总高度（含 lisboa-bottom / thumbs 内边距与行距），供主视觉区 bottom 避让 */
+  --brands-desktop-thumb-rows-h: calc(1.1rem + 1.35rem + 0.85rem + (2 * 5.45rem) + 0.62rem + 1rem);
   --copy-top: calc(44.5% + 0.85rem);
   --hero-shift: min(15vw, 11rem);
-  --thumb-height: 5.55rem;
+  --thumb-height: 5.5rem;
   --thumb-bottom: 0.78rem;
   --thumb-gap: 0.82rem;
   --thumb-nav-gap: max(1.12rem, calc(var(--thumb-gap) + 0.35rem));
@@ -104,7 +106,7 @@
   left: 33%;
   right: 7%;
   top: 12%;
-  bottom: calc(var(--thumb-height) + 3.25rem);
+  bottom: calc(var(--brands-desktop-thumb-rows-h) + 1.75rem);
   z-index: 3;
   display: flex;
   align-items: center;
@@ -193,6 +195,7 @@
   letter-spacing: 0.01em;
 }
 #brands .lisboa-control {
+  display: none;
   position: relative;
   isolation: isolate;
   flex: 0 0 auto;
@@ -270,45 +273,64 @@
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
-  gap: var(--thumb-nav-gap);
+  gap: 0;
   /* 为 .lisboa-thumbs 内选中项上移、scale、光晕预留竖直空间，避免被父级裁切 */
   padding-top: 1.1rem;
   pointer-events: none;
 }
 #brands .lisboa-thumbs {
+  /* 由 JS 写入：上排 floor(n/2)、下排 ceil(n/2)，默认 15 项 → 7 + 8 */
+  --thumb-row1-cols: 7;
+  --thumb-row2-cols: 8;
+  --thumb-gap-h: 0.48rem;
   position: relative;
   z-index: 1;
   flex: 1 1 auto;
+  width: 100%;
   min-width: 0;
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: var(--thumb-gap);
-  overflow-x: auto;
-  overflow-y: visible;
-  /* 顶/底留足空间：选中态 translateY + scale + box-shadow 会高出卡片盒；overflow-x≠visible 时 y 常被当成 auto 而裁切，padding 把绘制留在 padding 盒内 */
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.62rem;
+  overflow: visible;
+  /* 顶/底留足空间：选中态 translateY + scale + box-shadow 会高出卡片盒 */
   padding: 1.35rem 0.55rem 0.85rem;
-  scroll-padding-inline: 0.55rem;
-  scroll-behavior: auto;
-  overscroll-behavior-x: contain;
   pointer-events: auto;
-  scrollbar-width: none;
   background: transparent;
   box-shadow: none;
   backdrop-filter: none;
 }
-#brands .lisboa-thumbs::-webkit-scrollbar {
-  display: none;
+#brands .lisboa-thumbs-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: 0.62rem var(--thumb-gap-h);
+  width: 100%;
+}
+/* 每行按列数均分宽度，整行在容器内居中（上排少一个时两侧留白对称） */
+#brands .lisboa-thumbs-row--first .lisboa-thumb {
+  flex: 1 1 calc((100% - (var(--thumb-row1-cols) - 1) * var(--thumb-gap-h)) / var(--thumb-row1-cols));
+  max-width: calc((100% - (var(--thumb-row1-cols) - 1) * var(--thumb-gap-h)) / var(--thumb-row1-cols));
+  min-width: 0;
+  width: auto;
+}
+#brands .lisboa-thumbs-row--second .lisboa-thumb {
+  flex: 1 1 calc((100% - (var(--thumb-row2-cols) - 1) * var(--thumb-gap-h)) / var(--thumb-row2-cols));
+  max-width: calc((100% - (var(--thumb-row2-cols) - 1) * var(--thumb-gap-h)) / var(--thumb-row2-cols));
+  min-width: 0;
+  width: auto;
 }
 #brands .lisboa-thumb {
   position: relative;
   flex: 0 0 auto;
   width: auto;
-  min-width: 6.85rem;
+  min-width: 5.85rem;
   max-width: 9.25rem;
-  height: var(--thumb-height);
+  min-height: 5.45rem;
+  height: auto;
   margin-top: 0;
-  padding: 0.58rem 0.72rem 0.52rem;
+  padding: 0.52rem 0.34rem 0.44rem;
   border: 1px solid rgba(20, 24, 30, 0.06);
   border-radius: 1.05rem;
   display: flex;
@@ -322,11 +344,11 @@
   background: #ffffff;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  box-shadow: 0 4px 18px rgba(20, 24, 30, 0.06);
+  box-shadow: 0 4px 16px rgba(20, 24, 30, 0.07);
   cursor: pointer;
   pointer-events: auto;
   will-change: transform, box-shadow;
-  transform: translateY(-0.28rem);
+  transform: none;
   transition: transform 200ms ease, box-shadow 200ms ease, background-color 200ms ease, border-color 200ms ease;
 }
 #brands .lisboa-thumb::before {
@@ -365,8 +387,8 @@
   margin-top: 0;
   z-index: 1;
   border-color: rgba(20, 24, 30, 0.1);
-  transform: translateY(-0.4rem);
-  box-shadow: 0 8px 26px rgba(20, 24, 30, 0.1);
+  transform: translateY(-0.08rem);
+  box-shadow: 0 8px 22px rgba(20, 24, 30, 0.1);
 }
 #brands .lisboa-thumb:hover::after,
 #brands .lisboa-thumb:focus-visible::after {
@@ -384,9 +406,9 @@
   background: #fffef8;
   box-shadow:
     0 0 0 2px var(--thumb-active-glow),
-    0 0 28px rgba(255, 214, 120, 0.22),
-    0 10px 28px rgba(20, 24, 30, 0.08);
-  transform: translateY(-0.48rem) scale(1.02);
+    0 0 26px rgba(255, 214, 120, 0.2),
+    0 10px 26px rgba(20, 24, 30, 0.08);
+  transform: translateY(-0.1rem) scale(1.02);
 }
 #brands .lisboa-thumb.is-active::before {
   opacity: 0;
@@ -394,52 +416,65 @@
 }
 #brands .lisboa-thumb.is-active::after {
   background: radial-gradient(closest-side, var(--thumb-active-glow), rgba(255, 214, 120, 0));
-  opacity: 0.45;
-  transform: translateY(0.22rem) scaleX(1.12);
+  opacity: 0.4;
+  transform: translateY(0.18rem) scaleX(1.08);
 }
 #brands .lisboa-thumb__logo {
-  width: 2.95rem;
-  height: 2.95rem;
+  flex: 0 0 auto;
+  width: 2.1rem;
+  height: 2.1rem;
   object-fit: contain;
   filter: grayscale(1) contrast(0.95);
   transition: transform 220ms ease, filter 220ms ease;
 }
 #brands .lisboa-thumb__logo.lexus-mark {
-  width: 3.5rem;
-  height: 2.45rem;
+  width: 2.5rem;
+  height: 1.75rem;
   display: block;
   overflow: visible;
   color: rgba(17, 20, 26, 0.88);
   filter: grayscale(1) contrast(0.95);
 }
 #brands .lisboa-thumb__label {
+  flex: 0 1 auto;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
   width: 100%;
-  font-size: 0.82rem;
-  line-height: 1.18;
+  font-size: 0.58rem;
+  line-height: 1.2;
   font-weight: 600;
   letter-spacing: -0.02em;
   text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: rgba(60, 64, 72, 0.62);
+  white-space: normal;
+  word-break: break-word;
+  hyphens: auto;
+  color: rgba(60, 64, 72, 0.68);
+  margin-top: 0.06rem;
   transition: color 220ms ease, transform 220ms ease;
 }
 #brands .lisboa-thumb__label.is-tight {
-  font-size: 0.76rem;
+  font-size: 0.52rem;
 }
 #brands .lisboa-thumb__label.is-tighter {
-  font-size: 0.71rem;
+  font-size: 0.48rem;
   letter-spacing: -0.04em;
 }
 #brands .lisboa-thumb.is-active .lisboa-thumb__logo {
-  transform: translateY(-0.04rem) scale(1.04);
-  filter: grayscale(0) contrast(1) drop-shadow(0 4px 12px rgba(20, 24, 30, 0.08));
+  transform: translateY(-0.03rem) scale(1.04);
+  filter:
+    grayscale(0)
+    contrast(1)
+    drop-shadow(0 3px 10px rgba(255, 214, 120, 0.28))
+    drop-shadow(0 5px 12px rgba(20, 24, 30, 0.1));
 }
 #brands .lisboa-thumb.is-active .lisboa-thumb__logo.lexus-mark {
-  transform: translateY(-0.04rem) scale(1.04);
+  transform: translateY(-0.03rem) scale(1.04);
   color: rgba(17, 20, 26, 0.94);
-  filter: grayscale(0) contrast(1) drop-shadow(0 4px 12px rgba(20, 24, 30, 0.08));
+  filter:
+    drop-shadow(0 3px 10px rgba(255, 214, 120, 0.3))
+    drop-shadow(0 4px 12px rgba(20, 24, 28, 0.1));
 }
 #brands .lisboa-thumb.is-active .lisboa-thumb__label {
   color: rgba(26, 28, 32, 0.92);
@@ -641,6 +676,9 @@
     --content-edge: 6.25rem;
     --thumb-button-width: 1.9rem;
   }
+  #brands .lisboa-thumbs {
+    --thumb-gap-h: 0.4rem;
+  }
   #brands .lisboa-slide__copy {
     width: min(20rem, 28vw);
   }
@@ -754,98 +792,11 @@
     min-height: var(--brands-mobile-grid-h);
     align-content: start;
   }
+  /* 网格内品牌格：与桌面 .lisboa-thumb 共用图标/标签/选中态，仅覆盖栅格列宽 */
   #brands .lisboa-mobile-brand-grid .lisboa-thumb {
     width: 100%;
     min-width: 0;
     max-width: none;
-    min-height: 5.45rem;
-    height: auto;
-    aspect-ratio: unset;
-    padding: 0.52rem 0.34rem 0.44rem;
-    border-radius: 1.05rem;
-    gap: 0.48rem;
-    justify-content: center;
-    align-items: center;
-    transform: none;
-    margin-top: 0;
-    background: #ffffff;
-    border: 1px solid rgba(20, 24, 30, 0.06);
-    box-shadow: 0 4px 16px rgba(20, 24, 30, 0.07);
-  }
-  #brands .lisboa-mobile-brand-grid .lisboa-thumb:hover,
-  #brands .lisboa-mobile-brand-grid .lisboa-thumb:focus-visible {
-    transform: translateY(-0.08rem);
-    border-color: rgba(20, 24, 30, 0.1);
-    box-shadow: 0 8px 22px rgba(20, 24, 30, 0.1);
-  }
-  #brands .lisboa-mobile-brand-grid .lisboa-thumb.is-active {
-    border-color: var(--thumb-active-ring);
-    background: #fffef8;
-    box-shadow:
-      0 0 0 2px var(--thumb-active-glow),
-      0 0 26px rgba(255, 214, 120, 0.2),
-      0 10px 26px rgba(20, 24, 30, 0.08);
-    transform: translateY(-0.1rem) scale(1.02);
-  }
-  #brands .lisboa-mobile-brand-grid .lisboa-thumb.is-active::after {
-    background: radial-gradient(closest-side, var(--thumb-active-glow), rgba(255, 214, 120, 0));
-    opacity: 0.4;
-    transform: translateY(0.18rem) scaleX(1.08);
-  }
-  #brands .lisboa-mobile-brand-grid .lisboa-thumb.is-active .lisboa-thumb__logo {
-    transform: translateY(-0.03rem) scale(1.04);
-    filter:
-      grayscale(0)
-      contrast(1)
-      drop-shadow(0 3px 10px rgba(255, 214, 120, 0.28))
-      drop-shadow(0 5px 12px rgba(20, 24, 30, 0.1));
-  }
-  #brands .lisboa-mobile-brand-grid .lisboa-thumb.is-active .lisboa-thumb__logo.lexus-mark {
-    color: rgba(17, 20, 26, 0.94);
-    filter:
-      drop-shadow(0 3px 10px rgba(255, 214, 120, 0.3))
-      drop-shadow(0 4px 12px rgba(20, 24, 28, 0.1));
-  }
-  #brands .lisboa-mobile-brand-grid .lisboa-thumb.is-active .lisboa-thumb__label {
-    color: rgba(26, 28, 32, 0.92);
-    transform: translateY(-0.02rem);
-  }
-  #brands .lisboa-mobile-brand-grid .lisboa-thumb__logo {
-    flex: 0 0 auto;
-    width: 2.1rem;
-    height: 2.1rem;
-    object-fit: contain;
-    filter: grayscale(1) contrast(0.95);
-    transition: transform 220ms ease, filter 220ms ease;
-  }
-  #brands .lisboa-mobile-brand-grid .lisboa-thumb__logo.lexus-mark {
-    width: 2.5rem;
-    height: 1.75rem;
-    color: rgba(17, 20, 26, 0.88);
-    filter: grayscale(1) contrast(0.95);
-  }
-  #brands .lisboa-mobile-brand-grid .lisboa-thumb__label {
-    flex: 0 1 auto;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-    white-space: normal;
-    word-break: break-word;
-    hyphens: auto;
-    font-size: 0.58rem;
-    line-height: 1.2;
-    text-align: center;
-    width: 100%;
-    font-weight: 600;
-    color: rgba(60, 64, 72, 0.68);
-    margin-top: 0.06rem;
-  }
-  #brands .lisboa-mobile-brand-grid .lisboa-thumb__label.is-tight {
-    font-size: 0.52rem;
-  }
-  #brands .lisboa-mobile-brand-grid .lisboa-thumb__label.is-tighter {
-    font-size: 0.48rem;
   }
   #brands .lisboa-mobile-swipe-hint {
     display: inline-flex;

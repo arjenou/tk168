@@ -176,7 +176,8 @@ const RENTAL_COPY = {
 };
 
 const {
-  getDisplayPrice,
+  getRentalDailyDisplayPrice,
+  getRentalManJpyDisplayPrice,
   getVehicleName,
   getVehicleFieldLabel,
   getVehicleRentalProfile,
@@ -255,7 +256,7 @@ function formatMileage(value, language, mileageUnit) {
 }
 
 function formatRate(value, language) {
-  const display = getDisplayPrice(value, language) || '-';
+  const display = getRentalDailyDisplayPrice(value, language) || '-';
   if (language === 'en') return `${display}/day`;
   return language === 'ja' ? `${display}/日` : `${display}/天`;
 }
@@ -432,7 +433,7 @@ function hydrateRentalVehicleCard(card, vehicle, language) {
   if (subLabel) subLabel.textContent = copy('fleet.card.deposit', language);
 
   const subValue = card.querySelector('.v-price-sub');
-  if (subValue) subValue.textContent = getDisplayPrice(profile.deposit, language) || '-';
+  if (subValue) subValue.textContent = getRentalManJpyDisplayPrice(profile.deposit) || '-';
 
   const vehicleId = String(vehicle?.id || '').trim();
   card.dataset.rentalVehicleId = vehicleId;

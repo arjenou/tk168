@@ -272,7 +272,7 @@ const PRICE_HELP_CONTENT = {
     },
     rentalDaily: {
       title: '日租金说明',
-      summary: '此处「日租金」为每租用一个计费日的参考单价。中文与日文界面可能以「万円」展示：数字为日元金额÷1万（例如 0.06 万円表示约 600 日元/日）。英文界面为整笔日元（JPY）标价。均为参考，最终以门店或合约确认为准。',
+      summary: '此处「日租金」为每租用一个计费日的参考单价。中文、日文、英文均以整数日元（千分位）展示，不使用「万」换算。保証金仍与买卖车标价一致，为「万 JPY」。均为参考，最终以门店或合约确认为准。',
       included: [
         '基本租金的展示口径（是否含税以最终报价为准）',
         '可能受最短租期、旺季/周末、车型档期等影响的计费前提'
@@ -332,7 +332,7 @@ const PRICE_HELP_CONTENT = {
     },
     rentalDaily: {
       title: '「1日料金」について',
-      summary: '掲載の1日料金は、レンタル基本料金の目安です。日本語・中国語表示では「万円」表記となる場合があります（表示値は日本円を1万で割った数字。例：0.06万円＝600円／日）。英語表示では JPY の金額で示されます。最終条件は店舗・契約書の内容をご確認ください。',
+      summary: '掲載の1日料金は、レンタル基本料金の目安です。日本語・中国語・英語いずれも、1日料金は整数の日本円を千分位で表記し、「万」には換算しません（例：5,600円／日）。保証金は販売車両と同じく「万 JPY」表記です。最終条件は店舗・契約書の内容をご確認ください。',
       included: [
         '税込／税抜の扱い、最短日数、繁忙期割増などはプランにより異なります',
         '予約確定前の見積もり段階での参考表示であること'
@@ -392,7 +392,7 @@ const PRICE_HELP_CONTENT = {
     },
     rentalDaily: {
       title: 'About the daily rental rate',
-      summary: 'The daily rate shown here is the reference rental price per billing day before optional charges. On Japanese and Chinese locales the amount may appear in 「万円」 (yen divided by 10,000; e.g. 0.06万円 ≈ ¥600 per day). English uses full-yen JPY formatting. Final pricing follows the store and your rental agreement.',
+      summary: 'The daily rate is the reference rental price per billing day before optional charges. Japanese, Chinese, and English all show whole yen with thousands separators (no 「万」 scaling). The deposit follows the same 「万 JPY」 convention as purchase listings. Final pricing follows the store and your rental agreement.',
       included: [
         'May vary with minimum rental length, seasonality, and vehicle availability',
         'Shown as a planning estimate until your booking is confirmed'
@@ -474,7 +474,7 @@ function formatPriceMarkup(displayPrice = '') {
   if (match) {
     return `<span class="detail-price-amount">${match[1]}</span><span class="detail-price-unit">JPY</span>`;
   }
-  match = trimmed.match(/^([\d,.]+)\s*(万\s*JPY|万元|万円|JPY|円|元)$/);
+  match = trimmed.match(/^([\d,.]+)\s*(万\s*JPY|万元|万円|日元|JPY|円|元)$/);
   if (!match) return trimmed;
   const [, amount, unit] = match;
   return `<span class="detail-price-amount">${amount}</span><span class="detail-price-unit">${unit}</span>`;
@@ -659,10 +659,10 @@ function renderVehicleHeader() {
   if (isRentalDetail) {
     const profile = window.TK168_DATA.getVehicleRentalProfile(currentVehicle);
     detailTotalPriceValue.innerHTML = formatPriceMarkup(
-      window.TK168_DATA.getDisplayPrice(profile.dailyRate, language),
+      window.TK168_DATA.getRentalDailyDisplayPrice(profile.dailyRate, language),
     );
     detailBasePriceValue.innerHTML = formatPriceMarkup(
-      window.TK168_DATA.getDisplayPrice(profile.deposit, language),
+      window.TK168_DATA.getRentalManJpyDisplayPrice(profile.deposit),
     );
   } else {
     detailTotalPriceValue.innerHTML = formatPriceMarkup(

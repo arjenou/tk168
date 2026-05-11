@@ -28,7 +28,7 @@ window.TK168Renderers = (() => {
     if (match) {
       return `<span class="card-price-amount">${match[1]}</span><span class="card-price-unit">JPY</span>`;
     }
-    match = trimmed.match(/^([\d,.]+)\s*(万\s*JPY|万元|万円|JPY|円|元)$/);
+    match = trimmed.match(/^([\d,.]+)\s*(万\s*JPY|万元|万円|日元|JPY|円|元)$/);
     if (!match) return trimmed;
     const [, amount, unit] = match;
     return `<span class="card-price-amount">${amount}</span><span class="card-price-unit">${unit}</span>`;
@@ -238,9 +238,14 @@ window.TK168Renderers = (() => {
 
     const variant = variants[variantKey] || variants.inventory;
     const isRentalFleetCard = variantKey === 'rentalInventory';
-    const totalPrice = getVehicleTotalPrice(vehicle);
-    const basePrice = getVehicleBasePrice(vehicle);
     const language = window.TK168I18N?.getLanguage?.() || 'ja';
+    const rentalProfile = isRentalFleetCard ? window.TK168_DATA.getVehicleRentalProfile(vehicle) : null;
+    const totalPrice = isRentalFleetCard && rentalProfile
+      ? (window.TK168_DATA.getRentalDailyDisplayPrice(rentalProfile.dailyRate, language) || '')
+      : getVehicleTotalPrice(vehicle);
+    const basePrice = isRentalFleetCard && rentalProfile
+      ? (window.TK168_DATA.getRentalManJpyDisplayPrice(rentalProfile.deposit) || '')
+      : getVehicleBasePrice(vehicle);
     const vehicleName = getVehicleName(vehicle, language);
     const vehicleBrandLine = window.TK168_DATA.getVehicleBrandTitle(vehicle, language);
     const gradeTrim = String(vehicle.grade || '').trim();

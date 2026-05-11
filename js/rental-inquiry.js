@@ -7,7 +7,8 @@
     getVehicleFieldLabel,
     getVehicleRentalProfile,
     getRentableVehicles,
-    getDisplayPrice,
+    getRentalDailyDisplayPrice,
+    getRentalManJpyDisplayPrice,
     resolveVehicleMediaSource,
     buildBrandUrl
   } = window.TK168_DATA;
@@ -237,7 +238,7 @@
   }
 
   function formatRate(value, language) {
-    const display = getDisplayPrice(value, language) || '-';
+    const display = getRentalDailyDisplayPrice(value, language) || '-';
     if (language === 'en') return `${display}/day`;
     return language === 'ja' ? `${display}/日` : `${display}/天`;
   }
@@ -521,7 +522,7 @@
       .join(' / ');
 
     refs.rateValue.textContent = formatRate(profile.dailyRate, language);
-    refs.depositValue.textContent = getDisplayPrice(profile.deposit, language) || '-';
+    refs.depositValue.textContent = getRentalManJpyDisplayPrice(profile.deposit) || '-';
     refs.minDaysValue.textContent = formatMinDays(profile.minDays, language);
 
     if (refs.days) {

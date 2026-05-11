@@ -579,8 +579,33 @@
       return;
     }
 
+    const firstRowCount = slides.length ? Math.max(1, Math.floor(slides.length / 2)) : 0;
+    const secondRowCount = slides.length - firstRowCount;
+
+    thumbs.style.setProperty('--thumb-row1-cols', String(Math.max(1, firstRowCount)));
+    if (secondRowCount > 0) {
+      thumbs.style.setProperty('--thumb-row2-cols', String(secondRowCount));
+    } else {
+      thumbs.style.removeProperty('--thumb-row2-cols');
+    }
+
+    const row1 = document.createElement('div');
+    row1.className = 'lisboa-thumbs-row lisboa-thumbs-row--first';
+    thumbs.appendChild(row1);
+    let row2 = null;
+    if (secondRowCount > 0) {
+      row2 = document.createElement('div');
+      row2.className = 'lisboa-thumbs-row lisboa-thumbs-row--second';
+      thumbs.appendChild(row2);
+    }
+
     slides.forEach((item, index) => {
-      thumbs.appendChild(createThumb(item, index));
+      const thumb = createThumb(item, index);
+      if (index < firstRowCount) {
+        row1.appendChild(thumb);
+      } else if (row2) {
+        row2.appendChild(thumb);
+      }
     });
   }
 
