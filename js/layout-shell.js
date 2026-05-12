@@ -49,13 +49,36 @@
           <div class="footer-newsletter">
             <h4 data-i18n="footer.newsletterTitle">ニュースレター</h4>
             <div class="newsletter-form">
-              <input type="email" class="footer-input" placeholder="メールアドレスを入力" data-i18n-placeholder="footer.newsletterPlaceholder">
-              <button class="footer-btn" data-i18n="footer.newsletterButton">登録する</button>
+              <input type="email" class="footer-input" placeholder="メールアドレスを入力" data-i18n-placeholder="footer.newsletterPlaceholder" autocomplete="email">
+              <button type="button" class="footer-btn" data-i18n="footer.newsletterButton">登録する</button>
             </div>
           </div>
         </div>
 
-        <div class="footer-divider"></div>
+        <div class="footer-divider" role="presentation"></div>
+
+        <section class="footer-stores" aria-labelledby="footerStoresHeading">
+          <h3 class="footer-stores-heading" id="footerStoresHeading" data-i18n="footer.storesTitle">店舗ネットワーク</h3>
+          <div class="footer-stores-grid">
+            <div class="footer-store-col">
+              <p class="footer-store-region" data-i18n="footer.store1Region">日本・東京</p>
+              <p class="footer-store-name" data-i18n="footer.store1Name">亀戸店</p>
+              <p class="footer-store-meta" data-i18n-html="footer.store1Meta">東京都江東区亀戸<br>住所は準備中です</p>
+            </div>
+            <div class="footer-store-col">
+              <p class="footer-store-region" data-i18n="footer.store2Region">日本・大阪</p>
+              <p class="footer-store-name" data-i18n="footer.store2Name">大阪店</p>
+              <p class="footer-store-meta" data-i18n-html="footer.store2Meta">大阪府<br>住所は準備中です</p>
+            </div>
+            <div class="footer-store-col">
+              <p class="footer-store-region" data-i18n="footer.store3Region">マレーシア</p>
+              <p class="footer-store-name" data-i18n="footer.store3Name">マレーシア拠点</p>
+              <p class="footer-store-meta" data-i18n-html="footer.store3Meta">Kuala Lumpur, Malaysia<br>住所は準備中です</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="footer-divider" role="presentation"></div>
 
         <div class="footer-links">
           <div class="footer-col">
@@ -76,7 +99,7 @@
           </div>
         </div>
 
-        <div class="footer-divider footer-divider--bottom"></div>
+        <div class="footer-divider footer-divider--bottom" role="presentation"></div>
         <p class="footer-copyright" data-i18n="footer.copyright">© 2026 TK168. All rights reserved.</p>
       </div>
     </footer>
