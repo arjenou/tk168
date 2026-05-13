@@ -106,6 +106,8 @@ const galleryMainPrev = document.getElementById('galleryMainPrev');
 const galleryMainNext = document.getElementById('galleryMainNext');
 const thumbPrev = document.getElementById('thumbPrev');
 const thumbNext = document.getElementById('thumbNext');
+const thumbViewport = document.getElementById('thumbViewport');
+const THUMB_STRIP_SCROLL_MEDIA = window.matchMedia('(max-width: 640px)');
 const FEATURED_SLIDER_SHELL_ID = 'detailFeaturedSliderShell';
 const FEATURED_SLIDER_NAV_ID = 'detailFeaturedSliderNav';
 const FAVORITES_STORAGE_KEY = 'tk168_favorites';
@@ -659,21 +661,51 @@ function getThumbMaxOffset() {
   return Math.max(0, getGalleryItems().length - getThumbVisibleCount());
 }
 
+function isThumbStripScrollMode() {
+  return typeof THUMB_STRIP_SCROLL_MEDIA.matches === 'boolean' && THUMB_STRIP_SCROLL_MEDIA.matches;
+}
+
+function scrollThumbViewportToIndex(index, behavior = 'smooth') {
+  const vp = thumbViewport;
+  const grid = thumbGrid;
+  if (!vp || !grid) return;
+  const thumb = grid.querySelector(`.thumb[data-index="${index}"]`);
+  if (!thumb) return;
+  const thumbCenter = thumb.offsetLeft + thumb.offsetWidth / 2;
+  let left = thumbCenter - vp.clientWidth / 2;
+  const maxLeft = Math.max(0, vp.scrollWidth - vp.clientWidth);
+  left = Math.max(0, Math.min(maxLeft, left));
+  const be = behavior === 'instant' || behavior === 'auto' ? 'auto' : behavior;
+  vp.scrollTo({ left, behavior: be });
+}
+
 function updateThumbRail() {
   const items = getGalleryItems();
+  const hasMultipleImages = getImageGalleryItems(items).length > 1;
+  if (thumbPrev) thumbPrev.disabled = !hasMultipleImages;
+  if (thumbNext) thumbNext.disabled = !hasMultipleImages;
+
+  if (isThumbStripScrollMode()) {
+    thumbGrid?.style.setProperty('--thumb-visible-count', String(getThumbVisibleCount()));
+    thumbGrid?.style.setProperty('--thumb-offset', '0');
+    return;
+  }
+
   const visibleCount = getThumbVisibleCount();
   const maxOffset = getThumbMaxOffset();
   currentThumbOffset = Math.min(currentThumbOffset, maxOffset);
 
   thumbGrid?.style.setProperty('--thumb-visible-count', visibleCount);
   thumbGrid?.style.setProperty('--thumb-offset', String(currentThumbOffset));
-
-  const hasMultipleImages = getImageGalleryItems(items).length > 1;
-  if (thumbPrev) thumbPrev.disabled = !hasMultipleImages;
-  if (thumbNext) thumbNext.disabled = !hasMultipleImages;
 }
 
-function revealThumb(index) {
+function revealThumb(index, scrollBehavior = 'smooth') {
+  if (isThumbStripScrollMode()) {
+    scrollThumbViewportToIndex(index, scrollBehavior);
+    updateThumbRail();
+    return;
+  }
+
   const visibleCount = getThumbVisibleCount();
   const maxOffset = getThumbMaxOffset();
 
@@ -1153,7 +1185,15 @@ window.addEventListener('keydown', (event) => {
   if (event.key === 'ArrowRight') stepLightbox(1);
 });
 
-window.addEventListener('resize', updateThumbRail);
+function syncThumbStripOnResize() {
+  updateThumbRail();
+  revealThumb(currentGalleryIndex, 'instant');
+}
+
+window.addEventListener('resize', syncThumbStripOnResize);
+if (typeof THUMB_STRIP_SCROLL_MEDIA.addEventListener === 'function') {
+  THUMB_STRIP_SCROLL_MEDIA.addEventListener('change', syncThumbStripOnResize);
+}
 window.addEventListener('favorites:changed', syncDetailFavoriteButton);
 
 function navigateDetailBackLayer() {
