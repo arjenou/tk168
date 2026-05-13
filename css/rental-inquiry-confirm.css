@@ -1,0 +1,37 @@
+.rental-inquiry-confirm-page .riqc-summary {
+  display: grid;
+  gap: 10px;
+  width: 88%;
+  margin: 12px auto 0;
+}
+
+.rental-inquiry-confirm-page .riqc-summary-row {
+  border: 1px solid rgba(43, 41, 38, 0.1);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f4f6 100%);
+}
+
+.rental-inquiry-confirm-page .riqc-summary-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--inq-muted, #5c5f66);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.rental-inquiry-confirm-page .riqc-summary-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d2331;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@media (max-width: 980px) {
+  .rental-inquiry-confirm-page .riqc-summary {
+    width: 100%;
+  }
+}

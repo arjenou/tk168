@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="riqcPageTitle">レンタル相談の確認 — TK168 Premium Automotive</title>
+  <link rel="stylesheet" href="css/style.css?v=20260602b">
+  <link rel="stylesheet" href="css/skeleton.css?v=20260420h">
+  <script src="js/skeleton-boot.js?v=20260420h"></script>
+  <link rel="stylesheet" href="css/inquiry.css?v=20260620c">
+  <link rel="stylesheet" href="css/rental-inquiry.css?v=20260417i">
+  <link rel="stylesheet" href="css/rental-inquiry-confirm.css?v=20260620a">
+</head>
+
+<body class="inquiry-page rental-inquiry-page rental-inquiry-confirm-page no-hero-page">
+  <div data-layout-nav></div>
+
+  <main class="inq-main">
+    <section class="inq-shell">
+      <header class="inq-header">
+        <button type="button" class="inq-back-btn" id="riqcBackNavBtn" data-i18n-aria-label="detail.back">
+          <svg class="inq-back-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </button>
+        <div class="inq-header-main">
+          <p class="inq-eyebrow" id="riqcEyebrow">TK168 RENTAL CONSULT</p>
+          <h1 class="inq-title" id="riqcTitle">入力内容の確認</h1>
+          <p class="inq-subtitle" id="riqcSubtitle" hidden></p>
+        </div>
+      </header>
+
+      <div class="inq-board">
+        <p class="inq-lead" id="riqcLeadText"></p>
+
+        <article class="inq-vehicle riq-vehicle">
+          <img src="assets/images/011.jpg" alt="" class="inq-vehicle-thumb" id="riqcVehicleThumb">
+          <div class="inq-vehicle-copy">
+            <p class="inq-vehicle-brand" id="riqcVehicleBrand"></p>
+            <p class="inq-vehicle-name" id="riqcVehicleName"></p>
+            <p class="inq-vehicle-meta" id="riqcVehicleMeta"></p>
+            <div class="riq-metric-row">
+              <article class="riq-metric">
+                <span class="riq-metric-label" id="riqcRateLabel"></span>
+                <strong class="riq-metric-value" id="riqcRateValue"></strong>
+              </article>
+              <article class="riq-metric">
+                <span class="riq-metric-label" id="riqcDepositLabel"></span>
+                <strong class="riq-metric-value" id="riqcDepositValue"></strong>
+              </article>
+              <article class="riq-metric">
+                <span class="riq-metric-label" id="riqcMinDaysLabel"></span>
+                <strong class="riq-metric-value" id="riqcMinDaysValue"></strong>
+              </article>
+            </div>
+          </div>
+        </article>
+
+        <div id="riqcSummary" class="riqc-summary" aria-live="polite"></div>
+
+        <p class="inq-message" id="riqcMessage" aria-live="polite"></p>
+
+        <div class="inq-actions">
+          <button type="button" class="inq-btn inq-btn--ghost" id="riqcBackBtn">入力に戻る</button>
+          <button type="button" class="inq-btn inq-btn--primary" id="riqcSubmitBtn">送信</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div data-layout-footer></div>
+
+  <script src="js/layout-shell.js?v=20260512a"></script>
+  <script src="js/api-hydrate.js?v=20260511s"></script>
+  <script src="js/data.js?v=20260511s"></script>
+  <script src="js/i18n.js?v=20260619b"></script>
+  <script src="js/common-links.js?v=20260419a"></script>
+  <script src="js/page-chrome.js?v=20260601a"></script>
+  <script src="js/rental-inquiry-confirm.js?v=20260620a"></script>
+</body>
+
+</html>

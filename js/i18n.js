@@ -927,6 +927,12 @@ window.TK168I18N = (() => {
     didInit = true;
     applyTranslations(document);
     bindSwitchers();
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        applyTranslations(document);
+        fitCompactNewsletterTitle(document);
+      }, { once: true });
+    }
     let rafId = 0;
     window.addEventListener('resize', () => {
       if (rafId) cancelAnimationFrame(rafId);

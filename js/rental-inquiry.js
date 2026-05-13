@@ -13,6 +13,8 @@
     buildBrandUrl
   } = window.TK168_DATA;
 
+  const RENTAL_INQUIRY_DRAFT_KEY = 'tk168:rentalInquiryDraft';
+
   const STEP_KEYS = ['appointment', 'name', 'contact', 'confirm'];
 
   const COPY = {
@@ -20,9 +22,11 @@
       pageTitle: '租车咨询 — TK168 Premium Automotive',
       eyebrow: 'TK168 RENTAL CONSULT',
       title: '租车咨询单',
-      subtitle: '按来店预约的 4 步结构整理租车需求，整理完成后继续与顾问确认。',
-      progressAria: '租车咨询步骤',
+      subtitle: '在本页填写全部项目，点「确认」后在下一页核对并提交。',
       vehicleStatus: '当前可租',
+      flow: {
+        fillLead: '请在本页填写下列全部项目。'
+      },
       metrics: {
         rate: '日租金',
         deposit: '押金',
@@ -70,9 +74,7 @@
         readyToSend: '{detail} / 内容已确认'
       },
       actions: {
-        prev: '上一步',
-        next: '下一步',
-        submit: '完成确认'
+        confirm: '确认'
       },
       message: {
         appointmentRequired: '请填写日期、取车时间和预计租期。',
@@ -82,16 +84,19 @@
         storeRequired: '请选择门店。',
         addressRequired: '请填写送车地址。',
         consentRequired: '请先同意使用条款与隐私政策。',
-        submitSuccess: '租车咨询内容已整理完成，请按填写的联系方式继续与顾问沟通。'
+        submitSuccess: '租车咨询内容已整理完成，请按填写的联系方式继续与顾问沟通。',
+        storageError: '无法暂存表单，请检查浏览器是否禁用本地存储后重试。'
       }
     },
     ja: {
       pageTitle: 'レンタル相談 — TK168 Premium Automotive',
       eyebrow: 'TK168 RENTAL CONSULT',
       title: 'レンタル相談フォーム',
-      subtitle: '来店予約と同じ 4 ステップ構成で、車両・日程を整理し、内容確認へ進めます。',
-      progressAria: 'レンタル相談ステップ',
+      subtitle: 'このページですべて入力し、「確認」で次のページに進み、内容を確認して送信します。',
       vehicleStatus: '相談可能',
+      flow: {
+        fillLead: '以下の項目をこのページですべて入力してください。'
+      },
       metrics: {
         rate: '1日料金',
         deposit: '保証金',
@@ -139,9 +144,7 @@
         readyToSend: '{detail} / 内容確認済み'
       },
       actions: {
-        prev: '戻る',
-        next: '次へ',
-        submit: '確認を完了'
+        confirm: '確認'
       },
       message: {
         appointmentRequired: '利用日、受取時間、予定日数を入力してください。',
@@ -151,16 +154,19 @@
         storeRequired: '店舗を選択してください。',
         addressRequired: '配達先住所を入力してください。',
         consentRequired: '利用規約とプライバシーポリシーへの同意が必要です。',
-        submitSuccess: 'レンタル相談内容の整理が完了しました。入力した連絡先をもとに担当窓口との確認を進めてください。'
+        submitSuccess: 'レンタル相談内容の整理が完了しました。入力した連絡先をもとに担当窓口との確認を進めてください。',
+        storageError: '入力内容を一時保存できませんでした。ブラウザの設定をご確認のうえ、再度お試しください。'
       }
     },
     en: {
       pageTitle: 'Rental Inquiry — TK168 Premium Automotive',
       eyebrow: 'TK168 RENTAL CONSULT',
       title: 'Rental Inquiry Form',
-      subtitle: 'Using the same 4-step structure as the visit booking flow, this form helps you organize rental details before continuing with your advisor.',
-      progressAria: 'Rental inquiry steps',
+      subtitle: 'Fill in everything on this page, tap Confirm to review on the next page, then submit.',
       vehicleStatus: 'Available for inquiry',
+      flow: {
+        fillLead: 'Enter all required information on this page.'
+      },
       metrics: {
         rate: 'Daily rate',
         deposit: 'Deposit',
@@ -208,9 +214,7 @@
         readyToSend: '{detail} / details confirmed'
       },
       actions: {
-        prev: 'Back',
-        next: 'Next',
-        submit: 'Complete review'
+        confirm: 'Confirm'
       },
       message: {
         appointmentRequired: 'Please enter the date, pickup time, and expected rental length.',
@@ -220,7 +224,8 @@
         storeRequired: 'Please select a store.',
         addressRequired: 'Please enter the delivery address.',
         consentRequired: 'You must agree to the terms of use and privacy policy first.',
-        submitSuccess: 'The rental inquiry details are organized. Please continue the confirmation using the contact details you entered.'
+        submitSuccess: 'The rental inquiry details are organized. Please continue the confirmation using the contact details you entered.',
+        storageError: 'Could not save your answers locally. Please check browser storage settings and try again.'
       }
     }
   };
@@ -333,23 +338,16 @@
     consentPolicy: false
   };
 
-  let currentStep = 0;
-
   const refs = {
     pageTitle: document.getElementById('riqPageTitle'),
     eyebrow: document.getElementById('riqEyebrow'),
     title: document.getElementById('riqTitle'),
     subtitle: document.getElementById('riqSubtitle'),
+    board: document.getElementById('riqBoard'),
     lead: document.getElementById('riqLeadText'),
     message: document.getElementById('riqMessage'),
-    counter: document.getElementById('riqCounter'),
-    nextBtn: document.getElementById('riqNextBtn'),
-    prevBtn: document.getElementById('riqPrevBtn'),
-    progressRoot: document.getElementById('riqProgress'),
-    progress: Array.from(document.querySelectorAll('#riqProgress li')),
+    confirmBtn: document.getElementById('riqConfirmBtn'),
     rows: Array.from(document.querySelectorAll('.inq-row')),
-    jumpStepButtons: Array.from(document.querySelectorAll('[data-jump-step]')),
-    jumpRowButtons: Array.from(document.querySelectorAll('[data-jump-row]')),
     requiredBadges: Array.from(document.querySelectorAll('.inq-required')),
     date: document.getElementById('riqDate'),
     time: document.getElementById('riqTime'),
@@ -383,12 +381,6 @@
     depositValue: document.getElementById('riqDepositValue'),
     minDaysLabel: document.getElementById('riqMinDaysLabel'),
     minDaysValue: document.getElementById('riqMinDaysValue'),
-    stepLabels: {
-      appointment: document.getElementById('riqStepAppointment'),
-      name: document.getElementById('riqStepName'),
-      contact: document.getElementById('riqStepContact'),
-      confirm: document.getElementById('riqStepConfirm')
-    },
     rowLabels: {
       appointment: document.getElementById('riqRowAppointment'),
       name: document.getElementById('riqRowName'),
@@ -452,14 +444,12 @@
     setText(refs.eyebrow, copy.eyebrow);
     setText(refs.title, copy.title);
     setText(refs.subtitle, copy.subtitle);
+    setText(refs.lead, copy.flow.fillLead);
     setText(refs.rateLabel, copy.metrics.rate);
     setText(refs.depositLabel, copy.metrics.deposit);
     setText(refs.minDaysLabel, copy.metrics.minDays);
 
-    if (refs.progressRoot) refs.progressRoot.setAttribute('aria-label', copy.progressAria);
-
     STEP_KEYS.forEach((key) => {
-      setText(refs.stepLabels[key], copy.steps[key].tab);
       setText(refs.rowLabels[key], copy.steps[key].row);
       setText(refs.editLabels[key], copy.edit);
     });
@@ -497,7 +487,7 @@
     setPlaceholder(refs.name, copy.fields.namePlaceholder);
     setPlaceholder(refs.deliveryAddress, copy.fields.deliveryAddressPlaceholder);
 
-    setText(refs.prevBtn, copy.actions.prev);
+    setText(refs.confirmBtn, copy.actions.confirm);
     renderVehicleCard();
   }
 
@@ -613,30 +603,12 @@
     refs.summaryConfirm.textContent = buildConfirmSummary();
   }
 
-  function renderProgress() {
-    refs.progress.forEach((item, index) => {
-      item.classList.toggle('is-active', index === currentStep);
-      item.classList.toggle('is-done', index < currentStep);
-    });
-  }
-
-  function renderRows() {
-    const activeKey = STEP_KEYS[currentStep];
-    refs.rows.forEach((row) => {
-      row.classList.toggle('is-active', row.dataset.row === activeKey);
-    });
-  }
-
-  function renderActions() {
-    const copy = currentCopy();
-    refs.prevBtn.disabled = currentStep === 0;
-    refs.nextBtn.textContent = currentStep === STEP_KEYS.length - 1 ? copy.actions.submit : copy.actions.next;
-    refs.counter.textContent = `${currentStep + 1} / ${STEP_KEYS.length}`;
-  }
-
-  function renderHead() {
-    const key = STEP_KEYS[currentStep];
-    refs.lead.textContent = currentCopy().steps[key].lead;
+  function ensureFillBoard() {
+    if (refs.board) {
+      refs.board.classList.add('is-step-edit');
+      refs.board.classList.remove('is-step-review');
+    }
+    refs.rows.forEach((row) => row.classList.remove('is-active'));
   }
 
   function clearMessage() {
@@ -673,19 +645,55 @@
     return '';
   }
 
-  function render() {
-    renderHead();
-    renderProgress();
-    renderRows();
-    renderSummaries();
-    renderActions();
-    updateDeliveryConditionalVisibility();
+  function validateAllSections() {
+    for (let i = 0; i < STEP_KEYS.length; i += 1) {
+      const err = validateStep(STEP_KEYS[i]);
+      if (err) return err;
+    }
+    return '';
   }
 
-  function moveStep(nextStep) {
-    currentStep = Math.max(0, Math.min(STEP_KEYS.length - 1, nextStep));
-    clearMessage();
-    render();
+  function goToConfirmPage() {
+    syncStateFromInputs();
+    const error = validateAllSections();
+    if (error) {
+      setMessage(error, false);
+      return;
+    }
+    const draft = {
+      v: 1,
+      lang: currentLanguage(),
+      vehicleId: vehicleContext.currentVehicle?.id || vehicleContext.requestedVehicleId || '',
+      date: state.date,
+      time: state.time,
+      days: state.days,
+      name: state.name,
+      language: state.language,
+      email: state.email,
+      phone: state.phone,
+      deliveryMethod: state.deliveryMethod,
+      store: state.store,
+      deliveryAddress: state.deliveryAddress,
+      consentNews: state.consentNews,
+      consentPolicy: state.consentPolicy
+    };
+    try {
+      sessionStorage.setItem(RENTAL_INQUIRY_DRAFT_KEY, JSON.stringify(draft));
+    } catch {
+      setMessage(currentCopy().message.storageError, false);
+      return;
+    }
+    const id = sanitize(draft.vehicleId);
+    const target = id
+      ? `rental-inquiry-confirm.html?id=${encodeURIComponent(id)}`
+      : 'rental-inquiry-confirm.html';
+    window.location.assign(target);
+  }
+
+  function render() {
+    ensureFillBoard();
+    renderSummaries();
+    updateDeliveryConditionalVisibility();
   }
 
   function bindInputEvents() {
@@ -715,48 +723,7 @@
   }
 
   function bindStepEvents() {
-    refs.prevBtn.addEventListener('click', () => {
-      moveStep(currentStep - 1);
-    });
-
-    refs.nextBtn.addEventListener('click', () => {
-      syncStateFromInputs();
-      const currentKey = STEP_KEYS[currentStep];
-      const error = validateStep(currentKey);
-      if (error) {
-        setMessage(error, false);
-        return;
-      }
-
-      if (currentStep === STEP_KEYS.length - 1) {
-        setMessage(currentCopy().message.submitSuccess, true);
-        return;
-      }
-
-      moveStep(currentStep + 1);
-    });
-
-    refs.jumpStepButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        moveStep(Number(button.dataset.jumpStep || 0));
-      });
-    });
-
-    refs.jumpRowButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        const target = STEP_KEYS.indexOf(button.dataset.jumpRow || '');
-        if (target >= 0) moveStep(target);
-      });
-    });
-
-    refs.rows.forEach((row) => {
-      row.addEventListener('click', (event) => {
-        if (event.target.closest('.inq-editor')) return;
-        const rowKey = row.dataset.row || '';
-        const target = STEP_KEYS.indexOf(rowKey);
-        if (target >= 0) moveStep(target);
-      });
-    });
+    refs.confirmBtn?.addEventListener('click', goToConfirmPage);
   }
 
   function initDefaultDate() {

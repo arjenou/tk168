@@ -11,196 +11,12 @@
     buildBrandUrl
   } = window.TK168_DATA;
 
+  const { getText, getLanguage } = window.TK168StockConfirmI18n;
+
   const STOCK_CONFIRM_ID_KEY = 'tk168:stockConfirmVehicleId';
+  const STOCK_CONFIRM_DRAFT_KEY = 'tk168:stockConfirmDraft';
 
-  const COPY = {
-    zh: {
-      title: '在库确认内容填写',
-      subtitle: '通过 5 步快速提交在库确认需求，我们会尽快反馈库存与报价。',
-      stepButtons: ['确认内容', '姓名', '片假名', '联系方式', '确认'],
-      steps: [
-        { key: 'request', lead: '请选择你要确认的内容。' },
-        { key: 'name', lead: '请输入姓名。' },
-        { key: 'kana', lead: '请输入片假名。' },
-        { key: 'contact', lead: '请填写联系方式。' },
-        { key: 'confirm', lead: '请确认后完成内容整理。' }
-      ],
-      labels: {
-        request: '确认内容',
-        requestType: '确认类型',
-        requestNote: '确认备注（可选）',
-        name: '姓名',
-        kana: '片假名',
-        contact: '邮箱/电话',
-        email: '邮箱',
-        phone: '电话',
-        confirm: '内容确认',
-        required: '必填'
-      },
-      placeholders: {
-        requestType: '请选择',
-        requestNote: '请填写希望确认的要点、预算、配置偏好等',
-        name: '张 三',
-        kana: 'チョウ サン',
-        email: 'name@example.com',
-        phone: '09012345678'
-      },
-      options: {
-        stock: '确认在库状态',
-        quote: '确认总价估算',
-        spec: '确认配置与参数'
-      },
-      buttons: {
-        edit: '修改',
-        prev: '返回',
-        next: '下一步',
-        submit: '完成确认'
-      },
-      summary: {
-        empty: '未填写',
-        unconfirmed: '未确认',
-        confirmReady: '已同意并完成确认',
-        confirmPending: '待确认条款'
-      },
-      messages: {
-        request: '请选择确认类型。',
-        name: '请输入姓名。',
-        kana: '请输入片假名。',
-        contact: '邮箱和电话至少填写一项。',
-        policy: '请先同意利用条款与隐私政策。',
-        success: '确认内容已整理完成，请按填写的联系方式继续确认库存与报价。'
-      },
-      consentNews: '接收新车源与活动通知',
-      consentPolicy: '同意利用条款和隐私政策'
-    },
-    ja: {
-      title: '在庫確認内容の入力',
-      subtitle: '5ステップで必要な情報を入力し、在庫状況と見積りを確認します。',
-      stepButtons: ['確認内容', '氏名', 'フリガナ', '連絡先', '確認'],
-      steps: [
-        { key: 'request', lead: '在庫確認の内容を選択してください。' },
-        { key: 'name', lead: 'お名前を入力してください。' },
-        { key: 'kana', lead: 'フリガナを入力してください。' },
-        { key: 'contact', lead: '連絡先を入力してください。' },
-        { key: 'confirm', lead: '最終確認のうえ内容確認を完了してください。' }
-      ],
-      labels: {
-        request: '確認内容',
-        requestType: '確認種別',
-        requestNote: '確認メモ（任意）',
-        name: '氏名',
-        kana: 'フリガナ',
-        contact: 'メール・電話',
-        email: 'メールアドレス',
-        phone: '電話番号',
-        confirm: '内容確認',
-        required: '必須'
-      },
-      placeholders: {
-        requestType: '選択してください',
-        requestNote: '希望条件や確認したいポイントを入力してください',
-        name: '山田 太郎',
-        kana: 'ヤマダ タロウ',
-        email: 'name@example.com',
-        phone: '09012345678'
-      },
-      options: {
-        stock: '在庫状況を確認したい',
-        quote: '支払総額の見積りを確認したい',
-        spec: '装備・仕様を確認したい'
-      },
-      buttons: {
-        edit: '修正する',
-        prev: '戻る',
-        next: '次へ',
-        submit: '確認を完了'
-      },
-      summary: {
-        empty: '未入力',
-        unconfirmed: '未確認',
-        confirmReady: '同意済み（確認完了）',
-        confirmPending: '規約確認待ち'
-      },
-      messages: {
-        request: '確認種別を選択してください。',
-        name: '氏名を入力してください。',
-        kana: 'フリガナを入力してください。',
-        contact: 'メールまたは電話番号を入力してください。',
-        policy: '利用規約とプライバシーポリシーへの同意が必要です。',
-        success: '確認内容の整理が完了しました。入力した連絡先をもとに、在庫と見積りの確認を進めてください。'
-      },
-      consentNews: '新着在庫・キャンペーン情報を受け取る',
-      consentPolicy: '利用規約とプライバシーポリシーに同意する'
-    },
-    en: {
-      title: 'Complete Your Stock Check Request',
-      subtitle: 'Submit your stock inquiry in 5 quick steps and we will confirm availability and pricing as soon as possible.',
-      stepButtons: ['Request', 'Name', 'Name reading', 'Contact', 'Confirm'],
-      steps: [
-        { key: 'request', lead: 'Select what you want to confirm.' },
-        { key: 'name', lead: 'Enter your name.' },
-        { key: 'kana', lead: 'Enter the phonetic reading of your name.' },
-        { key: 'contact', lead: 'Enter your contact details.' },
-        { key: 'confirm', lead: 'Review everything and complete the request.' }
-      ],
-      labels: {
-        request: 'Request',
-        requestType: 'Request type',
-        requestNote: 'Request note (optional)',
-        name: 'Full name',
-        kana: 'Name reading',
-        contact: 'Email / phone',
-        email: 'Email address',
-        phone: 'Phone number',
-        confirm: 'Confirmation',
-        required: 'Required'
-      },
-      placeholders: {
-        requestType: 'Select',
-        requestNote: 'Enter the points you want confirmed, budget range, or spec preferences',
-        name: 'Taro Yamada',
-        kana: 'Taro Yamada',
-        email: 'name@example.com',
-        phone: '09012345678'
-      },
-      options: {
-        stock: 'Check stock availability',
-        quote: 'Check total price estimate',
-        spec: 'Check equipment and specifications'
-      },
-      buttons: {
-        edit: 'Edit',
-        prev: 'Back',
-        next: 'Next',
-        submit: 'Complete confirmation'
-      },
-      summary: {
-        empty: 'Not provided',
-        unconfirmed: 'Not confirmed',
-        confirmReady: 'Agreed and confirmed',
-        confirmPending: 'Policy consent pending'
-      },
-      messages: {
-        request: 'Please select a request type.',
-        name: 'Please enter your name.',
-        kana: 'Please enter the phonetic reading of your name.',
-        contact: 'Enter at least one of email or phone number.',
-        policy: 'You must agree to the terms of use and privacy policy first.',
-        success: 'The request details are organized. Please continue the stock and quotation check using the contact details you entered.'
-      },
-      consentNews: 'Receive new stock and event notifications',
-      consentPolicy: 'I agree to the terms of use and privacy policy'
-    }
-  };
-
-  function getLanguage() {
-    const language = window.TK168I18N?.getLanguage?.();
-    return language === 'zh' || language === 'en' || language === 'ja' ? language : 'ja';
-  }
-
-  function getText() {
-    return COPY[getLanguage()] || COPY.ja;
-  }
+  const STEP_KEYS = ['request', 'name', 'kana', 'contact', 'confirm'];
 
   function sanitize(value) {
     return String(value || '').trim();
@@ -275,17 +91,24 @@
 
   const vehicleContext = createVehicleContext();
 
+  function currentPersistedVehicleId() {
+    return String(vehicleContext.currentVehicle?.id || getRequestedStockVehicleId() || '').trim();
+  }
+
   function navigateStockConfirmBack() {
     try {
       const ref = document.referrer || '';
-      if (ref.startsWith(window.location.origin) && window.history.length > 1) {
-        window.history.back();
-        return;
+      if (ref.startsWith(window.location.origin)) {
+        const path = new URL(ref).pathname.toLowerCase();
+        if (path.indexOf('stock-confirm-review') === -1) {
+          window.location.assign(ref);
+          return;
+        }
       }
-    } catch {
+    } catch (_) {
       /* ignore */
     }
-    const id = vehicleContext.currentVehicle?.id;
+    const id = currentPersistedVehicleId();
     if (id && typeof window.TK168_DATA?.buildDetailUrl === 'function') {
       const filters = vehicleContext.isRentalDetail ? { from: 'rental' } : {};
       window.location.assign(window.TK168_DATA.buildDetailUrl(id, filters));
@@ -314,20 +137,13 @@
     consentPolicy: false
   };
 
-  let currentStep = 0;
-
   const refs = {
     pageTitle: document.getElementById('scPageTitle'),
     pageSubtitle: document.getElementById('scPageSubtitle'),
-    lead: document.getElementById('scLeadText'),
     message: document.getElementById('scMessage'),
-    counter: document.getElementById('scCounter'),
-    nextBtn: document.getElementById('scNextBtn'),
-    prevBtn: document.getElementById('scPrevBtn'),
-    progress: Array.from(document.querySelectorAll('#scProgress li')),
+    confirmBtn: document.getElementById('scConfirmBtn'),
+    backBtn: document.getElementById('scBackBtn'),
     rows: Array.from(document.querySelectorAll('.inq-row')),
-    jumpStepButtons: Array.from(document.querySelectorAll('[data-jump-step]')),
-    jumpRowButtons: Array.from(document.querySelectorAll('[data-jump-row]')),
     vehicleThumb: document.getElementById('scVehicleThumb'),
     vehicleBrand: document.getElementById('scVehicleBrand'),
     vehicleName: document.getElementById('scVehicleName'),
@@ -345,11 +161,6 @@
     summaryKana: document.getElementById('scSummaryKana'),
     summaryContact: document.getElementById('scSummaryContact'),
     summaryConfirm: document.getElementById('scSummaryConfirm'),
-    stepBtn0: document.getElementById('scStepBtn0'),
-    stepBtn1: document.getElementById('scStepBtn1'),
-    stepBtn2: document.getElementById('scStepBtn2'),
-    stepBtn3: document.getElementById('scStepBtn3'),
-    stepBtn4: document.getElementById('scStepBtn4'),
     labelRequest: document.getElementById('scLabelRequest'),
     labelName: document.getElementById('scLabelName'),
     labelKana: document.getElementById('scLabelKana'),
@@ -373,18 +184,21 @@
     consentPolicyText: document.getElementById('scConsentPolicyText')
   };
 
-  function getSteps() {
-    return getText().steps;
+  function requestTypeLabel(value) {
+    const text = getText();
+    const key = String(value || '').trim();
+    if (key === 'stock' || key === 'quote' || key === 'spec') return text.options[key];
+    return key;
   }
 
   function buildRequestSummary() {
     const text = getText();
-    const type = sanitize(state.requestType);
+    const typeLabel = requestTypeLabel(state.requestType);
     const note = sanitize(state.requestNote);
-    if (!type) return text.summary.empty;
-    if (!note) return type;
+    if (!sanitize(state.requestType)) return text.summary.empty;
+    if (!note) return typeLabel;
     const compactNote = note.length > 22 ? `${note.slice(0, 22)}...` : note;
-    return `${type} / ${compactNote}`;
+    return `${typeLabel} / ${compactNote}`;
   }
 
   function buildContactSummary() {
@@ -438,11 +252,6 @@
     refs.pageTitle.textContent = text.title;
     refs.pageSubtitle.textContent = text.subtitle;
 
-    [refs.stepBtn0, refs.stepBtn1, refs.stepBtn2, refs.stepBtn3, refs.stepBtn4].forEach((button, idx) => {
-      if (!button) return;
-      button.textContent = text.stepButtons[idx] || '';
-    });
-
     refs.labelRequest.textContent = text.labels.request;
     refs.labelName.textContent = text.labels.name;
     refs.labelKana.textContent = text.labels.kana;
@@ -465,16 +274,20 @@
       button.textContent = text.buttons.edit;
     });
 
-    refs.prevBtn.textContent = text.buttons.prev;
+    refs.backBtn.textContent = text.buttons.prev;
+    refs.confirmBtn.textContent = text.buttons.confirm;
     refs.consentNewsText.textContent = text.consentNews;
     refs.consentPolicyText.textContent = text.consentPolicy;
 
+    const prevType = state.requestType;
     refs.requestType.innerHTML = `
       <option value="">${text.placeholders.requestType}</option>
-      <option value="${options.stock}">${options.stock}</option>
-      <option value="${options.quote}">${options.quote}</option>
-      <option value="${options.spec}">${options.spec}</option>
+      <option value="stock">${options.stock}</option>
+      <option value="quote">${options.quote}</option>
+      <option value="spec">${options.spec}</option>
     `;
+    const allowed = new Set(['', 'stock', 'quote', 'spec']);
+    state.requestType = allowed.has(prevType) ? prevType : '';
     refs.requestType.value = state.requestType;
 
     refs.requestNote.placeholder = text.placeholders.requestNote;
@@ -491,32 +304,6 @@
     refs.summaryKana.textContent = sanitize(state.kana) || text.summary.empty;
     refs.summaryContact.textContent = buildContactSummary();
     refs.summaryConfirm.textContent = buildConfirmSummary();
-  }
-
-  function renderProgress() {
-    refs.progress.forEach((item, idx) => {
-      item.classList.toggle('is-active', idx === currentStep);
-      item.classList.toggle('is-done', idx < currentStep);
-    });
-  }
-
-  function renderRows() {
-    const steps = getSteps();
-    const activeKey = steps[currentStep].key;
-    refs.rows.forEach((row) => {
-      row.classList.toggle('is-active', row.dataset.row === activeKey);
-    });
-  }
-
-  function renderActions() {
-    const text = getText();
-    refs.prevBtn.disabled = currentStep === 0;
-    refs.nextBtn.textContent = currentStep === getSteps().length - 1 ? text.buttons.submit : text.buttons.next;
-    refs.counter.textContent = `${currentStep + 1} / ${getSteps().length}`;
-  }
-
-  function renderHead() {
-    refs.lead.textContent = getSteps()[currentStep].lead;
   }
 
   function clearMessage() {
@@ -553,19 +340,66 @@
     return '';
   }
 
-  function render() {
-    renderHead();
-    renderProgress();
-    renderRows();
-    renderSummaries();
-    renderActions();
+  function validateAll() {
+    for (let i = 0; i < STEP_KEYS.length; i += 1) {
+      const err = validateStep(STEP_KEYS[i]);
+      if (err) return err;
+    }
+    return '';
   }
 
-  function moveStep(nextStep) {
-    const clamped = Math.max(0, Math.min(getSteps().length - 1, nextStep));
-    currentStep = clamped;
-    clearMessage();
-    render();
+  function persistDraft() {
+    const payload = {
+      requestType: state.requestType,
+      requestNote: state.requestNote,
+      name: state.name,
+      kana: state.kana,
+      email: state.email,
+      phone: state.phone,
+      consentNews: state.consentNews,
+      consentPolicy: state.consentPolicy,
+      vehicleId: currentPersistedVehicleId(),
+      isRentalDetail: vehicleContext.isRentalDetail
+    };
+    try {
+      sessionStorage.setItem(STOCK_CONFIRM_DRAFT_KEY, JSON.stringify(payload));
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function tryRestoreDraft() {
+    try {
+      const raw = sessionStorage.getItem(STOCK_CONFIRM_DRAFT_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (!data || typeof data !== 'object') return;
+      if (String(data.vehicleId || '') !== currentPersistedVehicleId()) return;
+      const allowed = new Set(['', 'stock', 'quote', 'spec']);
+      state.requestType = allowed.has(data.requestType) ? data.requestType : '';
+      state.requestNote = String(data.requestNote || '');
+      state.name = String(data.name || '');
+      state.kana = String(data.kana || '');
+      state.email = String(data.email || '');
+      state.phone = String(data.phone || '');
+      state.consentNews = Boolean(data.consentNews);
+      state.consentPolicy = Boolean(data.consentPolicy);
+      refs.requestType.value = state.requestType;
+      refs.requestNote.value = state.requestNote;
+      refs.name.value = state.name;
+      refs.kana.value = state.kana;
+      refs.email.value = state.email;
+      refs.phone.value = state.phone;
+      refs.consentNews.checked = state.consentNews;
+      refs.consentPolicy.checked = state.consentPolicy;
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function goToReview() {
+    const q = window.location.search || '';
+    window.location.assign(`stock-confirm-review.html${q}`);
   }
 
   function bindInputEvents() {
@@ -582,62 +416,36 @@
     });
   }
 
-  function bindStepEvents() {
-    refs.prevBtn.addEventListener('click', () => {
-      moveStep(currentStep - 1);
-    });
+  function bindActions() {
+    refs.backBtn.addEventListener('click', navigateStockConfirmBack);
 
-    refs.nextBtn.addEventListener('click', () => {
+    refs.confirmBtn.addEventListener('click', () => {
       syncStateFromInputs();
-      const error = validateStep(getSteps()[currentStep].key);
+      const error = validateAll();
       if (error) {
         setMessage(error, false);
         return;
       }
-      if (currentStep === getSteps().length - 1) {
-        setMessage(getText().messages.success, true);
-        return;
-      }
-      moveStep(currentStep + 1);
-    });
-
-    refs.jumpStepButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        moveStep(Number(button.dataset.jumpStep || 0));
-      });
-    });
-
-    refs.jumpRowButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        const rowKey = button.dataset.jumpRow || '';
-        const target = getSteps().findIndex((step) => step.key === rowKey);
-        if (target >= 0) moveStep(target);
-      });
-    });
-
-    refs.rows.forEach((row) => {
-      row.addEventListener('click', (event) => {
-        if (event.target.closest('.inq-editor')) return;
-        const rowKey = row.dataset.row || '';
-        const target = getSteps().findIndex((step) => step.key === rowKey);
-        if (target >= 0) moveStep(target);
-      });
+      persistDraft();
+      goToReview();
     });
   }
 
   function init() {
     applyLanguageCopy();
+    tryRestoreDraft();
     renderVehicle();
     bindInputEvents();
-    bindStepEvents();
+    bindActions();
     document.getElementById('scBackNavBtn')?.addEventListener('click', navigateStockConfirmBack);
-    render();
+    renderSummaries();
   }
 
   window.addEventListener('tk168:languagechange', () => {
+    syncStateFromInputs();
     applyLanguageCopy();
     renderVehicle();
-    render();
+    renderSummaries();
   });
 
   function refreshVehicleFromHydrate() {
@@ -649,7 +457,6 @@
     vehicleContext.currentVehicle = next;
     if (next.brandKey) vehicleContext.inventoryHref = buildBrandUrl(next.brandKey);
     renderVehicle();
-    render();
   }
 
   document.addEventListener('tk168:data-updated', (event) => {

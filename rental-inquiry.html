@@ -8,8 +8,8 @@
   <link rel="stylesheet" href="css/style.css?v=20260602b">
   <link rel="stylesheet" href="css/skeleton.css?v=20260420h">
   <script src="js/skeleton-boot.js?v=20260420h"></script>
-  <link rel="stylesheet" href="css/inquiry.css?v=20260511s">
-  <link rel="stylesheet" href="css/rental-inquiry.css?v=20260417i">
+  <link rel="stylesheet" href="css/inquiry.css?v=20260620c">
+  <link rel="stylesheet" href="css/rental-inquiry.css?v=20260620a">
 </head>
 
 <body class="inquiry-page rental-inquiry-page no-hero-page">
@@ -26,19 +26,12 @@
         <div class="inq-header-main">
           <p class="inq-eyebrow" id="riqEyebrow">TK168 RENTAL CONSULT</p>
           <h1 class="inq-title" id="riqTitle">租车咨询单</h1>
-          <p class="inq-subtitle" id="riqSubtitle">按来店预约的 4 步结构整理租车需求，顾问会结合车辆状态与档期回复你。</p>
+          <p class="inq-subtitle" id="riqSubtitle">填写完成后点确认，将在下一页核对全部信息并提交。</p>
         </div>
       </header>
 
-      <ol class="inq-progress" id="riqProgress" aria-label="租车咨询步骤">
-        <li><button type="button" data-jump-step="0" id="riqStepAppointment">用车时间</button></li>
-        <li><button type="button" data-jump-step="1" id="riqStepName">联系人</button></li>
-        <li><button type="button" data-jump-step="2" id="riqStepContact">联系方式</button></li>
-        <li><button type="button" data-jump-step="3" id="riqStepConfirm">确认</button></li>
-      </ol>
-
-      <div class="inq-board">
-        <p class="inq-lead" id="riqLeadText">先确认希望用车日期、取车时间和预计租期。</p>
+      <div class="inq-board is-step-edit" id="riqBoard">
+        <p class="inq-lead" id="riqLeadText">请在本页填写下列全部项目。</p>
 
         <article class="inq-vehicle riq-vehicle">
           <img src="assets/images/011.jpg" alt="Rental vehicle" class="inq-vehicle-thumb" id="riqVehicleThumb">
@@ -211,11 +204,9 @@
 
         <p class="inq-message" id="riqMessage" aria-live="polite"></p>
 
-        <div class="inq-actions">
-          <button type="button" class="inq-btn inq-btn--ghost" id="riqPrevBtn">上一步</button>
-          <button type="button" class="inq-btn inq-btn--primary" id="riqNextBtn">下一步</button>
+        <div class="inq-actions inq-actions--single">
+          <button type="button" class="inq-btn inq-btn--primary" id="riqConfirmBtn">确认</button>
         </div>
-        <p class="inq-counter" id="riqCounter">1 / 4</p>
       </div>
     </section>
   </main>
@@ -225,10 +216,10 @@
   <script src="js/layout-shell.js?v=20260512a"></script>
   <script src="js/api-hydrate.js?v=20260511s"></script>
   <script src="js/data.js?v=20260511s"></script>
-  <script src="js/i18n.js?v=20260510f"></script>
+  <script src="js/i18n.js?v=20260619b"></script>
   <script src="js/common-links.js?v=20260419a"></script>
   <script src="js/page-chrome.js?v=20260601a"></script>
-  <script src="js/rental-inquiry.js?v=20260511s"></script>
+  <script src="js/rental-inquiry.js?v=20260620a"></script>
 </body>
 
 </html>

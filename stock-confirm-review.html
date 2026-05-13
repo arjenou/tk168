@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>在庫確認 — 内容の確認 — TK168 Premium Automotive</title>
+  <link rel="stylesheet" href="css/style.css?v=20260602b">
+  <link rel="stylesheet" href="css/skeleton.css?v=20260420h">
+  <script src="js/skeleton-boot.js?v=20260420h"></script>
+  <link rel="stylesheet" href="css/inquiry.css?v=20260620f">
+</head>
+
+<body class="inquiry-page no-hero-page">
+  <div data-layout-nav></div>
+
+  <main class="inq-main">
+    <section class="inq-shell">
+      <header class="inq-header">
+        <button type="button" class="inq-back-btn" id="scrBackNavBtn" data-i18n-aria-label="detail.back">
+          <svg class="inq-back-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </button>
+        <div class="inq-header-main">
+          <p class="inq-eyebrow">TK168 STOCK CHECK FLOW</p>
+          <h1 class="inq-title" id="scrPageTitle">在庫確認 — 内容の確認</h1>
+          <p class="inq-subtitle" id="scrPageSubtitle">入力内容をご確認のうえ、お間違いがなければ送信してください。</p>
+        </div>
+      </header>
+
+      <div class="inq-board is-step-review" id="scrBoard">
+        <p class="inq-lead" id="scrLeadText">送信後、ご入力の連絡先にて在庫・見積りの確認を進めます。</p>
+
+        <article class="inq-vehicle">
+          <img src="https://api.tk168.co.jp/api/media/vehicles/seed/002.png" alt="対象車両" class="inq-vehicle-thumb" id="scrVehicleThumb">
+          <div class="inq-vehicle-copy">
+            <p class="inq-vehicle-brand" id="scrVehicleBrand">BRAND</p>
+            <p class="inq-vehicle-name" id="scrVehicleName">Model</p>
+            <p class="inq-vehicle-meta" id="scrVehicleMeta">2023 / 4.0L / SUV</p>
+          </div>
+        </article>
+
+        <div class="inq-table">
+          <section class="inq-row">
+            <div class="inq-row-label">
+              <span id="scrLabelRequest">確認内容</span>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span class="scr-value scr-value--multiline" id="scrValueRequest"></span>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row">
+            <div class="inq-row-label">
+              <span id="scrLabelName">氏名</span>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span class="scr-value" id="scrValueName"></span>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row">
+            <div class="inq-row-label">
+              <span id="scrLabelKana">フリガナ</span>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span class="scr-value" id="scrValueKana"></span>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row">
+            <div class="inq-row-label">
+              <span id="scrLabelContact">メール・電話</span>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span class="scr-value scr-value--multiline" id="scrValueContact"></span>
+              </div>
+            </div>
+          </section>
+
+          <section class="inq-row">
+            <div class="inq-row-label">
+              <span id="scrLabelConsent">同意・通知</span>
+            </div>
+            <div class="inq-row-content">
+              <div class="inq-row-summary">
+                <span class="scr-value scr-value--multiline" id="scrValueConsent"></span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <p class="inq-message" id="scrMessage" aria-live="polite"></p>
+
+        <div class="inq-actions">
+          <button type="button" class="inq-btn inq-btn--primary" id="scrSubmitBtn">送信</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div data-layout-footer></div>
+
+  <script src="js/layout-shell.js?v=20260512a"></script>
+  <script src="js/brand-logo-inventory.js?v=20260417i"></script>
+  <script src="js/brand-library-data.js?v=20260420c"></script>
+  <script src="js/api-hydrate.js?v=20260511s"></script>
+  <script src="js/data.js?v=20260511s"></script>
+  <script src="js/i18n.js?v=20260619b"></script>
+  <script src="js/common-links.js?v=20260419a"></script>
+  <script src="js/page-chrome.js?v=20260601a"></script>
+  <script src="js/stock-confirm-i18n.js?v=20260620p"></script>
+  <script src="js/stock-confirm-review.js?v=20260620p"></script>
+</body>
+
+</html>

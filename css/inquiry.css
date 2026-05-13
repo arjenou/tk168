@@ -357,6 +357,10 @@
   font-size: 13px;
 }
 
+.scr-value--multiline {
+  white-space: pre-line;
+}
+
 .inq-edit {
   border: 0;
   background: none;
@@ -386,6 +390,39 @@
 
 .inq-row.is-active .inq-row-content {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(249, 251, 236, 0.72));
+}
+
+/* 两阶段：一页填完 → 一页只读确认（与 inquiry.js / service-appointment.js 联动） */
+.inq-board.is-step-edit .inq-row .inq-editor {
+  display: block;
+}
+
+.inq-board.is-step-edit .inq-row-summary {
+  display: none;
+}
+
+.inq-board.is-step-edit .inq-edit {
+  display: none;
+}
+
+.inq-board.is-step-edit .inq-row {
+  cursor: default;
+}
+
+.inq-board.is-step-review .inq-row .inq-editor {
+  display: none !important;
+}
+
+.inq-board.is-step-review .inq-row-summary {
+  display: flex;
+}
+
+.inq-board.is-step-review .inq-edit {
+  display: none;
+}
+
+.inq-board.is-step-review .inq-row {
+  cursor: default;
 }
 
 .inq-editor label {
@@ -455,7 +492,7 @@
 }
 
 .inq-actions {
-  padding: 9px 14px 0;
+  padding: 9px 14px 18px;
   display: flex;
   justify-content: center;
   gap: 8px;
@@ -553,6 +590,7 @@
 
   .inq-actions {
     flex-direction: column;
+    padding-bottom: 22px;
   }
 
   .inq-btn {

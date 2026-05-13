@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="css/style.css?v=20260602b">
   <link rel="stylesheet" href="css/skeleton.css?v=20260420h">
   <script src="js/skeleton-boot.js?v=20260420h"></script>
-  <link rel="stylesheet" href="css/inquiry.css?v=20260511s">
+  <link rel="stylesheet" href="css/inquiry.css?v=20260620c">
 </head>
 
 <body class="inquiry-page no-hero-page">
@@ -25,20 +25,12 @@
         <div class="inq-header-main">
           <p class="inq-eyebrow" id="inqEyebrow">TK168 CONTACT FLOW</p>
           <h1 class="inq-title" id="inqTitle">来店预约信息填写</h1>
-          <p class="inq-subtitle" id="inqSubtitle">通过 5 个步骤填写关键信息，整理完成后继续与顾问确认。</p>
+          <p class="inq-subtitle" id="inqSubtitle">先在一页填完必要信息，再进入确认页核对后提交。</p>
         </div>
       </header>
 
-      <ol class="inq-progress" id="inqProgress" aria-label="预约填写步骤">
-        <li><button type="button" data-jump-step="0" id="inqStepAppointment">来店时间</button></li>
-        <li><button type="button" data-jump-step="1" id="inqStepName">姓名</button></li>
-        <li><button type="button" data-jump-step="2" id="inqStepKana">读音</button></li>
-        <li><button type="button" data-jump-step="3" id="inqStepContact">联系方式</button></li>
-        <li><button type="button" data-jump-step="4" id="inqStepConfirm">确认</button></li>
-      </ol>
-
-      <div class="inq-board">
-        <p class="inq-lead" id="inqLeadText">请选择希望到店时间。</p>
+      <div class="inq-board is-step-edit" id="inqBoard">
+        <p class="inq-lead" id="inqLeadText" hidden></p>
 
         <article class="inq-vehicle">
           <img src="assets/images/chen001.jpg" alt="目标车辆" class="inq-vehicle-thumb" id="inqVehicleThumb">
@@ -180,10 +172,8 @@
         <p class="inq-message" id="inqMessage" aria-live="polite"></p>
 
         <div class="inq-actions">
-          <button type="button" class="inq-btn inq-btn--ghost" id="inqPrevBtn">上一步</button>
           <button type="button" class="inq-btn inq-btn--primary" id="inqNextBtn">下一步</button>
         </div>
-        <p class="inq-counter" id="inqCounter">1 / 5</p>
       </div>
     </section>
   </main>
@@ -195,10 +185,10 @@
   <script src="js/brand-library-data.js?v=20260420c"></script>
   <script src="js/api-hydrate.js?v=20260511s"></script>
   <script src="js/data.js?v=20260511s"></script>
-  <script src="js/i18n.js?v=20260510f"></script>
+  <script src="js/i18n.js?v=20260619b"></script>
   <script src="js/common-links.js?v=20260419a"></script>
   <script src="js/page-chrome.js?v=20260601a"></script>
-  <script src="js/inquiry.js?v=20260511s"></script>
+  <script src="js/inquiry.js?v=20260620q"></script>
 </body>
 
 </html>

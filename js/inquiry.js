@@ -9,15 +9,18 @@
     buildBrandUrl
   } = window.TK168_DATA;
 
-  const STEP_KEYS = ['appointment', 'name', 'kana', 'contact', 'confirm'];
+  const FLOW_KEYS = ['edit', 'review'];
+  const SECTION_KEYS = ['appointment', 'name', 'kana', 'contact', 'confirm'];
 
   const COPY = {
     zh: {
       pageTitle: '来店预约 — TK168 Premium Automotive',
       eyebrow: 'TK168 CONTACT FLOW',
       title: '来店预约信息填写',
-      subtitle: '通过 5 个步骤填写关键信息，整理完成后继续与顾问确认。',
-      progressAria: '预约填写步骤',
+      subtitle: '先在一页填完信息，再在确认页核对后提交。',
+      flow: {
+        reviewLead: '请核对下列摘要，确认无误后提交。'
+      },
       steps: {
         appointment: { tab: '来店时间', row: '来店希望时间', lead: '请选择希望到店时间。' },
         name: { tab: '姓名', row: '姓名', lead: '请输入你的姓名。' },
@@ -50,9 +53,8 @@
         readyToSend: '邮编 {postal} / 内容已确认'
       },
       actions: {
-        prev: '上一步',
-        next: '下一步',
-        submit: '完成确认'
+        toReview: '确认',
+        submit: '确认提交'
       },
       message: {
         appointmentRequired: '请填写来店希望日期和时间。',
@@ -69,8 +71,10 @@
       pageTitle: '来店予約 — TK168 Premium Automotive',
       eyebrow: 'TK168 CONTACT FLOW',
       title: '来店予約内容の入力',
-      subtitle: '5ステップで必要情報を入力し、内容整理後に担当アドバイザーとの確認へ進みます。',
-      progressAria: '入力ステップ',
+      subtitle: '必要事項を1ページにまとめて入力し、確認ページで内容を確認してから送信します。',
+      flow: {
+        reviewLead: '入力内容をご確認のうえ、問題なければ送信してください。'
+      },
       steps: {
         appointment: { tab: '来店希望', row: '来店希望日時', lead: '来店希望日時を選択してください。' },
         name: { tab: '氏名', row: '氏名', lead: 'お名前を入力してください。' },
@@ -103,9 +107,8 @@
         readyToSend: '〒{postal} / 内容確認済み'
       },
       actions: {
-        prev: '戻る',
-        next: '次へ',
-        submit: '確認を完了'
+        toReview: '確認',
+        submit: 'この内容で送信'
       },
       message: {
         appointmentRequired: '来店希望日時を入力してください。',
@@ -122,8 +125,10 @@
       pageTitle: 'Visit Booking — TK168 Premium Automotive',
       eyebrow: 'TK168 CONTACT FLOW',
       title: 'Complete Your Visit Booking',
-      subtitle: 'Enter the required details in 5 steps and finish organizing them before continuing with your advisor.',
-      progressAria: 'Booking steps',
+      subtitle: 'Fill everything on one page, review the summary, then submit.',
+      flow: {
+        reviewLead: 'Review your answers below, then submit if everything looks correct.'
+      },
       steps: {
         appointment: { tab: 'Visit time', row: 'Preferred visit time', lead: 'Select your preferred visit date and time.' },
         name: { tab: 'Name', row: 'Full name', lead: 'Enter your name.' },
@@ -156,9 +161,8 @@
         readyToSend: 'Postal code {postal} / details confirmed'
       },
       actions: {
-        prev: 'Back',
-        next: 'Next',
-        submit: 'Complete review'
+        toReview: 'Confirm',
+        submit: 'Submit booking'
       },
       message: {
         appointmentRequired: 'Please enter your preferred visit date and time.',
@@ -231,6 +235,10 @@
 
   const inquiryVehicleContext = createVehicleContext();
 
+  function currentInquiryVehicleId() {
+    return String(inquiryVehicleContext.currentVehicle?.id || getRequestedInquiryVehicleId() || '').trim();
+  }
+
   window.TK168CommonLinks?.applyCommonLinks();
   window.TK168PageChrome?.applyPageChrome({
     pageKey: 'inquiry',
@@ -260,14 +268,9 @@
     subtitle: document.getElementById('inqSubtitle'),
     lead: document.getElementById('inqLeadText'),
     message: document.getElementById('inqMessage'),
-    counter: document.getElementById('inqCounter'),
     nextBtn: document.getElementById('inqNextBtn'),
-    prevBtn: document.getElementById('inqPrevBtn'),
-    progressRoot: document.getElementById('inqProgress'),
-    progress: Array.from(document.querySelectorAll('#inqProgress li')),
+    board: document.getElementById('inqBoard'),
     rows: Array.from(document.querySelectorAll('.inq-row')),
-    jumpStepButtons: Array.from(document.querySelectorAll('[data-jump-step]')),
-    jumpRowButtons: Array.from(document.querySelectorAll('[data-jump-row]')),
     requiredBadges: Array.from(document.querySelectorAll('.inq-required')),
     date: document.getElementById('inqDate'),
     time: document.getElementById('inqTime'),
@@ -288,13 +291,6 @@
     vehicleBrand: document.getElementById('inqVehicleBrand'),
     vehicleName: document.getElementById('inqVehicleName'),
     vehicleMeta: document.getElementById('inqVehicleMeta'),
-    stepLabels: {
-      appointment: document.getElementById('inqStepAppointment'),
-      name: document.getElementById('inqStepName'),
-      kana: document.getElementById('inqStepKana'),
-      contact: document.getElementById('inqStepContact'),
-      confirm: document.getElementById('inqStepConfirm')
-    },
     rowLabels: {
       appointment: document.getElementById('inqRowAppointment'),
       name: document.getElementById('inqRowName'),
@@ -349,10 +345,7 @@
     setText(refs.title, copy.title);
     setText(refs.subtitle, copy.subtitle);
 
-    if (refs.progressRoot) refs.progressRoot.setAttribute('aria-label', copy.progressAria);
-
-    STEP_KEYS.forEach((key) => {
-      setText(refs.stepLabels[key], copy.steps[key].tab);
+    SECTION_KEYS.forEach((key) => {
       setText(refs.rowLabels[key], copy.steps[key].row);
       setText(refs.editLabels[key], copy.edit);
     });
@@ -376,8 +369,6 @@
     setPlaceholder(refs.note, copy.fields.notePlaceholder);
     setPlaceholder(refs.name, copy.fields.namePlaceholder);
     setPlaceholder(refs.kana, copy.fields.kanaPlaceholder);
-
-    setText(refs.prevBtn, copy.actions.prev);
   }
 
   function renderVehicleCard() {
@@ -458,30 +449,29 @@
     refs.summaryConfirm.textContent = buildConfirmSummary();
   }
 
-  function renderProgress() {
-    refs.progress.forEach((item, idx) => {
-      item.classList.toggle('is-active', idx === currentStep);
-      item.classList.toggle('is-done', idx < currentStep);
-    });
+  function applyBoardStep() {
+    if (!refs.board) return;
+    refs.board.classList.toggle('is-step-edit', currentStep === 0);
+    refs.board.classList.toggle('is-step-review', currentStep === 1);
+    refs.rows.forEach((row) => row.classList.remove('is-active'));
   }
 
   function renderRows() {
-    const activeKey = STEP_KEYS[currentStep];
-    refs.rows.forEach((row) => {
-      row.classList.toggle('is-active', row.dataset.row === activeKey);
-    });
+    applyBoardStep();
   }
 
   function renderActions() {
     const copy = currentCopy();
-    refs.prevBtn.disabled = currentStep === 0;
-    refs.nextBtn.textContent = currentStep === STEP_KEYS.length - 1 ? copy.actions.submit : copy.actions.next;
-    refs.counter.textContent = `${currentStep + 1} / ${STEP_KEYS.length}`;
+    refs.nextBtn.textContent = currentStep === 0 ? copy.actions.toReview : copy.actions.submit;
   }
 
   function renderHead() {
-    const key = STEP_KEYS[currentStep];
-    refs.lead.textContent = currentCopy().steps[key].lead;
+    const copy = currentCopy();
+    const raw = currentStep === 0 ? copy.flow.editLead : copy.flow.reviewLead;
+    const trimmed = String(raw || '').trim();
+    if (!refs.lead) return;
+    refs.lead.textContent = trimmed;
+    refs.lead.hidden = !trimmed;
   }
 
   function clearMessage() {
@@ -493,26 +483,26 @@
     refs.message.style.color = ok ? '#1f8f5f' : '#c6472f';
   }
 
-  function validateStep(stepKey) {
+  function validateSection(sectionKey) {
     const msg = currentCopy().message;
 
-    if (stepKey === 'appointment') {
+    if (sectionKey === 'appointment') {
       if (!sanitize(state.date) || !sanitize(state.time)) return msg.appointmentRequired;
       return '';
     }
-    if (stepKey === 'name') {
+    if (sectionKey === 'name') {
       if (!sanitize(state.name)) return msg.nameRequired;
       return '';
     }
-    if (stepKey === 'kana') {
+    if (sectionKey === 'kana') {
       if (!sanitize(state.kana)) return msg.kanaRequired;
       return '';
     }
-    if (stepKey === 'contact') {
+    if (sectionKey === 'contact') {
       if (!sanitize(state.email) || !sanitize(state.phone)) return msg.contactRequired;
       return '';
     }
-    if (stepKey === 'confirm') {
+    if (sectionKey === 'confirm') {
       if (!sanitize(state.postal)) return msg.postalRequired;
       if (!state.consentPolicy) return msg.consentRequired;
       return '';
@@ -520,16 +510,23 @@
     return '';
   }
 
+  function validateAllSections() {
+    for (let i = 0; i < SECTION_KEYS.length; i += 1) {
+      const err = validateSection(SECTION_KEYS[i]);
+      if (err) return err;
+    }
+    return '';
+  }
+
   function render() {
     renderHead();
-    renderProgress();
     renderRows();
     renderSummaries();
     renderActions();
   }
 
   function moveStep(nextStep) {
-    const clamped = Math.max(0, Math.min(STEP_KEYS.length - 1, nextStep));
+    const clamped = Math.max(0, Math.min(FLOW_KEYS.length - 1, nextStep));
     currentStep = clamped;
     clearMessage();
     render();
@@ -562,49 +559,24 @@
   }
 
   function bindStepEvents() {
-    refs.prevBtn.addEventListener('click', () => {
-      moveStep(currentStep - 1);
-    });
-
     refs.nextBtn.addEventListener('click', () => {
       syncStateFromInputs();
-      const currentKey = STEP_KEYS[currentStep];
-      const error = validateStep(currentKey);
+      if (currentStep === 0) {
+        const error = validateAllSections();
+        if (error) {
+          setMessage(error, false);
+          return;
+        }
+        moveStep(1);
+        return;
+      }
+
+      const error = validateAllSections();
       if (error) {
         setMessage(error, false);
         return;
       }
-
-      if (currentStep === STEP_KEYS.length - 1) {
-        setMessage(currentCopy().message.submitSuccess, true);
-        return;
-      }
-
-      moveStep(currentStep + 1);
-    });
-
-    refs.jumpStepButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        const value = Number(button.dataset.jumpStep || 0);
-        moveStep(value);
-      });
-    });
-
-    refs.jumpRowButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        const rowKey = button.dataset.jumpRow || '';
-        const target = STEP_KEYS.indexOf(rowKey);
-        if (target >= 0) moveStep(target);
-      });
-    });
-
-    refs.rows.forEach((row) => {
-      row.addEventListener('click', (event) => {
-        if (event.target.closest('.inq-editor')) return;
-        const rowKey = row.dataset.row || '';
-        const target = STEP_KEYS.indexOf(rowKey);
-        if (target >= 0) moveStep(target);
-      });
+      setMessage(currentCopy().message.submitSuccess, true);
     });
   }
 
@@ -620,16 +592,23 @@
   }
 
   function navigateInquiryBack() {
+    if (currentStep === 1) {
+      moveStep(0);
+      return;
+    }
     try {
       const ref = document.referrer || '';
-      if (ref.startsWith(window.location.origin) && window.history.length > 1) {
-        window.history.back();
-        return;
+      if (ref.startsWith(window.location.origin)) {
+        const path = new URL(ref).pathname.toLowerCase();
+        if (path.indexOf('inquiry.html') === -1) {
+          window.location.assign(ref);
+          return;
+        }
       }
     } catch {
       /* ignore */
     }
-    const id = inquiryVehicleContext.currentVehicle?.id;
+    const id = currentInquiryVehicleId();
     if (id && typeof window.TK168_DATA?.buildDetailUrl === 'function') {
       window.location.assign(window.TK168_DATA.buildDetailUrl(id));
       return;

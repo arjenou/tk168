@@ -1,17 +1,24 @@
-﻿(function () {
-  const STEP_KEYS = ['appointment', 'service', 'name', 'contact', 'confirm'];
+(function () {
+  const FLOW_KEYS = ['edit', 'review'];
+  const SECTION_KEYS = ['appointment', 'service', 'name', 'contact', 'confirm'];
 
   const COPY = {
     zh: {
       pageTitle: '增值服务预约 — TK168 Premium Automotive',
       eyebrow: 'VALUE-ADDED SERVICE DESK',
       title: '增值服务预约单',
-      subtitle: '通过 5 个步骤提交服务需求，顾问会按车辆阶段、服务类型和预约方式帮你安排。',
+      subtitle: '先在一页填完需求，再在确认页核对后提交。',
       cardLabel: 'Service Coordination',
       cardTitle: 'TK168 增值服务协同台',
       cardMeta: '购前评估 / 手续资料 / 交付协同 / 维修保养 / 年检续保',
       cardTags: ['购前评估', '保险说明', '手续资料', '交付前检查', '整备维修', '年检续保'],
       progressAria: '增值服务预约步骤',
+      flow: {
+        editTab: '填写',
+        reviewTab: '确认',
+        editLead: '请在本页填写全部项目。',
+        reviewLead: '请核对下列摘要，确认无误后提交。'
+      },
       steps: {
         appointment: { tab: '预约方式', row: '希望联系时间', lead: '先确认希望联系日期、时间和沟通方式。' },
         service: { tab: '服务内容', row: '咨询服务', lead: '请选择当前最想先处理的服务事项和车辆阶段。' },
@@ -70,9 +77,9 @@
         readyToSend: '地区 {region} / 信息已确认'
       },
       actions: {
-        prev: '上一步',
-        next: '下一步',
-        submit: '完成确认'
+        prev: '返回修改',
+        toReview: '前往确认',
+        submit: '确认提交'
       },
       message: {
         appointmentRequired: '请填写希望联系日期、时间和沟通方式。',
@@ -88,12 +95,18 @@
       pageTitle: '付加サービス予約 — TK168 Premium Automotive',
       eyebrow: 'VALUE-ADDED SERVICE DESK',
       title: '付加サービス予約フォーム',
-      subtitle: '5ステップで要件を入力すると、車両状況と希望手段に合わせて担当アドバイザーが調整します。',
+      subtitle: '必要事項を1ページにまとめて入力し、確認ページで内容を確認してから送信します。',
       cardLabel: 'Service Coordination',
       cardTitle: 'TK168 付加サービス窓口',
       cardMeta: '購入前評価 / 書類連携 / 納車調整 / 整備メンテナンス / 車検更新',
       cardTags: ['購入前評価', '保険説明', '書類連携', '納車前点検', '整備修理', '車検更新'],
       progressAria: '付加サービス予約ステップ',
+      flow: {
+        editTab: '入力',
+        reviewTab: '確認',
+        editLead: '以下の項目をこのページですべて入力してください。',
+        reviewLead: '入力内容をご確認のうえ、問題なければ送信してください。'
+      },
       steps: {
         appointment: { tab: '予約方法', row: '希望連絡日時', lead: 'まずは希望する連絡日時と相談方法を選択してください。' },
         service: { tab: '相談内容', row: '希望サービス', lead: '今優先して相談したい内容と現在の段階を選択してください。' },
@@ -152,9 +165,9 @@
         readyToSend: '地域 {region} / 内容確認済み'
       },
       actions: {
-        prev: '戻る',
-        next: '次へ',
-        submit: '確認を完了'
+        prev: '入力に戻る',
+        toReview: '内容を確認する',
+        submit: 'この内容で送信'
       },
       message: {
         appointmentRequired: '希望する連絡日時と相談方法を入力してください。',
@@ -170,12 +183,18 @@
       pageTitle: 'Service Booking — TK168 Premium Automotive',
       eyebrow: 'VALUE-ADDED SERVICE DESK',
       title: 'Value-added Service Booking',
-      subtitle: 'Submit your service request in 5 steps and your advisor will arrange the next action based on vehicle stage, request type, and preferred contact method.',
+      subtitle: 'Fill everything on one page, review the summary, then submit.',
       cardLabel: 'Service Coordination',
       cardTitle: 'TK168 Service Coordination Desk',
       cardMeta: 'Pre-purchase review / documents / delivery coordination / maintenance / inspection renewal',
       cardTags: ['Pre-purchase review', 'Insurance support', 'Documents', 'Pre-delivery check', 'Maintenance', 'Inspection renewal'],
       progressAria: 'Service booking steps',
+      flow: {
+        editTab: 'Details',
+        reviewTab: 'Review',
+        editLead: 'Enter all required information on this page.',
+        reviewLead: 'Review your answers below, then submit if everything looks correct.'
+      },
       steps: {
         appointment: { tab: 'Contact method', row: 'Preferred contact time', lead: 'Choose your preferred contact date, time, and consultation method first.' },
         service: { tab: 'Service request', row: 'Requested service', lead: 'Select the service item you want to handle first and the current vehicle stage.' },
@@ -234,9 +253,9 @@
         readyToSend: 'Region {region} / information confirmed'
       },
       actions: {
-        prev: 'Back',
-        next: 'Next',
-        submit: 'Complete confirmation'
+        prev: 'Back to edit',
+        toReview: 'Continue to review',
+        submit: 'Submit request'
       },
       message: {
         appointmentRequired: 'Please enter the preferred contact date, time, and consultation method.',
@@ -303,6 +322,7 @@
     counter: document.getElementById('svcCounter'),
     nextBtn: document.getElementById('svcNextBtn'),
     prevBtn: document.getElementById('svcPrevBtn'),
+    board: document.getElementById('svcBoard'),
     progressRoot: document.getElementById('svcProgress'),
     progress: Array.from(document.querySelectorAll('#svcProgress li')),
     rows: Array.from(document.querySelectorAll('.inq-row')),
@@ -329,11 +349,8 @@
     summaryContact: document.getElementById('svcSummaryContact'),
     summaryConfirm: document.getElementById('svcSummaryConfirm'),
     stepLabels: {
-      appointment: document.getElementById('svcStepAppointment'),
-      service: document.getElementById('svcStepService'),
-      name: document.getElementById('svcStepName'),
-      contact: document.getElementById('svcStepContact'),
-      confirm: document.getElementById('svcStepConfirm')
+      edit: document.getElementById('svcStepEdit'),
+      review: document.getElementById('svcStepReview')
     },
     rowLabels: {
       appointment: document.getElementById('svcRowAppointment'),
@@ -427,8 +444,10 @@
 
     if (refs.progressRoot) refs.progressRoot.setAttribute('aria-label', copy.progressAria);
 
-    STEP_KEYS.forEach((key) => {
-      setText(refs.stepLabels[key], copy.steps[key].tab);
+    setText(refs.stepLabels.edit, copy.flow.editTab);
+    setText(refs.stepLabels.review, copy.flow.reviewTab);
+
+    SECTION_KEYS.forEach((key) => {
       setText(refs.rowLabels[key], copy.steps[key].row);
       setText(refs.editLabels[key], copy.edit);
     });
@@ -561,23 +580,27 @@
     });
   }
 
+  function applyBoardStep() {
+    if (!refs.board) return;
+    refs.board.classList.toggle('is-step-edit', currentStep === 0);
+    refs.board.classList.toggle('is-step-review', currentStep === 1);
+    refs.rows.forEach((row) => row.classList.remove('is-active'));
+  }
+
   function renderRows() {
-    const activeKey = STEP_KEYS[currentStep];
-    refs.rows.forEach((row) => {
-      row.classList.toggle('is-active', row.dataset.row === activeKey);
-    });
+    applyBoardStep();
   }
 
   function renderActions() {
     const copy = currentCopy();
     refs.prevBtn.disabled = currentStep === 0;
-    refs.nextBtn.textContent = currentStep === STEP_KEYS.length - 1 ? copy.actions.submit : copy.actions.next;
-    refs.counter.textContent = `${currentStep + 1} / ${STEP_KEYS.length}`;
+    refs.nextBtn.textContent = currentStep === 0 ? copy.actions.toReview : copy.actions.submit;
+    refs.counter.textContent = `${currentStep + 1} / ${FLOW_KEYS.length}`;
   }
 
   function renderHead() {
-    const key = STEP_KEYS[currentStep];
-    refs.lead.textContent = currentCopy().steps[key].lead;
+    const copy = currentCopy();
+    refs.lead.textContent = currentStep === 0 ? copy.flow.editLead : copy.flow.reviewLead;
   }
 
   function clearMessage() {
@@ -589,29 +612,37 @@
     refs.message.style.color = ok ? '#1f8f5f' : '#c6472f';
   }
 
-  function validateStep(stepKey) {
+  function validateSection(sectionKey) {
     const msg = currentCopy().message;
 
-    if (stepKey === 'appointment') {
+    if (sectionKey === 'appointment') {
       if (!sanitize(state.date) || !sanitize(state.time) || !sanitize(state.mode)) return msg.appointmentRequired;
       return '';
     }
-    if (stepKey === 'service') {
+    if (sectionKey === 'service') {
       if (!sanitize(state.category) || !sanitize(state.stage)) return msg.serviceRequired;
       return '';
     }
-    if (stepKey === 'name') {
+    if (sectionKey === 'name') {
       if (!sanitize(state.name)) return msg.nameRequired;
       return '';
     }
-    if (stepKey === 'contact') {
+    if (sectionKey === 'contact') {
       if (!sanitize(state.email) || !sanitize(state.phone)) return msg.contactRequired;
       return '';
     }
-    if (stepKey === 'confirm') {
+    if (sectionKey === 'confirm') {
       if (!sanitize(state.region)) return msg.regionRequired;
       if (!state.consentPolicy) return msg.consentRequired;
       return '';
+    }
+    return '';
+  }
+
+  function validateAllSections() {
+    for (let i = 0; i < SECTION_KEYS.length; i += 1) {
+      const err = validateSection(SECTION_KEYS[i]);
+      if (err) return err;
     }
     return '';
   }
@@ -625,7 +656,7 @@
   }
 
   function moveStep(nextStep) {
-    currentStep = Math.max(0, Math.min(STEP_KEYS.length - 1, nextStep));
+    currentStep = Math.max(0, Math.min(FLOW_KEYS.length - 1, nextStep));
     clearMessage();
     render();
   }
@@ -667,42 +698,52 @@
 
     refs.nextBtn.addEventListener('click', () => {
       syncStateFromInputs();
-      const currentKey = STEP_KEYS[currentStep];
-      const error = validateStep(currentKey);
+      if (currentStep === 0) {
+        const error = validateAllSections();
+        if (error) {
+          setMessage(error, false);
+          return;
+        }
+        moveStep(1);
+        return;
+      }
+
+      const error = validateAllSections();
       if (error) {
         setMessage(error, false);
         return;
       }
-
-      if (currentStep === STEP_KEYS.length - 1) {
-        setMessage(currentCopy().message.submitSuccess, true);
-        return;
-      }
-
-      moveStep(currentStep + 1);
+      setMessage(currentCopy().message.submitSuccess, true);
     });
 
     refs.jumpStepButtons.forEach((button) => {
       button.addEventListener('click', () => {
         const value = Number(button.dataset.jumpStep || 0);
+        if (value === 1 && currentStep === 0) {
+          syncStateFromInputs();
+          const err = validateAllSections();
+          if (err) {
+            setMessage(err, false);
+            return;
+          }
+        }
         moveStep(value);
       });
     });
 
     refs.jumpRowButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        const rowKey = button.dataset.jumpRow || '';
-        const target = STEP_KEYS.indexOf(rowKey);
-        if (target >= 0) moveStep(target);
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (currentStep !== 1) return;
+        moveStep(0);
       });
     });
 
     refs.rows.forEach((row) => {
       row.addEventListener('click', (event) => {
         if (event.target.closest('.inq-editor')) return;
-        const rowKey = row.dataset.row || '';
-        const target = STEP_KEYS.indexOf(rowKey);
-        if (target >= 0) moveStep(target);
+        if (currentStep !== 1) return;
+        moveStep(0);
       });
     });
   }

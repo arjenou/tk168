@@ -2418,15 +2418,13 @@ body.price-help-open {
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.38),
-    0 24px 64px rgba(0, 0, 0, 0.20);
-  transition: transform .4s ease, box-shadow .4s ease;
+  box-shadow: none;
+  transition: transform .4s ease;
 }
 
 .featured-card:hover {
   transform: translateY(-12px);
-  box-shadow: 0 28px 64px rgba(43, 41, 38, .22), 0 8px 24px rgba(0, 0, 0, .15);
+  box-shadow: none;
 }
 
 /* 头部：品牌图标 + 车名 */

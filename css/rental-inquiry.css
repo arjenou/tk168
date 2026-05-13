@@ -2,6 +2,14 @@
   max-width: 1080px;
 }
 
+.rental-inquiry-page .inq-actions--single {
+  justify-content: center;
+}
+
+.rental-inquiry-page .inq-actions--single .inq-btn--primary {
+  min-width: min(100%, 280px);
+}
+
 .rental-inquiry-page .inq-shell::before {
   width: 58%;
   height: 58%;
