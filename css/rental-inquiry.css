@@ -19,8 +19,106 @@
   align-items: flex-start;
 }
 
-.riq-vehicle .inq-vehicle-thumb {
+.rental-inquiry-page .riq-vehicle,
+.rental-inquiry-confirm-page .riq-vehicle {
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.riq-vehicle-gallery {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 8px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(250, 250, 251, 0.98), rgba(238, 239, 242, 0.92));
+  border: 1px solid rgba(43, 41, 38, 0.07);
+  box-sizing: border-box;
+}
+
+.riq-gallery-viewport {
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.riq-gallery-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.riq-gallery-track {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  min-height: 74px;
+}
+
+.riq-gallery-slide {
+  flex: 0 0 auto;
+  width: min(26vw, 148px);
+  max-width: 200px;
+  scroll-snap-align: start;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(43, 41, 38, 0.12);
+  box-shadow: 0 8px 18px rgba(26, 26, 26, 0.14);
+  background: #1a1a1a;
+}
+
+.riq-gallery-img {
+  display: block;
+  width: 100%;
+  height: 72px;
   object-fit: cover;
+}
+
+.riq-gallery-nav {
+  align-self: center;
+  width: 24px;
+  min-height: 68px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: rgba(72, 72, 78, 0.42);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.riq-gallery-nav:hover:not(:disabled) {
+  background: rgba(52, 52, 58, 0.55);
+}
+
+.riq-gallery-nav:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+
+.riq-gallery-nav svg {
+  width: 13px;
+  height: 13px;
+}
+
+@media (max-width: 680px) {
+  .riq-gallery-slide {
+    width: min(32vw, 160px);
+  }
+
+  .riq-gallery-img {
+    height: 76px;
+  }
 }
 
 .riq-metric-row {

@@ -76,6 +76,10 @@
       actions: {
         confirm: '确认'
       },
+      gallery: {
+        prev: '上一张',
+        next: '下一张'
+      },
       message: {
         appointmentRequired: '请填写日期、取车时间和预计租期。',
         nameRequired: '请输入联系人姓名。',
@@ -146,6 +150,10 @@
       actions: {
         confirm: '確認'
       },
+      gallery: {
+        prev: '前の画像',
+        next: '次の画像'
+      },
       message: {
         appointmentRequired: '利用日、受取時間、予定日数を入力してください。',
         nameRequired: '運転者の氏名を入力してください。',
@@ -215,6 +223,10 @@
       },
       actions: {
         confirm: 'Confirm'
+      },
+      gallery: {
+        prev: 'Previous image',
+        next: 'Next image'
       },
       message: {
         appointmentRequired: 'Please enter the date, pickup time, and expected rental length.',
@@ -314,6 +326,10 @@
 
   const vehicleContext = createVehicleContext();
 
+  function currentRentalInquiryVehicleId() {
+    return String(vehicleContext.currentVehicle?.id || getRequestedVehicleId() || '').trim();
+  }
+
   window.TK168CommonLinks?.applyCommonLinks();
   window.TK168PageChrome?.applyPageChrome({
     pageKey: 'rental',
@@ -371,7 +387,10 @@
     summaryName: document.getElementById('riqSummaryName'),
     summaryContact: document.getElementById('riqSummaryContact'),
     summaryConfirm: document.getElementById('riqSummaryConfirm'),
-    vehicleThumb: document.getElementById('riqVehicleThumb'),
+    galleryViewport: document.getElementById('riqGalleryViewport'),
+    galleryTrack: document.getElementById('riqGalleryTrack'),
+    galleryPrev: document.getElementById('riqGalleryPrev'),
+    galleryNext: document.getElementById('riqGalleryNext'),
     vehicleBrand: document.getElementById('riqVehicleBrand'),
     vehicleName: document.getElementById('riqVehicleName'),
     vehicleMeta: document.getElementById('riqVehicleMeta'),
@@ -488,7 +507,109 @@
     setPlaceholder(refs.deliveryAddress, copy.fields.deliveryAddressPlaceholder);
 
     setText(refs.confirmBtn, copy.actions.confirm);
+    if (refs.galleryPrev) refs.galleryPrev.setAttribute('aria-label', copy.gallery.prev);
+    if (refs.galleryNext) refs.galleryNext.setAttribute('aria-label', copy.gallery.next);
     renderVehicleCard();
+  }
+
+  function collectVehicleGallerySources(vehicle) {
+    const seen = new Set();
+    const out = [];
+    const add = (key) => {
+      if (key === undefined || key === null || String(key).trim() === '') return;
+      const url = resolveVehicleMediaSource(key);
+      if (seen.has(url)) return;
+      seen.add(url);
+      out.push(url);
+    };
+    if (vehicle && Array.isArray(vehicle.gallery) && vehicle.gallery.length) {
+      vehicle.gallery.forEach(add);
+    } else if (vehicle) {
+      add(vehicle.photo || vehicle.gallery?.[0] || '011.jpg');
+    }
+    if (!out.length) add('011.jpg');
+    return out;
+  }
+
+  let vehicleGalleryScrollRaf = 0;
+  let vehicleGalleryEventsBound = false;
+
+  function getVehicleGalleryScrollStep() {
+    const vp = refs.galleryViewport;
+    if (!vp) return 200;
+    const slide = vp.querySelector('.riq-gallery-slide');
+    const w = slide ? slide.getBoundingClientRect().width : 148;
+    const trackStyles = window.getComputedStyle(refs.galleryTrack || vp);
+    const gap = parseFloat(trackStyles.columnGap || trackStyles.gap || '8') || 8;
+    return Math.max(120, Math.round(w + gap));
+  }
+
+  function scrollVehicleGallery(dir) {
+    const vp = refs.galleryViewport;
+    if (!vp) return;
+    vp.scrollBy({ left: dir * getVehicleGalleryScrollStep(), behavior: 'smooth' });
+  }
+
+  function updateVehicleGalleryNavState() {
+    const vp = refs.galleryViewport;
+    const prev = refs.galleryPrev;
+    const next = refs.galleryNext;
+    if (!vp || !prev || !next) return;
+    const maxScroll = Math.max(0, vp.scrollWidth - vp.clientWidth);
+    const canScroll = maxScroll > 4;
+    const left = vp.scrollLeft;
+    prev.disabled = left <= 2;
+    next.disabled = left >= maxScroll - 2;
+    const showNav = canScroll;
+    prev.style.visibility = showNav ? 'visible' : 'hidden';
+    next.style.visibility = showNav ? 'visible' : 'hidden';
+    prev.style.pointerEvents = showNav ? 'auto' : 'none';
+    next.style.pointerEvents = showNav ? 'auto' : 'none';
+    prev.setAttribute('aria-hidden', showNav ? 'false' : 'true');
+    next.setAttribute('aria-hidden', showNav ? 'false' : 'true');
+  }
+
+  function paintVehicleGalleryTrack(vehicle, language) {
+    const track = refs.galleryTrack;
+    const vp = refs.galleryViewport;
+    if (!track || !vp) return;
+    const urls = collectVehicleGallerySources(vehicle);
+    const name = vehicle ? getVehicleName(vehicle, language) : '';
+    track.textContent = '';
+    urls.forEach((src, index) => {
+      const slide = document.createElement('div');
+      slide.className = 'riq-gallery-slide';
+      slide.setAttribute('role', 'listitem');
+      const img = document.createElement('img');
+      img.className = 'riq-gallery-img';
+      img.src = src;
+      img.alt = name;
+      img.loading = index ? 'lazy' : 'eager';
+      img.decoding = 'async';
+      slide.appendChild(img);
+      track.appendChild(slide);
+    });
+    vp.scrollLeft = 0;
+    if (vehicleGalleryScrollRaf) cancelAnimationFrame(vehicleGalleryScrollRaf);
+    vehicleGalleryScrollRaf = requestAnimationFrame(() => updateVehicleGalleryNavState());
+  }
+
+  function ensureVehicleGalleryEvents() {
+    if (vehicleGalleryEventsBound) return;
+    const vp = refs.galleryViewport;
+    if (!vp || !refs.galleryPrev || !refs.galleryNext) return;
+    vehicleGalleryEventsBound = true;
+    refs.galleryPrev.addEventListener('click', () => scrollVehicleGallery(-1));
+    refs.galleryNext.addEventListener('click', () => scrollVehicleGallery(1));
+    vp.addEventListener(
+      'scroll',
+      () => {
+        if (vehicleGalleryScrollRaf) cancelAnimationFrame(vehicleGalleryScrollRaf);
+        vehicleGalleryScrollRaf = requestAnimationFrame(() => updateVehicleGalleryNavState());
+      },
+      { passive: true }
+    );
+    window.addEventListener('resize', () => updateVehicleGalleryNavState());
   }
 
   function renderVehicleCard() {
@@ -497,14 +618,13 @@
     const language = currentLanguage();
     const copy = currentCopy();
     const profile = getVehicleRentalProfile(vehicle);
-    const image = resolveVehicleMediaSource(vehicle.photo || vehicle.gallery?.[0] || '011.jpg');
     const type = sanitize(getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, language) || '');
     const fuel = sanitize(getVehicleFieldLabel('fuel', vehicle.fuel, language));
     const mileageDisplay =
       window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, language, vehicle.mileageUnit) || '';
 
-    refs.vehicleThumb.src = image;
-    refs.vehicleThumb.alt = getVehicleName(vehicle, language);
+    ensureVehicleGalleryEvents();
+    paintVehicleGalleryTrack(vehicle, language);
     refs.vehicleBrand.textContent = getBrandLabel(vehicle.brandKey, language).toUpperCase();
     refs.vehicleName.textContent = getVehicleName(vehicle, language);
     refs.vehicleMeta.textContent = [vehicle.year, type, fuel, mileageDisplay, copy.vehicleStatus]
@@ -740,14 +860,17 @@
   function navigateRentalInquiryBack() {
     try {
       const ref = document.referrer || '';
-      if (ref.startsWith(window.location.origin) && window.history.length > 1) {
-        window.history.back();
-        return;
+      if (ref.startsWith(window.location.origin)) {
+        const path = new URL(ref).pathname.toLowerCase();
+        if (path.indexOf('rental-inquiry-confirm') === -1 && path.indexOf('rental-inquiry.html') === -1) {
+          window.location.assign(ref);
+          return;
+        }
       }
     } catch {
       /* ignore */
     }
-    const id = vehicleContext.currentVehicle?.id;
+    const id = currentRentalInquiryVehicleId();
     if (id && typeof window.TK168_DATA?.buildDetailUrl === 'function') {
       window.location.assign(window.TK168_DATA.buildDetailUrl(id, { from: 'rental' }));
       return;
@@ -756,6 +879,7 @@
   }
 
   function init() {
+    ensureVehicleGalleryEvents();
     applyLanguageCopy();
     initDefaultDate();
     bindInputEvents();

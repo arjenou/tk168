@@ -20,7 +20,7 @@
       pageTitle: '租车咨询确认 — TK168 Premium Automotive',
       eyebrow: 'TK168 RENTAL CONSULT',
       title: '请确认咨询内容',
-      lead: '核对无误后点击下方提交。如需修改请返回上一页。',
+      lead: '核对无误后点击下方提交。',
       rows: {
         appointment: '希望用车时间',
         name: '联系人信息',
@@ -28,8 +28,11 @@
         confirm: '车辆交付与条款'
       },
       actions: {
-        backEdit: '返回修改',
         submit: '提交'
+      },
+      gallery: {
+        prev: '上一张',
+        next: '下一张'
       },
       consentYes: '是',
       consentNo: '否',
@@ -60,7 +63,7 @@
       pageTitle: 'レンタル相談の確認 — TK168 Premium Automotive',
       eyebrow: 'TK168 RENTAL CONSULT',
       title: '入力内容の確認',
-      lead: '内容に問題がなければ「送信」を押してください。修正する場合は「入力に戻る」から戻れます。',
+      lead: '内容に問題がなければ「送信」を押してください。',
       rows: {
         appointment: '希望利用日時',
         name: '運転者情報',
@@ -68,8 +71,11 @@
         confirm: '貸渡方法・規約'
       },
       actions: {
-        backEdit: '入力に戻る',
         submit: '送信'
+      },
+      gallery: {
+        prev: '前の画像',
+        next: '次の画像'
       },
       consentYes: 'はい',
       consentNo: 'いいえ',
@@ -100,7 +106,7 @@
       pageTitle: 'Confirm Rental Inquiry — TK168 Premium Automotive',
       eyebrow: 'TK168 RENTAL CONSULT',
       title: 'Review your inquiry',
-      lead: 'Check the details below, then press Submit. Use Back to edit if something needs changing.',
+      lead: 'Check the details below, then press Submit.',
       rows: {
         appointment: 'Preferred rental time',
         name: 'Contact details',
@@ -108,8 +114,11 @@
         confirm: 'Delivery & policies'
       },
       actions: {
-        backEdit: 'Back to edit',
         submit: 'Submit'
+      },
+      gallery: {
+        prev: 'Previous image',
+        next: 'Next image'
       },
       consentYes: 'Yes',
       consentNo: 'No',
@@ -262,9 +271,11 @@
     summary: document.getElementById('riqcSummary'),
     message: document.getElementById('riqcMessage'),
     backNavBtn: document.getElementById('riqcBackNavBtn'),
-    backBtn: document.getElementById('riqcBackBtn'),
     submitBtn: document.getElementById('riqcSubmitBtn'),
-    vehicleThumb: document.getElementById('riqcVehicleThumb'),
+    galleryViewport: document.getElementById('riqcGalleryViewport'),
+    galleryTrack: document.getElementById('riqcGalleryTrack'),
+    galleryPrev: document.getElementById('riqcGalleryPrev'),
+    galleryNext: document.getElementById('riqcGalleryNext'),
     vehicleBrand: document.getElementById('riqcVehicleBrand'),
     vehicleName: document.getElementById('riqcVehicleName'),
     vehicleMeta: document.getElementById('riqcVehicleMeta'),
@@ -286,20 +297,124 @@
     refs.message.style.color = ok ? '#1f8f5f' : '#c6472f';
   }
 
+  function setGalleryAria(lang) {
+    const copy = COPY[lang] || COPY.ja;
+    if (refs.galleryPrev) refs.galleryPrev.setAttribute('aria-label', copy.gallery.prev);
+    if (refs.galleryNext) refs.galleryNext.setAttribute('aria-label', copy.gallery.next);
+  }
+
+  function collectVehicleGallerySources(vehicle) {
+    const seen = new Set();
+    const out = [];
+    const add = (key) => {
+      if (key === undefined || key === null || String(key).trim() === '') return;
+      const url = resolveVehicleMediaSource(key);
+      if (seen.has(url)) return;
+      seen.add(url);
+      out.push(url);
+    };
+    if (vehicle && Array.isArray(vehicle.gallery) && vehicle.gallery.length) {
+      vehicle.gallery.forEach(add);
+    } else if (vehicle) {
+      add(vehicle.photo || vehicle.gallery?.[0] || '011.jpg');
+    }
+    if (!out.length) add('011.jpg');
+    return out;
+  }
+
+  let vehicleGalleryScrollRaf = 0;
+  let vehicleGalleryEventsBound = false;
+
+  function getVehicleGalleryScrollStep() {
+    const vp = refs.galleryViewport;
+    if (!vp) return 200;
+    const slide = vp.querySelector('.riq-gallery-slide');
+    const w = slide ? slide.getBoundingClientRect().width : 148;
+    const trackStyles = window.getComputedStyle(refs.galleryTrack || vp);
+    const gap = parseFloat(trackStyles.columnGap || trackStyles.gap || '8') || 8;
+    return Math.max(120, Math.round(w + gap));
+  }
+
+  function scrollVehicleGallery(dir) {
+    const vp = refs.galleryViewport;
+    if (!vp) return;
+    vp.scrollBy({ left: dir * getVehicleGalleryScrollStep(), behavior: 'smooth' });
+  }
+
+  function updateVehicleGalleryNavState() {
+    const vp = refs.galleryViewport;
+    const prev = refs.galleryPrev;
+    const next = refs.galleryNext;
+    if (!vp || !prev || !next) return;
+    const maxScroll = Math.max(0, vp.scrollWidth - vp.clientWidth);
+    const canScroll = maxScroll > 4;
+    const left = vp.scrollLeft;
+    prev.disabled = left <= 2;
+    next.disabled = left >= maxScroll - 2;
+    const showNav = canScroll;
+    prev.style.visibility = showNav ? 'visible' : 'hidden';
+    next.style.visibility = showNav ? 'visible' : 'hidden';
+    prev.style.pointerEvents = showNav ? 'auto' : 'none';
+    next.style.pointerEvents = showNav ? 'auto' : 'none';
+    prev.setAttribute('aria-hidden', showNav ? 'false' : 'true');
+    next.setAttribute('aria-hidden', showNav ? 'false' : 'true');
+  }
+
+  function paintVehicleGalleryTrack(vehicle, lang) {
+    const track = refs.galleryTrack;
+    const vp = refs.galleryViewport;
+    if (!track || !vp) return;
+    const urls = collectVehicleGallerySources(vehicle);
+    const name = vehicle ? getVehicleName(vehicle, lang) : '';
+    track.textContent = '';
+    urls.forEach((src, index) => {
+      const slide = document.createElement('div');
+      slide.className = 'riq-gallery-slide';
+      slide.setAttribute('role', 'listitem');
+      const img = document.createElement('img');
+      img.className = 'riq-gallery-img';
+      img.src = src;
+      img.alt = name;
+      img.loading = index ? 'lazy' : 'eager';
+      img.decoding = 'async';
+      slide.appendChild(img);
+      track.appendChild(slide);
+    });
+    vp.scrollLeft = 0;
+    if (vehicleGalleryScrollRaf) cancelAnimationFrame(vehicleGalleryScrollRaf);
+    vehicleGalleryScrollRaf = requestAnimationFrame(() => updateVehicleGalleryNavState());
+  }
+
+  function ensureVehicleGalleryEvents() {
+    if (vehicleGalleryEventsBound) return;
+    const vp = refs.galleryViewport;
+    if (!vp || !refs.galleryPrev || !refs.galleryNext) return;
+    vehicleGalleryEventsBound = true;
+    refs.galleryPrev.addEventListener('click', () => scrollVehicleGallery(-1));
+    refs.galleryNext.addEventListener('click', () => scrollVehicleGallery(1));
+    vp.addEventListener(
+      'scroll',
+      () => {
+        if (vehicleGalleryScrollRaf) cancelAnimationFrame(vehicleGalleryScrollRaf);
+        vehicleGalleryScrollRaf = requestAnimationFrame(() => updateVehicleGalleryNavState());
+      },
+      { passive: true }
+    );
+    window.addEventListener('resize', () => updateVehicleGalleryNavState());
+  }
+
   function renderVehicleCard(vehicle, lang) {
     if (!vehicle) return;
     const copy = currentCopyForDraft({ lang });
     const profile = getVehicleRentalProfile(vehicle);
-    const image = resolveVehicleMediaSource(vehicle.photo || vehicle.gallery?.[0] || '011.jpg');
     const type = sanitize(getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, lang) || '');
     const fuel = sanitize(getVehicleFieldLabel('fuel', vehicle.fuel, lang));
     const mileageDisplay =
       window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, lang, vehicle.mileageUnit) || '';
 
-    if (refs.vehicleThumb) {
-      refs.vehicleThumb.src = image;
-      refs.vehicleThumb.alt = getVehicleName(vehicle, lang);
-    }
+    ensureVehicleGalleryEvents();
+    setGalleryAria(lang);
+    paintVehicleGalleryTrack(vehicle, lang);
     if (refs.vehicleBrand) refs.vehicleBrand.textContent = getBrandLabel(vehicle.brandKey, lang).toUpperCase();
     if (refs.vehicleName) refs.vehicleName.textContent = getVehicleName(vehicle, lang);
     if (refs.vehicleMeta) {
@@ -339,9 +454,13 @@
         return;
       }
       try {
-        if (document.referrer?.startsWith(window.location.origin) && window.history.length > 1) {
-          window.history.back();
-          return;
+        const ref = document.referrer || '';
+        if (ref.startsWith(window.location.origin)) {
+          const path = new URL(ref).pathname.toLowerCase();
+          if (path.indexOf('rental-inquiry-confirm') === -1 && path.indexOf('rental-inquiry.html') === -1) {
+            window.location.assign(ref);
+            return;
+          }
         }
       } catch {
         /* ignore */
@@ -351,6 +470,7 @@
   }
 
   function init() {
+    ensureVehicleGalleryEvents();
     const draft = readDraft();
     const lang = draftLanguage(draft);
     if (window.TK168I18N?.setLanguage && draft?.lang) {
@@ -366,10 +486,6 @@
       setText(refs.lead, '');
       if (refs.summary) refs.summary.innerHTML = '';
       setMessage(copy.message.missingDraft, false);
-      if (refs.backBtn) {
-        refs.backBtn.textContent = copy.actions.backEdit;
-        refs.backBtn.onclick = () => { window.location.assign('rental-inquiry.html'); };
-      }
       if (refs.submitBtn) refs.submitBtn.disabled = true;
       window.TK168PageChrome?.applyPageChrome({
         pageKey: 'rental',
@@ -394,12 +510,7 @@
     applyChromeForVehicle(vehicle);
     if (vehicle) renderVehicleCard(vehicle, lang);
 
-    setText(refs.backBtn, copy.actions.backEdit);
     setText(refs.submitBtn, copy.actions.submit);
-
-    refs.backBtn?.addEventListener('click', () => {
-      window.location.assign(backToFormHref(draft));
-    });
 
     refs.submitBtn?.addEventListener('click', () => {
       try {
@@ -423,7 +534,6 @@
     setText(refs.title, copy.title);
     setText(refs.lead, copy.lead);
     refs.summary.innerHTML = buildSummaryHtml(draft);
-    setText(refs.backBtn, copy.actions.backEdit);
     setText(refs.submitBtn, copy.actions.submit);
     const vehicle = resolveInquiryVehicle(draft.vehicleId);
     if (vehicle) renderVehicleCard(vehicle, draftLanguage(draft));
