@@ -169,7 +169,7 @@ function installDetailSkeletonUi() {
   }
 
   if (thumbGrid) thumbGrid.innerHTML = buildDetailThumbSkeletonHTML(4);
-  if (specTable) specTable.innerHTML = buildDetailSpecSkeletonHTML(8);
+  if (specTable && !isRentalDetail) specTable.innerHTML = buildDetailSpecSkeletonHTML(8);
   if (detailOverview) detailOverview.innerHTML = buildDetailOverviewSkeletonHTML();
   if (benefitBars) benefitBars.innerHTML = buildDetailBenefitSkeletonHTML(10);
 
@@ -896,8 +896,9 @@ function renderGallery() {
 }
 
 function renderSpecs() {
+  if (isRentalDetail || !specTable) return;
   specTable.innerHTML = window.TK168Renderers.buildDetailSpecsHTML(currentVehicle, {
-    rentalDetail: isRentalDetail
+    rentalDetail: false
   });
 }
 

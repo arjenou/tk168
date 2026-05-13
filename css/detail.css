@@ -828,6 +828,11 @@ body.mobile-nav-open {
   grid-template-columns: minmax(0, 1fr);
 }
 
+/* 租赁详情不展示「車両情報」参数表板块 */
+.detail-shell--rental #detailSpecsSection {
+  display: none !important;
+}
+
 .detail-price-main {
   padding-left: 12px;
 }
