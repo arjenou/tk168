@@ -1514,6 +1514,11 @@ async function bootstrapDetailPage() {
     Boolean(requestedVehicleId) && currentVehicle?.id === requestedVehicleId;
 
   if (isRentalDetail) {
+    // Same stale-while-revalidate pattern as inventory: paint from list/cache
+    // immediately, then refresh from `/api/rentals/:id` when online.
+    if (hasLocalMatch) {
+      renderDetailShellAll();
+    }
     if (tryLive) {
       const flat = await window.TK168ApiHydrate?.fetchPublishedRentalById?.(requestedVehicleId);
       const merged = flat && window.TK168_DATA.mergeApiRentalWithBase?.(flat);
@@ -1523,9 +1528,7 @@ async function bootstrapDetailPage() {
         return;
       }
     }
-    if (hasLocalMatch) {
-      renderDetailShellAll();
-    } else {
+    if (!hasLocalMatch) {
       clearDetailSkeletonUi();
       detailShell?.classList.remove('detail-shell--hydrating');
     }
