@@ -15,7 +15,7 @@
 // data.js falls back to its built-in defaults.
 
 (() => {
-  const VEHICLE_KEY = "tk168:vehicles:v1";
+  const VEHICLE_KEY = "tk168:vehicles:v2"; // v2: 缓存含 show_on_home / 与首页筛选一致
   const RENTAL_KEY = "tk168:rentals:v1";
   const JOURNAL_KEY = "tk168:journal:v1";
   const MAX_AGE_MS = 5 * 60 * 1000;
@@ -150,6 +150,14 @@
       staffPhoto: keepMeaningful(toAbsoluteMedia(v.staffPhotoUrl)),
       staffMessage: keepMeaningful(v.staffMessage),
       staffPhone: keepMeaningful(v.staffPhone),
+      // 必须写入 flat：缺省时 merge 后无该键，首页会把 undefined 当成「仍上首页」。
+      showOnHome: keepMeaningful(
+        typeof v.showOnHome === "boolean"
+          ? v.showOnHome
+          : v.show_on_home != null && String(v.show_on_home).trim() !== ""
+            ? Number(v.show_on_home) === 1
+            : undefined,
+      ),
     };
     const out = {};
     for (const [k, val] of Object.entries(raw)) if (val !== undefined) out[k] = val;
