@@ -968,8 +968,8 @@ window.TK168_DATA = (() => {
   }
 
   // When the backend has published vehicles we treat it as the source of
-  // truth: the homepage / brand pages show exactly what the admin manages
-  // under the 首页车辆 板块, and the legacy brand-library-data.js is kept
+  // truth: brand.html lists all published 品牌车辆；index.html 车辆网格再按「首页显示」筛选。
+  // The legacy brand-library-data.js is kept
   // only as a catalog of brand logos / filters (no synthesized cards).
   //
   // If the API is unreachable we fall back to the old behaviour so file://
@@ -1003,7 +1003,7 @@ window.TK168_DATA = (() => {
       })
       .filter((vehicle) => {
         if (activeBrandKeySet.has(vehicle.brandKey)) return true;
-        // 后台「首页车辆」写入的数据应全部可见；白名单只约束静态种子与品牌馆占位，避免 test 等自填品牌整卡被裁掉
+        // 后台「品牌车辆」写入的数据应全部可见；白名单只约束静态种子与品牌馆占位，避免 test 等自填品牌整卡被裁掉
         if (apiVehicleIds.size > 0 && vehicle.id && apiVehicleIds.has(vehicle.id)) {
           return true;
         }
@@ -2845,13 +2845,19 @@ window.TK168_DATA = (() => {
     return filters;
   }
 
-  function filterVehicles(list, filters = {}) {
+  /**
+   * @param {object} [opts]
+   * @param {boolean} [opts.homeOnly] 为 true 时仅保留「首页显示」车辆（showOnHome !== false），用于 index.html；品牌页不传此项。
+   */
+  function filterVehicles(list, filters = {}, opts = {}) {
+    const homeOnly = Boolean(opts && opts.homeOnly);
+    const pool = homeOnly ? list.filter((vehicle) => vehicle.showOnHome !== false) : list;
     const keyword = String(filters.keyword || '').trim().toLowerCase();
     const priceOption = priceOptions.find((item) => item.value === filters.price);
     const yearOption = yearOptions.find((item) => item.value === filters.year);
     const mileageOption = mileageOptions.find((item) => item.value === filters.mileage);
 
-    return list.filter((vehicle) => {
+    return pool.filter((vehicle) => {
       if (filters.brand && vehicle.brandKey !== filters.brand) return false;
       if (filters.bodyStyle && String(vehicle.bodyStyle || '').trim() !== filters.bodyStyle) return false;
       if (priceOption) {

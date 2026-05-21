@@ -1071,7 +1071,7 @@ button { font: inherit; cursor: pointer; }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* -------------------- 首页车辆拖拽排序 -------------------- */
+/* -------------------- 品牌车辆拖拽排序 -------------------- */
 .admin-drag-hint {
   margin: 0 0 10px;
   font-size: 12px;

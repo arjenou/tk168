@@ -119,7 +119,7 @@ const STEERING_OPTIONS = [
 const RESOURCES = {
   vehicles: {
     key: "vehicles",
-    label: "首页车辆",
+    label: "品牌车辆",
     apiList: "/admin/vehicles",
     apiItem: (id) => `/admin/vehicles/${encodeURIComponent(id)}`,
     apiImages: (id) => `/admin/vehicles/${encodeURIComponent(id)}/images`,
@@ -130,13 +130,20 @@ const RESOURCES = {
     listKey: "vehicles",
     itemKey: "vehicle",
     duplicateCode: "vehicle_id_taken",
-    headerLabel: "首页车辆管理",
+    headerLabel: "品牌车辆管理",
     emptyLabel: "暂无车辆",
     priceColumn: { key: "totalPrice", label: "总价" },
-    /** 列表内拖拽调整 displayOrder，与前台首页排序一致 */
+    /** 列表内拖拽调整 displayOrder；品牌页展示全部已发布车，首页仅展示「首页显示」为开的车 */
     homeDragSort: true,
     homeDragSortHint:
-      "拖拽左侧手柄可调整首页展示顺序（保存后立即生效）。搜索时会暂时隐藏手柄。",
+      "拖拽左侧手柄可调整列表顺序（保存后立即生效）。品牌页展示全部已发布车辆；首页仅展示发布设置里勾选「首页显示」的车辆。搜索时会暂时隐藏手柄。",
+    extraColumns: [
+      {
+        key: "showOnHome",
+        label: "首页",
+        render: (on) => (on === false ? "隐藏" : "显示"),
+      },
+    ],
     // Editor form groups (new tabbed layout). Each field may declare:
     //   label / placeholder / hint / span (12-col grid): 3|4|6|12
     fieldGroups: [
@@ -253,7 +260,7 @@ const RESOURCES = {
       staffPhotoUrl: null,
       staffMessage: "",
       staffPhone: "",
-      displayOrder: 0, isPublished: true, images: [],
+      displayOrder: 0, isPublished: true, showOnHome: true, images: [],
     }),
   },
 
@@ -587,7 +594,7 @@ function combinedEngineFromDraft(draft) {
   return [d, c].filter(Boolean).join(" ").trim();
 }
 
-/** 首页车辆 / レンタル车辆排量：编辑框只填数字，右侧固定单位 L；纯数字存库为「nL」，其余原文保留（兼容旧数据）。 */
+/** 品牌车辆 / レンタル车辆排量：编辑框只填数字，右侧固定单位 L；纯数字存库为「nL」，其余原文保留（兼容旧数据）。 */
 function displacementLitersInputDisplay(stored) {
   const t = String(stored ?? "").trim();
   if (!t) return "";
@@ -1188,7 +1195,7 @@ async function persistHomeDisplayOrderAfterDrop(fromId, toId) {
         ? "租赁页展示顺序已保存"
         : r.key === "journal"
           ? "最新情報展示顺序已保存"
-          : "首页展示顺序已保存",
+          : "展示顺序已保存",
     );
     render();
   } catch (err) {
@@ -1624,7 +1631,7 @@ function buildVehicleIconOptions(stored) {
 }
 
 // Editor tabs shown at the top of the left column. "specs" only when
-// "staff" for 首页车辆 与 レンタル车辆（同一条 icon + 员工区逻辑）。
+// "staff" for 品牌车辆 与 レンタル车辆（同一条 icon + 员工区逻辑）。
 const EDITOR_TABS = [
   { id: "content", label: "内容" },
   { id: "specs", label: "规格 / 选项", requiresPresets: true },
@@ -2111,6 +2118,18 @@ function renderPublishTab(r, draft) {
           <div class="admin-field-hint" style="margin-top:2px;">在「${escapeHtml(r.headerLabel)}」列表页拖拽左侧手柄调整并自动保存，无需在此填写数字。</div>
         </div>`
     : "";
+  const homeVisibilityField =
+    r.key === "vehicles"
+      ? `
+        <div class="admin-field admin-col-6">
+          <label>首页显示</label>
+          <label class="admin-switch">
+            <input type="checkbox" data-draft="showOnHome" ${draft.showOnHome !== false ? "checked" : ""}>
+            <span>${draft.showOnHome !== false ? "在首页展示" : "仅品牌页"}</span>
+          </label>
+          <div class="admin-field-hint">关闭后该车仍会在品牌页（brand.html）列表展示；仅首页（index.html）车辆网格隐藏。</div>
+        </div>`
+      : "";
   return `
     <section class="admin-section">
       <div class="admin-section-head">
@@ -2130,6 +2149,7 @@ function renderPublishTab(r, draft) {
               : "关闭后仅你能在后台看到，该车不会出现在前台列表。"
           }</div>
         </div>
+        ${homeVisibilityField}
         ${orderHint}
         ${sortField}
       </div>
@@ -2336,7 +2356,7 @@ function readForcedInductionPairFromDom() {
   };
 }
 
-/** 首页车辆与レンタル车辆共用：与 `saveItem` 中增压处理一致（DOM 优先、zh 与 text 同值）。 */
+/** 品牌车辆与レンタル车辆共用：与 `saveItem` 中增压处理一致（DOM 优先、zh 与 text 同值）。 */
 function attachForcedInductionToInventoryPayload(payload, draft) {
   delete payload.forcedInductionJa;
   delete payload.forcedInductionEn;
@@ -2489,7 +2509,7 @@ function bindEditor() {
     const onDraftField = () => {
       applyDraftInput(input);
       if (input.dataset.draft === "icon") syncAdminIconPreview();
-      if (input.dataset.draft === "isPublished") {
+      if (input.dataset.draft === "isPublished" || input.dataset.draft === "showOnHome") {
         // Re-render so the header badge + switch label stay in sync.
         renderEditor();
       }

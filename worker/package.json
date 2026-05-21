@@ -12,5 +12,8 @@
     "db:migrate:mileage:remote": "wrangler d1 execute tk168 --remote --file=schema/migrations/20260609_mileage_km_to_wan.sql",
     "db:migrate:trans:remote": "wrangler d1 execute tk168 --remote --file=schema/migrations/20260610_trans_taxonomy.sql",
     "db:migrate:listing-fuel-grade:remote": "wrangler d1 execute tk168 --remote --file=schema/migration-2026-05-07-listing-fuel-grade.sql"
+  },
+  "devDependencies": {
+    "wrangler": "^4.93.1"
   }
 }

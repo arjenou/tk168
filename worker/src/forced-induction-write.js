@@ -1,5 +1,5 @@
 /**
- * 增压字段写入前统一处理：与首页车辆（`vehicles`）admin 保存语义一致，
+ * 增压字段写入前统一处理：与品牌车辆（`vehicles`）admin 保存语义一致，
  * `rentals` 复用同一实现，避免两套 coerce 行为分叉。
  *
  * `forced_induction_text` 与旧列 `forced_induction_zh` 写入同一字符串；

@@ -492,7 +492,7 @@ function getHomeVehicleColumns() {
 
 function getHomeVehiclesDisplayed() {
   if (typeof filterVehicles !== 'function') return homeVehicles;
-  return filterVehicles(homeVehicles, homeActiveFilters);
+  return filterVehicles(homeVehicles, homeActiveFilters, { homeOnly: true });
 }
 
 function getHomeVehicleLoadMoreLabel() {

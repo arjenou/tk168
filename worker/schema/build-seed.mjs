@@ -125,7 +125,7 @@ baseVehicles.forEach((v, index) => {
     listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
-    display_order, is_published
+    display_order, is_published, show_on_home
   ) VALUES (
     ${esc(v.id)}, ${esc(v.brandKey)}, ${esc(v.name)}, ${esc(v.nameJa)}, ${esc(v.nameEn)}, ${esc(v.year)}, ${esc(v.type)},
     ${esc(v.icon)}, ${esc(v.mileage)}, ${esc(engineCombined(v))}, ${esc(v.displacement)}, ${esc(v.cylinders)},
@@ -142,7 +142,7 @@ baseVehicles.forEach((v, index) => {
     ${presetJson(listing.fuelGrade)},
     ${presetJson(highlight.steering)}, ${presetJson(highlight.chassisTail)},
     NULL, NULL, NULL, NULL,
-    ${index}, 1
+    ${index}, 1, 1
   );`;
   lines.push(insert);
 

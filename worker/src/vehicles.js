@@ -22,7 +22,7 @@ const VEHICLE_COLUMNS = [
   "listing_legal_maintenance", "listing_fuel_grade",
   "highlight_steering", "highlight_chassis_tail",
   "staff_photo_r2_key", "staff_photo_url", "staff_message", "staff_phone",
-  "display_order", "is_published",
+  "display_order", "is_published", "show_on_home",
 ];
 
 const VEHICLE_JSON_COLUMNS = new Set([
@@ -85,6 +85,7 @@ const VEHICLE_FIELD_MAP = {
   staffPhone: "staff_phone",
   displayOrder: "display_order",
   isPublished: "is_published",
+  showOnHome: "show_on_home",
 };
 
 const vehicleResource = createResource({

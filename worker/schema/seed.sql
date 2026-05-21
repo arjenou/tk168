@@ -15,7 +15,7 @@ INSERT INTO vehicles (
     listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
-    display_order, is_published
+    display_order, is_published, show_on_home
   ) VALUES (
     'lamborghini-urus', 'lamborghini', '兰博基尼 Urus', NULL, NULL, '2022', '高性能SUV',
     'b1.svg', '0.32', '4.0L V8', '4.0L', 'V8',
@@ -32,7 +32,7 @@ INSERT INTO vehicles (
     '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"右舵","ja":"右ハンドル"}', '{"zh":"381","ja":"381"}',
     NULL, NULL, NULL, NULL,
-    0, 1
+    0, 1, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Urus', 1, 0);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Urus', 0, 1);
@@ -51,7 +51,7 @@ INSERT INTO vehicles (
     listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
-    display_order, is_published
+    display_order, is_published, show_on_home
   ) VALUES (
     'audi-r8-spyder', 'audi', '奥迪 R8 Spyder', NULL, NULL, '2023', '敞篷跑车',
     'b2.svg', '0.009', '5.2L V10', '5.2L', 'V10',
@@ -68,7 +68,7 @@ INSERT INTO vehicles (
     '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"127","ja":"127"}',
     NULL, NULL, NULL, NULL,
-    1, 1
+    1, 1, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('audi-r8-spyder', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '奥迪 R8 Spyder', 1, 0);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('audi-r8-spyder', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '奥迪 R8 Spyder', 0, 1);
@@ -87,7 +87,7 @@ INSERT INTO vehicles (
     listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
-    display_order, is_published
+    display_order, is_published, show_on_home
   ) VALUES (
     'ferrari-458-italia', 'ferrari', '法拉利 458 Italia', NULL, NULL, '2019', '中置跑车',
     'b3.svg', '1.52', '4.5L V8', '4.5L', 'V8',
@@ -104,7 +104,7 @@ INSERT INTO vehicles (
     '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"458","ja":"458"}',
     NULL, NULL, NULL, NULL,
-    2, 1
+    2, 1, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-458-italia', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '法拉利 458 Italia', 1, 0);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-458-italia', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '法拉利 458 Italia', 0, 1);
@@ -123,7 +123,7 @@ INSERT INTO vehicles (
     listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
-    display_order, is_published
+    display_order, is_published, show_on_home
   ) VALUES (
     'bmw-x6-m', 'bmw', '宝马 X6 M', NULL, NULL, '2024', '轿跑SUV',
     'b4.svg', '0.012', '4.4L V8', '4.4L', 'V8',
@@ -140,7 +140,7 @@ INSERT INTO vehicles (
     '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"右舵","ja":"右ハンドル"}', '{"zh":"642","ja":"642"}',
     NULL, NULL, NULL, NULL,
-    3, 1
+    3, 1, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('bmw-x6-m', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '宝马 X6 M', 1, 0);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('bmw-x6-m', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '宝马 X6 M', 0, 1);
@@ -159,7 +159,7 @@ INSERT INTO vehicles (
     listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
-    display_order, is_published
+    display_order, is_published, show_on_home
   ) VALUES (
     'ferrari-488-gtb', 'ferrari', '法拉利 488 GTB', NULL, NULL, '2021', '中置跑车',
     'b5.svg', '0.87', '3.9L V8', '3.9L', 'V8',
@@ -176,7 +176,7 @@ INSERT INTO vehicles (
     '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"488","ja":"488"}',
     NULL, NULL, NULL, NULL,
-    4, 1
+    4, 1, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-488-gtb', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '法拉利 488 GTB', 1, 0);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('ferrari-488-gtb', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '法拉利 488 GTB', 0, 1);
@@ -195,7 +195,7 @@ INSERT INTO vehicles (
     listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
-    display_order, is_published
+    display_order, is_published, show_on_home
   ) VALUES (
     'lamborghini-aventador', 'lamborghini', '兰博基尼 Aventador', NULL, NULL, '2022', 'V12超跑',
     'b6.svg', '1.25', '6.5L V12', '6.5L', 'V12',
@@ -212,7 +212,7 @@ INSERT INTO vehicles (
     '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"770","ja":"770"}',
     NULL, NULL, NULL, NULL,
-    5, 1
+    5, 1, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-aventador', 'seed:vehicles/seed/006.png', '/api/media/vehicles/seed/006.png', '兰博基尼 Aventador', 1, 0);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-aventador', 'seed:vehicles/seed/006.png', '/api/media/vehicles/seed/006.png', '兰博基尼 Aventador', 0, 1);
@@ -231,7 +231,7 @@ INSERT INTO vehicles (
     listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
-    display_order, is_published
+    display_order, is_published, show_on_home
   ) VALUES (
     'lamborghini-huracan-evo', 'lamborghini', '兰博基尼 Huracan EVO', NULL, NULL, '2023', '中置跑车',
     'b1.svg', '0.08', '5.2L V10', '5.2L', 'V10',
@@ -248,7 +248,7 @@ INSERT INTO vehicles (
     '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"613","ja":"613"}',
     NULL, NULL, NULL, NULL,
-    6, 1
+    6, 1, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '兰博基尼 Huracan EVO', 1, 0);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo', 'seed:vehicles/seed/003.png', '/api/media/vehicles/seed/003.png', '兰博基尼 Huracan EVO', 0, 1);
@@ -267,7 +267,7 @@ INSERT INTO vehicles (
     listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
-    display_order, is_published
+    display_order, is_published, show_on_home
   ) VALUES (
     'lamborghini-urus-s', 'lamborghini', '兰博基尼 Urus S', NULL, NULL, '2024', '高性能SUV',
     'b1.svg', '0.012', '4.0L V8', '4.0L', 'V8',
@@ -284,7 +284,7 @@ INSERT INTO vehicles (
     '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"右舵","ja":"右ハンドル"}', '{"zh":"524","ja":"524"}',
     NULL, NULL, NULL, NULL,
-    7, 1
+    7, 1, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-s', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus S', 1, 0);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-s', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus S', 0, 1);
@@ -303,7 +303,7 @@ INSERT INTO vehicles (
     listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
-    display_order, is_published
+    display_order, is_published, show_on_home
   ) VALUES (
     'lamborghini-huracan-sto', 'lamborghini', '兰博基尼 Huracan STO', NULL, NULL, '2022', '中置跑车',
     'b1.svg', '0.54', '5.2L V10', '5.2L', 'V10',
@@ -320,7 +320,7 @@ INSERT INTO vehicles (
     '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"912","ja":"912"}',
     NULL, NULL, NULL, NULL,
-    8, 1
+    8, 1, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-sto', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan STO', 1, 0);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-sto', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan STO', 0, 1);
@@ -339,7 +339,7 @@ INSERT INTO vehicles (
     listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
-    display_order, is_published
+    display_order, is_published, show_on_home
   ) VALUES (
     'lamborghini-gallardo', 'lamborghini', '兰博基尼 Gallardo', NULL, NULL, '2019', '中置跑车',
     'b1.svg', '2.8', '5.0L V10', '5.0L', 'V10',
@@ -356,7 +356,7 @@ INSERT INTO vehicles (
     '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"305","ja":"305"}',
     NULL, NULL, NULL, NULL,
-    9, 1
+    9, 1, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-gallardo', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '兰博基尼 Gallardo', 1, 0);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-gallardo', 'seed:vehicles/seed/002.png', '/api/media/vehicles/seed/002.png', '兰博基尼 Gallardo', 0, 1);
@@ -375,7 +375,7 @@ INSERT INTO vehicles (
     listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
-    display_order, is_published
+    display_order, is_published, show_on_home
   ) VALUES (
     'lamborghini-sian-fkp-37', 'lamborghini', '兰博基尼 Sian FKP 37', NULL, NULL, '2021', '混动超跑',
     'b1.svg', '0.21', '6.5L V12', '6.5L', 'V12',
@@ -392,7 +392,7 @@ INSERT INTO vehicles (
     '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"037","ja":"037"}',
     NULL, NULL, NULL, NULL,
-    10, 1
+    10, 1, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-sian-fkp-37', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Sian FKP 37', 1, 0);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-sian-fkp-37', 'seed:vehicles/seed/001.png', '/api/media/vehicles/seed/001.png', '兰博基尼 Sian FKP 37', 0, 1);
@@ -411,7 +411,7 @@ INSERT INTO vehicles (
     listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
-    display_order, is_published
+    display_order, is_published, show_on_home
   ) VALUES (
     'lamborghini-urus-performante', 'lamborghini', '兰博基尼 Urus Performante', NULL, NULL, '2023', '高性能SUV',
     'b1.svg', '0.036', '4.0L V8', '4.0L', 'V8',
@@ -428,7 +428,7 @@ INSERT INTO vehicles (
     '{"zh":"高辛烷汽油","ja":"ハイオク","en":"Premium"}',
     '{"zh":"右舵","ja":"右ハンドル"}', '{"zh":"801","ja":"801"}',
     NULL, NULL, NULL, NULL,
-    11, 1
+    11, 1, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-performante', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus Performante', 1, 0);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-urus-performante', 'seed:vehicles/seed/004.png', '/api/media/vehicles/seed/004.png', '兰博基尼 Urus Performante', 0, 1);
@@ -447,7 +447,7 @@ INSERT INTO vehicles (
     listing_fuel_grade,
     highlight_steering, highlight_chassis_tail,
     staff_photo_r2_key, staff_photo_url, staff_message, staff_phone,
-    display_order, is_published
+    display_order, is_published, show_on_home
   ) VALUES (
     'lamborghini-huracan-evo-rwd', 'lamborghini', '兰博基尼 Huracan EVO RWD', NULL, NULL, '2020', '中置跑车',
     'b1.svg', '0.92', '5.2L V10', '5.2L', 'V10',
@@ -464,7 +464,7 @@ INSERT INTO vehicles (
     NULL,
     '{"zh":"左舵","ja":"左ハンドル"}', '{"zh":"274","ja":"274"}',
     NULL, NULL, NULL, NULL,
-    12, 1
+    12, 1, 1
   );
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo-rwd', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan EVO RWD', 1, 0);
 INSERT INTO vehicle_images (vehicle_id, r2_key, url, alt, is_primary, position) VALUES ('lamborghini-huracan-evo-rwd', 'seed:vehicles/seed/005.png', '/api/media/vehicles/seed/005.png', '兰博基尼 Huracan EVO RWD', 0, 1);

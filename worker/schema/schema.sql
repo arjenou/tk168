@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS vehicles (
   staff_phone                 TEXT,
   display_order   INTEGER NOT NULL DEFAULT 0,
   is_published    INTEGER NOT NULL DEFAULT 1,
+  show_on_home    INTEGER NOT NULL DEFAULT 1,
   created_at      TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
 );
