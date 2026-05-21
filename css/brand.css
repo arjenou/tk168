@@ -1011,10 +1011,43 @@ html:lang(ja) .bn-name {
 }
 
 
-.v-pagination {
-  margin-top: 28px;
+.brand-vehicle-load-more-wrap {
+  width: 100%;
+  max-width: var(--brand-page-shell);
+  margin: 28px auto 0;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 8px;
+  box-sizing: border-box;
 }
 
+.brand-vehicle-load-more-wrap[hidden] {
+  display: none !important;
+}
+
+.brand-vehicle-load-more {
+  min-width: min(320px, 100%);
+  padding: 14px 28px;
+  border-radius: 16px;
+  border: 1px solid rgba(43, 41, 38, 0.14);
+  background: linear-gradient(180deg, #f2fa5a 0%, #e8ef52 100%);
+  color: rgba(34, 40, 47, 0.92);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(43, 41, 38, 0.1);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.brand-vehicle-load-more:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(43, 41, 38, 0.14);
+}
+
+.brand-vehicle-load-more:active {
+  transform: translateY(0);
+}
 
 @media (max-width: 1024px) {
   .bn-grid {
@@ -1151,61 +1184,32 @@ html:lang(ja) .bn-name {
   }
 
   #vehicles.brand-vehicles .vehicle-grid {
-    display: flex;
-    grid-template-columns: none;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 16px;
-    max-width: none;
-    margin: 0;
+    max-width: var(--brand-page-shell);
+    margin: 0 auto;
     padding: 10px 0 18px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 0;
-    overscroll-behavior-x: contain;
+    overflow-x: visible;
+    overflow-y: visible;
+    scroll-snap-type: none;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  #vehicles.brand-vehicles .vehicle-grid::-webkit-scrollbar {
-    display: none;
   }
 
   #vehicles.brand-vehicles .vehicle-grid .v-card {
-    flex: 0 0 calc(100% - 16px);
-    min-width: calc(100% - 16px);
+    flex: initial;
+    min-width: 0;
     margin: 0;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
+    scroll-snap-align: unset;
+    scroll-snap-stop: normal;
   }
 
   #vehicles.brand-vehicles .vehicle-slider-nav {
     display: none !important;
-    position: static;
-    align-items: center;
-    justify-content: center;
-    margin-top: 8px;
-    padding: 0 6px;
-    opacity: 0.26;
-    pointer-events: none;
-  }
-
-  #vehicles.brand-vehicles .vehicle-slider-nav.is-visible {
-    display: flex;
-    pointer-events: auto;
-  }
-
-  #vehicles.brand-vehicles .vehicle-slider-nav.is-visible.is-engaged,
-  #vehicles.brand-vehicles .vehicle-slider-nav.is-visible:focus-within,
-  #vehicles.brand-vehicles .vehicle-slider-shell:hover .vehicle-slider-nav.is-visible {
-    opacity: 0.96;
   }
 
   #vehicles.brand-vehicles .vehicle-grid .v-card:hover {
     transform: none;
-  }
-
-  #vehicles.brand-vehicles .v-pagination {
-    display: flex;
   }
 }
 

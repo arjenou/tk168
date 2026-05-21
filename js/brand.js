@@ -84,7 +84,12 @@ function resolveFocusBrandKey(rawFocusBrand = '') {
 const initialUrlParams = new URLSearchParams(window.location.search);
 let focusBrandKey = resolveFocusBrandKey(initialUrlParams.get('focusBrand') || '');
 
-const ITEMS_PER_PAGE = 6;
+const BRAND_VEHICLE_BATCH = 30;
+let visibleVehicleLimit = 0;
+
+function resetBrandVehicleVisibleLimit() {
+  visibleVehicleLimit = Math.min(BRAND_VEHICLE_BATCH, sourceVehicles.length);
+}
 const inventoryContext = window.TK168InventoryContext.createInventoryContext(window.location.search, vehicles);
 const currentBrand = inventoryContext.currentBrand;
 if (!focusBrandKey && currentBrand?.key) {
@@ -92,17 +97,9 @@ if (!focusBrandKey && currentBrand?.key) {
 }
 let sourceVehicles = [];
 
-let currentPage = 0;
 let brandHeroPreviewKey = '';
 let brandHeroTitleFxTimer = 0;
 const brandVehicleGrid = document.getElementById('vehicleGrid');
-const brandVehicleSliderViewport = window.matchMedia('(max-width: 760px)');
-const BRAND_VEHICLE_SLIDER_SHELL_ID = 'brandVehicleSliderShell';
-const BRAND_VEHICLE_SLIDER_NAV_ID = 'brandVehicleSliderNav';
-let brandVehicleSliderScrollFrame = 0;
-let brandVehicleSliderResizeFrame = 0;
-let brandVehicleSliderInteractionTimer = 0;
-let brandVehicleRenderMode = brandVehicleSliderViewport.matches ? 'mobile' : 'desktop';
 
 const canonicalInventoryUrl = inventoryContext.canonicalInventoryUrl;
 const canonicalInventoryTarget = new URL(canonicalInventoryUrl, window.location.href);
@@ -126,6 +123,7 @@ function recomputeSourceVehicles() {
 }
 
 recomputeSourceVehicles();
+resetBrandVehicleVisibleLimit();
 
 const inventoryHrefForChrome = `${window.location.pathname.split('/').pop()}${window.location.search}`;
 window.TK168PageChrome?.applyPageChrome({
@@ -162,7 +160,7 @@ function finishBrandNavClientUpdate() {
     pageKey: 'inventory',
     inventoryHref: inventoryPathAndQuery
   });
-  currentPage = 0;
+  resetBrandVehicleVisibleLimit();
   setBrandHeroPreview('');
   syncBrandHeader();
   buildBrandNav();
@@ -413,265 +411,52 @@ function buildCardHTML(v) {
   );
 }
 
-function ensureBrandVehicleSliderShell() {
-  if (!brandVehicleGrid) return null;
-
-  const existingShell = document.getElementById(BRAND_VEHICLE_SLIDER_SHELL_ID);
-  if (existingShell) return existingShell;
-
-  const parent = brandVehicleGrid.parentElement;
-  if (!parent) return null;
-
-  const shell = document.createElement('div');
-  shell.id = BRAND_VEHICLE_SLIDER_SHELL_ID;
-  shell.className = 'vehicle-slider-shell';
-  parent.insertBefore(shell, brandVehicleGrid);
-  shell.appendChild(brandVehicleGrid);
-  return shell;
-}
-
-function getBrandVehicleCards() {
-  if (!brandVehicleGrid) return [];
-  return Array.from(brandVehicleGrid.querySelectorAll('.v-card'));
-}
-
-function isBrandVehicleMobileView() {
-  return brandVehicleSliderViewport.matches;
-}
-
-function getBrandVehicleLeadIndex() {
-  return brandVehicleRenderMode === 'mobile'
-    ? currentPage
-    : currentPage * ITEMS_PER_PAGE;
-}
-
-function getBrandVehicleSliderNav() {
-  return document.getElementById(BRAND_VEHICLE_SLIDER_NAV_ID);
-}
-
-function markBrandVehicleSliderInteraction() {
-  const nav = getBrandVehicleSliderNav();
-  if (!nav || !brandVehicleSliderViewport.matches) return;
-
-  nav.classList.add('is-engaged');
-  if (brandVehicleSliderInteractionTimer) {
-    clearTimeout(brandVehicleSliderInteractionTimer);
-  }
-  brandVehicleSliderInteractionTimer = window.setTimeout(() => {
-    nav.classList.remove('is-engaged');
-    brandVehicleSliderInteractionTimer = 0;
-  }, 1200);
-}
-
-function getClosestBrandVehicleCardIndex() {
-  const cards = getBrandVehicleCards();
-  if (!brandVehicleGrid || !cards.length) return 0;
-
-  const viewportCenter = brandVehicleGrid.scrollLeft + (brandVehicleGrid.clientWidth / 2);
-  let nearestIndex = 0;
-  let nearestDistance = Number.POSITIVE_INFINITY;
-
-  cards.forEach((card, index) => {
-    const cardCenter = card.offsetLeft + (card.offsetWidth / 2);
-    const distance = Math.abs(cardCenter - viewportCenter);
-    if (distance < nearestDistance) {
-      nearestDistance = distance;
-      nearestIndex = index;
-    }
+function createBrandVehicleCardElement(v, staggerIndex) {
+  const card = document.createElement('div');
+  card.className = 'v-card';
+  card.style.transitionDelay = `${(staggerIndex % BRAND_VEHICLE_BATCH) * 0.07}s`;
+  card.innerHTML = buildCardHTML(v);
+  card.querySelectorAll('img').forEach((image) => {
+    image.loading = 'lazy';
+    image.decoding = 'async';
+    image.setAttribute('fetchpriority', 'low');
   });
-
-  return nearestIndex;
+  normalizeVehicleMetaSubtitle(card);
+  applyMiniBrandIcon(card, v);
+  return card;
 }
 
-function scrollToBrandVehicleCard(index, behavior = 'smooth') {
-  const cards = getBrandVehicleCards();
-  if (!cards.length) return;
-
-  const clampedIndex = Math.max(0, Math.min(cards.length - 1, index));
-  cards[clampedIndex].scrollIntoView({
-    behavior,
-    block: 'nearest',
-    inline: 'start'
+function appendBrandVehicleCards(fromIdx, toIdx) {
+  const grid = brandVehicleGrid;
+  if (!grid) return;
+  const slice = sourceVehicles.slice(fromIdx, toIdx);
+  slice.forEach((v, i) => {
+    const card = createBrandVehicleCardElement(v, fromIdx + i);
+    grid.appendChild(card);
+    requestAnimationFrame(() => card.classList.add('visible'));
   });
+  window.TK168CommonLinks?.enhanceClickableCards(grid);
+  window.TK168Renderers?.bindVehicleCardLikes?.(grid);
+  window.TK168Renderers?.bindVehicleCardCoverSkeletons?.(grid);
 }
 
-function updateBrandVehicleSliderNavState() {
-  const nav = getBrandVehicleSliderNav();
-  if (!nav) return;
-
-  const prev = nav.querySelector('[data-brand-vehicle-nav="prev"]');
-  const next = nav.querySelector('[data-brand-vehicle-nav="next"]');
-  if (!prev || !next) return;
-
-  const cards = getBrandVehicleCards();
-  const canSlide = brandVehicleSliderViewport.matches && cards.length > 1;
-  nav.classList.toggle('is-visible', canSlide);
-  nav.setAttribute('aria-hidden', canSlide ? 'false' : 'true');
-
-  const dotsWrap = nav.querySelector('.vehicle-slider-dots');
-  if (!dotsWrap) return;
-
-  if (!canSlide) {
-    prev.disabled = true;
-    next.disabled = true;
-    return;
-  }
-
-  const index = getClosestBrandVehicleCardIndex();
-  prev.disabled = index <= 0;
-  next.disabled = index >= cards.length - 1;
-  window.TK168Renderers?.renderPaginationDots?.(dotsWrap, {
-    totalCount: cards.length,
-    activeIndex: index,
-    maxVisible: 3,
-    isCompact: true,
-    dataAttribute: 'data-brand-vehicle-dot',
-    ariaLabelBuilder: (dotIndex) => `Vehicle ${dotIndex + 1}`
-  });
+function getBrandLoadMoreLabel() {
+  return window.TK168I18N?.t('brand.loadMore')
+    || (getCompareLanguage() === 'zh'
+      ? '加载更多'
+      : (getCompareLanguage() === 'en' ? 'Load more' : 'もっと見る'));
 }
 
-function ensureBrandVehicleSliderNav() {
-  if (!brandVehicleGrid) return null;
-
-  let nav = getBrandVehicleSliderNav();
-  if (nav) return nav;
-
-  const shell = ensureBrandVehicleSliderShell();
-  if (!shell) return null;
-
-  nav = document.createElement('div');
-  nav.id = BRAND_VEHICLE_SLIDER_NAV_ID;
-  nav.className = 'vehicle-slider-nav';
-  nav.setAttribute('aria-hidden', 'true');
-  nav.innerHTML = `
-    <button type="button" class="vehicle-slider-btn vehicle-slider-btn--prev" data-brand-vehicle-nav="prev" aria-label="前の車両">
-      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-        <path d="M12.5 4 7 10l5.5 6"></path>
-      </svg>
-    </button>
-    <div class="vehicle-slider-dots" aria-label="ページ送り"></div>
-    <button type="button" class="vehicle-slider-btn vehicle-slider-btn--next" data-brand-vehicle-nav="next" aria-label="次の車両">
-      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-        <path d="m7.5 4 5.5 6-5.5 6"></path>
-      </svg>
-    </button>
-  `;
-
-  nav.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-brand-vehicle-nav]');
-    if (button && !button.disabled) {
-      markBrandVehicleSliderInteraction();
-      const direction = button.dataset.brandVehicleNav === 'prev' ? -1 : 1;
-      const current = getClosestBrandVehicleCardIndex();
-      scrollToBrandVehicleCard(current + direction);
-      window.setTimeout(updateBrandVehicleSliderNavState, 220);
-      return;
-    }
-
-    const dot = event.target.closest('[data-brand-vehicle-dot]');
-    if (!dot) return;
-    markBrandVehicleSliderInteraction();
-    scrollToBrandVehicleCard(Number(dot.dataset.brandVehicleDot));
-    window.setTimeout(updateBrandVehicleSliderNavState, 220);
-  });
-
-  shell.appendChild(nav);
-  return nav;
-}
-
-function bindBrandVehicleSliderEvents() {
-  if (!brandVehicleGrid) return;
-  if (brandVehicleGrid.dataset.sliderBound === '1') return;
-  brandVehicleGrid.dataset.sliderBound = '1';
-
-  brandVehicleGrid.addEventListener('scroll', () => {
-    if (!brandVehicleSliderViewport.matches) return;
-    markBrandVehicleSliderInteraction();
-    if (brandVehicleSliderScrollFrame) return;
-    brandVehicleSliderScrollFrame = requestAnimationFrame(() => {
-      brandVehicleSliderScrollFrame = 0;
-      updateBrandVehicleSliderNavState();
-    });
-  }, { passive: true });
-
-  brandVehicleGrid.addEventListener('pointerdown', () => {
-    markBrandVehicleSliderInteraction();
-  }, { passive: true });
-
-  const syncOnViewportChange = () => {
-    if (!brandVehicleSliderViewport.matches) {
-      brandVehicleGrid.scrollLeft = 0;
-      const nav = getBrandVehicleSliderNav();
-      nav?.classList.remove('is-engaged');
-    } else {
-      scrollToBrandVehicleCard(getClosestBrandVehicleCardIndex(), 'auto');
-      markBrandVehicleSliderInteraction();
-    }
-    updateBrandVehicleSliderNavState();
-  };
-
-  if (typeof brandVehicleSliderViewport.addEventListener === 'function') {
-    brandVehicleSliderViewport.addEventListener('change', syncOnViewportChange);
-  } else if (typeof brandVehicleSliderViewport.addListener === 'function') {
-    brandVehicleSliderViewport.addListener(syncOnViewportChange);
-  }
-
-  window.addEventListener('resize', () => {
-    if (brandVehicleSliderResizeFrame) cancelAnimationFrame(brandVehicleSliderResizeFrame);
-    brandVehicleSliderResizeFrame = requestAnimationFrame(() => {
-      brandVehicleSliderResizeFrame = 0;
-      updateBrandVehicleSliderNavState();
-    });
-  });
-}
-
-function syncBrandVehicleSlider() {
-  if (!brandVehicleGrid) return;
-  ensureBrandVehicleSliderShell();
-  ensureBrandVehicleSliderNav();
-  bindBrandVehicleSliderEvents();
-  updateBrandVehicleSliderNavState();
-}
-
-function bindBrandVehicleMobilePager() {
-  if (!brandVehicleGrid || brandVehicleGrid.dataset.mobilePagerBound === '1') return;
-  brandVehicleGrid.dataset.mobilePagerBound = '1';
-
-  brandVehicleGrid.addEventListener('scroll', () => {
-    if (!isBrandVehicleMobileView()) return;
-    if (brandVehicleSliderScrollFrame) return;
-    brandVehicleSliderScrollFrame = requestAnimationFrame(() => {
-      brandVehicleSliderScrollFrame = 0;
-      const nextPage = getClosestBrandVehicleCardIndex();
-      if (nextPage === currentPage) return;
-      currentPage = nextPage;
-      updatePagination();
-    });
-  }, { passive: true });
-
-  const scheduleSync = () => {
-    if (brandVehicleSliderResizeFrame) cancelAnimationFrame(brandVehicleSliderResizeFrame);
-    brandVehicleSliderResizeFrame = requestAnimationFrame(() => {
-      brandVehicleSliderResizeFrame = 0;
-      const nextMode = isBrandVehicleMobileView() ? 'mobile' : 'desktop';
-      if (nextMode !== brandVehicleRenderMode) {
-        renderPage();
-        return;
-      }
-      if (nextMode === 'mobile') {
-        currentPage = getClosestBrandVehicleCardIndex();
-        updatePagination();
-      }
-    });
-  };
-
-  if (typeof brandVehicleSliderViewport.addEventListener === 'function') {
-    brandVehicleSliderViewport.addEventListener('change', scheduleSync);
-  } else if (typeof brandVehicleSliderViewport.addListener === 'function') {
-    brandVehicleSliderViewport.addListener(scheduleSync);
-  }
-
-  window.addEventListener('resize', scheduleSync);
+function updateBrandLoadMoreUi() {
+  const wrap = document.getElementById('brandVehicleLoadMoreWrap');
+  const btn = document.getElementById('brandVehicleLoadMore');
+  if (!wrap || !btn) return;
+  const pinnedEmpty = Boolean(getPinnedBrandKey()) && sourceVehicles.length === 0;
+  const canLoadMore = sourceVehicles.length > visibleVehicleLimit;
+  wrap.hidden = pinnedEmpty || !sourceVehicles.length || !canLoadMore;
+  const label = getBrandLoadMoreLabel();
+  btn.textContent = label;
+  btn.setAttribute('aria-label', label);
 }
 
 function normalizeVehicleMetaSubtitle(card) {
@@ -705,10 +490,6 @@ function applyMiniBrandIcon(card, vehicle) {
   img.classList.add('v-mini-brand-glyph');
 }
 
-function getCompareTotalPages() {
-  return Math.max(1, Math.ceil(sourceVehicles.length / ITEMS_PER_PAGE));
-}
-
 function getCompareLanguage() {
   const language = window.TK168I18N?.getLanguage?.();
   if (language === 'zh' || language === 'ja' || language === 'en') return language;
@@ -721,17 +502,21 @@ function getCompareLanguage() {
 function renderPage() {
   const grid = brandVehicleGrid;
   if (!grid) return;
-  const renderMode = isBrandVehicleMobileView() ? 'mobile' : 'desktop';
-  const leadIndex = getBrandVehicleLeadIndex();
+
+  if (visibleVehicleLimit > sourceVehicles.length) {
+    visibleVehicleLimit = sourceVehicles.length;
+  }
+  if (sourceVehicles.length > 0 && sourceVehicles.length <= BRAND_VEHICLE_BATCH) {
+    visibleVehicleLimit = sourceVehicles.length;
+  }
 
   // 数据尚未到达（既无缓存又无 API 回包）：直接渲染骨架卡，避免空白状态闪烁。
   const dataPoolEmpty = !Array.isArray(vehicles) || vehicles.length === 0;
   if (dataPoolEmpty && !Array.isArray(window.TK168_API_VEHICLES)) {
     delete grid.dataset.mobilePaged;
-    const placeholder = renderMode === 'mobile' ? 4 : ITEMS_PER_PAGE;
+    const placeholder = 8;
     window.TK168Renderers?.renderVehicleSkeletons?.(grid, placeholder);
-    brandVehicleRenderMode = renderMode;
-    updatePagination();
+    updateBrandLoadMoreUi();
     return;
   }
 
@@ -773,38 +558,15 @@ function renderPage() {
       emptyState.appendChild(document.createTextNode(emptyMessage));
       grid.replaceChildren(emptyState);
 
-      brandVehicleRenderMode = renderMode;
-      updatePagination();
+      updateBrandLoadMoreUi();
       return;
     }
 
-    const totalDesktopPages = Math.max(1, Math.ceil(sourceVehicles.length / ITEMS_PER_PAGE));
-    currentPage = renderMode === 'mobile'
-      ? Math.max(0, Math.min(sourceVehicles.length - 1, leadIndex))
-      : Math.max(0, Math.min(totalDesktopPages - 1, Math.floor(leadIndex / ITEMS_PER_PAGE)));
+    grid.scrollLeft = 0;
 
-    const slice = renderMode === 'mobile'
-      ? sourceVehicles
-      : sourceVehicles.slice(currentPage * ITEMS_PER_PAGE, (currentPage * ITEMS_PER_PAGE) + ITEMS_PER_PAGE);
-
-    if (renderMode === 'mobile') {
-      grid.dataset.mobilePaged = 'true';
-    } else {
-      grid.scrollLeft = 0;
-    }
-
+    const slice = sourceVehicles.slice(0, visibleVehicleLimit);
     slice.forEach((v, i) => {
-      const card = document.createElement('div');
-      card.className = 'v-card';
-      card.style.transitionDelay = `${i * 0.07}s`;
-      card.innerHTML = buildCardHTML(v);
-      card.querySelectorAll('img').forEach((image) => {
-        image.loading = 'lazy';
-        image.decoding = 'async';
-        image.setAttribute('fetchpriority', 'low');
-      });
-      normalizeVehicleMetaSubtitle(card);
-      applyMiniBrandIcon(card, v);
+      const card = createBrandVehicleCardElement(v, i);
       grid.appendChild(card);
 
       requestAnimationFrame(() => {
@@ -815,66 +577,10 @@ function renderPage() {
     window.TK168CommonLinks?.enhanceClickableCards(grid);
     window.TK168Renderers?.bindVehicleCardLikes?.(grid);
     window.TK168Renderers?.bindVehicleCardCoverSkeletons?.(grid);
-    brandVehicleRenderMode = renderMode;
-    updatePagination();
-
-    if (renderMode === 'mobile') {
-      requestAnimationFrame(() => {
-        scrollToBrandVehicleCard(currentPage, 'auto');
-      });
-    }
+    updateBrandLoadMoreUi();
   }, existing.length ? 220 : 0);
 }
 
-function updatePagination() {
-  const pagination = document.getElementById('vPagination');
-  const dotsWrap = document.getElementById('vpnDots');
-  const prevBtn  = document.getElementById('vpnPrev');
-  const nextBtn  = document.getElementById('vpnNext');
-  const mobilePaged = isBrandVehicleMobileView();
-  const totalPages = Math.max(1, mobilePaged ? sourceVehicles.length : getCompareTotalPages());
-  if (!pagination || !dotsWrap || !prevBtn || !nextBtn) return;
-  const shouldHidePagination = (Boolean(getPinnedBrandKey()) && sourceVehicles.length === 0) || totalPages <= 1;
-  pagination.style.display = shouldHidePagination ? 'none' : '';
-
-  // Rebuild dots
-  window.TK168Renderers?.renderPaginationDots?.(dotsWrap, {
-    totalCount: totalPages,
-    activeIndex: currentPage,
-    maxVisible: 3,
-    isCompact: true,
-    dataAttribute: 'data-brand-page-dot',
-    ariaLabelBuilder: (dotIndex) => `Page ${dotIndex + 1}`,
-    onClick: (pageIndex) => goToPage(pageIndex)
-  });
-
-  prevBtn.disabled = totalPages <= 1 || (mobilePaged && currentPage <= 0);
-  nextBtn.disabled = totalPages <= 1 || (mobilePaged && currentPage >= totalPages - 1);
-}
-
-function goToPage(page) {
-  const mobilePaged = isBrandVehicleMobileView();
-  const totalPages = Math.max(1, mobilePaged ? sourceVehicles.length : getCompareTotalPages());
-  if (totalPages <= 0) return;
-
-  if (mobilePaged) {
-    const normalizedPage = Math.max(0, Math.min(totalPages - 1, page));
-    if (normalizedPage === currentPage) return;
-    currentPage = normalizedPage;
-    scrollToBrandVehicleCard(currentPage);
-    updatePagination();
-    return;
-  }
-
-  const normalizedPage = ((page % totalPages) + totalPages) % totalPages;
-  if (normalizedPage === currentPage) return;
-  currentPage = normalizedPage;
-  renderPage();
-}
-
-// Arrow click handlers
-document.getElementById('vpnPrev').addEventListener('click', () => goToPage(currentPage - 1));
-document.getElementById('vpnNext').addEventListener('click', () => goToPage(currentPage + 1));
 function handleBrandNavViewportChange() {
   brandNavCycleIndex = 0;
   buildBrandNav();
@@ -894,7 +600,18 @@ if (typeof brandNavNarrowViewport.addEventListener === 'function') {
 
 syncBrandHeader();
 buildBrandNav();
-bindBrandVehicleMobilePager();
+(function bindBrandVehicleLoadMore() {
+  const btn = document.getElementById('brandVehicleLoadMore');
+  if (!btn || btn.dataset.bound === '1') return;
+  btn.dataset.bound = '1';
+  btn.addEventListener('click', () => {
+    const prev = visibleVehicleLimit;
+    visibleVehicleLimit = Math.min(sourceVehicles.length, visibleVehicleLimit + BRAND_VEHICLE_BATCH);
+    if (visibleVehicleLimit <= prev) return;
+    appendBrandVehicleCards(prev, visibleVehicleLimit);
+    updateBrandLoadMoreUi();
+  });
+})();
 renderPage();
 
 window.addEventListener('tk168:languagechange', () => {

@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://api.tk168.co.jp" crossorigin>
   <!-- R2 的 S3 端点 (…r2.cloudflarestorage.com/桶名) 一般不能直接匿名在浏览器中播放。公开读请用 Cloudflare
        「自定义域」或 r2.dev 公开桶，再设: window.TK168_MEDIA_BASE = "https://你的公开根"; -->
-  <link rel="stylesheet" href="css/style.css?v=20260512a">
+  <link rel="stylesheet" href="css/style.css?v=20260522a">
   <link rel="stylesheet" href="css/home-cube.css?v=20260511o">
   <link rel="stylesheet" href="css/inquiry.css?v=20260620c">
   <link rel="stylesheet" href="css/contact.css?v=20260618b">
@@ -119,19 +119,10 @@
       </div>
 
       <div class="vehicle-grid" id="vehicleGrid"></div>
-      <div class="vehicle-pagination" id="homeVehiclePagination">
-        <button class="vehicle-slider-btn vehicle-slider-btn--prev" id="homeVehiclePrev" aria-label="前のページ">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M15 18l-6-6 6-6"/>
-          </svg>
-        </button>
-        <div class="vehicle-slider-dots" id="homeVehicleDots" aria-label="ページ送り"></div>
-        <button class="vehicle-slider-btn vehicle-slider-btn--next" id="homeVehicleNext" aria-label="次のページ">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 18l6-6-6-6"/>
-          </svg>
-        </button>
+      <div class="home-vehicle-load-more-wrap" id="homeVehicleLoadMoreWrap" hidden>
+        <button type="button" class="home-vehicle-load-more" id="homeVehicleLoadMore"></button>
       </div>
+      <p class="home-vehicle-list-end" id="homeVehicleListEnd" hidden role="status"></p>
     </section>
 
     <!-- ─ 第四页：企业新闻 ─ -->
@@ -459,14 +450,14 @@
   <script defer src="js/admin-brand-key-options.js?v=20260425a"></script>
   <script defer src="js/brand-key-name-i18n.js?v=20260426a"></script>
   <script defer src="js/data.js?v=20260511h"></script>
-  <script defer src="js/i18n.js?v=20260619b"></script>
+  <script defer src="js/i18n.js?v=20260521c"></script>
   <script defer src="js/contact.js?v=20260618b"></script>
   <script defer src="js/common-links.js?v=20260419a"></script>
-  <script defer src="js/home-scroll-restore.js?v=20260425a"></script>
+  <script defer src="js/home-scroll-restore.js?v=20260521b"></script>
   <script defer src="js/page-chrome.js?v=20260601a"></script>
   <script defer src="js/renderers.js?v=20260511q"></script>
   <script defer src="js/search-ui.js?v=20260509d"></script>
-  <script defer src="js/script.js?v=20260511q"></script>
+  <script defer src="js/script.js?v=20260521e"></script>
   <script defer src="js/home-cube.js?v=20260507d"></script>
 </body>
 

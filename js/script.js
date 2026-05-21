@@ -446,13 +446,13 @@ const {
   serializeInventoryFilters
 } = homeDataApi;
 
-const HOME_VEHICLES_PER_PAGE = 6;
+const HOME_VEHICLES_BATCH = 30;
+const LEGACY_HOME_VEHICLE_PAGE_SIZE = 6;
 
 const homeVehicleGrid = document.getElementById('vehicleGrid');
-const homeVehiclePagination = document.getElementById('homeVehiclePagination');
-const homeVehicleDots = document.getElementById('homeVehicleDots');
-const homeVehiclePrev = document.getElementById('homeVehiclePrev');
-const homeVehicleNext = document.getElementById('homeVehicleNext');
+const homeVehicleLoadMoreWrap = document.getElementById('homeVehicleLoadMoreWrap');
+const homeVehicleLoadMoreBtn = document.getElementById('homeVehicleLoadMore');
+const homeVehicleListEnd = document.getElementById('homeVehicleListEnd');
 const homeVehicleMobileViewport = window.matchMedia('(max-width: 760px)');
 const homeVehicleTabletViewport = window.matchMedia('(max-width: 1180px)');
 
@@ -461,9 +461,15 @@ let homeActiveFilters =
     ? parseInventoryFilters(window.location.search)
     : {};
 
-let currentHomeVehiclePage = pendingHomeScrollRestore
-  ? pendingHomeScrollRestore.page
-  : 0;
+let homeVisibleVehicleLimit = (() => {
+  const r = pendingHomeScrollRestore;
+  if (!r) return 0;
+  if (typeof r.visible === 'number' && r.visible > 0) return r.visible;
+  if (typeof r.page === 'number' && r.page >= 0) {
+    return (r.page + 1) * LEGACY_HOME_VEHICLE_PAGE_SIZE;
+  }
+  return 0;
+})();
 let currentHomeVehicleColumns = getHomeVehicleColumns();
 let homeVehicleResizeFrame = 0;
 /** 与后台 `display_order` 一致（经 `/api/vehicles` 排序后的全量列表） */
@@ -473,8 +479,9 @@ function translate(key, params = {}) {
   return window.TK168I18N?.t(key, params) || key;
 }
 
-function getHomeVehiclesPerPage() {
-  return HOME_VEHICLES_PER_PAGE;
+function resetHomeVisibleVehicleLimit() {
+  const list = getHomeVehiclesDisplayed();
+  homeVisibleVehicleLimit = Math.min(HOME_VEHICLES_BATCH, list.length);
 }
 
 function getHomeVehicleColumns() {
@@ -483,23 +490,66 @@ function getHomeVehicleColumns() {
   return 3;
 }
 
-function chunkHomeVehicles(items, chunkSize) {
-  if (!Array.isArray(items) || !items.length || chunkSize <= 0) return [];
-  const pages = [];
-  for (let index = 0; index < items.length; index += chunkSize) {
-    pages.push(items.slice(index, index + chunkSize));
-  }
-  return pages;
-}
-
 function getHomeVehiclesDisplayed() {
   if (typeof filterVehicles !== 'function') return homeVehicles;
   return filterVehicles(homeVehicles, homeActiveFilters);
 }
 
-function getHomeVehicleTotalPages() {
-  const list = getHomeVehiclesDisplayed();
-  return Math.max(1, Math.ceil(list.length / getHomeVehiclesPerPage()));
+function getHomeVehicleLoadMoreLabel() {
+  const lang = window.TK168I18N?.getLanguage?.() || 'ja';
+  return window.TK168I18N?.t('home.loadMore')
+    || window.TK168I18N?.t('brand.loadMore')
+    || (lang === 'zh' ? '加载更多' : lang === 'en' ? 'Load more' : 'もっと見る');
+}
+
+function updateHomeVehicleLoadMoreUi() {
+  const displayed = getHomeVehiclesDisplayed();
+  const canLoadMore = displayed.length > homeVisibleVehicleLimit;
+
+  if (homeVehicleLoadMoreWrap && homeVehicleLoadMoreBtn) {
+    homeVehicleLoadMoreWrap.hidden = !displayed.length || !canLoadMore;
+    const label = getHomeVehicleLoadMoreLabel();
+    homeVehicleLoadMoreBtn.textContent = label;
+    homeVehicleLoadMoreBtn.setAttribute('aria-label', label);
+  }
+
+  if (homeVehicleListEnd) {
+    if (displayed.length > 0 && !canLoadMore) {
+      homeVehicleListEnd.hidden = false;
+      homeVehicleListEnd.textContent = window.TK168I18N?.t('home.inventoryShownAll', { count: displayed.length })
+        || `已显示全部 ${displayed.length} 辆`;
+    } else {
+      homeVehicleListEnd.hidden = true;
+      homeVehicleListEnd.textContent = '';
+    }
+  }
+}
+
+function createHomeVehicleCard(vehicle, index) {
+  const card = document.createElement('div');
+  card.className = 'v-card fade-up visible';
+  card.style.transitionDelay = `${(index % HOME_VEHICLES_BATCH) * 0.05}s`;
+  card.innerHTML = window.TK168Renderers.buildInventoryCardHTML(
+    vehicle,
+    buildDetailUrl(vehicle.id, homeActiveFilters)
+  );
+  card.querySelectorAll('img').forEach((image) => {
+    image.loading = 'lazy';
+    image.decoding = 'async';
+    image.setAttribute('fetchpriority', 'low');
+  });
+  return card;
+}
+
+function appendHomeVehicleCards(displayed, fromIdx, toIdx) {
+  if (!homeVehicleGrid) return;
+  displayed.slice(fromIdx, toIdx).forEach((vehicle, offset) => {
+    const index = fromIdx + offset;
+    homeVehicleGrid.appendChild(createHomeVehicleCard(vehicle, index));
+  });
+  window.TK168CommonLinks?.enhanceClickableCards(homeVehicleGrid);
+  window.TK168Renderers?.bindVehicleCardLikes?.(homeVehicleGrid);
+  window.TK168Renderers?.bindVehicleCardCoverSkeletons?.(homeVehicleGrid);
 }
 
 function renderHomeVehiclePages() {
@@ -512,76 +562,50 @@ function renderHomeVehiclePages() {
   if (homeVehicles.length === 0 && !Array.isArray(window.TK168_API_VEHICLES)) {
     const placeholderCount = currentHomeVehicleColumns * 2;
     window.TK168Renderers?.renderVehicleSkeletons?.(homeVehicleGrid, placeholderCount);
-    homeVehicleGrid.dataset.homeVehiclePage = '0';
-    if (homeVehiclePagination) homeVehiclePagination.style.display = 'none';
+    homeVehicleGrid.removeAttribute('data-home-vehicle-visible');
+    if (homeVehicleLoadMoreWrap) homeVehicleLoadMoreWrap.hidden = true;
+    if (homeVehicleListEnd) {
+      homeVehicleListEnd.hidden = true;
+      homeVehicleListEnd.textContent = '';
+    }
     return;
   }
 
   const displayed = getHomeVehiclesDisplayed();
-  const pages = chunkHomeVehicles(displayed, getHomeVehiclesPerPage());
-  const totalPages = Math.max(1, pages.length);
-  currentHomeVehiclePage = Math.max(0, Math.min(totalPages - 1, currentHomeVehiclePage));
-  homeVehicleGrid.dataset.homeVehiclePage = String(currentHomeVehiclePage);
+  if (displayed.length <= HOME_VEHICLES_BATCH) {
+    homeVisibleVehicleLimit = displayed.length;
+  } else if (homeVisibleVehicleLimit <= 0) {
+    resetHomeVisibleVehicleLimit();
+  } else {
+    homeVisibleVehicleLimit = Math.min(homeVisibleVehicleLimit, displayed.length);
+  }
+
+  homeVehicleGrid.dataset.homeVehicleVisible = String(homeVisibleVehicleLimit);
   homeVehicleGrid.innerHTML = '';
 
-  (pages[currentHomeVehiclePage] || []).forEach((vehicle, index) => {
-    const card = document.createElement('div');
-    card.className = 'v-card fade-up visible';
-    card.style.transitionDelay = `${index * 0.05}s`;
-    card.innerHTML = window.TK168Renderers.buildInventoryCardHTML(
-      vehicle,
-      buildDetailUrl(vehicle.id, homeActiveFilters)
-    );
-    card.querySelectorAll('img').forEach((image) => {
-      image.loading = 'lazy';
-      image.decoding = 'async';
-      image.setAttribute('fetchpriority', 'low');
-    });
-    homeVehicleGrid.appendChild(card);
+  displayed.slice(0, homeVisibleVehicleLimit).forEach((vehicle, index) => {
+    homeVehicleGrid.appendChild(createHomeVehicleCard(vehicle, index));
   });
 
   window.TK168CommonLinks?.enhanceClickableCards(homeVehicleGrid);
   window.TK168Renderers?.bindVehicleCardLikes?.(homeVehicleGrid);
   window.TK168Renderers?.bindVehicleCardCoverSkeletons?.(homeVehicleGrid);
-  updateHomeVehiclePagination();
+  updateHomeVehicleLoadMoreUi();
 }
 
-function updateHomeVehiclePagination() {
-  if (!homeVehiclePagination || !homeVehicleDots || !homeVehiclePrev || !homeVehicleNext) return;
-
-  const totalPages = getHomeVehicleTotalPages();
-  homeVehiclePagination.style.display = totalPages > 1 ? '' : 'none';
-
-  window.TK168Renderers?.renderPaginationDots?.(homeVehicleDots, {
-    totalCount: totalPages,
-    activeIndex: currentHomeVehiclePage,
-    dataAttribute: 'data-home-page-dot',
-    ariaLabelBuilder: (dotIndex) => `Page ${dotIndex + 1}`,
-    onClick: (pageIndex) => goToHomeVehiclePage(pageIndex)
-  });
-
-  homeVehiclePrev.disabled = currentHomeVehiclePage === 0;
-  homeVehicleNext.disabled = currentHomeVehiclePage >= totalPages - 1;
-}
-
-function goToHomeVehiclePage(pageIndex) {
-  const totalPages = getHomeVehicleTotalPages();
-  const normalizedPage = Math.max(0, Math.min(totalPages - 1, pageIndex));
-  if (normalizedPage === currentHomeVehiclePage) return;
-  currentHomeVehiclePage = normalizedPage;
-  renderHomeVehiclePages();
-}
-
-function bindHomeVehiclePagination() {
-  if (!homeVehiclePagination || homeVehiclePagination.dataset.bound === '1') return;
-  homeVehiclePagination.dataset.bound = '1';
-
-  homeVehiclePrev?.addEventListener('click', () => {
-    goToHomeVehiclePage(currentHomeVehiclePage - 1);
-  });
-
-  homeVehicleNext?.addEventListener('click', () => {
-    goToHomeVehiclePage(currentHomeVehiclePage + 1);
+function bindHomeVehicleLoadMore() {
+  const btn = document.getElementById('homeVehicleLoadMore');
+  if (!btn || btn.dataset.bound === '1') return;
+  btn.dataset.bound = '1';
+  btn.addEventListener('click', () => {
+    if (!homeVehicleGrid) return;
+    const displayed = getHomeVehiclesDisplayed();
+    const prev = homeVisibleVehicleLimit;
+    homeVisibleVehicleLimit = Math.min(displayed.length, homeVisibleVehicleLimit + HOME_VEHICLES_BATCH);
+    if (homeVisibleVehicleLimit <= prev) return;
+    appendHomeVehicleCards(displayed, prev, homeVisibleVehicleLimit);
+    homeVehicleGrid.dataset.homeVehicleVisible = String(homeVisibleVehicleLimit);
+    updateHomeVehicleLoadMoreUi();
   });
 }
 
@@ -676,7 +700,7 @@ function applyHomeInventoryFilters(filterState) {
   const url = new URL(window.location.href);
   url.search = qs;
   history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
-  currentHomeVehiclePage = 0;
+  homeVisibleVehicleLimit = 0;
   renderHomeVehiclePages();
 }
 
@@ -706,7 +730,7 @@ function renderHomeContent() {
   renderHomeNews();
 }
 
-bindHomeVehiclePagination();
+bindHomeVehicleLoadMore();
 bindHomeVehicleResizeSync();
 renderHomeContent();
 initHomeSearch();
