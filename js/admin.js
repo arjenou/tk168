@@ -137,13 +137,6 @@ const RESOURCES = {
     homeDragSort: true,
     homeDragSortHint:
       "拖拽左侧手柄可调整列表顺序（保存后立即生效）。品牌页展示全部已发布车辆；首页仅展示发布设置里勾选「首页显示」的车辆。搜索时会暂时隐藏手柄。",
-    extraColumns: [
-      {
-        key: "showOnHome",
-        label: "首页",
-        render: (on) => (on === false ? "隐藏" : "显示"),
-      },
-    ],
     // Editor form groups (new tabbed layout). Each field may declare:
     //   label / placeholder / hint / span (12-col grid): 3|4|6|12
     fieldGroups: [
@@ -1071,6 +1064,7 @@ function renderList() {
   const extraHeadCells = (r.extraColumns || [])
     .map((c) => `<th>${escapeHtml(c.label)}</th>`)
     .join("");
+  const vehicleHomeHead = r.key === "vehicles" ? `<th scope="col">首页</th>` : "";
 
   const dragHint =
     r.homeDragSort && !state.filter.trim()
@@ -1114,6 +1108,7 @@ function renderList() {
                 <th>品牌</th>
                 <th>年份</th>
                 <th>${escapeHtml(r.priceColumn.label)}</th>
+                ${vehicleHomeHead}
                 ${extraHeadCells}
                 <th>图片</th>
                 <th>状态</th>
@@ -1360,6 +1355,14 @@ function itemRow(v, r) {
     (r.key === "rentals" && priceKey === "dailyRate")
       ? formatInventoryPriceYenStyle(rawPrice)
       : rawPrice;
+  const vehicleHomeCell =
+    r.key === "vehicles"
+      ? `<td>
+        <button type="button" class="admin-badge ${v.showOnHome !== false ? "is-on" : "is-off"}" data-toggle-show-on-home="${escapeAttr(v.id)}" title="点击切换是否在首页车辆网格展示">
+          ${v.showOnHome !== false ? "显示" : "隐藏"}
+        </button>
+      </td>`
+      : "";
   return `
     <tr data-item-id="${escapeAttr(v.id)}">
       ${dragCell}
@@ -1370,6 +1373,7 @@ function itemRow(v, r) {
       <td>${escapeHtml(v.brandKey || "")}</td>
       <td>${escapeHtml(v.year || "")}</td>
       <td>${escapeHtml(priceCell)}</td>
+      ${vehicleHomeCell}
       ${extraCells}
       <td>${(v.images || []).length}</td>
       <td>
@@ -1385,6 +1389,30 @@ function itemRow(v, r) {
       </td>
     </tr>
   `;
+}
+
+/** 将 PATCH/PUT 返回的单条合并进当前 resource 的列表 state，避免整表 loading 刷新。 */
+function mergeListItemFromApiPayload(data) {
+  const r = currentResource();
+  const updated = data && data[r.itemKey];
+  if (!updated || !updated.id) return false;
+  const list = state.items[r.key];
+  if (!Array.isArray(list)) return false;
+  const idx = list.findIndex((x) => x.id === updated.id);
+  if (idx < 0) return false;
+  list[idx] = { ...list[idx], ...updated };
+  return true;
+}
+
+/** 只重绘列表 tbody（与搜索框一致），表头/工具栏/筛选不变，不出现「加载中…」。 */
+function rerenderCurrentListTbody() {
+  const r = currentResource();
+  const tbody = document.querySelector(".admin-table tbody");
+  if (!tbody) return false;
+  const rr = r.listKind === "journal" ? journalItemRow : itemRow;
+  tbody.innerHTML = filteredItems().map((row) => rr(row, r)).join("");
+  bindRowActions();
+  return true;
 }
 
 function bindRowActions() {
@@ -1428,12 +1456,40 @@ function bindRowActions() {
       const v = (state.items[r.key] || []).find((x) => x.id === id);
       if (!v) return;
       try {
-        await api(r.apiItem(id), {
+        const data = await api(r.apiItem(id), {
           method: "PATCH",
           body: { isPublished: !v.isPublished },
         });
-        showToast(v.isPublished ? "已下架" : "已发布");
-        await refreshItems();
+        mergeListItemFromApiPayload(data);
+        if (!rerenderCurrentListTbody()) {
+          await refreshItems();
+        }
+        const up = data && data[r.itemKey];
+        showToast(up?.isPublished ? "已发布" : "已下架");
+      } catch (err) {
+        showToast(`切换失败：${err.message}`, "error");
+      }
+    });
+  });
+  document.querySelectorAll("[data-toggle-show-on-home]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      if (r.key !== "vehicles") return;
+      const id = btn.dataset.toggleShowOnHome;
+      const v = (state.items[r.key] || []).find((x) => x.id === id);
+      if (!v) return;
+      const nextShow = !(v.showOnHome !== false);
+      try {
+        const data = await api(r.apiItem(id), {
+          method: "PATCH",
+          body: { showOnHome: nextShow },
+        });
+        mergeListItemFromApiPayload(data);
+        if (!rerenderCurrentListTbody()) {
+          await refreshItems();
+        }
+        const up = data && data[r.itemKey];
+        const on = up && up.showOnHome !== false;
+        showToast(on ? "已设为首页显示" : "已设为仅品牌页（首页隐藏）");
       } catch (err) {
         showToast(`切换失败：${err.message}`, "error");
       }
