@@ -68,6 +68,8 @@ const RENTAL_COPY = {
     'notes.card2.text': '市区代步、近郊往返和跨地区使用，对里程和安排要求会不同，最好在确认前一次说清。',
     'notes.card3.title': '最后确认条款、押金和证件',
     'notes.card3.text': '押金、补偿范围、取还车地点和所需证件，会在确认前逐项说明，避免到店后再反复沟通。',
+    'mobileBar.inquiry': '咨询',
+    'mobileBar.access': '地图 / 到店',
   },
   ja: {
     'meta.title': 'レンタル — TK168 Premium Automotive',
@@ -138,6 +140,8 @@ const RENTAL_COPY = {
     'notes.card2.text': '市内移動、近郊往復、地域をまたぐ利用では走行条件が変わるため、事前共有が必要です。',
     'notes.card3.title': '最後に条項、保証金、必要書類',
     'notes.card3.text': '保証金、補償範囲、受け取り場所、必要書類は確定前に順番に確認します。',
+    'mobileBar.inquiry': 'お問い合わせ',
+    'mobileBar.access': 'アクセス',
   },
   en: {
     'meta.title': 'Rental — TK168 Premium Automotive',
@@ -208,6 +212,8 @@ const RENTAL_COPY = {
     'notes.card2.text': 'City use, suburban return trips, and cross-region use all change the mileage and arrangement requirements, so it is best to state that clearly in advance.',
     'notes.card3.title': 'Finally terms, deposit, and documents',
     'notes.card3.text': 'Deposit, compensation range, pickup/return point, and required documents are confirmed before final approval.',
+    'mobileBar.inquiry': 'Contact',
+    'mobileBar.access': 'Directions',
   }
 };
 
@@ -256,9 +262,7 @@ const RENTAL_FLEET_BATCH = 30;
 let rentalFleetVisibleLimit = 0;
 const rentalFleetMobileViewport = window.matchMedia('(max-width: 760px)');
 let rentalFleetRenderMode = rentalFleetMobileViewport.matches ? 'mobile' : 'desktop';
-let rentalFleetScrollLoadFrame = 0;
 let rentalFleetResizeFrame = 0;
-let rentalFleetScrollTailLock = false;
 
 function getLanguage() {
   return window.TK168I18N?.getLanguage?.() || 'ja';
@@ -704,7 +708,6 @@ function renderRentableVehicles(language = getLanguage()) {
     const dataNotHydrated = !Array.isArray(window.TK168_API_VEHICLES)
       && !Array.isArray(window.TK168_API_RENTALS);
     if (dataNotHydrated) {
-      delete grid.dataset.mobilePaged;
       empty.hidden = true;
       const placeholder = renderMode === 'mobile' ? 4 : 8;
       window.TK168Renderers?.renderVehicleSkeletons?.(grid, placeholder);
@@ -713,7 +716,6 @@ function renderRentableVehicles(language = getLanguage()) {
       updateRentalFleetLoadMoreUi(rentableVehicles);
       return;
     }
-    delete grid.dataset.mobilePaged;
     grid.innerHTML = '';
     empty.hidden = false;
     rentalFleetRenderMode = renderMode;
@@ -726,10 +728,7 @@ function renderRentableVehicles(language = getLanguage()) {
   const slice = rentableVehicles.slice(0, rentalFleetVisibleLimit);
 
   empty.hidden = true;
-  if (renderMode === 'mobile') {
-    grid.dataset.mobilePaged = 'true';
-  } else {
-    delete grid.dataset.mobilePaged;
+  if (renderMode !== 'mobile') {
     grid.scrollLeft = 0;
   }
   grid.innerHTML = slice.map((vehicle) => buildVehicleCardHtml(vehicle, language)).join('');
@@ -765,30 +764,6 @@ function bindRentalFleetLoadMoreButton() {
   btn.addEventListener('click', () => {
     loadMoreRentalFleetChunk(getLanguage());
   });
-}
-
-function bindRentalFleetScrollLoadMore() {
-  const grid = document.getElementById('rentalVehicleGrid');
-  if (!grid || grid.dataset.rentalScrollLoadBound === '1') return;
-  grid.dataset.rentalScrollLoadBound = '1';
-
-  grid.addEventListener('scroll', () => {
-    if (!isRentalFleetMobileView()) return;
-    if (rentalFleetScrollLoadFrame) return;
-    rentalFleetScrollLoadFrame = requestAnimationFrame(() => {
-      rentalFleetScrollLoadFrame = 0;
-      const list = getRentableVehicles();
-      if (list.length <= rentalFleetVisibleLimit) return;
-      if (rentalFleetScrollTailLock) return;
-      const tol = 64;
-      if (grid.scrollLeft + grid.clientWidth < grid.scrollWidth - tol) return;
-      rentalFleetScrollTailLock = true;
-      const opened = loadMoreRentalFleetChunk(getLanguage());
-      window.setTimeout(() => {
-        rentalFleetScrollTailLock = false;
-      }, opened ? 500 : 0);
-    });
-  }, { passive: true });
 }
 
 function bindRentalFleetViewportSync() {
@@ -861,7 +836,6 @@ function initRentalPage() {
   bindRentalFlowContactsReveal();
   void hydrateRentalFlowContactsFromApi();
   bindRentalFleetLoadMoreButton();
-  bindRentalFleetScrollLoadMore();
   bindRentalFleetViewportSync();
   wireRentalInquiryIdStash();
   renderRentableVehicles(language);
