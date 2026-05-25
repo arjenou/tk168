@@ -722,4 +722,54 @@ html:lang(ja) .rental-page :is(.rental-hero-title, .rental-section-head h2, h3) 
   .rental-fleet-pagination {
     margin-top: 16px;
   }
+
+  .rental-page-contact-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+/* rental.html — 后台配置的联络方式（与 rental-inquiry 页的 .rental-contact-* 区分） */
+.rental-section--page-contact {
+  padding-bottom: 12px;
+}
+
+.rental-page-contact-list {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+  max-width: 720px;
+}
+
+.rental-page-contact-row {
+  display: grid;
+  grid-template-columns: minmax(108px, 148px) 1fr;
+  gap: 10px 20px;
+  align-items: baseline;
+  margin: 0;
+  padding: 16px 18px;
+  background: var(--rental-surface);
+  border: 1px solid var(--rental-border);
+  border-radius: 16px;
+  box-shadow: var(--rental-float-rest);
+}
+
+.rental-page-contact-row dt {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  color: var(--rental-text-sub);
+}
+
+.rental-page-contact-row dd {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+.rental-page-contact-value {
+  color: var(--rental-text-main);
 }

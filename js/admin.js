@@ -607,7 +607,7 @@ function normalizeDisplacementLitersStorage(raw) {
 
 const state = {
   user: null,
-  // "login" | "list" | "editor" | "users"
+  // "login" | "list" | "editor" | "users" | "rental-contacts"
   view: "login",
   // "vehicles" | "rentals" | "journal" — which inventory is currently active
   resource: "vehicles",
@@ -616,6 +616,7 @@ const state = {
   // per-resource caches, keyed by resource name
   items: { vehicles: [], rentals: [], journal: [] },
   users: [],
+  rentalContacts: { phone: "", email: "", wechat: "", whatsapp: "" },
   editingId: null,
   /** True while creating a row that has not been successfully saved to the list yet. */
   editingIsNew: false,
@@ -786,6 +787,21 @@ async function loadUsersIntoState() {
   }
 }
 
+async function loadRentalContactsIntoState() {
+  try {
+    const data = await api("/admin/rental-contacts");
+    state.rentalContacts = {
+      phone: String(data.phone ?? "").trim(),
+      email: String(data.email ?? "").trim(),
+      wechat: String(data.wechat ?? "").trim(),
+      whatsapp: String(data.whatsapp ?? "").trim(),
+    };
+  } catch (err) {
+    showToast(`载入租赁联络方式失败：${err.message}`, "error");
+    state.rentalContacts = { phone: "", email: "", wechat: "", whatsapp: "" };
+  }
+}
+
 async function hydrateEditorFromPersistedId(id, isNewGuess) {
   const editId = id == null ? "" : String(id).trim();
   if (!editId) {
@@ -837,6 +853,15 @@ async function boot() {
       state.editingIsNew = false;
       state.filter = typeof saved.filter === "string" ? saved.filter : "";
       await loadUsersIntoState();
+    } else if (saved?.view === "rental-contacts") {
+      state.view = "rental-contacts";
+      state.resource = saved.resource && RESOURCES[saved.resource] ? saved.resource : "vehicles";
+      state.editorTab = "content";
+      state.editingId = null;
+      state.editingDraft = null;
+      state.editingIsNew = false;
+      state.filter = typeof saved.filter === "string" ? saved.filter : "";
+      await loadRentalContactsIntoState();
     } else if (saved?.view === "editor" && saved.editingId) {
       state.resource = saved.resource && RESOURCES[saved.resource] ? saved.resource : "vehicles";
       state.editorTab = saved.editorTab || "content";
@@ -968,6 +993,12 @@ function navHtml() {
       active: state.view === "users",
       onClick: "users",
     },
+    {
+      id: "nav-rental-contacts",
+      label: "租赁联络方式",
+      active: state.view === "rental-contacts",
+      onClick: "rental-contacts",
+    },
   ];
   return items
     .map(
@@ -1019,6 +1050,9 @@ function bindShell() {
       } else if (target === "users") {
         state.view = "users";
         await refreshUsers();
+      } else if (target === "rental-contacts") {
+        state.view = "rental-contacts";
+        await loadRentalContactsIntoState();
       }
       render();
     });
@@ -2952,6 +2986,70 @@ async function saveItem() {
   }
 }
 
+// -------------------- Rental contacts (rental.html) --------------------
+
+function renderRentalContactsSettings() {
+  const c = state.rentalContacts || { phone: "", email: "", wechat: "", whatsapp: "" };
+  const inner = `
+    <div class="admin-page-head">
+      <h1>租赁页联络方式</h1>
+    </div>
+    <p style="margin:-6px 0 18px;font-size:13px;line-height:1.55;opacity:0.72;max-width:640px;">
+      对应前台 <code>rental.html</code> 页面联络区块（電話 / メール / WeChat / WhatsApp）。均为纯文本，保存后对访客立即生效。
+    </p>
+    <div class="admin-card" style="max-width:560px;">
+      <form id="rentalContactsForm" class="admin-grid">
+        <div class="admin-field admin-grid-col-1">
+          <label for="rcPhone">電話</label>
+          <input id="rcPhone" class="admin-input" type="text" autocomplete="tel" value="${escapeAttr(c.phone)}">
+        </div>
+        <div class="admin-field admin-grid-col-1">
+          <label for="rcEmail">メール</label>
+          <input id="rcEmail" class="admin-input" type="text" autocomplete="email" value="${escapeAttr(c.email)}">
+        </div>
+        <div class="admin-field admin-grid-col-1">
+          <label for="rcWechat">WeChat</label>
+          <input id="rcWechat" class="admin-input" type="text" value="${escapeAttr(c.wechat)}">
+        </div>
+        <div class="admin-field admin-grid-col-1">
+          <label for="rcWhatsapp">WhatsApp</label>
+          <input id="rcWhatsapp" class="admin-input" type="text" value="${escapeAttr(c.whatsapp)}">
+        </div>
+        <div class="admin-grid-col-1">
+          <button type="submit" class="admin-btn admin-btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  ROOT.innerHTML = appShell(inner);
+  bindShell();
+
+  document.getElementById("rentalContactsForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const phone = document.getElementById("rcPhone").value.trim();
+    const email = document.getElementById("rcEmail").value.trim();
+    const wechat = document.getElementById("rcWechat").value.trim();
+    const whatsapp = document.getElementById("rcWhatsapp").value.trim();
+    try {
+      const data = await api("/admin/rental-contacts", {
+        method: "PATCH",
+        body: { phone, email, wechat, whatsapp },
+      });
+      state.rentalContacts = {
+        phone: String(data.phone ?? "").trim(),
+        email: String(data.email ?? "").trim(),
+        wechat: String(data.wechat ?? "").trim(),
+        whatsapp: String(data.whatsapp ?? "").trim(),
+      };
+      showToast("已保存");
+      renderRentalContactsSettings();
+    } catch (err) {
+      showToast(`保存失败：${err.message}`, "error");
+    }
+  });
+}
+
 // -------------------- Users view --------------------
 
 function renderUsers() {
@@ -3072,6 +3170,8 @@ function render() {
     renderEditor();
   } else if (state.view === "users") {
     renderUsers();
+  } else if (state.view === "rental-contacts") {
+    renderRentalContactsSettings();
   } else {
     renderList();
   }

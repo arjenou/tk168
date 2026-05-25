@@ -40,6 +40,7 @@ import {
   clearJournalCover,
   uploadJournalCover,
 } from "./journal.js";
+import { getPublicRentalContacts, patchAdminRentalContacts } from "./site-settings.js";
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
 
@@ -219,6 +220,10 @@ async function handleApi(request, env, url) {
     const journal = await listJournalEntries(env, { includeUnpublished: false });
     return json({ journal });
   }
+  if (path === "/rental-contacts" && method === "GET") {
+    const contacts = await getPublicRentalContacts(env);
+    return json(contacts);
+  }
   if (path.startsWith("/rentals/") && method === "GET" && path.split("/").length === 3) {
     const id = decodeURIComponent(path.split("/")[2]);
     const rental = await getRental(env, id);
@@ -263,6 +268,16 @@ async function handleApi(request, env, url) {
 
   // ---------- Admin-only ----------
   const me = await requireAuth(env, request);
+
+  if (path === "/admin/rental-contacts" && method === "GET") {
+    const contacts = await getPublicRentalContacts(env);
+    return json(contacts);
+  }
+  if (path === "/admin/rental-contacts" && method === "PATCH") {
+    const body = await readJson(request);
+    const contacts = await patchAdminRentalContacts(env, body);
+    return json(contacts);
+  }
 
   // Users
   if (path === "/admin/users" && method === "GET") {

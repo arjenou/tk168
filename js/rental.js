@@ -55,7 +55,15 @@ const RENTAL_COPY = {
     'notes.card2.title': '再看行程范围和里程',
     'notes.card2.text': '市区代步、近郊往返和跨地区使用，对里程和安排要求会不同，最好在确认前一次说清。',
     'notes.card3.title': '最后确认条款、押金和证件',
-    'notes.card3.text': '押金、补偿范围、取还车地点和所需证件，会在确认前逐项说明，避免到店后再反复沟通。'
+    'notes.card3.text': '押金、补偿范围、取还车地点和所需证件，会在确认前逐项说明，避免到店后再反复沟通。',
+    'contact.kicker': 'CONTACT',
+    'contact.title': '租赁咨询联络方式',
+    'contact.subtitle': '以下内容由后台配置，可直接复制或通过常用通讯工具联系。',
+    'contact.phoneLabel': '電話',
+    'contact.emailLabel': 'メール',
+    'contact.wechatLabel': 'WeChat',
+    'contact.whatsappLabel': 'WhatsApp',
+    'contact.empty': '—'
   },
   ja: {
     'meta.title': 'レンタル — TK168 Premium Automotive',
@@ -113,7 +121,15 @@ const RENTAL_COPY = {
     'notes.card2.title': '次に行程範囲と走行距離',
     'notes.card2.text': '市内移動、近郊往復、地域をまたぐ利用では走行条件が変わるため、事前共有が必要です。',
     'notes.card3.title': '最後に条項、保証金、必要書類',
-    'notes.card3.text': '保証金、補償範囲、受け取り場所、必要書類は確定前に順番に確認します。'
+    'notes.card3.text': '保証金、補償範囲、受け取り場所、必要書類は確定前に順番に確認します。',
+    'contact.kicker': 'CONTACT',
+    'contact.title': 'レンタルお問い合わせ',
+    'contact.subtitle': '以下は管理画面で設定した連絡先です。コピーまたは各アプリからご連絡ください。',
+    'contact.phoneLabel': '電話',
+    'contact.emailLabel': 'メール',
+    'contact.wechatLabel': 'WeChat',
+    'contact.whatsappLabel': 'WhatsApp',
+    'contact.empty': '—'
   },
   en: {
     'meta.title': 'Rental — TK168 Premium Automotive',
@@ -171,7 +187,15 @@ const RENTAL_COPY = {
     'notes.card2.title': 'Then route and mileage',
     'notes.card2.text': 'City use, suburban return trips, and cross-region use all change the mileage and arrangement requirements, so it is best to state that clearly in advance.',
     'notes.card3.title': 'Finally terms, deposit, and documents',
-    'notes.card3.text': 'Deposit, compensation range, pickup/return point, and required documents are confirmed before final approval.'
+    'notes.card3.text': 'Deposit, compensation range, pickup/return point, and required documents are confirmed before final approval.',
+    'contact.kicker': 'CONTACT',
+    'contact.title': 'Rental inquiries',
+    'contact.subtitle': 'These lines are configured in the admin. Copy them or reach out via your usual app.',
+    'contact.phoneLabel': 'Phone',
+    'contact.emailLabel': 'Email',
+    'contact.wechatLabel': 'WeChat',
+    'contact.whatsappLabel': 'WhatsApp',
+    'contact.empty': '—'
   }
 };
 
@@ -229,6 +253,49 @@ function getLanguage() {
 
 function copy(key, language = getLanguage()) {
   return RENTAL_COPY[language]?.[key] || RENTAL_COPY.ja[key] || RENTAL_COPY.zh[key] || key;
+}
+
+function resolveRentalApiBase() {
+  if (typeof window.TK168_API_BASE === 'string') {
+    return window.TK168_API_BASE.trim().replace(/\/+$/, '');
+  }
+  try {
+    const host = String(location.hostname || '').toLowerCase();
+    if (host === 'tk168.co.jp' || host === 'www.tk168.co.jp') {
+      return '';
+    }
+  } catch {
+    /* ignore */
+  }
+  return 'https://api.tk168.co.jp';
+}
+
+async function hydrateRentalContacts() {
+  const base = resolveRentalApiBase();
+  const lang = getLanguage();
+  const pairs = [
+    ['rentalContactPhone', 'phone'],
+    ['rentalContactEmail', 'email'],
+    ['rentalContactWechat', 'wechat'],
+    ['rentalContactWhatsapp', 'whatsapp'],
+  ];
+  const emptyDisp = copy('contact.empty', lang);
+  const applyValues = (data) => {
+    for (const [id, key] of pairs) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      const t = String(data?.[key] ?? '').trim();
+      el.textContent = t || emptyDisp;
+    }
+  };
+  try {
+    const res = await fetch(`${base}/api/rental-contacts`, { credentials: 'omit' });
+    if (!res.ok) throw new Error(String(res.status));
+    const data = await res.json();
+    applyValues(data);
+  } catch {
+    applyValues({});
+  }
 }
 
 function fleetCardStatusLabel(language, vehicle) {
@@ -666,6 +733,7 @@ function initRentalPage() {
 
   const language = getLanguage();
   applyRentalCopy(language);
+  void hydrateRentalContacts();
   wireFleetPagination();
   bindRentalFleetMobilePager();
   wireRentalInquiryIdStash();
@@ -675,6 +743,7 @@ function initRentalPage() {
 window.addEventListener('tk168:languagechange', (event) => {
   const language = event.detail?.language || 'ja';
   applyRentalCopy(language);
+  void hydrateRentalContacts();
   renderRentableVehicles(language);
 });
 

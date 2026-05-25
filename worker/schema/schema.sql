@@ -189,3 +189,15 @@ CREATE TABLE IF NOT EXISTS journal_entries (
 
 CREATE INDEX IF NOT EXISTS idx_journal_order ON journal_entries(display_order);
 CREATE INDEX IF NOT EXISTS idx_journal_published ON journal_entries(is_published, display_order);
+
+-- 站点级设置（固定 id=1）；租赁页联络方式等
+CREATE TABLE IF NOT EXISTS site_settings (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  rental_contact_phone TEXT NOT NULL DEFAULT '',
+  rental_contact_email TEXT NOT NULL DEFAULT '',
+  rental_contact_wechat TEXT NOT NULL DEFAULT '',
+  rental_contact_whatsapp TEXT NOT NULL DEFAULT '',
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+INSERT OR IGNORE INTO site_settings (id) VALUES (1);
