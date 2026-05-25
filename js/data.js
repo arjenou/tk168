@@ -2535,6 +2535,26 @@ window.TK168_DATA = (() => {
     return r ? buildRentalVehicleRecord(r) : null;
   }
 
+  /**
+   * 租赁详情页首屏解析用：优先 API 租赁表；否则与 rental 列表相同逻辑，用「在库车 + rentalProfiles」兜底，
+   * 避免无 session 缓存且列表请求尚未完成时 currentVehicle 为空、侧边栏骨架永远不替换。
+   */
+  function resolveRentalDetailPageVehicle(id) {
+    const clean = String(id || '').trim();
+    if (!clean) return null;
+    const fromRental = getRentalVehicleDetailById(clean);
+    if (fromRental) return fromRental;
+    const base = getInventoryVehicleById(clean);
+    if (!base) return null;
+    const profile = getVehicleRentalProfile(clean);
+    if (!profile.rentable) return null;
+    return {
+      ...base,
+      rentalStatus: normalizeRentalFleetStatus(profile.rentalStatus),
+      minDays: profile.minDays,
+    };
+  }
+
   /** 単体取得の生データを `TK168_API_RENTALS` に突き合わせたうえで詳細用レコードを返す */
   function mergeApiRentalWithBase(flat) {
     if (!flat || !flat.id) return null;
@@ -3064,6 +3084,7 @@ window.TK168_DATA = (() => {
     parseVehicleMileageKm,
     formatVehicleMileageDisplay,
     getRentalVehicleDetailById,
+    resolveRentalDetailPageVehicle,
     mergeApiRentalWithBase,
     refreshVehiclesFromApiHydrate,
     refreshJournalFromApiHydrate,

@@ -29,6 +29,7 @@ window.TK168InventoryContext = (() => {
     const {
       getVehicleById,
       getRentalVehicleDetailById,
+      resolveRentalDetailPageVehicle,
       getBrandByKey,
       vehicles,
       parseInventoryFilters,
@@ -69,7 +70,9 @@ window.TK168InventoryContext = (() => {
     let currentVehicle = null;
     if (isRentalDetail) {
       if (requestedVehicleId) {
-        currentVehicle = getRentalVehicleDetailById(requestedVehicleId);
+        currentVehicle = resolveRentalDetailPageVehicle
+          ? resolveRentalDetailPageVehicle(requestedVehicleId)
+          : getRentalVehicleDetailById(requestedVehicleId);
       }
     } else {
       currentVehicle = requestedVehicleId ? getVehicleById(requestedVehicleId) : null;

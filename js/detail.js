@@ -896,9 +896,9 @@ function renderGallery() {
 }
 
 function renderSpecs() {
-  if (isRentalDetail || !specTable) return;
+  if (!specTable) return;
   specTable.innerHTML = window.TK168Renderers.buildDetailSpecsHTML(currentVehicle, {
-    rentalDetail: false
+    rentalDetail: isRentalDetail
   });
 }
 
