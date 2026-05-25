@@ -705,14 +705,18 @@ function applyHomeInventoryFilters(filterState) {
 }
 
 function initHomeSearch() {
+  const roots = [
+    document.querySelector('#static-search .fb-desktop'),
+    document.querySelector('#floating-bar .fb-desktop')
+  ].filter(Boolean);
+  const mobileButtons = [
+    document.querySelector('#floating-bar .fb-mobile .fb-cta')
+  ].filter(Boolean);
+  if (!roots.length && !mobileButtons.length) return;
+
   window.TK168SearchUI.createInventorySearchUI({
-    roots: [
-      document.querySelector('#static-search .fb-desktop'),
-      document.querySelector('#floating-bar .fb-desktop')
-    ].filter(Boolean),
-    mobileButtons: [
-      document.querySelector('#floating-bar .fb-mobile .fb-cta')
-    ].filter(Boolean),
+    roots,
+    mobileButtons,
     initialState: homeActiveFilters,
     onFiltersChange: applyHomeInventoryFilters,
     onSubmit: (filters) => {

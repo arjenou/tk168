@@ -2,14 +2,20 @@
   --page-text: #1f2630;
   --page-text-soft: rgba(31, 38, 48, 0.68);
   --shadow-soft: 0 28px 90px rgba(11, 15, 22, 0.18);
-  --content-edge: clamp(7rem, 8.5vw, 8.8rem);
+  --content-edge: clamp(8rem, 9.35vw, 9.85rem);
   --copy-edge: var(--content-edge);
+  /* 与 .lisboa-slide__copy 同宽，供主视觉区 left 计算，保证左右外边距对称 */
+  --copy-col-w: min(34rem, 37vw);
+  --copy-hero-gutter: clamp(1.25rem, 2.2vw, 2.75rem);
   /* 桌面两排品牌格总高度（含 lisboa-bottom / thumbs 内边距与行距），供主视觉区 bottom 避让 */
   --brands-desktop-thumb-rows-h: calc(1.1rem + 1.35rem + 0.85rem + (2 * 5.45rem) + 0.62rem + 1rem);
-  --copy-top: calc(44.5% + 0.85rem);
+  /* 预留 top/bottom；文案块在可用高度内垂直居中（与右侧主视觉对齐） */
+  --copy-top: clamp(3.5rem, 9vh, 6.25rem);
+  --copy-bottom-gap: 2rem;
   --hero-shift: min(15vw, 11rem);
   --thumb-height: 5.5rem;
-  --thumb-bottom: 0.78rem;
+  /* 略小于 0：品牌条整体再下移一点，与大标/文案拉开距离 */
+  --thumb-bottom: -0.45rem;
   --thumb-gap: 0.82rem;
   --thumb-nav-gap: max(1.12rem, calc(var(--thumb-gap) + 0.35rem));
   --thumb-button-width: 1.62rem;
@@ -95,16 +101,25 @@
   position: absolute;
   left: var(--copy-edge);
   top: var(--copy-top);
+  bottom: calc(var(--brands-desktop-thumb-rows-h) + var(--copy-bottom-gap));
   z-index: 4;
-  width: min(34rem, 37vw);
+  width: var(--copy-col-w);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  justify-content: safe center;
+  align-items: flex-start;
+  box-sizing: border-box;
+  padding-right: 0.5rem;
+  overflow: hidden;
   opacity: 0;
-  transform: translateY(-50%) translateX(-1rem);
+  transform: translateX(-1rem);
   transition: opacity 520ms ease, transform 820ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 #brands .lisboa-slide__hero {
   position: absolute;
-  left: 33%;
-  right: 7%;
+  left: calc(var(--content-edge) + var(--copy-col-w) + var(--copy-hero-gutter));
+  right: var(--content-edge);
   top: 12%;
   bottom: calc(var(--brands-desktop-thumb-rows-h) + 1.75rem);
   z-index: 3;
@@ -282,6 +297,8 @@
   /* 由 JS 写入：上排 floor(n/2)、下排 ceil(n/2)，默认 15 项 → 7 + 8 */
   --thumb-row1-cols: 7;
   --thumb-row2-cols: 8;
+  /* 两排卡片用同一列宽基准（下排列数 ≥ 上排），避免 7+8 时上排被拉宽 */
+  --thumb-cols-uniform: max(var(--thumb-row1-cols), var(--thumb-row2-cols, var(--thumb-row1-cols)));
   --thumb-gap-h: 0.48rem;
   position: relative;
   z-index: 1;
@@ -308,26 +325,23 @@
   gap: 0.62rem var(--thumb-gap-h);
   width: 100%;
 }
-/* 每行按列数均分宽度，整行在容器内居中（上排少一个时两侧留白对称） */
-#brands .lisboa-thumbs-row--first .lisboa-thumb {
-  flex: 1 1 calc((100% - (var(--thumb-row1-cols) - 1) * var(--thumb-gap-h)) / var(--thumb-row1-cols));
-  max-width: calc((100% - (var(--thumb-row1-cols) - 1) * var(--thumb-gap-h)) / var(--thumb-row1-cols));
-  min-width: 0;
-  width: auto;
-}
+/* 每格宽度按「较多列的一排」计算，两排卡片宽高一致；上排少格时由 flex 居中留白 */
+#brands .lisboa-thumbs-row--first .lisboa-thumb,
 #brands .lisboa-thumbs-row--second .lisboa-thumb {
-  flex: 1 1 calc((100% - (var(--thumb-row2-cols) - 1) * var(--thumb-gap-h)) / var(--thumb-row2-cols));
-  max-width: calc((100% - (var(--thumb-row2-cols) - 1) * var(--thumb-gap-h)) / var(--thumb-row2-cols));
+  --lisboa-thumb-cell: calc((100% - (var(--thumb-cols-uniform) - 1) * var(--thumb-gap-h)) / var(--thumb-cols-uniform));
+  flex: 0 0 var(--lisboa-thumb-cell);
+  width: var(--lisboa-thumb-cell);
+  max-width: var(--lisboa-thumb-cell);
   min-width: 0;
-  width: auto;
 }
 #brands .lisboa-thumb {
   position: relative;
   flex: 0 0 auto;
-  width: auto;
-  min-width: 5.85rem;
-  max-width: 9.25rem;
-  min-height: 5.45rem;
+  min-width: 0;
+  max-width: none;
+  box-sizing: border-box;
+  aspect-ratio: 1 / 1;
+  min-height: 0;
   height: auto;
   margin-top: 0;
   padding: 0.52rem 0.34rem 0.44rem;
@@ -519,7 +533,7 @@
 }
 #brands .lisboa-slide.is-active .lisboa-slide__copy {
   opacity: 1;
-  transform: translateY(-50%) translateX(0);
+  transform: translateX(0);
 }
 #brands .lisboa-slide.is-active .lisboa-slide__hero {
   transform: translateX(0) scale(1);
@@ -552,21 +566,21 @@
 @keyframes copy-enter {
   from {
     opacity: 0.18;
-    transform: translateY(-50%) translateX(-0.7rem);
+    transform: translateX(-0.7rem);
   }
   to {
     opacity: 1;
-    transform: translateY(-50%) translateX(0);
+    transform: translateX(0);
   }
 }
 @keyframes copy-exit {
   from {
     opacity: 1;
-    transform: translateY(-50%) translateX(0);
+    transform: translateX(0);
   }
   to {
     opacity: 0;
-    transform: translateY(-50%) translateX(-1.2rem);
+    transform: translateX(-1.2rem);
   }
 }
 @keyframes hero-enter-right {
@@ -673,18 +687,17 @@
 }
 @media (max-width: 72rem) {
   #brands {
-    --content-edge: 6.25rem;
+    --content-edge: 7.1rem;
+    --copy-col-w: min(20rem, 28vw);
+    --copy-hero-gutter: clamp(1rem, 1.85vw, 2rem);
     --thumb-button-width: 1.9rem;
+    --copy-top: clamp(3.15rem, 8.25vh, 5.5rem);
+    --copy-bottom-gap: 2.25rem;
   }
   #brands .lisboa-thumbs {
     --thumb-gap-h: 0.4rem;
   }
-  #brands .lisboa-slide__copy {
-    width: min(20rem, 28vw);
-  }
   #brands .lisboa-slide__hero {
-    left: 35%;
-    right: 5.5%;
     top: 12.5%;
   }
   #brands .lisboa-slide__hero-logo {
@@ -749,7 +762,11 @@
     left: var(--mobile-side-gap);
     right: var(--mobile-side-gap);
     top: calc(var(--mobile-nav-height) + var(--mobile-top-gap) + var(--mobile-section-offset));
+    bottom: auto;
     width: calc(100% - var(--mobile-side-gap) * 2);
+    display: block;
+    padding-right: 0;
+    overflow: visible;
     transform: translateX(-1rem);
     z-index: 5;
   }
@@ -788,7 +805,7 @@
     z-index: 13;
     left: var(--mobile-side-gap);
     right: var(--mobile-side-gap);
-    bottom: calc(var(--mobile-bottom-safe) + 0.48rem);
+    bottom: calc(var(--mobile-bottom-safe) + 0.08rem);
     min-height: var(--brands-mobile-grid-h);
     align-content: start;
   }
@@ -874,7 +891,7 @@
   #brands .lisboa-bottom {
     left: var(--mobile-side-gap);
     right: var(--mobile-side-gap);
-    bottom: calc(var(--mobile-bottom-safe) + 0.25rem);
+    bottom: calc(var(--mobile-bottom-safe) + 0.1rem);
     align-items: flex-end;
     gap: 0;
   }

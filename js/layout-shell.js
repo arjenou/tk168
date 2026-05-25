@@ -49,57 +49,57 @@
           <div class="footer-newsletter">
             <h4 data-i18n="footer.newsletterTitle">ニュースレター</h4>
             <div class="newsletter-form">
-              <input type="email" class="footer-input" placeholder="メールアドレスを入力" data-i18n-placeholder="footer.newsletterPlaceholder" autocomplete="email">
-              <button type="button" class="footer-btn" data-i18n="footer.newsletterButton">登録する</button>
+              <input type="email" class="footer-input" placeholder="メールアドレスを入力" data-i18n-placeholder="footer.newsletterPlaceholder">
+              <button class="footer-btn" data-i18n="footer.newsletterButton">登録する</button>
             </div>
           </div>
         </div>
 
-        <div class="footer-divider" role="presentation"></div>
+        <div class="footer-divider"></div>
 
-        <section class="footer-stores" aria-labelledby="footerStoresHeading">
-          <h3 class="footer-stores-heading" id="footerStoresHeading" data-i18n="footer.storesTitle">店舗ネットワーク</h3>
+        <div class="footer-stores">
+          <h4 class="footer-stores-title" data-i18n="footer.storesTitle">店舗ネットワーク</h4>
           <div class="footer-stores-grid">
-            <div class="footer-store-col">
-              <p class="footer-store-region" data-i18n="footer.store1Region">日本・東京</p>
-              <p class="footer-store-name" data-i18n="footer.store1Name">亀戸店</p>
-              <p class="footer-store-meta" data-i18n-html="footer.store1Meta">東京都江東区亀戸<br>住所は準備中です</p>
-            </div>
-            <div class="footer-store-col">
-              <p class="footer-store-region" data-i18n="footer.store2Region">日本・大阪</p>
-              <p class="footer-store-name" data-i18n="footer.store2Name">大阪店</p>
-              <p class="footer-store-meta" data-i18n-html="footer.store2Meta">大阪府<br>住所は準備中です</p>
-            </div>
-            <div class="footer-store-col">
-              <p class="footer-store-region" data-i18n="footer.store3Region">マレーシア</p>
-              <p class="footer-store-name" data-i18n="footer.store3Name">マレーシア拠点</p>
-              <p class="footer-store-meta" data-i18n-html="footer.store3Meta">Kuala Lumpur, Malaysia<br>住所は準備中です</p>
-            </div>
-          </div>
-        </section>
-
-        <div class="footer-divider" role="presentation"></div>
-
-        <div class="footer-links">
-          <div class="footer-col">
-            <h4 data-i18n="footer.pages">ページ</h4>
-            <a href="service.html#service-faq" data-link-key="faq" data-i18n="footer.faq">よくある質問</a>
-          </div>
-          <div class="footer-col" data-footer-col="phone">
-            <h4 data-i18n="footer.phone">電話番号</h4>
-            <a href="tel:+819012220168">+81 09012220168</a>
-          </div>
-          <div class="footer-col" data-footer-col="email">
-            <h4 data-i18n="footer.email">メール</h4>
-            <a href="mailto:AUTO@tk168.co.jp">AUTO@tk168.co.jp</a>
-          </div>
-          <div class="footer-col" data-footer-col="address">
-            <h4 data-i18n="footer.address">住所</h4>
-            <p class="footer-text" data-i18n-html="footer.addressValue">339-0035埼玉県さいたま市岩<br>槻区笹久保新田</p>
+            <article class="footer-store">
+              <p class="footer-store-eyebrow" data-i18n="footer.stores.tokyo.eyebrow">JAPAN · TOKYO</p>
+              <h5 class="footer-store-name" data-i18n="footer.stores.tokyo.name">亀戸店</h5>
+              <p class="footer-store-address" data-i18n-html="footer.stores.tokyo.address">東京都江東区亀戸<br>住所準備中</p>
+              <div class="footer-store-contact">
+                <p data-i18n="footer.storePhoneLine">電話番号：準備中</p>
+                <p data-i18n="footer.storeEmailLine">メール：準備中</p>
+              </div>
+            </article>
+            <article class="footer-store">
+              <p class="footer-store-eyebrow" data-i18n="footer.stores.saitama.eyebrow">JAPAN · TOKYO</p>
+              <h5 class="footer-store-name" data-i18n="footer.stores.saitama.name">さいたま店</h5>
+              <p class="footer-store-address" data-i18n-html="footer.stores.saitama.address">339-0035<br>埼玉県さいたま市岩槻区笹久保新田</p>
+              <div class="footer-store-contact">
+                <p data-i18n="footer.storePhoneLine">電話番号：準備中</p>
+                <p data-i18n="footer.storeEmailLine">メール：準備中</p>
+              </div>
+            </article>
+            <article class="footer-store">
+              <p class="footer-store-eyebrow" data-i18n="footer.stores.osaka.eyebrow">JAPAN · OSAKA</p>
+              <h5 class="footer-store-name" data-i18n="footer.stores.osaka.name">大阪店</h5>
+              <p class="footer-store-address" data-i18n-html="footer.stores.osaka.address">大阪府<br>住所準備中</p>
+              <div class="footer-store-contact">
+                <p data-i18n="footer.storePhoneLine">電話番号：準備中</p>
+                <p data-i18n="footer.storeEmailLine">メール：準備中</p>
+              </div>
+            </article>
+            <article class="footer-store">
+              <p class="footer-store-eyebrow" data-i18n="footer.stores.malaysia.eyebrow">MALAYSIA</p>
+              <h5 class="footer-store-name" data-i18n="footer.stores.malaysia.name">マレーシア支店</h5>
+              <p class="footer-store-address" data-i18n-html="footer.stores.malaysia.address">Kuala Lumpur, Malaysia<br>住所準備中</p>
+              <div class="footer-store-contact">
+                <p data-i18n="footer.storePhoneLine">電話番号：準備中</p>
+                <p data-i18n="footer.storeEmailLine">メール：準備中</p>
+              </div>
+            </article>
           </div>
         </div>
 
-        <div class="footer-divider footer-divider--bottom" role="presentation"></div>
+        <div class="footer-divider footer-divider--bottom"></div>
         <p class="footer-copyright" data-i18n="footer.copyright">© 2026 TK168. All rights reserved.</p>
       </div>
     </footer>

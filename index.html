@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://api.tk168.co.jp" crossorigin>
   <!-- R2 的 S3 端点 (…r2.cloudflarestorage.com/桶名) 一般不能直接匿名在浏览器中播放。公开读请用 Cloudflare
        「自定义域」或 r2.dev 公开桶，再设: window.TK168_MEDIA_BASE = "https://你的公开根"; -->
-  <link rel="stylesheet" href="css/style.css?v=20260522a">
-  <link rel="stylesheet" href="css/home-cube.css?v=20260511o">
+  <link rel="stylesheet" href="css/style.css?v=20260527f">
+  <link rel="stylesheet" href="css/home-cube.css?v=20260527a">
   <link rel="stylesheet" href="css/inquiry.css?v=20260620c">
   <link rel="stylesheet" href="css/contact.css?v=20260618b">
 </head>
@@ -94,28 +94,6 @@
     <section id="vehicles" data-home-grid="paged">
       <div class="section-header light vehicles-header" style="height: 0; margin: 0; padding: 0; overflow: hidden;">
         <!-- v1.5 删除标题 -->
-      </div>
-
-      <!-- 统一搜索栏（静态版，与悬浮搜索条完全一致） -->
-      <div class="search-bar-wrap" id="static-search">
-        <div class="fb-desktop static-search-inner">
-          <img src="assets/images/logo_TK168.svg" alt="TK168" class="fb-logo" loading="lazy" decoding="async">
-          <div class="fb-filters">
-            <button class="fb-filter" data-ui-field="makerModel">メーカー車名 <svg viewBox="0 0 10 6" fill="none">
-                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-              </svg></button>
-            <button class="fb-filter" data-ui-field="price">価格 <svg viewBox="0 0 10 6" fill="none">
-                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-              </svg></button>
-            <button class="fb-filter" data-ui-field="bodyStyle">ボディタイプ <svg viewBox="0 0 10 6" fill="none">
-                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-              </svg></button>
-          </div>
-          <div class="fb-input-wrap">
-            <input type="text" class="fb-input" placeholder="例: フェラーリ 458" data-i18n-placeholder="search.placeholder">
-            <button class="fb-cta" data-i18n="search.cta">検索する</button>
-          </div>
-        </div>
       </div>
 
       <div class="vehicle-grid" id="vehicleGrid"></div>
@@ -415,33 +393,6 @@
     <div data-layout-footer></div>
 
   </div><!-- /main -->
-
-  <div id="floating-bar">
-    <!-- 桌面端 -->
-    <div class="fb-desktop">
-      <img src="assets/images/logo_TK168.svg" alt="TK168" class="fb-logo" loading="lazy" decoding="async">
-      <div class="fb-filters">
-        <button class="fb-filter" data-ui-field="makerModel">メーカー車名 <svg viewBox="0 0 10 6" fill="none">
-            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-          </svg></button>
-        <button class="fb-filter" data-ui-field="price">価格 <svg viewBox="0 0 10 6" fill="none">
-            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-          </svg></button>
-        <button class="fb-filter" data-ui-field="bodyStyle">ボディタイプ <svg viewBox="0 0 10 6" fill="none">
-            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-          </svg></button>
-      </div>
-      <div class="fb-input-wrap">
-        <input type="text" class="fb-input" placeholder="例: フェラーリ 458" data-i18n-placeholder="search.placeholder">
-        <button class="fb-cta" data-i18n="search.cta">検索する</button>
-      </div>
-    </div>
-    <!-- 移动端 -->
-    <div class="fb-mobile">
-      <img src="assets/images/logo_TK168.svg" alt="TK168" class="fb-logo" loading="lazy" decoding="async">
-      <button class="fb-cta" data-i18n="search.cta">検索する</button>
-    </div>
-  </div>
 
   <script defer src="js/layout-shell.js?v=20260512a"></script>
   <script defer src="js/brand-logo-inventory.js?v=20260417i"></script>

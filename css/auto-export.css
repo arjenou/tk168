@@ -150,10 +150,33 @@ body.export-page {
 }
 
 .export-overview-grid {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 0.96fr);
-  gap: 18px;
+  gap: 14px;
   align-items: stretch;
+  padding: 16px;
+  border-radius: 28px;
+  border: 1px solid rgba(23, 23, 23, 0.08);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(242, 250, 90, 0.22), transparent 30%),
+    radial-gradient(circle at 96% 4%, rgba(23, 23, 23, 0.05), transparent 28%),
+    linear-gradient(135deg, #ffffff 0%, #f4f6f8 58%, #eef1f4 100%);
+  box-shadow: 0 24px 58px rgba(20, 24, 28, 0.12),
+              inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+.export-overview-grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, rgba(23, 23, 23, 0.045) 0 1px, transparent 1px 42px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.48), transparent 42%);
+  background-size: 42px 42px, auto;
+  opacity: 0.62;
 }
 
 .export-card {
@@ -162,44 +185,91 @@ body.export-page {
 
 .export-card--lead,
 .export-card--stats {
-  padding: 22px;
+  position: relative;
+  z-index: 1;
+  padding: clamp(24px, 3vw, 34px);
 }
 
 .export-card--lead {
+  min-height: 286px;
   display: grid;
   align-content: start;
-  gap: 10px;
+  gap: 14px;
+  border-color: rgba(23, 23, 23, 0.08);
+  box-shadow: 0 14px 34px rgba(20, 24, 28, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(250, 251, 252, 0.82) 100%),
+    rgba(255, 255, 255, 0.78);
+  color: var(--export-text-main);
+}
+
+.export-card--lead::before {
+  content: "PROJECT CHECK";
+  width: fit-content;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(23, 23, 23, 0.92);
+  color: var(--cyan);
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.export-card--lead::after {
+  content: "";
+  position: absolute;
+  right: 28px;
+  bottom: 28px;
+  width: min(190px, 32%);
+  height: 42px;
+  border-right: 2px solid rgba(242, 250, 90, 0.72);
+  border-bottom: 2px solid rgba(242, 250, 90, 0.72);
+  border-radius: 0 0 24px 0;
+  opacity: 0.72;
 }
 
 .export-card--lead p {
   margin: 0;
-  font-size: 14px;
-  line-height: 1.82;
-  color: var(--export-text-sub);
+  max-width: 68ch;
+  font-size: 15px;
+  line-height: 1.9;
+  color: rgba(43, 41, 38, 0.7);
 }
 
 .export-card--stats {
   display: grid;
   align-content: start;
-  gap: 14px;
+  gap: 16px;
+  border-color: rgba(255, 255, 255, 0.74);
+  box-shadow: 0 18px 42px rgba(9, 12, 16, 0.16);
   background:
-    radial-gradient(circle at 94% 4%, rgba(122, 111, 216, 0.1), transparent 24%),
-    linear-gradient(170deg, #edf0f4 0%, #ffffff 100%);
+    radial-gradient(circle at 96% 8%, rgba(242, 250, 90, 0.2), transparent 24%),
+    linear-gradient(170deg, rgba(255, 255, 255, 0.98) 0%, #f5f7f9 100%);
 }
 
 .export-metric-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 12px;
 }
 
 .export-metric-tile {
   border-radius: 16px;
   border: 1px solid var(--export-border);
-  background: rgba(255, 255, 255, 0.82);
-  padding: 12px;
+  background: rgba(255, 255, 255, 0.88);
+  padding: 14px;
   display: grid;
   gap: 4px;
+  transition: transform 0.28s cubic-bezier(.22, 1, .36, 1),
+              border-color 0.28s ease,
+              box-shadow 0.28s ease;
+}
+
+.export-metric-tile:hover {
+  transform: translateY(-3px);
+  border-color: rgba(23, 23, 23, 0.18);
+  box-shadow: 0 14px 28px rgba(20, 24, 28, 0.1);
 }
 
 .export-metric-label {
@@ -218,8 +288,8 @@ body.export-page {
 .export-inline-note {
   margin: 0;
   border-radius: 14px;
-  border: 1px dashed rgba(23, 23, 23, 0.18);
-  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(23, 23, 23, 0.08);
+  background: rgba(242, 250, 90, 0.12);
   padding: 12px 14px;
   font-size: 13px;
   line-height: 1.76;
@@ -232,75 +302,152 @@ body.export-page {
   gap: 16px;
 }
 
+.export-focus-grid {
+  counter-reset: focus-step;
+}
+
 .export-focus-card {
+  position: relative;
   height: 100%;
   display: grid;
   grid-template-rows: auto 1fr;
   overflow: hidden;
-  background: linear-gradient(180deg, #ffffff 0%, #f6f7f9 100%);
-  transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfbfc 100%);
+  counter-increment: focus-step;
+  transition: transform 0.28s cubic-bezier(.22, 1, .36, 1),
+              box-shadow 0.28s ease,
+              border-color 0.28s ease,
+              background-color 0.28s ease;
+}
+
+.export-focus-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--cyan);
+  z-index: 2;
+  transition: height 0.28s cubic-bezier(.22, 1, .36, 1),
+              box-shadow 0.28s ease;
+}
+
+.export-focus-card::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--cyan);
+  z-index: 2;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.5s cubic-bezier(.22, 1, .36, 1);
 }
 
 .export-focus-card:hover,
 .export-process-card:hover,
 .export-coverage-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-6px);
   box-shadow: var(--export-float-raise);
   border-color: var(--export-border-strong);
 }
 
+.export-focus-card:hover {
+  background:
+    radial-gradient(circle at 92% 88%, rgba(242, 250, 90, 0.18), transparent 36%),
+    linear-gradient(180deg, #ffffff 0%, #fcfdf2 100%);
+  box-shadow: var(--export-float-raise),
+              0 24px 60px rgba(242, 250, 90, 0.18),
+              inset 3px 0 0 var(--cyan);
+}
+
+.export-focus-card:hover::before {
+  height: 4px;
+  box-shadow: 0 0 22px rgba(242, 250, 90, 0.6),
+              0 2px 8px rgba(242, 250, 90, 0.32);
+}
+
+.export-focus-card:hover::after {
+  transform: scaleX(1);
+}
+
 .export-focus-media {
-  height: 188px;
-  padding: 16px;
-  display: grid;
-  place-items: center;
+  aspect-ratio: 16 / 10;
   overflow: hidden;
+  background: #eef0f2;
 }
 
 .export-focus-media img {
   display: block;
-  width: min(100%, 214px);
+  width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
+  transform: scale(1.01);
+  transition: transform 0.62s cubic-bezier(.22, 1, .36, 1),
+              filter 0.32s ease;
 }
 
-.export-focus-card--route .export-focus-media {
-  background:
-    radial-gradient(circle at 16% 0%, rgba(15, 163, 184, 0.16), transparent 34%),
-    linear-gradient(180deg, #f9fbfc 0%, #eef5f6 100%);
-}
-
-.export-focus-card--files .export-focus-media {
-  background:
-    radial-gradient(circle at 82% 10%, rgba(217, 95, 30, 0.14), transparent 28%),
-    linear-gradient(180deg, #fcfaf8 0%, #f5efea 100%);
-}
-
-.export-focus-card--shipping .export-focus-media {
-  background:
-    radial-gradient(circle at 86% 12%, rgba(15, 163, 184, 0.14), transparent 28%),
-    linear-gradient(180deg, #f6f9fc 0%, #edf2f8 100%);
+.export-focus-card:hover .export-focus-media img {
+  filter: saturate(1.04) contrast(1.03);
+  transform: scale(1.07);
 }
 
 .export-focus-body {
+  position: relative;
   display: grid;
   align-content: start;
-  padding: 16px 16px 18px;
+  gap: 14px;
+  padding: clamp(28px, 3vw, 36px) clamp(24px, 2.6vw, 32px);
+}
+
+.export-focus-body::before {
+  content: counter(focus-step, decimal-leading-zero);
+  position: absolute;
+  top: clamp(24px, 2.6vw, 32px);
+  right: clamp(24px, 2.6vw, 32px);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: rgba(23, 23, 23, 0.22);
+  transition: color 0.28s ease, transform 0.28s cubic-bezier(.22, 1, .36, 1);
+}
+
+.export-focus-card:hover .export-focus-body::before {
+  color: #171717;
+  transform: translateX(-2px);
+  letter-spacing: 0.22em;
 }
 
 .export-focus-body h3 {
   margin: 0;
-  font-size: 20px;
-  line-height: 1.28;
+  padding-right: 36px;
+  font-size: clamp(20px, 2.4vw, 26px);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
   color: #171717;
+  transition: transform 0.28s cubic-bezier(.22, 1, .36, 1),
+              letter-spacing 0.28s ease;
+}
+
+.export-focus-card:hover .export-focus-body h3 {
+  transform: translateY(-2px);
+  letter-spacing: 0;
 }
 
 .export-focus-body p {
-  margin: 10px 0 0;
-  font-size: 13px;
-  line-height: 1.78;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.86;
   color: var(--export-text-sub);
+  transition: color 0.28s ease;
+}
+
+.export-focus-card:hover .export-focus-body p {
+  color: rgba(23, 23, 23, 0.78);
 }
 
 .export-process-layout {
@@ -332,6 +479,7 @@ body.export-page {
 }
 
 .export-process-step {
+  position: relative;
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 12px;
@@ -340,34 +488,97 @@ body.export-page {
   border: 1px solid rgba(17, 17, 17, 0.08);
   background: rgba(255, 255, 255, 0.82);
   padding: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.28s cubic-bezier(.22, 1, .36, 1),
+              border-color 0.28s ease,
+              background-color 0.28s ease,
+              box-shadow 0.28s ease;
+}
+
+.export-process-step::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: var(--cyan);
+  transition: width 0.28s cubic-bezier(.22, 1, .36, 1);
+}
+
+.export-process-step:hover,
+.export-process-step:focus-visible {
+  transform: translateX(6px);
+  border-color: rgba(23, 23, 23, 0.14);
+  background: #fff;
+  box-shadow: 0 14px 28px rgba(20, 24, 28, 0.1);
+}
+
+.export-process-step:hover::before,
+.export-process-step:focus-visible::before {
+  width: 4px;
+}
+
+.export-process-step:focus-visible {
+  outline: 2px solid rgba(242, 250, 90, 0.88);
+  outline-offset: 3px;
 }
 
 .export-process-index {
+  position: relative;
+  z-index: 1;
   display: inline-grid;
   place-items: center;
   min-width: 46px;
   height: 26px;
   border-radius: 999px;
-  background: rgba(122, 111, 216, 0.12);
-  border: 1px solid rgba(122, 111, 216, 0.36);
-  color: #7a6fd8;
+  background: #171717;
+  border: 1px solid #171717;
+  color: var(--cyan);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
+  transition: background-color 0.28s ease,
+              border-color 0.28s ease,
+              color 0.28s ease,
+              transform 0.28s cubic-bezier(.22, 1, .36, 1);
+}
+
+.export-process-step:hover .export-process-index,
+.export-process-step:focus-visible .export-process-index {
+  background: var(--cyan);
+  border-color: var(--cyan);
+  color: #171717;
+  transform: scale(1.04);
 }
 
 .export-process-step h3 {
+  position: relative;
+  z-index: 1;
   margin: 0;
   font-size: 17px;
   line-height: 1.3;
   color: #171717;
+  transition: transform 0.28s cubic-bezier(.22, 1, .36, 1);
+}
+
+.export-process-step:hover h3,
+.export-process-step:focus-visible h3 {
+  transform: translateY(-1px);
 }
 
 .export-process-step p {
+  position: relative;
+  z-index: 1;
   margin: 6px 0 0;
   font-size: 13px;
   line-height: 1.72;
   color: var(--export-text-sub);
+  transition: color 0.28s ease;
+}
+
+.export-process-step:hover p,
+.export-process-step:focus-visible p {
+  color: rgba(23, 23, 23, 0.76);
 }
 
 .export-coverage-card {
@@ -375,36 +586,29 @@ body.export-page {
   flex-direction: column;
   justify-content: space-between;
   background:
-    radial-gradient(circle at 86% 10%, rgba(15, 163, 184, 0.14), transparent 26%),
-    linear-gradient(180deg, #ffffff 0%, #f6f7f9 100%);
-}
-
-.export-coverage-media {
-  min-height: 224px;
-  display: grid;
-  place-items: center;
-}
-
-.export-coverage-media img {
-  display: block;
-  width: min(100%, 324px);
-  margin: 0 auto;
+    radial-gradient(circle at 50% 8%, rgba(242, 250, 90, 0.1), transparent 38%),
+    linear-gradient(180deg, #ffffff 0%, #f5f6f8 100%);
 }
 
 .export-coverage-body {
-  margin-top: 12px;
+  display: grid;
+  align-content: center;
+  gap: 14px;
+  height: 100%;
+  padding: clamp(8px, 1.5vw, 16px) clamp(4px, 1vw, 10px);
 }
 
 .export-coverage-body h2 {
   margin: 0;
   font-size: clamp(24px, 2.6vw, 32px);
   line-height: 1.14;
+  letter-spacing: -0.01em;
 }
 
 .export-coverage-body p {
-  margin: 10px 0 0;
+  margin: 0;
   font-size: 14px;
-  line-height: 1.82;
+  line-height: 1.86;
   color: var(--export-text-sub);
 }
 
@@ -412,7 +616,7 @@ body.export-page {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 16px 0 0;
+  margin: 6px 0 0;
   padding: 0;
   list-style: none;
 }
@@ -420,14 +624,16 @@ body.export-page {
 .export-region-tags li {
   display: inline-flex;
   align-items: center;
-  min-height: 30px;
-  padding: 0 12px;
+  min-height: 32px;
+  padding: 0 14px;
   border-radius: 999px;
-  border: 1px solid rgba(17, 17, 17, 0.1);
-  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  background: #ffffff;
   font-size: 12px;
   font-weight: 700;
-  color: rgba(17, 17, 17, 0.76);
+  letter-spacing: 0.04em;
+  color: #171717;
+  pointer-events: none;
 }
 
 .export-note-card {
@@ -546,17 +752,16 @@ html:lang(ja) .export-page :is(.export-hero-title, .export-section-head h2, h3) 
     grid-template-columns: 1fr;
   }
 
-  .export-focus-media {
-    height: 180px;
-    padding: 16px;
+  .export-focus-body {
+    padding: 24px 22px;
   }
 
-  .export-coverage-media {
-    min-height: 180px;
+  .export-focus-body h3 {
+    font-size: 20px;
   }
 
-  .export-coverage-media img {
-    width: min(100%, 280px);
+  .export-coverage-body {
+    padding: 4px 6px;
   }
 
   .export-note-card {
