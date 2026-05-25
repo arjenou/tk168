@@ -257,8 +257,41 @@ body.rental-page {
   color: rgba(32, 31, 29, 0.58);
 }
 
-.rental-fleet-pagination {
-  margin-top: 24px;
+.rental-fleet-load-more-wrap {
+  width: 100%;
+  margin: 28px auto 0;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.rental-fleet-load-more-wrap[hidden] {
+  display: none !important;
+}
+
+.rental-fleet-load-more {
+  min-width: min(320px, 100%);
+  padding: 14px 28px;
+  border-radius: 16px;
+  border: 1px solid rgba(43, 41, 38, 0.14);
+  background: linear-gradient(180deg, #f2fa5a 0%, #e8ef52 100%);
+  color: rgba(34, 40, 47, 0.92);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(43, 41, 38, 0.1);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.rental-fleet-load-more:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(43, 41, 38, 0.14);
+}
+
+.rental-fleet-load-more:active {
+  transform: translateY(0);
 }
 
 .rental-card {
@@ -368,7 +401,144 @@ body.rental-page {
 
 .rental-flow-card {
   height: 100%;
+  align-content: start;
   background: linear-gradient(180deg, #ffffff 0%, #f7f7f8 100%);
+}
+
+.rental-flow-card--wide {
+  grid-column: 1 / -1;
+}
+
+.rental-flow-contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.rental-flow-contact-link {
+  min-width: 108px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid rgba(228, 189, 61, 0.34);
+  border-radius: 999px;
+  background: rgba(255, 250, 236, 0.76);
+  appearance: none;
+  color: rgba(23, 23, 23, 0.78);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.rental-flow-contact-link:hover,
+.rental-flow-contact-link:focus-visible {
+  border-color: rgba(228, 189, 61, 0.68);
+  background: rgba(242, 207, 99, 0.2);
+  color: #171717;
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.rental-flow-contact-link svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rental-flow-card--sample {
+  overflow: visible;
+}
+
+.rental-flow-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  margin-top: 14px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(228, 189, 61, 0.36);
+  background: rgba(242, 207, 99, 0.16);
+  appearance: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 700;
+  color: rgba(23, 23, 23, 0.76);
+}
+
+.rental-flow-card-cta::after {
+  content: "+";
+  font-size: 14px;
+  line-height: 1;
+}
+
+.rental-flow-card.is-expanded .rental-flow-card-cta::after {
+  content: "-";
+}
+
+.rental-flow-card-cta:focus-visible {
+  outline: 2px solid var(--rental-accent-strong);
+  outline-offset: 3px;
+}
+
+.rental-flow-sample {
+  margin: 16px 0 0;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(228, 189, 61, 0.28);
+  background: rgba(255, 250, 236, 0.74);
+}
+
+.rental-flow-sample[hidden] {
+  display: none;
+}
+
+.rental-flow-sample p {
+  margin: 0;
+  font-weight: 700;
+  color: var(--rental-text-main);
+}
+
+.rental-flow-sample ul {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rental-flow-sample li {
+  position: relative;
+  padding-left: 15px;
+  font-size: 13px;
+  line-height: 1.72;
+  color: rgba(43, 41, 38, 0.72);
+}
+
+.rental-flow-sample li::before {
+  content: "";
+  position: absolute;
+  top: 0.72em;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--rental-accent-strong);
 }
 
 .rental-flow-step {
@@ -400,44 +570,30 @@ body.rental-page {
 }
 
 .rental-note-media {
-  height: 188px;
-  padding: 16px;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  height: auto;
+  padding: 0;
   display: grid;
   place-items: center;
+  overflow: hidden;
+  background: #eef0f2;
 }
 
 .rental-note-media img {
   display: block;
-  width: min(100%, 214px);
+  width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1.01);
+  transition: transform 0.62s cubic-bezier(.22, 1, .36, 1),
+              filter 0.32s ease;
 }
 
-.rental-note-card--availability .rental-note-media {
-  background:
-    radial-gradient(circle at 16% 0%, rgba(242, 207, 99, 0.16), transparent 34%),
-    linear-gradient(180deg, #fffaf0 0%, #f8f4e8 100%);
-}
-
-.rental-note-card--usage .rental-note-media {
-  background:
-    radial-gradient(circle at 84% 8%, rgba(15, 163, 184, 0.12), transparent 30%),
-    linear-gradient(180deg, #f7fbfd 0%, #eef5f7 100%);
-}
-
-.rental-note-card--terms .rental-note-media {
-  background:
-    radial-gradient(circle at 82% 10%, rgba(217, 95, 30, 0.12), transparent 30%),
-    linear-gradient(180deg, #fcfaf8 0%, #f5efea 100%);
-  padding: 14px 24px 30px;
-  place-items: start center;
-}
-
-.rental-note-card--terms .rental-note-media img {
-  width: min(100%, 186px);
-  height: auto;
-  max-height: 144px;
-  transform: translateY(-4px);
+.rental-note-card:hover .rental-note-media img {
+  filter: saturate(1.04) contrast(1.03);
+  transform: scale(1.07);
 }
 
 .rental-note-body {
@@ -667,8 +823,29 @@ html:lang(ja) .rental-page :is(.rental-hero-title, .rental-section-head h2, h3) 
     min-height: 300px;
   }
 
+  .rental-flow-card--wide {
+    grid-column: auto;
+  }
+
+  .rental-flow-contact-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .rental-flow-contact-link {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .rental-flow-sample {
+    margin: 16px 0 0;
+  }
+
   .rental-note-media {
-    height: 176px;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
   }
 
   .rental-note-body {
@@ -719,57 +896,116 @@ html:lang(ja) .rental-page :is(.rental-hero-title, .rental-section-head h2, h3) 
     transform: none;
   }
 
-  .rental-fleet-pagination {
-    margin-top: 16px;
-  }
-
-  .rental-page-contact-row {
-    grid-template-columns: 1fr;
-    gap: 8px;
+  .rental-fleet-load-more-wrap {
+    margin-top: 18px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
   }
 }
 
-/* rental.html — 后台配置的联络方式（与 rental-inquiry 页的 .rental-contact-* 区分） */
-.rental-section--page-contact {
-  padding-bottom: 12px;
+/* 租赁流程区：联系方式（后台值）中央弹窗 */
+body.rental-contact-modal-open {
+  overflow: hidden;
 }
 
-.rental-page-contact-list {
-  margin: 0;
-  padding: 0;
+.rental-contact-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
   display: grid;
-  gap: 14px;
-  max-width: 720px;
+  place-items: center;
+  padding: 24px 16px;
+  box-sizing: border-box;
 }
 
-.rental-page-contact-row {
-  display: grid;
-  grid-template-columns: minmax(108px, 148px) 1fr;
-  gap: 10px 20px;
-  align-items: baseline;
-  margin: 0;
-  padding: 16px 18px;
-  background: var(--rental-surface);
-  border: 1px solid var(--rental-border);
-  border-radius: 16px;
-  box-shadow: var(--rental-float-rest);
+.rental-contact-modal[hidden] {
+  display: none !important;
 }
 
-.rental-page-contact-row dt {
+.rental-contact-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(18, 17, 15, 0.45);
+  backdrop-filter: blur(3px);
+}
+
+.rental-contact-modal-dialog {
+  position: relative;
+  width: min(400px, 100%);
+  max-height: min(80vh, 520px);
+  overflow: auto;
+  padding: 22px 22px 18px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fffef9 0%, #ffffff 40%);
+  border: 1px solid rgba(228, 189, 61, 0.28);
+  box-shadow: 0 24px 48px rgba(24, 22, 18, 0.22);
+}
+
+.rental-contact-modal-title {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #171717;
+}
+
+.rental-contact-modal-content {
+  margin: 0 0 18px;
+}
+
+.rental-contact-modal-message {
   margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: rgba(43, 41, 38, 0.78);
+}
+
+.rental-contact-modal-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(43, 41, 38, 0.14);
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: #fafafa;
+  color: #171717;
+}
+
+.rental-contact-modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.rental-contact-modal-btn {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+  font-size: 0.9rem;
   font-weight: 700;
-  font-size: 0.82rem;
-  letter-spacing: 0.03em;
-  color: var(--rental-text-sub);
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid transparent;
 }
 
-.rental-page-contact-row dd {
-  margin: 0;
-  font-size: 1rem;
-  line-height: 1.55;
-  word-break: break-word;
+.rental-contact-modal-btn--primary {
+  background: linear-gradient(180deg, #f2fa5a 0%, #e8ef52 100%);
+  border-color: rgba(228, 189, 61, 0.45);
+  color: rgba(23, 23, 23, 0.92);
 }
 
-.rental-page-contact-value {
-  color: var(--rental-text-main);
+.rental-contact-modal-btn--secondary {
+  background: #fff;
+  border-color: rgba(43, 41, 38, 0.16);
+  color: rgba(23, 23, 23, 0.82);
+}
+
+.rental-contact-modal-btn:hover {
+  filter: brightness(1.02);
+}
+
+.rental-contact-modal-btn:focus-visible {
+  outline: 2px solid var(--rental-accent-strong, #e4bd3d);
+  outline-offset: 2px;
 }

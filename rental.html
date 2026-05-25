@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="css/skeleton.css?v=20260420h">
   <script src="js/skeleton-boot.js?v=20260420h"></script>
   <link rel="stylesheet" href="css/showcase-template.css?v=20260417u">
-  <link rel="stylesheet" href="css/rental.css?v=20260526a">
+  <link rel="stylesheet" href="css/rental.css?v=20260526f">
 </head>
 
 <body class="rental-page showcase-page">
@@ -77,18 +77,8 @@
           <p data-rental-key="fleet.subtitle">先看目前可谈的车，具体档期和条款再人工确认。</p>
         </header>
         <div class="rental-fleet-grid vehicle-grid" id="rentalVehicleGrid"></div>
-        <div class="vehicle-pagination rental-fleet-pagination" id="rentalFleetPagination" hidden>
-          <button type="button" class="vehicle-slider-btn vehicle-slider-btn--prev" id="rentalFleetPrev" aria-label="上一页">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M15 18l-6-6 6-6"/>
-            </svg>
-          </button>
-          <div class="vehicle-slider-dots" id="rentalFleetDots" aria-label="车辆翻页"></div>
-          <button type="button" class="vehicle-slider-btn vehicle-slider-btn--next" id="rentalFleetNext" aria-label="下一页">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 18l6-6-6-6"/>
-            </svg>
-          </button>
+        <div class="rental-fleet-load-more-wrap" id="rentalFleetLoadMoreWrap" hidden>
+          <button type="button" class="rental-fleet-load-more" id="rentalFleetLoadMore"></button>
         </div>
         <p class="rental-fleet-empty" id="rentalFleetEmpty" hidden data-rental-key="fleet.empty">当前暂无可立即租赁车辆，请先联系顾问确认最新状态。</p>
       </div>
@@ -108,23 +98,56 @@
           </figure>
 
           <ol class="rental-flow-grid">
-            <li class="rental-flow-card fade-up">
-              <span class="rental-flow-step">01</span>
-              <h3 data-rental-key="flow.step1.title">看车和日期</h3>
-              <p data-rental-key="flow.step1.text">先确认车型、日期和大致用途。</p>
+            <li class="rental-flow-card rental-flow-card--wide fade-up">
+              <span class="rental-flow-step">1</span>
+              <h3 data-rental-key="flow.step1.title">联系方式</h3>
+              <p data-rental-key="flow.step1.text">确认车型、日期和用途后，通过电话、邮件或表单联系顾问核对空档。</p>
+              <div class="rental-flow-contact-actions" aria-label="Rental contact methods">
+                <a class="rental-flow-contact-link" href="tel:+819012220168" aria-label="電話" data-rental-flow-contact="phone">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6.6 3.8l3 3a1.4 1.4 0 01.2 1.7l-1.1 1.9a12.7 12.7 0 004.9 4.9l1.9-1.1a1.4 1.4 0 011.7.2l3 3a1.5 1.5 0 01.1 2.1l-1.4 1.5c-.7.7-1.8 1-2.8.7C8.8 20.4 3.6 15.2 1.8 7.9c-.3-1 .1-2.1.8-2.8L4.1 3.7a1.5 1.5 0 012.1.1z"></path>
+                  </svg>
+                  <span data-rental-key="flow.contact.phone">电话</span>
+                </a>
+                <a class="rental-flow-contact-link" href="mailto:AUTO@tk168.co.jp" aria-label="メール" data-rental-flow-contact="email">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3.5 6.5h17v11h-17z"></path>
+                    <path d="M4.2 7.2l7.8 6.1 7.8-6.1"></path>
+                  </svg>
+                  <span data-rental-key="flow.contact.email">邮箱</span>
+                </a>
+                <button class="rental-flow-contact-link" type="button" aria-label="WeChat" data-rental-flow-contact="wechat">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M9.4 5.2c-4 0-7.2 2.5-7.2 5.7 0 1.8 1 3.4 2.7 4.4l-.6 2.1 2.5-1.3c.8.2 1.7.4 2.6.4 4 0 7.2-2.5 7.2-5.6S13.4 5.2 9.4 5.2z"></path>
+                    <path d="M14.8 11.3c3.4.4 6 2.6 6 5.2 0 1.5-.8 2.8-2.1 3.7l.5 1.8-2.1-1.1c-.7.2-1.4.3-2.2.3-2.9 0-5.4-1.7-6.1-4"></path>
+                  </svg>
+                  <span data-rental-key="flow.contact.wechat">微信</span>
+                </button>
+                <a class="rental-flow-contact-link" href="https://wa.me/819012220168" target="_blank" rel="noreferrer" aria-label="WhatsApp" data-rental-flow-contact="whatsapp">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M20.5 11.7a8.4 8.4 0 01-12.4 7.4L3.5 20.5l1.5-4.4A8.4 8.4 0 1120.5 11.7z"></path>
+                    <path d="M8.6 7.8c.3-.6.5-.6.9-.6h.6c.2 0 .5.1.7.5l.8 1.9c.1.3.1.5-.1.8l-.5.7c-.2.2-.2.4 0 .7.5.9 1.3 1.7 2.3 2.2.3.2.5.1.7-.1l.7-.8c.2-.3.5-.3.8-.2l1.9.9c.4.2.5.5.5.7 0 .6-.4 1.4-.9 1.7-.7.4-1.6.5-2.7.2-2.7-.8-5.2-3.2-6-5.9-.3-1-.2-1.9.3-2.6z"></path>
+                  </svg>
+                  <span data-rental-key="flow.contact.whatsapp">WhatsApp</span>
+                </a>
+              </div>
+            </li>
+            <li class="rental-flow-card rental-flow-card--sample fade-up" data-rental-flow-sample-card>
+              <span class="rental-flow-step">2</span>
+              <h3 data-rental-key="flow.step3.title">条件确认</h3>
+              <p data-rental-key="flow.step3.text">点击查看驾照法规、证件、押金和保险等要求 sample。</p>
+              <button class="rental-flow-card-cta" type="button" aria-expanded="false" aria-controls="rentalConditionSample" data-rental-sample-toggle data-rental-key="flow.sample.cta">查看 sample</button>
+              <div class="rental-flow-sample" id="rentalConditionSample" data-rental-sample-panel hidden>
+                <p data-rental-key="flow.sample.title">Sample 确认项目</p>
+                <ul>
+                  <li data-rental-key="flow.sample.item1">有效驾照原件，按日本道路交通法规确认可驾驶资格。</li>
+                  <li data-rental-key="flow.sample.item2">本人身份证件、联系方式、希望取还车日期。</li>
+                  <li data-rental-key="flow.sample.item3">保险范围、押金、里程限制和禁止事项。</li>
+                </ul>
+              </div>
             </li>
             <li class="rental-flow-card fade-up">
-              <span class="rental-flow-step">02</span>
-              <h3 data-rental-key="flow.step2.title">确认可用</h3>
-              <p data-rental-key="flow.step2.text">顾问核对车辆状态、档期和基础条件。</p>
-            </li>
-            <li class="rental-flow-card fade-up">
-              <span class="rental-flow-step">03</span>
-              <h3 data-rental-key="flow.step3.title">确认条款</h3>
-              <p data-rental-key="flow.step3.text">押金、里程、取还车方式逐项说明。</p>
-            </li>
-            <li class="rental-flow-card fade-up">
-              <span class="rental-flow-step">04</span>
+              <span class="rental-flow-step">3</span>
               <h3 data-rental-key="flow.step4.title">到店取车</h3>
               <p data-rental-key="flow.step4.text">确认后安排签约和交付。</p>
             </li>
@@ -144,7 +167,7 @@
         <div class="rental-note-grid">
           <article class="rental-note-card rental-note-card--availability fade-up">
             <div class="rental-note-media">
-              <img src="assets/images/export-illustrations/rental-booked.svg" alt="Rental availability" loading="lazy" decoding="async">
+              <img src="assets/images/rental-booking/rental-booking-01-16x10.jpg?v=20260507a" alt="Rental availability calendar check" loading="lazy" decoding="async">
             </div>
             <div class="rental-note-body">
               <h3 data-rental-key="notes.card1.title">先看档期</h3>
@@ -154,7 +177,7 @@
 
           <article class="rental-note-card rental-note-card--usage fade-up">
             <div class="rental-note-media">
-              <img src="assets/images/export-illustrations/rental-by-the-road.svg" alt="Rental route scope" loading="lazy" decoding="async">
+              <img src="assets/images/rental-booking/rental-booking-02-16x10.jpg?v=20260507a" alt="Rental route and mileage planning" loading="lazy" decoding="async">
             </div>
             <div class="rental-note-body">
               <h3 data-rental-key="notes.card2.title">再看行程范围和里程</h3>
@@ -164,7 +187,7 @@
 
           <article class="rental-note-card rental-note-card--terms fade-up">
             <div class="rental-note-media">
-              <img src="assets/images/export-illustrations/rental-terms.svg" alt="Rental terms and deposit" loading="lazy" decoding="async">
+              <img src="assets/images/rental-booking/rental-booking-03-16x10.jpg?v=20260507a" alt="Rental terms document confirmation" loading="lazy" decoding="async">
             </div>
             <div class="rental-note-body">
               <h3 data-rental-key="notes.card3.title">最后确认条款、押金和证件</h3>
@@ -175,37 +198,21 @@
       </div>
     </section>
 
-    <section class="rental-section showcase-section rental-section--page-contact" id="rental-contact">
-      <div class="showcase-shell">
-        <header class="rental-section-head rental-section-head--page-contact rental-header showcase-head fade-up">
-          <p class="rental-kicker" data-rental-key="contact.kicker">CONTACT</p>
-          <h2 data-rental-key="contact.title">租赁咨询联络方式</h2>
-          <p class="rental-section-sub" data-rental-key="contact.subtitle">以下内容由后台配置，可直接复制或通过常用通讯工具联系。</p>
-        </header>
-        <dl class="rental-page-contact-list">
-          <div class="rental-page-contact-row fade-up">
-            <dt data-rental-key="contact.phoneLabel">電話</dt>
-            <dd><span class="rental-page-contact-value" id="rentalContactPhone">—</span></dd>
-          </div>
-          <div class="rental-page-contact-row fade-up">
-            <dt data-rental-key="contact.emailLabel">メール</dt>
-            <dd><span class="rental-page-contact-value" id="rentalContactEmail">—</span></dd>
-          </div>
-          <div class="rental-page-contact-row fade-up">
-            <dt data-rental-key="contact.wechatLabel">WeChat</dt>
-            <dd><span class="rental-page-contact-value" id="rentalContactWechat">—</span></dd>
-          </div>
-          <div class="rental-page-contact-row fade-up">
-            <dt data-rental-key="contact.whatsappLabel">WhatsApp</dt>
-            <dd><span class="rental-page-contact-value" id="rentalContactWhatsapp">—</span></dd>
-          </div>
-        </dl>
-      </div>
-    </section>
-
   </main>
 
   <div data-layout-footer></div>
+
+  <div class="rental-contact-modal" id="rentalContactModal" hidden aria-hidden="true">
+    <div class="rental-contact-modal-backdrop" data-rental-contact-modal-dismiss tabindex="-1"></div>
+    <div class="rental-contact-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="rentalContactModalTitle">
+      <h3 class="rental-contact-modal-title" id="rentalContactModalTitle"></h3>
+      <div id="rentalContactModalContent" class="rental-contact-modal-content"></div>
+      <div class="rental-contact-modal-actions">
+        <button type="button" class="rental-contact-modal-btn rental-contact-modal-btn--secondary" id="rentalContactModalCopy" hidden></button>
+        <button type="button" class="rental-contact-modal-btn rental-contact-modal-btn--primary" id="rentalContactModalOk"></button>
+      </div>
+    </div>
+  </div>
 
   <script defer src="js/layout-shell.js?v=20260512a"></script>
   <script defer src="js/api-hydrate.js?v=20260522e"></script>
@@ -214,7 +221,7 @@
   <script defer src="js/common-links.js?v=20260419a"></script>
   <script defer src="js/page-chrome.js?v=20260601a"></script>
   <script defer src="js/renderers.js?v=20260511q"></script>
-  <script defer src="js/rental.js?v=20260526a"></script>
+  <script defer src="js/rental.js?v=20260526g"></script>
 </body>
 
 </html>
