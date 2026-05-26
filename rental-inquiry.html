@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="css/skeleton.css?v=20260420h">
   <script src="js/skeleton-boot.js?v=20260420h"></script>
   <link rel="stylesheet" href="css/inquiry.css?v=20260620c">
-  <link rel="stylesheet" href="css/rental-inquiry.css?v=20260621a">
+  <link rel="stylesheet" href="css/rental-inquiry.css?v=20260526d">
 </head>
 
 <body class="inquiry-page rental-inquiry-page no-hero-page">
@@ -140,7 +140,7 @@
 
           <section class="inq-row" data-row="contact">
             <div class="inq-row-label">
-              <span id="riqRowContact">邮箱 / 电话</span>
+              <span id="riqRowContact">联系方式（四选二）</span>
               <b class="inq-required">必填</b>
             </div>
             <div class="inq-row-content">
@@ -149,14 +149,23 @@
                 <button type="button" class="inq-edit" data-jump-row="contact" id="riqEditContact">修改</button>
               </div>
               <div class="inq-editor">
-                <div class="inq-inline-grid">
-                  <label>
-                    <span id="riqEmailLabel">邮箱地址</span>
-                    <input type="email" id="riqEmail" placeholder="name@example.com">
-                  </label>
+                <p class="riq-contact-hint" id="riqContactHint"></p>
+                <div class="inq-inline-grid riq-contact-grid">
                   <label>
                     <span id="riqPhoneLabel">电话号码</span>
-                    <input type="tel" id="riqPhone" placeholder="09012345678">
+                    <input type="tel" id="riqPhone" placeholder="09012345678" autocomplete="tel">
+                  </label>
+                  <label>
+                    <span id="riqEmailLabel">邮箱地址</span>
+                    <input type="email" id="riqEmail" placeholder="name@example.com" autocomplete="email">
+                  </label>
+                  <label>
+                    <span id="riqWechatLabel">微信</span>
+                    <input type="text" id="riqWechat" placeholder="WeChat ID" autocomplete="off">
+                  </label>
+                  <label>
+                    <span id="riqWhatsappLabel">WhatsApp</span>
+                    <input type="text" id="riqWhatsapp" placeholder="+81 …" autocomplete="tel">
                   </label>
                 </div>
               </div>
@@ -234,7 +243,7 @@
   <script defer src="js/i18n.js?v=20260619b"></script>
   <script defer src="js/common-links.js?v=20260419a"></script>
   <script defer src="js/page-chrome.js?v=20260601a"></script>
-  <script defer src="js/rental-inquiry.js?v=20260621b"></script>
+  <script defer src="js/rental-inquiry.js?v=20260526e"></script>
 </body>
 
 </html>

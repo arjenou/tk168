@@ -24,7 +24,7 @@
       rows: {
         appointment: '希望用车时间',
         name: '联系人信息',
-        contact: '邮箱 / 电话',
+        contact: '联系方式（四选二）',
         confirm: '车辆交付与条款'
       },
       actions: {
@@ -51,6 +51,10 @@
         languageZh: '中文',
         languageJa: '日语',
         languageEn: '英语',
+        phone: '电话',
+        email: '邮箱',
+        wechat: '微信',
+        whatsapp: 'WhatsApp',
         consentNews: '接收档期更新与新车源通知',
         consentPolicy: '同意使用条款与隐私政策'
       },
@@ -67,7 +71,7 @@
       rows: {
         appointment: '希望利用日時',
         name: '運転者情報',
-        contact: 'メール / 電話',
+        contact: '連絡先（4つから2つ）',
         confirm: '貸渡方法・規約'
       },
       actions: {
@@ -94,6 +98,10 @@
         languageZh: '中国語',
         languageJa: '日本語',
         languageEn: '英語',
+        phone: '電話',
+        email: 'メール',
+        wechat: 'WeChat',
+        whatsapp: 'WhatsApp',
         consentNews: '空き状況や新着車両情報を受け取る',
         consentPolicy: '利用規約とプライバシーポリシーに同意する'
       },
@@ -110,7 +118,7 @@
       rows: {
         appointment: 'Preferred rental time',
         name: 'Contact details',
-        contact: 'Email / phone',
+        contact: 'Contact (pick two)',
         confirm: 'Delivery & policies'
       },
       actions: {
@@ -137,6 +145,10 @@
         languageZh: 'Chinese',
         languageJa: 'Japanese',
         languageEn: 'English',
+        phone: 'Phone',
+        email: 'Email',
+        wechat: 'WeChat',
+        whatsapp: 'WhatsApp',
         consentNews: 'Receive availability updates and new vehicle notifications',
         consentPolicy: 'I agree to the terms of use and privacy policy'
       },
@@ -224,12 +236,31 @@
     return '';
   }
 
+  function formatContactDraftLines(draft, copy) {
+    const lines = [];
+    const add = (field, labelKey) => {
+      const v = sanitize(draft[field]);
+      if (!v) return;
+      lines.push(`${copy.fields[labelKey]}: ${v}`);
+    };
+    if (Number(draft.v) === 1) {
+      add('phone', 'phone');
+      add('email', 'email');
+      return lines.join('\n');
+    }
+    add('phone', 'phone');
+    add('email', 'email');
+    add('wechat', 'wechat');
+    add('whatsapp', 'whatsapp');
+    return lines.join('\n');
+  }
+
   function buildSummaryHtml(draft) {
     const copy = currentCopyForDraft(draft);
     const lang = draftLanguage(draft);
     const appointment = `${sanitize(draft.date)} ${sanitize(draft.time)} / ${formatMinDays(draft.days, lang)}`;
     const nameBlock = `${sanitize(draft.name)}\n${languageLabel(draft, copy)}`;
-    const contactBlock = `${sanitize(draft.email)}\n${sanitize(draft.phone)}`;
+    const contactBlock = formatContactDraftLines(draft, copy);
     const delivery = buildDeliveryBlock(draft, copy);
     const news = draft.consentNews ? copy.consentYes : copy.consentNo;
     const policy = draft.consentPolicy ? copy.consentYes : copy.consentNo;
@@ -254,7 +285,7 @@
       const raw = sessionStorage.getItem(RENTAL_INQUIRY_DRAFT_KEY);
       if (!raw) return null;
       const data = JSON.parse(raw);
-      if (!data || data.v !== 1) return null;
+      if (!data || (data.v !== 1 && data.v !== 2)) return null;
       return data;
     } catch {
       return null;

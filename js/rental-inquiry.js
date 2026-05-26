@@ -35,7 +35,7 @@
       steps: {
         appointment: { tab: '用车时间', row: '希望用车时间', lead: '先确认希望用车日期、取车时间和预计租期。' },
         name: { tab: '联系人', row: '联系人信息', lead: '填写联系人姓名和偏好语言。' },
-        contact: { tab: '联系方式', row: '邮箱 / 电话', lead: '请留下方便回访的邮箱和电话。' },
+        contact: { tab: '联系方式', row: '联系方式（四选二）', lead: '请从电话、邮箱、微信、WhatsApp 中恰好填写两项，便于我们与您联系。' },
         confirm: { tab: '交车', row: '车辆交付方式', lead: '选择来店或送车，填写门店或送车地址，并同意条款后完成确认。' }
       },
       required: '必填',
@@ -54,6 +54,11 @@
         languageEn: '英语',
         email: '邮箱地址',
         phone: '电话号码',
+        wechat: '微信',
+        whatsapp: 'WhatsApp',
+        wechatPlaceholder: '微信号',
+        whatsappPlaceholder: '号码或 WhatsApp 账号',
+        contactHint: '以下四项中请至少填写两项。',
         deliveryMethodLabel: '车辆交付方式',
         deliveryVisit: '来店',
         deliveryShip: '送车',
@@ -83,7 +88,8 @@
       message: {
         appointmentRequired: '请填写日期、取车时间和预计租期。',
         nameRequired: '请输入联系人姓名。',
-        contactRequired: '请填写邮箱和电话号码。',
+        contactNeedExactlyTwo: '请在「电话、邮箱、微信、WhatsApp」中填写两项',
+        contactEmailInvalid: '填写的邮箱格式不正确。',
         deliveryMethodRequired: '请选择车辆交付方式。',
         storeRequired: '请选择门店。',
         addressRequired: '请填写送车地址。',
@@ -109,7 +115,7 @@
       steps: {
         appointment: { tab: '利用日時', row: '希望利用日時', lead: '希望利用日、受取時間、予定日数を入力してください。' },
         name: { tab: '運転者', row: '運転者氏名', lead: '運転者の氏名と希望言語を入力してください。' },
-        contact: { tab: '連絡先', row: 'メール / 電話', lead: '折り返ししやすい連絡先を入力してください。' },
+        contact: { tab: '連絡先', row: '連絡先（4つから2つ）', lead: '電話・メール・WeChat・WhatsApp のうち、必ず2項目だけご入力ください。' },
         confirm: { tab: '貸渡', row: '貸渡方法', lead: '来店または配達を選び、店舗またはお届け先を入力のうえ、規約に同意してください。' }
       },
       required: '必須',
@@ -128,6 +134,11 @@
         languageEn: '英語',
         email: 'メールアドレス',
         phone: '電話番号',
+        wechat: 'WeChat',
+        whatsapp: 'WhatsApp',
+        wechatPlaceholder: 'WeChat ID',
+        whatsappPlaceholder: '電話番号またはアカウント',
+        contactHint: '以下4項目のうち、必ず2項目のみご入力ください（1項目のみ・3項目以上は送信できません）。',
         deliveryMethodLabel: '貸渡方法',
         deliveryVisit: '来店',
         deliveryShip: '配達',
@@ -157,7 +168,8 @@
       message: {
         appointmentRequired: '利用日、受取時間、予定日数を入力してください。',
         nameRequired: '運転者の氏名を入力してください。',
-        contactRequired: 'メールアドレスと電話番号を入力してください。',
+        contactNeedExactlyTwo: '電話・メール・WeChat・WhatsApp のうち、必ず2項目だけ入力してください。',
+        contactEmailInvalid: 'メールアドレスの形式が正しくありません。',
         deliveryMethodRequired: '貸渡方法を選択してください。',
         storeRequired: '店舗を選択してください。',
         addressRequired: '配達先住所を入力してください。',
@@ -183,7 +195,7 @@
       steps: {
         appointment: { tab: 'Schedule', row: 'Preferred rental time', lead: 'Enter your preferred rental date, pickup time, and expected rental length.' },
         name: { tab: 'Contact person', row: 'Contact details', lead: 'Enter your name and preferred language.' },
-        contact: { tab: 'Contact', row: 'Email / phone', lead: 'Leave an email and phone number that is easy to reply to.' },
+        contact: { tab: 'Contact', row: 'Contact (pick any two)', lead: 'Enter exactly two of: phone, email, WeChat, or WhatsApp so we can reach you.' },
         confirm: { tab: 'Handover', row: 'Vehicle delivery method', lead: 'Choose visit or delivery, enter the store or address, then agree to the policies.' }
       },
       required: 'Required',
@@ -202,6 +214,11 @@
         languageEn: 'English',
         email: 'Email address',
         phone: 'Phone number',
+        wechat: 'WeChat',
+        whatsapp: 'WhatsApp',
+        wechatPlaceholder: 'WeChat ID',
+        whatsappPlaceholder: 'Number or WhatsApp ID',
+        contactHint: 'Enter exactly two of the four fields below (not one, not three).',
         deliveryMethodLabel: 'Vehicle delivery method',
         deliveryVisit: 'Visit showroom',
         deliveryShip: 'Delivery to you',
@@ -231,7 +248,8 @@
       message: {
         appointmentRequired: 'Please enter the date, pickup time, and expected rental length.',
         nameRequired: 'Please enter the contact person name.',
-        contactRequired: 'Please enter the email address and phone number.',
+        contactNeedExactlyTwo: 'Enter exactly two of: phone, email, WeChat, and WhatsApp (not more, not fewer).',
+        contactEmailInvalid: 'The email address format is not valid.',
         deliveryMethodRequired: 'Please choose a vehicle delivery method.',
         storeRequired: 'Please select a store.',
         addressRequired: 'Please enter the delivery address.',
@@ -347,6 +365,8 @@
     language: '',
     email: '',
     phone: '',
+    wechat: '',
+    whatsapp: '',
     deliveryMethod: '',
     store: '',
     deliveryAddress: '',
@@ -362,6 +382,7 @@
     board: document.getElementById('riqBoard'),
     lead: document.getElementById('riqLeadText'),
     message: document.getElementById('riqMessage'),
+    contactHint: document.getElementById('riqContactHint'),
     confirmBtn: document.getElementById('riqConfirmBtn'),
     rows: Array.from(document.querySelectorAll('.inq-row')),
     requiredBadges: Array.from(document.querySelectorAll('.inq-required')),
@@ -372,6 +393,8 @@
     language: document.getElementById('riqLanguage'),
     email: document.getElementById('riqEmail'),
     phone: document.getElementById('riqPhone'),
+    wechat: document.getElementById('riqWechat'),
+    whatsapp: document.getElementById('riqWhatsapp'),
     deliveryVisit: document.getElementById('riqDeliveryVisit'),
     deliveryShip: document.getElementById('riqDeliveryShip'),
     deliveryMethodLabel: document.getElementById('riqDeliveryMethodLabel'),
@@ -420,6 +443,8 @@
       language: document.getElementById('riqLanguageLabel'),
       email: document.getElementById('riqEmailLabel'),
       phone: document.getElementById('riqPhoneLabel'),
+      wechat: document.getElementById('riqWechatLabel'),
+      whatsapp: document.getElementById('riqWhatsappLabel'),
       store: document.getElementById('riqStoreLabel'),
       deliveryAddress: document.getElementById('riqDeliveryAddressLabel'),
       consentNews: document.getElementById('riqConsentNewsLabel'),
@@ -440,6 +465,15 @@
 
   function sanitize(value) {
     return String(value || '').trim();
+  }
+
+  function isValidEmail(value) {
+    if (!value) return false;
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sanitize(value));
+  }
+
+  function countFilledContactChannelsFromState() {
+    return [sanitize(state.email), sanitize(state.phone), sanitize(state.wechat), sanitize(state.whatsapp)].filter(Boolean).length;
   }
 
   function setText(el, value) {
@@ -477,6 +511,7 @@
       badge.textContent = copy.required;
     });
 
+    setText(refs.contactHint, copy.fields.contactHint);
     setText(refs.fieldLabels.date, copy.fields.date);
     setText(refs.fieldLabels.time, copy.fields.time);
     setText(refs.fieldLabels.days, copy.fields.days);
@@ -484,6 +519,8 @@
     setText(refs.fieldLabels.language, copy.fields.language);
     setText(refs.fieldLabels.email, copy.fields.email);
     setText(refs.fieldLabels.phone, copy.fields.phone);
+    setText(refs.fieldLabels.wechat, copy.fields.wechat);
+    setText(refs.fieldLabels.whatsapp, copy.fields.whatsapp);
     setText(refs.fieldLabels.store, copy.fields.storeLabel);
     setText(refs.fieldLabels.deliveryAddress, copy.fields.deliveryAddressLabel);
     setText(refs.fieldLabels.consentNews, copy.fields.consentNews);
@@ -504,6 +541,8 @@
     setText(refs.optionLabels.languageEn, copy.fields.languageEn);
 
     setPlaceholder(refs.name, copy.fields.namePlaceholder);
+    setPlaceholder(refs.wechat, copy.fields.wechatPlaceholder);
+    setPlaceholder(refs.whatsapp, copy.fields.whatsappPlaceholder);
     setPlaceholder(refs.deliveryAddress, copy.fields.deliveryAddressPlaceholder);
 
     setText(refs.confirmBtn, copy.actions.confirm);
@@ -661,12 +700,19 @@
   }
 
   function buildContactSummary() {
-    const email = sanitize(state.email);
-    const phone = sanitize(state.phone);
-    if (!email && !phone) return currentCopy().summary.empty;
-    if (!email) return phone;
-    if (!phone) return email;
-    return `${email} / ${phone}`;
+    const copy = currentCopy();
+    const parts = [];
+    const push = (val, key) => {
+      const v = sanitize(val);
+      if (!v) return;
+      parts.push(`${copy.fields[key]}: ${v}`);
+    };
+    push(state.phone, 'phone');
+    push(state.email, 'email');
+    push(state.wechat, 'wechat');
+    push(state.whatsapp, 'whatsapp');
+    if (!parts.length) return copy.summary.empty;
+    return parts.join(' · ');
   }
 
   function buildDeliveryDetailSummary() {
@@ -707,6 +753,8 @@
     state.language = refs.language.value;
     state.email = refs.email.value;
     state.phone = refs.phone.value;
+    state.wechat = refs.wechat?.value || '';
+    state.whatsapp = refs.whatsapp?.value || '';
     if (refs.deliveryVisit?.checked) state.deliveryMethod = 'visit';
     else if (refs.deliveryShip?.checked) state.deliveryMethod = 'delivery';
     else state.deliveryMethod = '';
@@ -751,7 +799,8 @@
       return '';
     }
     if (stepKey === 'contact') {
-      if (!sanitize(state.email) || !sanitize(state.phone)) return msg.contactRequired;
+      if (countFilledContactChannelsFromState() !== 2) return msg.contactNeedExactlyTwo;
+      if (sanitize(state.email) && !isValidEmail(state.email)) return msg.contactEmailInvalid;
       return '';
     }
     if (stepKey === 'confirm') {
@@ -781,7 +830,7 @@
       return;
     }
     const draft = {
-      v: 1,
+      v: 2,
       lang: currentLanguage(),
       vehicleId: vehicleContext.currentVehicle?.id || vehicleContext.requestedVehicleId || '',
       date: state.date,
@@ -791,6 +840,8 @@
       language: state.language,
       email: state.email,
       phone: state.phone,
+      wechat: state.wechat,
+      whatsapp: state.whatsapp,
       deliveryMethod: state.deliveryMethod,
       store: state.store,
       deliveryAddress: state.deliveryAddress,
@@ -817,7 +868,7 @@
   }
 
   function bindInputEvents() {
-    const inputKeys = ['date', 'time', 'days', 'name', 'language', 'email', 'phone', 'store', 'deliveryAddress', 'consentNews', 'consentPolicy'];
+    const inputKeys = ['date', 'time', 'days', 'name', 'language', 'email', 'phone', 'wechat', 'whatsapp', 'store', 'deliveryAddress', 'consentNews', 'consentPolicy'];
 
     inputKeys.forEach((key) => {
       const el = refs[key];
