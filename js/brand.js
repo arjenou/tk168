@@ -367,18 +367,38 @@ function updateBrandNavLayout() {
   track.style.setProperty('--bn-visible-count', String(count));
 }
 
+function centerActiveBrandNav(grid, active, smooth) {
+  if (!grid || !active) return;
+  // 用相对 track 的几何位置计算，避免 offsetParent 差异；clientWidth 为 0（尚未布局）时跳过本次
+  const gridWidth = grid.clientWidth;
+  if (gridWidth <= 0) return;
+  const trackRect = grid.getBoundingClientRect();
+  const activeRect = active.getBoundingClientRect();
+  const activeLeftWithinTrack = (activeRect.left - trackRect.left) + grid.scrollLeft;
+  const targetLeft = activeLeftWithinTrack - (gridWidth - activeRect.width) / 2;
+  const maxLeft = Math.max(0, grid.scrollWidth - gridWidth);
+  grid.scrollTo({
+    left: Math.max(0, Math.min(maxLeft, targetLeft)),
+    behavior: smooth ? 'smooth' : 'auto'
+  });
+}
+
 function scrollActiveBrandNavIntoView({ smooth = true } = {}) {
   const grid = document.getElementById('bnGrid');
   if (!grid) return;
   const active = grid.querySelector('.bn-thumb.is-active');
   if (!active) return;
-  // 让高亮品牌在导航条中水平居中
-  const targetLeft = active.offsetLeft - (grid.clientWidth - active.clientWidth) / 2;
-  const maxLeft = Math.max(0, grid.scrollWidth - grid.clientWidth);
-  grid.scrollTo({
-    left: Math.max(0, Math.min(maxLeft, targetLeft)),
-    behavior: smooth ? 'smooth' : 'auto'
-  });
+
+  // 布局/字体可能尚未就绪：等两帧再量一次，确保移动端按当前屏幕宽度与可见卡片数居中
+  const run = () => centerActiveBrandNav(grid, active, smooth);
+  run();
+  requestAnimationFrame(() => requestAnimationFrame(run));
+
+  // 品牌 logo 图片为异步加载，宽度变化会影响居中；加载完成后再校正一次（不使用动画避免抖动）
+  const logo = active.querySelector('.bn-thumb__logo');
+  if (logo instanceof HTMLImageElement && !logo.complete) {
+    logo.addEventListener('load', () => centerActiveBrandNav(grid, active, false), { once: true });
+  }
 }
 
 function bindBrandNavTrackGestures() {
@@ -705,6 +725,11 @@ if (typeof brandNavNarrowViewport.addEventListener === 'function') {
 
 syncBrandHeader();
 buildBrandNav({ centerActive: true });
+// 首次从首页点击 logo 跳转进来：页面与图片完全加载后再校正一次居中，
+// 避免移动端因 hero 大图 / 字体回流导致高亮 logo 未停在正中。
+if (document.readyState !== 'complete') {
+  window.addEventListener('load', () => scrollActiveBrandNavIntoView({ smooth: false }), { once: true });
+}
 (function bindBrandVehicleLoadMore() {
   const btn = document.getElementById('brandVehicleLoadMore');
   if (!btn || btn.dataset.bound === '1') return;

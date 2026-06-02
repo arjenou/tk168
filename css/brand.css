@@ -592,7 +592,9 @@ html:lang(ja) .bn-name {
   min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
-  scroll-snap-type: x mandatory;
+  /* 不用 scroll-snap：避免点击某个 logo（变为 is-active）时被浏览器自动吸附到中间。
+     居中仅在「从首页点击 logo 跳转进来」时由 JS 处理；其余仅用户手动拖拽滚动。 */
+  scroll-snap-type: none;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
@@ -631,7 +633,6 @@ html:lang(ja) .bn-name {
 
 .bn-thumb {
   position: relative;
-  scroll-snap-align: start;
   min-width: 0;
   min-height: 156px;
   padding: 22px 14px 18px;
@@ -678,8 +679,6 @@ html:lang(ja) .bn-name {
 
 .bn-thumb.is-active {
   z-index: 2;
-  /* 高亮项吸附到居中位置（其余项仍吸附到 start） */
-  scroll-snap-align: center;
   border-color: rgba(232, 197, 71, 0.6);
   color: rgba(34, 40, 47, 0.95);
   background: #fffef8;
