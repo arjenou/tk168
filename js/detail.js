@@ -160,6 +160,11 @@ function installDetailSkeletonUi() {
   if (!detailShell) return;
   detailShell.classList.add('detail-shell--skeleton-ui');
 
+  if (detailMainImage) {
+    detailMainImage.src = 'assets/images/placeholder.svg';
+    detailMainImage.alt = '';
+  }
+
   if (galleryMainTrigger && !document.getElementById('detailSkelGalleryCover')) {
     const cover = document.createElement('div');
     cover.id = 'detailSkelGalleryCover';
@@ -1490,11 +1495,7 @@ function renderDetailShellAll() {
 }
 
 document.addEventListener('tk168:data-updated', (event) => {
-  if (
-    !isRentalDetail ||
-    !requestedVehicleId ||
-    String(requestedVehicleId).endsWith('-catalog')
-  ) {
+  if (!isRentalDetail || !requestedVehicleId) {
     return;
   }
   if (!event.detail?.rentals) return;
@@ -1508,8 +1509,7 @@ document.addEventListener('tk168:data-updated', (event) => {
 async function bootstrapDetailPage() {
   const tryLive =
     /^https?:$/.test(location.protocol) &&
-    requestedVehicleId &&
-    !String(requestedVehicleId).endsWith('-catalog');
+    requestedVehicleId;
 
   const hasLocalMatch =
     Boolean(requestedVehicleId) && currentVehicle?.id === requestedVehicleId;

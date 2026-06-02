@@ -8,14 +8,11 @@
 window.TK168CommonLinks?.applyCommonLinks();
 const brandNavNarrowViewport = window.matchMedia('(max-width: 480px)');
 const brandNavTabletViewport = window.matchMedia('(max-width: 1100px)');
-let brandNavCycleIndex = 0;
+let brandNavSuppressClickUntil = 0;
 const fullBrandNavCatalog = Array.isArray(window.TK168BrandLogoInventory?.items) && window.TK168BrandLogoInventory.items.length
   ? [...window.TK168BrandLogoInventory.items]
   : (Array.isArray(brands) ? [...brands] : []);
 const FULL_BRAND_NAV_ORDER = fullBrandNavCatalog.map((brand) => brand.key);
-const BRAND_NAV_VISIBLE_DESKTOP = 6;
-const BRAND_NAV_VISIBLE_TABLET = 5;
-const BRAND_NAV_VISIBLE_MOBILE = 4;
 
 const normalizeBrandToken = (value = '') => String(value || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
 const BRAND_FOCUS_ALIAS_MAP = Object.freeze({
@@ -81,6 +78,15 @@ function resolveFocusBrandKey(rawFocusBrand = '') {
   return fullBrandKeyByToken.get(normalizeBrandToken(aliased)) || '';
 }
 
+function normalizeInventoryPageKey(pathname = '') {
+  const leaf = String(pathname || '').split('/').pop() || '';
+  return leaf.replace(/\.html$/i, '').toLowerCase();
+}
+
+function inventoryPagesMatch(pathA, pathB) {
+  return normalizeInventoryPageKey(pathA) === normalizeInventoryPageKey(pathB);
+}
+
 const initialUrlParams = new URLSearchParams(window.location.search);
 let focusBrandKey = resolveFocusBrandKey(initialUrlParams.get('focusBrand') || '');
 
@@ -119,7 +125,11 @@ function recomputeSourceVehicles() {
   const fb = resolveFocusBrandKey(params.get('focusBrand') || '');
   const b = filters.brand ? resolveFocusBrandKey(filters.brand) : '';
   focusBrandKey = fb || b || '';
-  sourceVehicles = window.TK168_DATA.filterVehicles(vehicles, filters);
+  const effectiveFilters = { ...filters };
+  if (focusBrandKey && !effectiveFilters.brand) {
+    effectiveFilters.brand = focusBrandKey;
+  }
+  sourceVehicles = window.TK168_DATA.filterVehicles(vehicles, effectiveFilters);
 }
 
 recomputeSourceVehicles();
@@ -138,12 +148,6 @@ function getBrandHeroDefaultTitle() {
 function getBrandNavItemByKey(key) {
   if (!key) return null;
   return fullBrandNavCatalog.find((brand) => brand.key === key) || null;
-}
-
-function getBrandNavVisibleCount() {
-  if (brandNavNarrowViewport.matches) return BRAND_NAV_VISIBLE_MOBILE;
-  if (brandNavTabletViewport.matches) return BRAND_NAV_VISIBLE_TABLET;
-  return BRAND_NAV_VISIBLE_DESKTOP;
 }
 
 function getPinnedBrandKey() {
@@ -172,7 +176,7 @@ function navigateBrandWithoutReload(brandKey) {
   if (!resolved) return;
   const href = buildBrandNavHref(brandKey);
   const u = new URL(href, window.location.href);
-  if (u.pathname !== window.location.pathname) return;
+  if (!inventoryPagesMatch(u.pathname, window.location.pathname)) return;
   window.history.pushState({}, '', `${u.pathname}${u.search}`);
   recomputeSourceVehicles();
   finishBrandNavClientUpdate();
@@ -181,7 +185,7 @@ function navigateBrandWithoutReload(brandKey) {
 function navigateClearBrandFilterWithoutReload() {
   const href = buildBrandNavHref('');
   const u = new URL(href, window.location.href);
-  if (u.pathname !== window.location.pathname) return;
+  if (!inventoryPagesMatch(u.pathname, window.location.pathname)) return;
   window.history.pushState({}, '', `${u.pathname}${u.search}`);
   recomputeSourceVehicles();
   finishBrandNavClientUpdate();
@@ -189,21 +193,6 @@ function navigateClearBrandFilterWithoutReload() {
 
 function getOrderedBrandNavCatalog() {
   return fullBrandNavCatalog;
-}
-
-function getBrandNavLoopSlice(orderedCatalog) {
-  const total = orderedCatalog.length;
-  if (!total) return [];
-  const visibleCount = Math.min(getBrandNavVisibleCount(), total);
-  const normalizedStart = ((brandNavCycleIndex % total) + total) % total;
-  return Array.from({ length: visibleCount }, (_, offset) => {
-    const catalogIndex = (normalizedStart + offset) % total;
-    return {
-      brand: orderedCatalog[catalogIndex],
-      slotIndex: offset,
-      catalogIndex
-    };
-  });
 }
 
 function getBrandNavDisplayLabel(brand) {
@@ -257,6 +246,10 @@ function bindBrandNavThumbInteractions(node) {
   });
 
   node.addEventListener('click', (event) => {
+    if (Date.now() < brandNavSuppressClickUntil) {
+      event.preventDefault();
+      return;
+    }
     const brandKey = node.dataset.brandKey;
     if (!brandKey) return;
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -264,7 +257,7 @@ function bindBrandNavThumbInteractions(node) {
 
     const nextUrl = new URL(buildBrandLandingHref(brandKey), window.location.href);
     const currentUrl = new URL(window.location.href);
-    if (nextUrl.pathname !== currentUrl.pathname) return;
+    if (!inventoryPagesMatch(nextUrl.pathname, currentUrl.pathname)) return;
 
     const resolved = resolveFocusBrandKey(brandKey);
     const pinned = getPinnedBrandKey();
@@ -330,6 +323,82 @@ function setBrandHeroPreview(previewKey = '') {
   pulseBrandHeroTitle();
 }
 
+function updateBrandNavLayout() {
+  const track = document.getElementById('bnGrid');
+  if (!track) return;
+  const styles = getComputedStyle(track);
+  const gap = parseFloat(styles.columnGap || styles.gap) || 12;
+  const minCard = parseFloat(styles.getPropertyValue('--bn-card-min')) || 128;
+  const width = track.clientWidth;
+  if (width <= 0) return;
+  const count = Math.max(2, Math.floor((width + gap) / (minCard + gap)));
+  track.style.setProperty('--bn-visible-count', String(count));
+}
+
+function scrollActiveBrandNavIntoView({ smooth = true } = {}) {
+  const grid = document.getElementById('bnGrid');
+  if (!grid) return;
+  const active = grid.querySelector('.bn-thumb.is-active');
+  if (!active) return;
+  active.scrollIntoView({
+    behavior: smooth ? 'smooth' : 'auto',
+    inline: 'start',
+    block: 'nearest'
+  });
+}
+
+function bindBrandNavTrackGestures() {
+  const track = document.getElementById('bnGrid');
+  if (!track || track.dataset.swipeBound === '1') return;
+  track.dataset.swipeBound = '1';
+
+  let pointerId = null;
+  let startX = 0;
+  let startScrollLeft = 0;
+  let dragging = false;
+  let didScroll = false;
+
+  track.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0) return;
+    pointerId = event.pointerId;
+    startX = event.clientX;
+    startScrollLeft = track.scrollLeft;
+    dragging = false;
+    didScroll = false;
+  });
+
+  track.addEventListener('pointermove', (event) => {
+    if (event.pointerId !== pointerId) return;
+    const deltaX = event.clientX - startX;
+    if (!dragging && Math.abs(deltaX) > 10) {
+      dragging = true;
+      didScroll = true;
+      track.classList.add('is-dragging');
+      track.setPointerCapture?.(event.pointerId);
+    }
+    if (!dragging) return;
+    event.preventDefault();
+    track.scrollLeft = startScrollLeft - deltaX;
+  });
+
+  const finishPointer = (event) => {
+    if (event.pointerId !== pointerId) return;
+    if (didScroll) {
+      brandNavSuppressClickUntil = Date.now() + 280;
+    }
+    pointerId = null;
+    dragging = false;
+    didScroll = false;
+    track.classList.remove('is-dragging');
+    if (track.hasPointerCapture?.(event.pointerId)) {
+      track.releasePointerCapture?.(event.pointerId);
+    }
+  };
+
+  track.addEventListener('pointerup', finishPointer);
+  track.addEventListener('pointercancel', finishPointer);
+}
+
 function buildBrandNav() {
   const grid = document.getElementById('bnGrid');
   const prevButton = document.getElementById('bnPrev');
@@ -337,44 +406,27 @@ function buildBrandNav() {
   if (!grid) return;
 
   const orderedCatalog = getOrderedBrandNavCatalog();
-  const visibleBrands = getBrandNavLoopSlice(orderedCatalog);
-  const visibleCount = visibleBrands.length;
-  const canCycle = orderedCatalog.length > visibleCount;
+  const total = orderedCatalog.length;
 
-  grid.style.setProperty('--bn-visible-count', String(Math.max(visibleCount, 1)));
-  if (prevButton) {
-    prevButton.hidden = !canCycle;
-    prevButton.disabled = !canCycle;
-  }
-  if (nextButton) {
-    nextButton.hidden = !canCycle;
-    nextButton.disabled = !canCycle;
-  }
+  if (prevButton) prevButton.hidden = true;
+  if (nextButton) nextButton.hidden = true;
 
-  while (grid.children.length < visibleCount) {
+  while (grid.children.length < total) {
     const thumb = document.createElement('a');
     bindBrandNavThumbInteractions(thumb);
     grid.appendChild(thumb);
   }
 
-  while (grid.children.length > visibleCount) {
+  while (grid.children.length > total) {
     grid.removeChild(grid.lastElementChild);
   }
 
-  visibleBrands.forEach(({ brand, slotIndex }, visibleIndex) => {
-    const thumb = grid.children[visibleIndex];
-    updateBrandNavThumb(thumb, brand, slotIndex);
+  orderedCatalog.forEach((brand, index) => {
+    updateBrandNavThumb(grid.children[index], brand, index);
   });
-}
 
-function shiftBrandNav(step) {
-  const orderedCatalog = getOrderedBrandNavCatalog();
-  const total = orderedCatalog.length;
-  const visibleCount = Math.min(getBrandNavVisibleCount(), total);
-  if (total <= visibleCount) return;
-  brandNavCycleIndex = ((brandNavCycleIndex + step) % total + total) % total;
-  setBrandHeroPreview('');
-  buildBrandNav();
+  updateBrandNavLayout();
+  scrollActiveBrandNavIntoView({ smooth: false });
 }
 
 function syncBrandHeader() {
@@ -582,12 +634,26 @@ function renderPage() {
 }
 
 function handleBrandNavViewportChange() {
-  brandNavCycleIndex = 0;
+  updateBrandNavLayout();
   buildBrandNav();
 }
 
-document.getElementById('bnPrev')?.addEventListener('click', () => shiftBrandNav(-1));
-document.getElementById('bnNext')?.addEventListener('click', () => shiftBrandNav(1));
+function bindBrandNavLayoutObserver() {
+  const track = document.getElementById('bnGrid');
+  if (!track || track.dataset.layoutObserved === '1') return;
+  track.dataset.layoutObserved = '1';
+  if (typeof ResizeObserver !== 'undefined') {
+    const observer = new ResizeObserver(() => {
+      updateBrandNavLayout();
+    });
+    observer.observe(track);
+  }
+  window.addEventListener('resize', updateBrandNavLayout, { passive: true });
+}
+
+bindBrandNavTrackGestures();
+bindBrandNavLayoutObserver();
+updateBrandNavLayout();
 
 if (typeof brandNavNarrowViewport.addEventListener === 'function') {
   brandNavNarrowViewport.addEventListener('change', handleBrandNavViewportChange);

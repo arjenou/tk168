@@ -195,7 +195,7 @@
   function renderVehicle() {
     const vehicle = vehicleContext.currentVehicle;
     if (!vehicle) return;
-    const image = window.TK168_DATA.resolveVehicleMediaSource(vehicle.photo || vehicle.gallery?.[0] || '002.png');
+    const image = window.TK168_DATA.resolveVehicleMediaSource(vehicle.photo || vehicle.gallery?.[0] || 'placeholder.svg');
     const lang = getLanguage();
     const yearLabel = sanitize(vehicle.year);
     const typeLabel = getVehicleFieldLabel('bodyStyle', vehicle.bodyStyle, lang) || '';

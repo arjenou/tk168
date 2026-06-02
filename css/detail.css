@@ -1388,7 +1388,7 @@ body.price-help-open {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 10;
-  background-image: url('https://api.tk168.co.jp/api/media/vehicles/seed/002.png');
+  background-image: url('../assets/images/placeholder.svg');
   background-repeat: no-repeat;
   border-radius: 6px;
 }

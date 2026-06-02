@@ -29,83 +29,15 @@ window.TK168_DATA = (() => {
   const brandLogoInventoryItems = Array.isArray(brandLogoInventoryApi.items)
     ? brandLogoInventoryApi.items.filter((item) => activeBrandKeySet.has(item.key))
     : [];
-  const brandLogoMetaByKey = new Map(
-    brandLogoInventoryItems.map((item) => [
-      item.key,
-      {
-        labelZh: item.labelZh,
-        labelJa: item.labelJa,
-        labelEn: item.labelEn,
-        file: item.file
-      }
-    ])
-  );
-  const brandLibraryApi = window.TK168BrandLibrary || { items: [], getByKey: () => null };
-  const brandLibraryItems = Array.isArray(brandLibraryApi.items)
-    ? brandLibraryApi.items.filter((item) => activeBrandKeySet.has(item.key))
-    : [];
-
-  const brandLibraryExtraMeta = {
-    astonmartin: { labelZh: '阿斯顿・马丁', labelJa: 'アストンマーティン', labelEn: 'Aston Martin' },
-    audi: { labelZh: '奥迪', labelJa: 'アウディ', labelEn: 'Audi' },
-    bentley: { labelZh: '宾利', labelJa: 'ベントレー', labelEn: 'Bentley' },
-    bmw: { labelZh: '宝马', labelJa: 'BMW', labelEn: 'BMW' },
-    cadillac: { labelZh: '凯迪拉克', labelJa: 'キャデラック', labelEn: 'Cadillac' },
-    ferrari: { labelZh: '法拉利', labelJa: 'フェラーリ', labelEn: 'Ferrari' },
-    jaguar: { labelZh: '捷豹', labelJa: 'ジャガー', labelEn: 'Jaguar' },
-    lamborghini: { labelZh: '兰博基尼', labelJa: 'ランボルギーニ', labelEn: 'Lamborghini' },
-    landrover: { labelZh: '路虎', labelJa: 'ランドローバー', labelEn: 'Land Rover' },
-    lexus: { labelZh: '雷克萨斯', labelJa: 'レクサス', labelEn: 'Lexus' },
-    mclaren: { labelZh: '迈凯伦', labelJa: 'マクラーレン', labelEn: 'McLaren' },
-    maserati: { labelZh: '玛莎拉蒂', labelJa: 'マセラティ', labelEn: 'Maserati' },
-    mercedes: { labelZh: '奔驰', labelJa: 'メルセデス・ベンツ', labelEn: 'Mercedes-Benz' },
-    porsche: { labelZh: '保时捷', labelJa: 'ポルシェ', labelEn: 'Porsche' },
-    'rolls-royce': { labelZh: '劳斯莱斯', labelJa: 'ロールス・ロイス', labelEn: 'Rolls-Royce' }
-  };
-
-  const coreBrands = [
-    { key: 'rolls-royce', labelZh: '劳斯莱斯', labelJa: 'ロールス・ロイス', labelEn: 'Rolls-Royce', file: 'rollsroyce.svg', heroImage: 'assets/images/f2.webp' },
-    { key: 'bentley', labelZh: '宾利', labelJa: 'ベントレー', labelEn: 'Bentley', file: 'bentley.svg', heroImage: 'assets/images/f7.webp' },
-    { key: 'mercedes', labelZh: '奔驰', labelJa: 'メルセデス・ベンツ', labelEn: 'Mercedes-Benz', file: 'mercedes.svg', heroImage: 'assets/images/f4.webp' },
-    { key: 'bmw', labelZh: '宝马', labelJa: 'BMW', labelEn: 'BMW', file: 'bmw.svg', heroImage: 'assets/images/f4.webp' },
-    { key: 'porsche', labelZh: '保时捷', labelJa: 'ポルシェ', labelEn: 'Porsche', file: 'porsche.svg', heroImage: 'assets/images/f2.webp' },
-    { key: 'ferrari', labelZh: '法拉利', labelJa: 'フェラーリ', labelEn: 'Ferrari', file: 'ferrari.svg', heroImage: 'assets/images/f3.webp' },
-    { key: 'lamborghini', labelZh: '兰博基尼', labelJa: 'ランボルギーニ', labelEn: 'Lamborghini', file: 'lamborghini.svg', heroImage: 'assets/images/f2.webp' },
-    { key: 'audi', labelZh: '奥迪', labelJa: 'アウディ', labelEn: 'Audi', file: 'audi.svg', heroImage: 'assets/images/f7.webp' },
-    { key: 'lexus', labelZh: '雷克萨斯', labelJa: 'レクサス', labelEn: 'Lexus', file: 'lexus.svg', heroImage: 'assets/images/f3.webp' },
-    { key: 'landrover', labelZh: '路虎', labelJa: 'ランドローバー', labelEn: 'Land Rover', file: 'landrover.svg', heroImage: 'assets/images/f7.webp' },
-    { key: 'maserati', labelZh: '玛莎拉蒂', labelJa: 'マセラティ', labelEn: 'Maserati', file: 'maserati.svg', heroImage: 'assets/images/f4.webp' },
-    { key: 'astonmartin', labelZh: '阿斯顿・马丁', labelJa: 'アストンマーティン', labelEn: 'Aston Martin', file: 'astonmartin.svg', heroImage: 'assets/images/f2.webp' },
-    { key: 'mclaren', labelZh: '迈凯伦', labelJa: 'マクラーレン', labelEn: 'McLaren', file: 'mclaren.svg', heroImage: 'assets/images/f3.webp' },
-    { key: 'jaguar', labelZh: '捷豹', labelJa: 'ジャガー', labelEn: 'Jaguar', file: 'jaguar.svg', heroImage: 'assets/images/f3.webp' },
-    { key: 'cadillac', labelZh: '凯迪拉克', labelJa: 'キャデラック', labelEn: 'Cadillac', file: 'cadillac.svg', heroImage: 'assets/images/f4.webp' }
-  ];
-
-  function mergeBrandCatalog(sourceBrands, libraryItems) {
-    const merged = sourceBrands.map((brand) => ({ ...brand }));
-    const seen = new Set(merged.map((brand) => brand.key));
-
-    libraryItems.forEach((item) => {
-      if (!item?.key || seen.has(item.key) || !activeBrandKeySet.has(item.key)) return;
-      const meta = brandLogoMetaByKey.get(item.key) || brandLibraryExtraMeta[item.key];
-      if (!meta) return;
-
-      merged.push({
-        key: item.key,
-        labelZh: meta.labelZh,
-        labelJa: meta.labelJa,
-        labelEn: meta.labelEn,
-        file: meta.file || `${item.folder || item.key}.svg`,
-        heroImage: item.models?.[0]?.image || 'assets/images/f2.webp'
-      });
-      seen.add(item.key);
-    });
-
-    return merged;
-  }
-
-  const brands = mergeBrandCatalog(coreBrands, brandLibraryItems)
-    .filter((brand) => activeBrandKeySet.has(brand.key));
+  const brands = brandLogoInventoryItems
+    .filter((item) => activeBrandKeySet.has(item.key))
+    .map((item) => ({
+      key: item.key,
+      labelZh: item.labelZh,
+      labelJa: item.labelJa,
+      labelEn: item.labelEn,
+      file: item.file
+    }));
 
   const brandKeyAliasMap = {
     rollsroyce: 'rolls-royce',
@@ -267,65 +199,6 @@ window.TK168_DATA = (() => {
     'Fast delivery'
   ];
 
-  const libraryVehicleCatalogPresets = {
-    exotic: {
-      typeOptions: ['中置跑车', 'GT跑车', 'V12超跑'],
-      bodyStyleOptions: ['跑车', '超跑', '敞篷车'],
-      displacementOptions: ['3.9L', '5.2L', '6.5L'],
-      cylinderOptions: ['V8', 'V10', 'V12'],
-      fuelOptions: ['汽油', 'HEV（混动）'],
-      driveOptions: ['RWD', 'AWD'],
-      seats: '2 座',
-      totalBase: 1680000,
-      totalStep: 320000,
-      mileageBase: 1800,
-      mileageStep: 2600
-    },
-    gt: {
-      typeOptions: ['GT跑车', '双门轿跑'],
-      bodyStyleOptions: ['跑车', '双门轿跑', '敞篷车'],
-      displacementOptions: ['3.0L', '4.0L', '5.2L'],
-      cylinderOptions: ['V6', 'V8', 'V10'],
-      fuelOptions: ['汽油', 'HEV（混动）'],
-      driveOptions: ['RWD', 'AWD'],
-      seats: '2 座',
-      totalBase: 920000,
-      totalStep: 210000,
-      mileageBase: 4200,
-      mileageStep: 3400
-    },
-    suv: {
-      typeOptions: ['豪华SUV', '高性能SUV', '越野SUV', '轿跑SUV'],
-      bodyStyleOptions: ['SUV', '越野车'],
-      displacementOptions: ['2.0L Turbo', '3.0L', '3.5L', '4.0L'],
-      cylinderOptions: ['L4', 'V6', 'V6', 'V8'],
-      fuelOptions: ['汽油', 'HEV（混动）', 'PHEV（插电混动）'],
-      driveOptions: ['AWD'],
-      seats: '5 座',
-      totalBase: 480000,
-      totalStep: 140000,
-      mileageBase: 6200,
-      mileageStep: 4200
-    },
-    sedan: {
-      typeOptions: ['行政轿车', '豪华轿车', '高性能轿车'],
-      bodyStyleOptions: ['轿车'],
-      displacementOptions: ['2.0L Turbo', '2.5L Hybrid', '3.0L'],
-      cylinderOptions: ['L4', 'L4', 'V6'],
-      fuelOptions: ['汽油', 'HEV（混动）', 'PHEV（插电混动）'],
-      driveOptions: ['RWD', 'AWD'],
-      seats: '5 座',
-      totalBase: 280000,
-      totalStep: 110000,
-      mileageBase: 7800,
-      mileageStep: 4600
-    }
-  };
-
-  const libraryVehicleColors = ['珍珠白', '黑色', '银色', '灰色', '蓝色', '酒红色', '黄色', '绿色', '米色', '紫色'];
-  const libraryVehicleInteriors = ['黑色', '棕色', '米色', '灰色', '红色', '白色', '蓝色'];
-  const libraryVehicleIcons = ['b1.svg', 'b2.svg', 'b3.svg', 'b4.svg', 'b5.svg', 'b6.svg'];
-
   /** 管理端 / 首页筛选 / 存库统一使用的车身类型（中文） */
   const standardBodyStyleValues = [
     'SUV',
@@ -341,11 +214,6 @@ window.TK168_DATA = (() => {
     '商务车 / 面包车',
     '越野车'
   ];
-
-  function pickCatalogValue(pool, seed) {
-    if (!Array.isArray(pool) || pool.length === 0) return '';
-    return pool[Math.abs(seed) % pool.length];
-  }
 
   /** 历史合并字段「4.0L V8」「2.0L Turbo」→ 排量 / 缸数布局 */
   function splitLegacyEngineSpec(combined) {
@@ -390,565 +258,11 @@ window.TK168_DATA = (() => {
     return { ...vehicle, displacement: d, cylinders: c };
   }
 
-  function formatCatalogPrice(amount) {
-    const n = Number(amount || 0);
-    return `${n.toLocaleString('ja-JP', { useGrouping: true })} JPY`;
-  }
-
-  function resolveLibraryVehicleCategory(brandKey, modelSlug, modelName) {
-    const token = `${brandKey} ${modelSlug} ${modelName}`.toLowerCase();
-
-    if (/urus|dbx|bentayga|escalade|xt5|defender|discovery|range-rover|q5|x5|gle|f-pace|levante|macan|cayenne|nx|rx/.test(token)) {
-      return 'suv';
-    }
-    if (/911|488|f8-tributo|huracan|aventador|570s|720s|artura/.test(token)) {
-      return 'exotic';
-    }
-    if (/roma|f-type|db11|vantage|continental-gt|granturismo|ghost|phantom|flying-spur/.test(token)) {
-      return 'gt';
-    }
-    return 'sedan';
-  }
-
-  function buildLibraryVehicleOverview(brand, model, type) {
-    return {
-      zh: [
-        `${brand.labelZh} ${model.name} 是门店在品牌咨询里很常被问到的一台，先用这组照片帮助判断车身比例、姿态和 ${type} 的整体气质是否符合预期。`,
-        '如果准备继续确认预算、上牌年份、到店节奏或交付方式，顾问会再根据实际车辆状态补充更细的说明。'
-      ],
-      ja: [
-        `${brand.labelJa} ${model.name} はブランド相談でよく比較対象になる一台で、このフォトカードではまずボディバランスと ${type} の雰囲気を把握しやすくしています。`,
-        'ご予算や年式、入庫予定、納車段取りまで確認したい場合は、担当スタッフが実車状況に合わせて続けてご案内します。'
-      ]
-    };
-  }
-
-  function createLibraryVehicleRecord(brand, model, index) {
-    const category = resolveLibraryVehicleCategory(brand.key, model.slug, model.name);
-    const preset = libraryVehicleCatalogPresets[category] || libraryVehicleCatalogPresets.sedan;
-    const seed = `${brand.key}-${model.slug}-${index}`.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
-    const totalAmount = preset.totalBase + ((seed % 5) * preset.totalStep);
-    const baseAmount = Math.max(100000, totalAmount - (28000 + ((seed % 4) * 6000)));
-    const year = 2019 + (seed % 7);
-    const mileageKm = preset.mileageBase + ((seed % 6) * preset.mileageStep);
-    const type = pickCatalogValue(preset.typeOptions, seed);
-    const bodyStyle = pickCatalogValue(preset.bodyStyleOptions, seed + 1) || type;
-    const overview = buildLibraryVehicleOverview(brand, model, type);
-
-    return {
-      id: `${brand.key}-${model.slug}-catalog`,
-      brandKey: brand.key,
-      name: `${brand.labelZh} ${model.name}`,
-      year: String(year),
-      type,
-      icon: pickCatalogValue(libraryVehicleIcons, seed),
-      photo: model.image,
-      gallery: [model.image, model.image, model.image, model.image],
-      mileage: (() => {
-        const w = mileageKm / 10000;
-        let s = w.toFixed(2).replace(/(\.\d*?[1-9])0+$/g, '$1').replace(/\.$/, '');
-        return s || '0';
-      })(),
-      displacement: pickCatalogValue(preset.displacementOptions, seed + 2),
-      cylinders: pickCatalogValue(preset.cylinderOptions, seed + 3),
-      fuel: pickCatalogValue(preset.fuelOptions, seed + 4),
-      fuelOilType: '高辛烷汽油',
-      trans: 'AT',
-      totalPrice: formatCatalogPrice(totalAmount),
-      basePrice: formatCatalogPrice(baseAmount),
-      bodyStyle,
-      drive: pickCatalogValue(preset.driveOptions, seed + 5),
-      bodyColor: pickCatalogValue(libraryVehicleColors, seed + 6),
-      interiorColor: pickCatalogValue(libraryVehicleInteriors, seed + 7),
-      seats: preset.seats,
-      serviceRecord: '完整在册',
-      overview: overview.zh,
-      overviewJa: overview.ja,
-      benefits: defaultBenefits,
-      features: defaultFeatures
-    };
-  }
-
-  function appendBrandLibraryVehicles(existingVehicles, libraryItems) {
-    const normalizedVehicles = existingVehicles.map((vehicle) => ({
-      ...vehicle,
-      brandKey: resolveCanonicalBrandKey(vehicle.brandKey) || vehicle.brandKey
-    }));
-    const existingIds = new Set(normalizedVehicles.map((vehicle) => vehicle.id));
-
-    libraryItems.forEach((item) => {
-      const canonicalBrandKey = resolveCanonicalBrandKey(item?.key) || item?.key;
-      const brand = brands.find((entry) => entry.key === canonicalBrandKey);
-      if (!brand) return;
-
-      item.models.slice(0, 3).forEach((model, index) => {
-        const candidateId = `${brand.key}-${model.slug}-catalog`;
-        if (existingIds.has(candidateId)) return;
-        normalizedVehicles.push(createLibraryVehicleRecord(brand, model, index));
-        existingIds.add(candidateId);
-      });
-    });
-
-    return normalizedVehicles;
-  }
-
-  const baseVehicles = [
-    {
-      id: 'lamborghini-urus',
-      brandKey: 'lamborghini',
-      name: '兰博基尼 Urus',
-      year: '2022',
-      type: '高性能SUV',
-      icon: 'b1.svg',
-      photo: '001.png',
-      gallery: ['001.png', '001.png', '001.png', '001.png'],
-      mileage: '0.32',
-      displacement: '4.0L',
-      cylinders: 'V8',
-      fuel: '汽油',
-      fuelOilType: '高辛烷汽油',
-      trans: 'AT',
-      totalPrice: '1,980,000 JPY',
-      basePrice: '1,860,000 JPY',
-      bodyStyle: 'SUV',
-      drive: 'AWD',
-      bodyColor: '曜石黑',
-      interiorColor: '黑色真皮',
-      seats: '5 座',
-      serviceRecord: '完整在册',
-      overview: [
-        '这台 Lamborghini Urus 保持了完整保养记录与出色的整体状态，在高性能 SUV 的张力之外，也保留了足够从容的日常使用感。',
-        '车身姿态、内饰质感与机械完成度都处于很整齐的水准，适合被当作兼顾性能表达与通勤场景的一台主力座驾。'
-      ],
-      overviewJa: [
-        'この Lamborghini Urus は整備履歴が明確で、全体のコンディションも非常に整っています。高性能 SUV らしい緊張感を保ちながら、日常域では落ち着いた扱いやすさも感じられる一台です。',
-        'ボディの佇まい、内装の質感、機関系のまとまりまで全体の完成度が高く、パフォーマンス性と日常使いを両立したメインカーとして自然に選べる内容です。'
-      ],
-      benefits: defaultBenefits,
-      features: defaultFeatures
-    },
-    {
-      id: 'audi-r8-spyder',
-      brandKey: 'audi',
-      name: '奥迪 R8 Spyder',
-      year: '2023',
-      type: '敞篷跑车',
-      icon: 'b2.svg',
-      photo: '002.png',
-      gallery: ['002.png', '002.png', '002.png', '002.png'],
-      mileage: '0.009',
-      displacement: '5.2L',
-      cylinders: 'V10',
-      fuel: '汽油',
-      fuelOilType: '高辛烷汽油',
-      trans: 'AT',
-      totalPrice: '1,600,000 JPY',
-      basePrice: '1,490,000 JPY',
-      bodyStyle: '跑车',
-      drive: 'AWD',
-      bodyColor: '曜石黑',
-      interiorColor: '棕色真皮',
-      seats: '2 座',
-      serviceRecord: '完整在册',
-      overview: [
-        '这台奥迪 R8 保持了低里程与完整保养记录，低伏车身与中置布局让整车始终带着很鲜明的超跑比例。',
-        '无论是漆面状态、机械质感还是敞篷姿态，都呈现出相当完整的完成度，兼具驾驶乐趣与日常使用的稳定感。'
-      ],
-      overviewJa: [
-        'このアウディ R8 Spyder は低走行で整備履歴も明確に保たれており、低く構えたシルエットとミッドシップレイアウトによって、スーパーカーらしいプロポーションが際立っています。',
-        'ボディコンディション、機械的な質感、オープントップの見栄えまで総合的な完成度が高く、走る楽しさと日常での扱いやすさをバランスよく備えています。'
-      ],
-      benefits: defaultBenefits,
-      features: defaultFeatures
-    },
-    {
-      id: 'ferrari-458-italia',
-      brandKey: 'ferrari',
-      name: '法拉利 458 Italia',
-      year: '2019',
-      type: '中置跑车',
-      icon: 'b3.svg',
-      photo: '003.png',
-      gallery: ['003.png', '003.png', '003.png', '003.png'],
-      mileage: '1.52',
-      displacement: '4.5L',
-      cylinders: 'V8',
-      fuel: '汽油',
-      fuelOilType: '高辛烷汽油',
-      trans: 'AT',
-      totalPrice: '1,750,000 JPY',
-      basePrice: '1,640,000 JPY',
-      bodyStyle: '跑车',
-      drive: 'RWD',
-      bodyColor: '竞技红',
-      interiorColor: '黑红拼色真皮',
-      seats: '2 座',
-      serviceRecord: '完整在册',
-      overview: [
-        'Ferrari 458 Italia 保留了自然吸气时代极具代表性的声浪与比例，是法拉利车系里辨识度很高的一代作品。',
-        '这台车的整体状态干净利落，既有足够鲜明的收藏气质，也保留了很纯粹的驾驶表达。'
-      ],
-      overviewJa: [
-        'Ferrari 458 Italia は自然吸気時代を象徴するサウンドとプロポーションを色濃く残した一台で、フェラーリの中でも特に印象深い世代として知られています。',
-        'この個体は全体の状態が非常にすっきりと整っており、コレクション性を感じさせながらも、純粋なドライビングプレジャーをしっかり残しています。'
-      ],
-      benefits: defaultBenefits,
-      features: defaultFeatures
-    },
-    {
-      id: 'bmw-x6-m',
-      brandKey: 'bmw',
-      name: '宝马 X6 M',
-      year: '2024',
-      type: '轿跑SUV',
-      icon: 'b4.svg',
-      photo: '004.png',
-      gallery: ['004.png', '004.png', '004.png', '004.png'],
-      mileage: '0.012',
-      displacement: '4.4L',
-      cylinders: 'V8',
-      fuel: '汽油',
-      fuelOilType: '高辛烷汽油',
-      trans: 'AT',
-      totalPrice: '750,000 JPY',
-      basePrice: '698,000 JPY',
-      bodyStyle: 'SUV',
-      drive: 'AWD',
-      bodyColor: '矿石白',
-      interiorColor: '黑色真皮',
-      seats: '5 座',
-      serviceRecord: '完整在册',
-      overview: [
-        'BMW X6 M 将轿跑 SUV 的线条与高性能动力结合得很直接，整车视觉重心低，气场也足够鲜明。',
-        '低里程与整齐的车况让它更像一台完成度很高的性能日用车，在通勤与长途场景里都保持着稳定质感。'
-      ],
-      overviewJa: [
-        'BMW X6 M はクーペ SUV ならではの流麗なラインと高出力ユニットを素直に結びつけた一台で、低重心に見えるスタンスが強い存在感を生み出しています。',
-        '低走行かつコンディションも整っており、日常使いのしやすさを備えながら、パフォーマンスモデルとしての濃さもしっかり感じられる内容です。'
-      ],
-      benefits: defaultBenefits,
-      features: defaultFeatures
-    },
-    {
-      id: 'ferrari-488-gtb',
-      brandKey: 'ferrari',
-      name: '法拉利 488 GTB',
-      year: '2021',
-      type: '中置跑车',
-      icon: 'b5.svg',
-      photo: '005.png',
-      gallery: ['005.png', '005.png', '005.png', '005.png'],
-      mileage: '0.87',
-      displacement: '3.9L',
-      cylinders: 'V8',
-      fuel: '汽油',
-      fuelOilType: '高辛烷汽油',
-      trans: 'AT',
-      totalPrice: '2,250,000 JPY',
-      basePrice: '2,120,000 JPY',
-      bodyStyle: '跑车',
-      drive: 'RWD',
-      bodyColor: '亮银灰',
-      interiorColor: '深棕真皮',
-      seats: '2 座',
-      serviceRecord: '完整在册',
-      overview: [
-        'Ferrari 488 GTB 有着很成熟的空气动力学比例，车身线条紧凑而克制，是法拉利近代设计语言里很完整的一台作品。',
-        '这台车的状态收得很整齐，既保留了性能车应有的锋利感，也维持了足够清爽的日常可驾性。'
-      ],
-      overviewJa: [
-        'Ferrari 488 GTB は空力処理を感じさせる完成度の高いプロポーションを持ち、引き締まったボディラインが現代フェラーリらしい美しさを際立たせています。',
-        'この個体は全体のまとまりが良く、スーパーカーらしい鋭さを保ちながらも、日常域で扱いやすいクリアな印象をしっかり残しています。'
-      ],
-      benefits: defaultBenefits,
-      features: defaultFeatures
-    },
-    {
-      id: 'lamborghini-aventador',
-      brandKey: 'lamborghini',
-      name: '兰博基尼 Aventador',
-      year: '2022',
-      type: 'V12超跑',
-      icon: 'b6.svg',
-      photo: '006.png',
-      gallery: ['006.png', '006.png', '006.png', '006.png'],
-      mileage: '1.25',
-      displacement: '6.5L',
-      cylinders: 'V12',
-      fuel: '汽油',
-      fuelOilType: '高辛烷汽油',
-      trans: 'AT',
-      totalPrice: '4,000,000 JPY',
-      basePrice: '3,780,000 JPY',
-      bodyStyle: '跑车',
-      drive: 'AWD',
-      bodyColor: '珍珠白',
-      interiorColor: '黑色 Alcantara',
-      seats: '2 座',
-      serviceRecord: '完整在册',
-      overview: [
-        'Aventador 保留了兰博基尼最具代表性的楔形姿态与 V12 气场，整车的存在感几乎不需要额外修饰。',
-        '从比例、声浪到细节完成度，它都更接近一台具有象征意味的旗舰超跑，而不只是单纯的性能机器。'
-      ],
-      overviewJa: [
-        'Aventador はランボルギーニを象徴するウェッジシェイプと V12 の圧倒的な存在感をそのまま体現しており、余計な演出がなくても十分な迫力を放つ一台です。',
-        'プロポーション、サウンド、細部の仕上がりに至るまで、単なる高性能車というよりブランドの象徴性を背負ったフラッグシップとしての空気感があります。'
-      ],
-      benefits: defaultBenefits,
-      features: defaultFeatures
-    },
-    {
-      id: 'lamborghini-huracan-evo',
-      brandKey: 'lamborghini',
-      name: '兰博基尼 Huracan EVO',
-      year: '2023',
-      type: '中置跑车',
-      icon: 'b1.svg',
-      photo: '003.png',
-      gallery: ['003.png', '003.png', '003.png', '003.png'],
-      mileage: '0.08',
-      displacement: '5.2L',
-      cylinders: 'V10',
-      fuel: '汽油',
-      fuelOilType: '高辛烷汽油',
-      trans: 'AT',
-      totalPrice: '2,680,000 JPY',
-      basePrice: '2,520,000 JPY',
-      bodyStyle: '跑车',
-      drive: 'AWD',
-      bodyColor: '珍珠黄',
-      interiorColor: '黑黄拼色',
-      seats: '2 座',
-      serviceRecord: '完整在册',
-      overview: [
-        'Huracan EVO 以极低里程保留了很新鲜的状态，车身比例紧凑直接，带着典型的兰博基尼视觉张力。',
-        '它的动态表达比外形更轻快，既适合城市环境中的展示感，也保留了周末驾驶时应有的灵活回应。'
-      ],
-      overviewJa: [
-        'Huracan EVO は極低走行らしい新鮮さを保っており、引き締まったボディバランスにはランボルギーニらしい視覚的な緊張感が宿っています。',
-        '見た目の強さに対して走りの反応は軽快で、街中での見栄えと週末のドライビングの楽しさをどちらも自然に楽しめる仕上がりです。'
-      ],
-      benefits: defaultBenefits,
-      features: defaultFeatures
-    },
-    {
-      id: 'lamborghini-urus-s',
-      brandKey: 'lamborghini',
-      name: '兰博基尼 Urus S',
-      year: '2024',
-      type: '高性能SUV',
-      icon: 'b1.svg',
-      photo: '004.png',
-      gallery: ['004.png', '004.png', '004.png', '004.png'],
-      mileage: '0.012',
-      displacement: '4.0L',
-      cylinders: 'V8',
-      fuel: '汽油',
-      fuelOilType: '高辛烷汽油',
-      trans: 'AT',
-      totalPrice: '2,280,000 JPY',
-      basePrice: '2,140,000 JPY',
-      bodyStyle: 'SUV',
-      drive: 'AWD',
-      bodyColor: '石墨灰',
-      interiorColor: '黑橙拼色',
-      seats: '5 座',
-      serviceRecord: '完整在册',
-      overview: [
-        'Urus S 在保留实用性的同时，依然维持了很强的品牌辨识度与性能氛围，是一台边界感很少的高性能 SUV。',
-        '整车状态新、配置完整，外观与座舱都呈现出相当统一的完成度，适合被放进更高频的日常使用场景里。'
-      ],
-      overviewJa: [
-        'Urus S は高い実用性を持ちながらも、ブランドらしいアイコン性とパフォーマンス感をしっかり残した、懐の深いハイパフォーマンス SUV です。',
-        '車両状態は非常に新しく、装備も整っており、エクステリアとインテリアの完成度に統一感があるため、日常の使用頻度が高い環境にも自然に馴染みます。'
-      ],
-      benefits: defaultBenefits,
-      features: defaultFeatures
-    },
-    {
-      id: 'lamborghini-huracan-sto',
-      brandKey: 'lamborghini',
-      name: '兰博基尼 Huracan STO',
-      year: '2022',
-      type: '中置跑车',
-      icon: 'b1.svg',
-      photo: '005.png',
-      gallery: ['005.png', '005.png', '005.png', '005.png'],
-      mileage: '0.54',
-      displacement: '5.2L',
-      cylinders: 'V10',
-      fuel: '汽油',
-      fuelOilType: '高辛烷汽油',
-      trans: 'AT',
-      totalPrice: '3,150,000 JPY',
-      basePrice: '2,960,000 JPY',
-      bodyStyle: '跑车',
-      drive: 'RWD',
-      bodyColor: '赛道灰',
-      interiorColor: '黑色 Alcantara',
-      seats: '2 座',
-      serviceRecord: '完整在册',
-      overview: [
-        'Huracan STO 的设定明显更偏赛道取向，空气动力学细节与车身姿态都带着非常直接的功能性表达。',
-        '它保留了更纯粹的操控导向，同时也让整车在静止状态下就有很强的收藏与展示意味。'
-      ],
-      overviewJa: [
-        'Huracan STO は明確にサーキット志向へ振られたモデルで、空力パーツや車体の構えそのものに機能性がストレートに表れています。',
-        '操作感はよりピュアで、停まっている状態でもコレクション性と展示映えの強さを感じさせる、非常に個性の立った一台です。'
-      ],
-      benefits: defaultBenefits,
-      features: defaultFeatures
-    },
-    {
-      id: 'lamborghini-gallardo',
-      brandKey: 'lamborghini',
-      name: '兰博基尼 Gallardo',
-      year: '2019',
-      type: '中置跑车',
-      icon: 'b1.svg',
-      photo: '002.png',
-      gallery: ['002.png', '002.png', '002.png', '002.png'],
-      mileage: '2.8',
-      displacement: '5.0L',
-      cylinders: 'V10',
-      fuel: '汽油',
-      fuelOilType: '高辛烷汽油',
-      trans: 'AT',
-      totalPrice: '1,480,000 JPY',
-      basePrice: '1,360,000 JPY',
-      bodyStyle: '跑车',
-      drive: 'AWD',
-      bodyColor: '黑曜石',
-      interiorColor: '黑色真皮',
-      seats: '2 座',
-      serviceRecord: '完整在册',
-      overview: [
-        'Gallardo 保留了兰博基尼早期非常鲜明的车身比例，线条更简洁，也更容易让人联想到品牌过去的设计阶段。',
-        '这台车的状态干净稳定，既有经典时期的气质，也带着很明确的品牌历史感。'
-      ],
-      overviewJa: [
-        'Gallardo はランボルギーニ初期の鮮烈なプロポーションを色濃く残し、よりシンプルなラインによってブランドの過去のデザイン文脈を想起させる一台です。',
-        'この個体はコンディションが安定しており、クラシックな時代感とブランドの歴史性を素直に味わえる内容にまとまっています。'
-      ],
-      benefits: defaultBenefits,
-      features: defaultFeatures
-    },
-    {
-      id: 'lamborghini-sian-fkp-37',
-      brandKey: 'lamborghini',
-      name: '兰博基尼 Sian FKP 37',
-      year: '2021',
-      type: '混动超跑',
-      icon: 'b1.svg',
-      photo: '001.png',
-      gallery: ['001.png', '001.png', '001.png', '001.png'],
-      mileage: '0.21',
-      displacement: '6.5L',
-      cylinders: 'V12',
-      fuel: 'HEV（混动）',
-      fuelOilType: '高辛烷汽油',
-      trans: 'AT',
-      totalPrice: '8,800,000 JPY',
-      basePrice: '8,320,000 JPY',
-      bodyStyle: '跑车',
-      drive: 'AWD',
-      bodyColor: '金属绿',
-      interiorColor: '黑金拼色',
-      seats: '2 座',
-      serviceRecord: '完整在册',
-      overview: [
-        'Sian FKP 37 兼具极高稀缺性与技术象征性，视觉表达和机械规格都处在品牌体系里非常特殊的位置。',
-        '相比常规量产超跑，它更像一件带有明确时代印记的收藏级作品，存在感和话题性都非常完整。'
-      ],
-      overviewJa: [
-        'Sian FKP 37 は圧倒的な希少性と技術的象徴性を併せ持ち、デザイン表現とメカニカルな存在感の両面でブランド内でも特別な立ち位置にあるモデルです。',
-        '一般的な量産スーパーカーというより、時代性を明確に刻んだコレクターズピースに近く、存在感も話題性も非常に完成度の高い一台です。'
-      ],
-      benefits: defaultBenefits,
-      features: defaultFeatures
-    },
-    {
-      id: 'lamborghini-urus-performante',
-      brandKey: 'lamborghini',
-      name: '兰博基尼 Urus Performante',
-      year: '2023',
-      type: '高性能SUV',
-      icon: 'b1.svg',
-      photo: '004.png',
-      gallery: ['004.png', '004.png', '004.png', '004.png'],
-      mileage: '0.036',
-      displacement: '4.0L',
-      cylinders: 'V8',
-      fuel: '汽油',
-      fuelOilType: '高辛烷汽油',
-      trans: 'AT',
-      totalPrice: '2,650,000 JPY',
-      basePrice: '2,490,000 JPY',
-      bodyStyle: 'SUV',
-      drive: 'AWD',
-      bodyColor: '哑光灰',
-      interiorColor: '黑红拼色',
-      seats: '5 座',
-      serviceRecord: '完整在册',
-      overview: [
-        'Urus Performante 在实用轮廓之上进一步强化了性能感，整车姿态、细节处理和运动氛围都更鲜明一些。',
-        '低里程让它保留了很完整的新鲜度，无论从外观状态还是驾驶预期来看，都处在很利落的区间里。'
-      ],
-      overviewJa: [
-        'Urus Performante は実用的な SUV の輪郭を保ちながら、さらに強いパフォーマンス色を与えられたモデルで、姿勢や細部の処理により濃いスポーツ感が表れています。',
-        '低走行によって新鮮な印象が残されており、外観の状態も走りへの期待値もともにシャープな水準にあります。'
-      ],
-      benefits: defaultBenefits,
-      features: defaultFeatures
-    },
-    {
-      id: 'lamborghini-huracan-evo-rwd',
-      brandKey: 'lamborghini',
-      name: '兰博基尼 Huracan EVO RWD',
-      year: '2020',
-      type: '中置跑车',
-      icon: 'b1.svg',
-      photo: '005.png',
-      gallery: ['005.png', '005.png', '005.png', '005.png'],
-      mileage: '0.92',
-      displacement: '5.2L',
-      cylinders: 'V10',
-      fuel: '汽油',
-      fuelOilType: '高辛烷汽油',
-      trans: 'AT',
-      totalPrice: '2,100,000 JPY',
-      basePrice: '1,960,000 JPY',
-      bodyStyle: '跑车',
-      drive: 'RWD',
-      bodyColor: '珍珠白',
-      interiorColor: '黑色真皮',
-      seats: '2 座',
-      serviceRecord: '完整在册',
-      overview: [
-        'Huracan EVO RWD 有着更直接的转向与车尾反馈，整车动态更轻快，也更接近传统后驱跑车的驾驶语气。',
-        '它在状态上保持得很整齐，既保留了兰博基尼应有的视觉张力，也多了一层更纯粹的操控趣味。'
-      ],
-      overviewJa: [
-        'Huracan EVO RWD はステアリングの初期応答とリアの動きがよりダイレクトで、伝統的な後輪駆動スポーツらしい軽快なドライビングフィールが魅力です。',
-        'コンディションも非常に整っており、ランボルギーニらしい視覚的な緊張感に加えて、より純粋な操る楽しさがしっかり感じられる一台です。'
-      ],
-      benefits: defaultBenefits,
-      features: defaultFeatures
-    }
-  ];
-
-  // If the API hydrate script (js/api-hydrate.js) populated live vehicles
-  // from the admin backend, merge them onto the static baseVehicles so the
-  // admin console drives the site while fields the admin does not manage
-  // (richly localised `specs`, `highlights`, `description`, etc.) keep
-  // falling back to the built-in defaults.  If the API has never been
-  // reached we behave exactly like before.
   const apiPresets = (window.TK168_API_PRESETS && typeof window.TK168_API_PRESETS === "object")
     ? window.TK168_API_PRESETS
     : null;
 
-  // Keep only values the admin actually set; an empty string or null means
-  // "fall back to whatever baseVehicles has for this field".
+  // Vehicle inventory comes exclusively from js/api-hydrate.js (TK168_API_VEHICLES).
   function pickDefined(src) {
     const out = {};
     if (!src || typeof src !== "object") return out;
@@ -961,19 +275,6 @@ window.TK168_DATA = (() => {
     return out;
   }
 
-  function mergeVehicleData(base, override) {
-    if (!base) return { ...override };
-    if (!override) return { ...base };
-    return { ...base, ...pickDefined(override) };
-  }
-
-  // When the backend has published vehicles we treat it as the source of
-  // truth: brand.html lists all published 品牌车辆；index.html 车辆网格再按「首页显示」筛选。
-  // The legacy brand-library-data.js is kept
-  // only as a catalog of brand logos / filters (no synthesized cards).
-  //
-  // If the API is unreachable we fall back to the old behaviour so file://
-  // previews and offline dev don't end up with an empty site.
   function buildMergedVehicleListFromHydrate() {
     const apiList = Array.isArray(window.TK168_API_VEHICLES)
       ? window.TK168_API_VEHICLES
@@ -981,19 +282,8 @@ window.TK168_DATA = (() => {
     const apiVehicleIds = apiList && apiList.length
       ? new Set(apiList.map((v) => v && v.id).filter(Boolean))
       : new Set();
-    let seed;
-    let includeBrandLibraryCards = false;
-    if (apiList && apiList.length) {
-      const baseById = new Map(baseVehicles.map((v) => [v.id, v]));
-      seed = apiList.map((apiV) => mergeVehicleData(baseById.get(apiV.id), apiV));
-    } else {
-      seed = baseVehicles;
-      includeBrandLibraryCards = true;
-    }
-    const raw = includeBrandLibraryCards
-      ? appendBrandLibraryVehicles(seed, brandLibraryItems)
-      : seed;
-    return raw
+    const seed = apiList && apiList.length ? apiList.slice() : [];
+    return seed
       .map((vehicle) => {
         const canonicalBrandKey = resolveCanonicalBrandKey(vehicle.brandKey);
         const v = canonicalBrandKey
@@ -1003,7 +293,6 @@ window.TK168_DATA = (() => {
       })
       .filter((vehicle) => {
         if (activeBrandKeySet.has(vehicle.brandKey)) return true;
-        // 后台「品牌车辆」写入的数据应全部可见；白名单只约束静态种子与品牌馆占位，避免 test 等自填品牌整卡被裁掉
         if (apiVehicleIds.size > 0 && vehicle.id && apiVehicleIds.has(vehicle.id)) {
           return true;
         }
@@ -1031,7 +320,7 @@ window.TK168_DATA = (() => {
       categoryJa: 'マーケット情報',
       categoryEn: 'Market update',
       date: '2026 · 04 · 08',
-      image: 'assets/images/f3.webp',
+      image: 'assets/images/placeholder.svg',
       summary: '从法拉利到布加迪，2026 年度最受关注的超跑阵容正在成形。TK168 为您提前梳理每一台车型背后的设计语言与性能看点……',
       summaryJa: 'フェラーリからブガッティまで、2026年に注目されるスーパーカーの顔ぶれが見え始めています。TK168 が各モデルのデザイン言語と性能面の見どころを先に整理します。',
       summaryEn: 'From Ferrari to Bugatti, the 2026 supercar line-up is starting to take shape. TK168 highlights the design language and performance points worth tracking in advance.'
@@ -1045,7 +334,7 @@ window.TK168_DATA = (() => {
       categoryJa: '新規入庫',
       categoryEn: 'New arrival',
       date: '2026 · 03 · 28',
-      image: 'assets/images/f4.webp'
+      image: 'assets/images/placeholder.svg'
     },
     {
       id: 'static-2',
@@ -1056,7 +345,7 @@ window.TK168_DATA = (() => {
       categoryJa: 'ブランドトピックス',
       categoryEn: 'Brand story',
       date: '2026 · 03 · 12',
-      image: 'assets/images/f7.webp'
+      image: 'assets/images/placeholder.svg'
     }
   ];
 
@@ -2404,7 +1693,6 @@ window.TK168_DATA = (() => {
         labelZh: tri.zh,
         labelEn: tri.en,
         file: "",
-        heroImage: "assets/images/f2.webp",
         isCatalogOnly: true
       };
     }
@@ -2416,7 +1704,6 @@ window.TK168_DATA = (() => {
       labelZh: en,
       labelEn: en,
       file: "",
-      heroImage: "assets/images/f2.webp",
       isCatalogOnly: true
     };
   }
@@ -2468,8 +1755,7 @@ window.TK168_DATA = (() => {
   /** Single-row merge for forms when `vehicles` list has not yet refreshed from API (same rules as buildMergedVehicleListFromHydrate). */
   function buildInventoryVehicleFromApiRow(apiV) {
     if (!apiV || !apiV.id) return null;
-    const baseById = new Map(baseVehicles.map((v) => [v.id, v]));
-    let vehicle = mergeVehicleData(baseById.get(apiV.id), apiV);
+    let vehicle = { ...apiV };
     const canonicalBrandKey = resolveCanonicalBrandKey(vehicle.brandKey);
     vehicle = canonicalBrandKey ? { ...vehicle, brandKey: canonicalBrandKey } : { ...vehicle };
     return normalizeVehicleEngineFields(vehicle);
@@ -2501,23 +1787,8 @@ window.TK168_DATA = (() => {
     return getVehicleTotalPrice(vehicle);
   }
 
-  const rentalProfiles = {
-    'lamborghini-urus': { rentable: true, rentalStatus: 'available', dailyRate: 5600, deposit: 120000, minDays: 2 },
-    'audi-r8-spyder': { rentable: true, rentalStatus: 'available', dailyRate: 4800, deposit: 100000, minDays: 2 },
-    'ferrari-458-italia': { rentable: true, rentalStatus: 'reserved', dailyRate: 5200, deposit: 120000, minDays: 3 },
-    'bmw-x6-m': { rentable: true, rentalStatus: 'available', dailyRate: 3600, deposit: 80000, minDays: 2 },
-    'ferrari-488-gtb': { rentable: true, rentalStatus: 'rented', dailyRate: 5600, deposit: 130000, minDays: 3 },
-    'lamborghini-aventador': { rentable: true, rentalStatus: 'available', dailyRate: 7600, deposit: 180000, minDays: 3 },
-    'lamborghini-huracan-evo': { rentable: true, rentalStatus: 'available', dailyRate: 6800, deposit: 150000, minDays: 3 },
-    'lamborghini-urus-s': { rentable: true, rentalStatus: 'available', dailyRate: 6000, deposit: 130000, minDays: 2 },
-    'lamborghini-huracan-sto': { rentable: true, rentalStatus: 'reserved', dailyRate: 7200, deposit: 160000, minDays: 3 },
-    'lamborghini-gallardo': { rentable: true, rentalStatus: 'available', dailyRate: 4300, deposit: 90000, minDays: 2 }
-  };
 
-  // Rentals live in a separate API-backed inventory
-  // (`window.TK168_API_RENTALS` populated by js/api-hydrate.js).  We keep
-  // the legacy `rentalProfiles` object as a last-resort fallback so the
-  // site still renders if the API is unreachable.
+  // Rentals live in a separate API-backed inventory (window.TK168_API_RENTALS populated by js/api-hydrate.js).
   function getApiRentals() {
     const list = window.TK168_API_RENTALS;
     return Array.isArray(list) ? list : null;
@@ -2536,8 +1807,7 @@ window.TK168_DATA = (() => {
   }
 
   /**
-   * 租赁详情页首屏解析用：优先 API 租赁表；否则与 rental 列表相同逻辑，用「在库车 + rentalProfiles」兜底，
-   * 避免无 session 缓存且列表请求尚未完成时 currentVehicle 为空、侧边栏骨架永远不替换。
+   * 租赁详情页首屏解析用：优先 API 租赁表；在库车兜底仅当该 id 已在租赁 API 中标记可租时生效。
    */
   function resolveRentalDetailPageVehicle(id) {
     const clean = String(id || '').trim();
@@ -2597,19 +1867,12 @@ window.TK168_DATA = (() => {
       };
     }
 
-    const profile = rentalProfiles[vehicleId] || {};
-    const rentable = Boolean(profile.rentable);
-    const rentalStatus = profile.rentalStatus || (rentable ? 'available' : 'unavailable');
-    const dailyRate = Number(profile.dailyRate) > 0 ? Number(profile.dailyRate) : 0;
-    const deposit = Number(profile.deposit) > 0 ? Number(profile.deposit) : 0;
-    const minDays = Number(profile.minDays) > 0 ? Number(profile.minDays) : 1;
-
     return {
-      rentable,
-      rentalStatus,
-      dailyRate,
-      deposit,
-      minDays
+      rentable: false,
+      rentalStatus: 'unavailable',
+      dailyRate: 0,
+      deposit: 0,
+      minDays: 1
     };
   }
 
@@ -2718,27 +1981,8 @@ window.TK168_DATA = (() => {
 
   function getRentableVehicles() {
     const apiRentals = getApiRentals();
-    const rentalApiIds = new Set();
-    const combined = [];
-
-    if (apiRentals && apiRentals.length) {
-      const fromApi = apiRentals.map(buildRentalVehicleRecord);
-      fromApi.forEach((v) => {
-        if (v && v.id) rentalApiIds.add(v.id);
-      });
-      combined.push(...fromApi);
-    }
-
-    const fromInventory = vehicles
-      .filter((vehicle) => vehicle.id && !rentalApiIds.has(vehicle.id) && rentalProfiles[vehicle.id])
-      .map((vehicle) => ({
-        ...vehicle,
-        rentalStatus: normalizeRentalFleetStatus(getVehicleRentalProfile(vehicle).rentalStatus),
-        minDays: getVehicleRentalProfile(vehicle).minDays,
-      }));
-
-    combined.push(...fromInventory);
-    return sortRentalFleetRecordsByStatus(combined);
+    if (!apiRentals || !apiRentals.length) return [];
+    return sortRentalFleetRecordsByStatus(apiRentals.map(buildRentalVehicleRecord));
   }
 
   /** 前台标价：中日英统一「X万 JPY」（日本円÷1万）。用于买卖车源与租赁保証金。 */
@@ -2980,12 +2224,28 @@ window.TK168_DATA = (() => {
   }
 
   /**
+   * Vercel 等线上环境启用 cleanUrls（/detail → detail.html）；Live Server / 局域网静态服不支持。
+   */
+  function siteUsesCleanHtmlUrls() {
+    if (typeof window === 'undefined') return false;
+    const host = String(window.location.hostname || '').toLowerCase();
+    if (!host || host === 'localhost' || host === '127.0.0.1' || host === '[::1]') return false;
+    if (/^192\.168\./.test(host) || /^10\./.test(host) || /^172\.(1[6-9]|2\d|3[01])\./.test(host)) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * 在 clean URL 环境下（路径为 /home、/detail 等无 .html 后缀），若仍链到
    * `detail.html?id=…`，部分服务器会 301 到 `/detail` 并丢掉查询串，详情页读不到 id。
    * 此时改为生成同目录下的 `/detail?…`（或子路径前缀 + /detail）。
    */
   function resolveDetailHref(queryString) {
     if (typeof window === 'undefined' || !/^https?:$/i.test(String(window.location.protocol || ''))) {
+      return `detail.html?${queryString}`;
+    }
+    if (!siteUsesCleanHtmlUrls()) {
       return `detail.html?${queryString}`;
     }
     const path = window.location.pathname || '/';
@@ -3023,7 +2283,8 @@ window.TK168_DATA = (() => {
   function mergeApiVehicleWithBase(apiFlat) {
     if (!apiFlat || !apiFlat.id) return null;
     const base = getVehicleById(apiFlat.id);
-    return normalizeVehicleEngineFields(mergeVehicleData(base, apiFlat));
+    const merged = base ? { ...base, ...pickDefined(apiFlat) } : { ...apiFlat };
+    return normalizeVehicleEngineFields(merged);
   }
 
   return {

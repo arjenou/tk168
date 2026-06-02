@@ -21,8 +21,8 @@ INSERT INTO journal_entries (
   'フェラーリからブガッティまで、2026年に注目されるスーパーカーの顔ぶれが見え始めています。TK168 が各モデルのデザイン言語と性能面の見どころを先に整理します。',
   'From Ferrari to Bugatti, the 2026 supercar line-up is starting to take shape. TK168 highlights the design language and performance points worth tracking in advance.',
   NULL, NULL, NULL,
-  NULL,
-  'assets/images/f3.webp',
+  'seed:journal/seed/nseed001.webp',
+  '/api/media/journal/seed/nseed001.webp',
   '2026 · 04 · 08',
   0,
   1
@@ -37,8 +37,8 @@ INSERT INTO journal_entries (
   'New arrival',
   NULL, NULL, NULL,
   NULL, NULL, NULL,
-  NULL,
-  'assets/images/f4.webp',
+  'seed:journal/seed/nseed002.webp',
+  '/api/media/journal/seed/nseed002.webp',
   '2026 · 03 · 28',
   1,
   1
@@ -53,8 +53,8 @@ INSERT INTO journal_entries (
   'Brand story',
   NULL, NULL, NULL,
   NULL, NULL, NULL,
-  NULL,
-  'assets/images/f7.webp',
+  'seed:journal/seed/nseed003.webp',
+  '/api/media/journal/seed/nseed003.webp',
   '2026 · 03 · 12',
   2,
   1

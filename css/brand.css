@@ -247,31 +247,9 @@ html:lang(ja) .bn-name {
   letter-spacing: 0.01em;
 }
 
-#brand-nav-section::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(72% 72% at 16% 20%, rgba(198, 209, 224, 0.42) 0%, rgba(198, 209, 224, 0) 78%),
-    radial-gradient(84% 70% at 87% 74%, rgba(219, 226, 236, 0.38) 0%, rgba(219, 226, 236, 0) 80%);
-  animation: bnAmbientShift 16s ease-in-out infinite;
-}
-
+#brand-nav-section::before,
 #brand-nav-section::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.18;
-  background:
-    repeating-linear-gradient(
-      0deg,
-      rgba(255, 255, 255, 0.42) 0px,
-      rgba(255, 255, 255, 0.42) 1px,
-      rgba(255, 255, 255, 0) 1px,
-      rgba(255, 255, 255, 0) 4px
-    );
+  content: none;
 }
 
 .bn-grid {
@@ -537,33 +515,12 @@ html:lang(ja) .bn-name {
   width: 100%;
   max-width: var(--brand-page-shell);
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 48px minmax(0, 1fr) 48px;
-  align-items: center;
-  gap: clamp(8px, 1vw, 12px);
+  display: block;
   box-sizing: border-box;
 }
 
 .bn-control {
-  position: relative;
-  isolation: isolate;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 156px;
-  border: 1px solid rgba(43, 41, 38, 0.08);
-  border-radius: 18px;
-  background: #F0F0F2;
-  color: #171717;
-  box-shadow:
-    0 12px 26px rgba(43, 41, 38, 0.08),
-    0 22px 38px rgba(43, 41, 38, 0.04);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  cursor: pointer;
-  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease, color 180ms ease;
+  display: none;
 }
 
 .bn-control::before {
@@ -624,10 +581,41 @@ html:lang(ja) .bn-name {
 .bn-track {
   position: relative;
   z-index: 1;
+  --bn-card-min: 128px;
+  --bn-visible-count: 4;
+  --bn-gap: clamp(10px, 2vw, 16px);
   display: grid;
-  grid-template-columns: repeat(var(--bn-visible-count, 6), minmax(0, 1fr));
-  gap: clamp(10px, 1.5vw, 18px);
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - (var(--bn-visible-count) - 1) * var(--bn-gap)) / var(--bn-visible-count));
+  gap: var(--bn-gap);
+  align-items: stretch;
   min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  /* 为 hover/active 的 translateY 留出空间，避免顶部被 overflow 裁切 */
+  padding: 4px 0 2px;
+  cursor: grab;
+  touch-action: pan-x;
+  background: transparent;
+}
+
+.bn-track::-webkit-scrollbar {
+  display: none;
+}
+
+.bn-track.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  scroll-behavior: auto;
+}
+
+.bn-track.is-dragging .bn-thumb {
+  pointer-events: none;
 }
 
 #vehicles.brand-vehicles .vehicle-slider-shell {
@@ -643,10 +631,11 @@ html:lang(ja) .bn-name {
 
 .bn-thumb {
   position: relative;
+  scroll-snap-align: start;
   min-width: 0;
   min-height: 156px;
   padding: 22px 14px 18px;
-  border: 1px solid rgba(43, 41, 38, 0.06);
+  border: 1px solid rgba(43, 41, 38, 0.1);
   border-radius: 28px;
   display: flex;
   flex-direction: column;
@@ -655,14 +644,12 @@ html:lang(ja) .bn-name {
   gap: 14px;
   text-decoration: none;
   color: rgba(34, 40, 47, 0.88);
-  background: #F0F0F2;
-  box-shadow:
-    0 12px 26px rgba(43, 41, 38, 0.08),
-    0 22px 38px rgba(43, 41, 38, 0.04);
+  background: #FFFFFF;
+  box-shadow: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   will-change: transform, box-shadow;
-  transform: translateY(-3px);
+  transform: none;
   transition:
     transform 180ms ease,
     background-color 180ms ease,
@@ -672,97 +659,37 @@ html:lang(ja) .bn-name {
 }
 
 .bn-thumb::before {
-  content: "";
-  position: absolute;
-  inset: 1px;
-  border-radius: inherit;
-  border: 1px solid rgba(255, 255, 255, 0.36);
-  background: transparent;
-  opacity: 0.88;
-  pointer-events: none;
-  transition: border-color 180ms ease, opacity 180ms ease, background 220ms ease, box-shadow 220ms ease;
+  content: none;
 }
 
 .bn-thumb::after {
-  content: "";
-  position: absolute;
-  left: 18%;
-  right: 18%;
-  bottom: -10px;
-  height: 18px;
-  border-radius: 999px;
-  background: radial-gradient(closest-side, rgba(43, 41, 38, 0.1), rgba(43, 41, 38, 0));
-  filter: blur(10px);
-  opacity: 0.2;
-  pointer-events: none;
-  transition: opacity 180ms ease, transform 180ms ease;
+  content: none;
 }
 
 .bn-thumb:focus-visible {
   outline: 2px solid rgba(23, 23, 23, 0.16);
   outline-offset: 4px;
-  transform: translateY(-5px);
-  color: rgba(255, 255, 255, 0.92);
-  background: #989898;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
-    0 24px 48px rgba(43, 41, 38, 0.22),
-    0 40px 68px rgba(43, 41, 38, 0.1),
-    0 0 0 1px rgba(242, 250, 90, 0.16),
-    0 0 24px rgba(242, 250, 90, 0.12);
-}
-
-.bn-thumb:focus-visible::before {
-  border-color: rgba(255, 255, 255, 0.24);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04) 44%, rgba(255, 255, 255, 0.08) 100%);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
-    0 0 0 1px rgba(242, 250, 90, 0.24),
-    0 0 28px rgba(242, 250, 90, 0.2),
-    0 0 48px rgba(242, 250, 90, 0.12);
-}
-
-.bn-thumb:focus-visible::after {
-  background:
-    radial-gradient(closest-side, rgba(43, 41, 38, 0.18), rgba(43, 41, 38, 0)),
-    radial-gradient(closest-side, rgba(242, 250, 90, 0.3), rgba(242, 250, 90, 0));
-  opacity: 0.62;
-  transform: translateY(5px) scaleX(1.22);
+  transform: translateY(-1px);
+  color: rgba(34, 40, 47, 0.92);
+  background: #FFFFFF;
+  border-color: rgba(23, 23, 23, 0.18);
+  box-shadow: none;
 }
 
 .bn-thumb.is-active {
   z-index: 2;
-  border-color: rgba(242, 250, 90, 0.24);
-  color: rgba(255, 255, 255, 0.92);
-  background: #989898;
-  transform: translateY(-8px) scale(1.02);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
-    0 24px 48px rgba(43, 41, 38, 0.22),
-    0 40px 68px rgba(43, 41, 38, 0.1),
-    0 0 0 1px rgba(242, 250, 90, 0.16),
-    0 0 24px rgba(242, 250, 90, 0.12);
-  animation: bnThumbActive 1.85s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  border-color: rgba(23, 23, 23, 0.22);
+  color: rgba(34, 40, 47, 0.95);
+  background: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: none;
 }
 
-.bn-thumb.is-active::before {
-  border-color: rgba(255, 255, 255, 0.24);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04) 44%, rgba(255, 255, 255, 0.08) 100%);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
-    0 0 0 1px rgba(242, 250, 90, 0.24),
-    0 0 28px rgba(242, 250, 90, 0.2),
-    0 0 48px rgba(242, 250, 90, 0.12);
-}
-
-.bn-thumb.is-active::after {
-  background:
-    radial-gradient(closest-side, rgba(43, 41, 38, 0.18), rgba(43, 41, 38, 0)),
-    radial-gradient(closest-side, rgba(242, 250, 90, 0.3), rgba(242, 250, 90, 0));
-  opacity: 0.62;
-  transform: translateY(5px) scaleX(1.22);
+.bn-thumb.is-active::before,
+.bn-thumb.is-active::after,
+.bn-thumb:focus-visible::before,
+.bn-thumb:focus-visible::after {
+  content: none;
 }
 
 .bn-thumb__logo-wrap {
@@ -805,68 +732,38 @@ html:lang(ja) .bn-name {
 
 .bn-thumb.is-active .bn-thumb__logo {
   transform: translateY(-1px) scale(1.03);
-  filter:
-    brightness(0)
-    invert(1)
-    drop-shadow(0 0 6px rgba(255, 255, 255, 0.46))
-    drop-shadow(0 0 14px rgba(242, 250, 90, 0.42))
-    drop-shadow(0 0 28px rgba(242, 250, 90, 0.26));
-  animation: bnLogoWhiteGlow 1.85s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  filter: drop-shadow(0 6px 12px rgba(24, 24, 28, 0.12));
 }
 
 .bn-thumb.is-active .bn-thumb__label {
   transform: translateY(-1px);
-  color: rgba(255, 255, 255, 0.92);
-  text-shadow: 0 0 12px rgba(242, 250, 90, 0.16);
+  color: rgba(43, 41, 38, 0.88);
+  text-shadow: none;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .bn-thumb:not(.is-active):hover {
     z-index: 2;
-    transform: translateY(-11px) scale(1.028);
-    border-color: rgba(242, 250, 90, 0.24);
-    color: rgba(255, 255, 255, 0.92);
-    background: #989898;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.28),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.08),
-      0 24px 48px rgba(43, 41, 38, 0.22),
-      0 40px 68px rgba(43, 41, 38, 0.1),
-      0 0 0 1px rgba(242, 250, 90, 0.16),
-      0 0 24px rgba(242, 250, 90, 0.12);
+    transform: translateY(-2px);
+    border-color: rgba(23, 23, 23, 0.16);
+    color: rgba(34, 40, 47, 0.92);
+    background: #FFFFFF;
+    box-shadow: none;
   }
 
-  .bn-thumb:not(.is-active):hover::before {
-    border-color: rgba(255, 255, 255, 0.24);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04) 44%, rgba(255, 255, 255, 0.08) 100%);
-    box-shadow:
-      inset 0 0 0 1px rgba(255, 255, 255, 0.1),
-      0 0 0 1px rgba(242, 250, 90, 0.24),
-      0 0 28px rgba(242, 250, 90, 0.2),
-      0 0 48px rgba(242, 250, 90, 0.12);
-  }
-
+  .bn-thumb:not(.is-active):hover::before,
   .bn-thumb:not(.is-active):hover::after {
-    background:
-      radial-gradient(closest-side, rgba(43, 41, 38, 0.18), rgba(43, 41, 38, 0)),
-      radial-gradient(closest-side, rgba(242, 250, 90, 0.3), rgba(242, 250, 90, 0));
-    opacity: 0.62;
-    transform: translateY(8px) scaleX(1.22);
+    content: none;
   }
 
   .bn-thumb:not(.is-active):hover .bn-thumb__logo {
-    transform: translateY(-1px) scale(1.03);
-    filter:
-      brightness(0)
-      invert(1)
-      drop-shadow(0 0 6px rgba(255, 255, 255, 0.46))
-      drop-shadow(0 0 14px rgba(242, 250, 90, 0.42))
-      drop-shadow(0 0 28px rgba(242, 250, 90, 0.26));
+    transform: translateY(-1px) scale(1.02);
+    filter: drop-shadow(0 4px 8px rgba(24, 24, 28, 0.08));
   }
 
   .bn-thumb:not(.is-active):hover .bn-thumb__label {
-    color: rgba(255, 255, 255, 0.92);
-    text-shadow: 0 0 12px rgba(242, 250, 90, 0.16);
+    color: rgba(43, 41, 38, 0.82);
+    text-shadow: none;
   }
 }
 
@@ -1060,19 +957,9 @@ html:lang(ja) .bn-name {
     padding: 34px var(--page-gutter-mobile) 42px;
   }
 
-  .bn-shell {
-    grid-template-columns: 42px minmax(0, 1fr) 42px;
-    gap: 10px;
-  }
-
-  .bn-control {
-    width: 42px;
-    height: 122px;
-    border-radius: 14px;
-  }
-
   .bn-track {
-    gap: 10px;
+    --bn-card-min: 112px;
+    --bn-gap: 10px;
   }
 
   .bn-thumb {
@@ -1214,23 +1101,9 @@ html:lang(ja) .bn-name {
 }
 
 @media (max-width: 480px) {
-  .bn-shell {
-    grid-template-columns: 34px minmax(0, 1fr) 34px;
-    gap: 8px;
-  }
-
-  .bn-control {
-    width: 34px;
-    height: 108px;
-    border-radius: 12px;
-  }
-
-  .bn-control span {
-    font-size: 16px;
-  }
-
   .bn-track {
-    gap: 8px;
+    --bn-card-min: 100px;
+    --bn-gap: 8px;
   }
 
   .bn-thumb {

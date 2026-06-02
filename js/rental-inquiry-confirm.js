@@ -347,9 +347,9 @@
     if (vehicle && Array.isArray(vehicle.gallery) && vehicle.gallery.length) {
       vehicle.gallery.forEach(add);
     } else if (vehicle) {
-      add(vehicle.photo || vehicle.gallery?.[0] || '011.jpg');
+      add(vehicle.photo || vehicle.gallery?.[0] || 'placeholder.svg');
     }
-    if (!out.length) add('011.jpg');
+    if (!out.length) add('placeholder.svg');
     return out;
   }
 
