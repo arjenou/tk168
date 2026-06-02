@@ -131,18 +131,6 @@ export async function compressPanoramaFile(env, file) {
   } catch (cause) {
     if (cause?.status) throw cause;
     console.error("panorama_compress_failed", cause);
-
-    // 已是较小 JPEG 时降级为原图入库，避免 Images 偶发失败导致无法上传
-    if (originalBytes <= 6 * 1024 * 1024 && /jpe?g/.test(inputType)) {
-      return {
-        body: buffer,
-        contentType: "image/jpeg",
-        ext: "jpg",
-        originalBytes,
-        compressedBytes: originalBytes,
-      };
-    }
-
     throw makeApiError(
       "panorama_compress_failed",
       422,
