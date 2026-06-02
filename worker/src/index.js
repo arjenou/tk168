@@ -18,6 +18,8 @@ import {
   reorderVehicleImages,
   uploadVehicleStaffPhoto,
   clearVehicleStaffPhoto,
+  uploadVehiclePanorama,
+  clearVehiclePanorama,
 } from "./vehicles.js";
 import {
   listRentals,
@@ -30,6 +32,8 @@ import {
   reorderRentalImages,
   uploadRentalStaffPhoto,
   clearRentalStaffPhoto,
+  uploadRentalPanorama,
+  clearRentalPanorama,
 } from "./rentals.js";
 import {
   listJournalEntries,
@@ -387,6 +391,21 @@ async function handleApi(request, env, url) {
       const vehicle = await clearVehicleStaffPhoto(env, vehicleId);
       return json({ vehicle });
     }
+    const panoramaMatch = /^\/admin\/vehicles\/([^/]+)\/panorama$/.exec(path);
+    if (panoramaMatch && method === "POST") {
+      const vehicleId = decodeURIComponent(panoramaMatch[1]);
+      const form = await request.formData();
+      const file = form.get("file");
+      if (!(file instanceof File)) return error(400, "no_file");
+      const vehicle = await uploadVehiclePanorama(env, vehicleId, file);
+      const { panoramaCompress, ...vehicleOut } = vehicle;
+      return json({ vehicle: vehicleOut, panoramaCompress });
+    }
+    if (panoramaMatch && method === "DELETE") {
+      const vehicleId = decodeURIComponent(panoramaMatch[1]);
+      const vehicle = await clearVehiclePanorama(env, vehicleId);
+      return json({ vehicle });
+    }
   }
 
   // Rentals (parallel to vehicles but a distinct inventory)
@@ -514,6 +533,21 @@ async function handleApi(request, env, url) {
       const rental = await clearRentalStaffPhoto(env, rentalId);
       return json({ rental });
     }
+    const panoramaRentalMatch = /^\/admin\/rentals\/([^/]+)\/panorama$/.exec(path);
+    if (panoramaRentalMatch && method === "POST") {
+      const rentalId = decodeURIComponent(panoramaRentalMatch[1]);
+      const form = await request.formData();
+      const file = form.get("file");
+      if (!(file instanceof File)) return error(400, "no_file");
+      const rental = await uploadRentalPanorama(env, rentalId, file);
+      const { panoramaCompress, ...rentalOut } = rental;
+      return json({ rental: rentalOut, panoramaCompress });
+    }
+    if (panoramaRentalMatch && method === "DELETE") {
+      const rentalId = decodeURIComponent(panoramaRentalMatch[1]);
+      const rental = await clearRentalPanorama(env, rentalId);
+      return json({ rental });
+    }
   }
 
   return error(404, "not_found");
@@ -537,7 +571,7 @@ export default {
         const status = err?.status && Number.isInteger(err.status) ? err.status : 500;
         const code = err?.message || "internal_error";
         if (status >= 500) console.error("API error:", err);
-        response = error(status, code);
+        response = error(status, code, err?.apiMessage || code);
       }
       return withCors(response, request, env);
     }

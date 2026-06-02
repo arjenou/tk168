@@ -39,6 +39,10 @@ database_id = "98fcc2a7-0461-41b7-9e01-238e9d78b3bc"
 binding = "R2"
 bucket_name = "tk168-media"
 
+# 360° 全景上传：在 Worker 内缩放并转 JPEG 后再写入 R2
+[images]
+binding = "IMAGES"
+
 [vars]
 # Origins allowed to call the API with credentials.  Adjust here to add
 # preview/staging domains later.  RFC1918 LAN http:// origins (10/8, 192.168/16, …)

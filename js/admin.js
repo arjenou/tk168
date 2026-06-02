@@ -127,6 +127,7 @@ const RESOURCES = {
       `/admin/vehicles/${encodeURIComponent(id)}/images/${imgId}`,
     apiImagesReorder: (id) => `/admin/vehicles/${encodeURIComponent(id)}/images/reorder`,
     apiStaffPhoto: (id) => `/admin/vehicles/${encodeURIComponent(id)}/staff-photo`,
+    apiPanorama: (id) => `/admin/vehicles/${encodeURIComponent(id)}/panorama`,
     listKey: "vehicles",
     itemKey: "vehicle",
     duplicateCode: "vehicle_id_taken",
@@ -253,6 +254,8 @@ const RESOURCES = {
       staffPhotoUrl: null,
       staffMessage: "",
       staffPhone: "",
+      panoramaR2Key: null,
+      panoramaUrl: null,
       displayOrder: 0, isPublished: true, showOnHome: true, images: [],
     }),
   },
@@ -267,6 +270,7 @@ const RESOURCES = {
       `/admin/rentals/${encodeURIComponent(id)}/images/${imgId}`,
     apiImagesReorder: (id) => `/admin/rentals/${encodeURIComponent(id)}/images/reorder`,
     apiStaffPhoto: (id) => `/admin/rentals/${encodeURIComponent(id)}/staff-photo`,
+    apiPanorama: (id) => `/admin/rentals/${encodeURIComponent(id)}/panorama`,
     listKey: "rentals",
     itemKey: "rental",
     duplicateCode: "rental_id_taken",
@@ -406,6 +410,8 @@ const RESOURCES = {
       staffPhotoUrl: null,
       staffMessage: "",
       staffPhone: "",
+      panoramaR2Key: null,
+      panoramaUrl: null,
       displayOrder: 0, isPublished: true, images: [],
     }),
   },
@@ -660,6 +666,25 @@ function shouldAbandonNewDraft(r, item) {
 
 function currentResource() {
   return RESOURCES[state.resource];
+}
+
+function formatFileSize(bytes) {
+  const n = Number(bytes);
+  if (!Number.isFinite(n) || n <= 0) return "0 B";
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function panoramaUploadSuccessMessage(panoramaCompress) {
+  if (!panoramaCompress?.originalBytes || !panoramaCompress?.compressedBytes) {
+    return "360° 全景图已更新（服务器已自动压缩）";
+  }
+  const { originalBytes, compressedBytes } = panoramaCompress;
+  if (compressedBytes >= originalBytes) {
+    return `360° 全景图已更新（${formatFileSize(compressedBytes)}）`;
+  }
+  const pct = Math.round((1 - compressedBytes / originalBytes) * 100);
+  return `360° 全景已压缩上传：${formatFileSize(originalBytes)} → ${formatFileSize(compressedBytes)}（约减 ${pct}%）`;
 }
 
 // -------------------- API helpers --------------------
@@ -1985,6 +2010,39 @@ function renderJournalContentTab(draft) {
   `;
 }
 
+function renderPanoramaAsideSection(draft) {
+  const hasPanorama = Boolean(draft.panoramaUrl);
+  const previewSrc = hasPanorama ? escapeAttr(resolveMediaUrlForImg(draft.panoramaUrl)) : "";
+  return `
+        <section class="admin-card admin-card--panorama">
+          <h2>360° 全景图</h2>
+          <p class="admin-cover-meta" style="margin:0 0 12px;">
+            详情页「360°」缩略图点开后的环顾图。请上传 <strong>2:1</strong> 等距柱状全景（Insta360 导出的 JPG 等）。<strong>原图可直接上传</strong>（最大 48MB），服务器会自动缩放到最长边 6144px 并转为 JPEG。
+          </p>
+          <div class="admin-panorama-preview ${
+            hasPanorama ? "" : "admin-cover-empty"
+          }" id="adminPanoramaPreview">
+            ${
+              hasPanorama
+                ? `<img src="${previewSrc}" alt="" loading="lazy" decoding="async">`
+                : "暂未上传 360° 全景"
+            }
+          </div>
+          <div class="admin-upload" style="margin-top:12px;">
+            <input class="admin-staff-file" id="panoramaUpload" type="file" accept="image/jpeg,image/png,image/webp,image/jpg" aria-label="选择 360 全景图">
+            <label for="panoramaUpload" class="admin-btn admin-btn-sm admin-btn-primary" style="display:inline-flex;margin:0;">${
+              hasPanorama ? "更换全景图" : "上传全景图"
+            }</label>
+            ${
+              hasPanorama
+                ? `<button type="button" class="admin-btn admin-btn-sm admin-btn-ghost" id="panoramaClear" style="margin-left:8px;">移除</button>`
+                : ""
+            }
+          </div>
+        </section>
+  `;
+}
+
 function renderVehicleStaffSection(draft) {
   const hasImg = Boolean(draft.staffPhotoUrl);
   const imgSrc = hasImg ? escapeAttr(resolveMediaUrlForImg(draft.staffPhotoUrl)) : "";
@@ -2347,6 +2405,7 @@ function renderEditor() {
             <div style="margin-top:8px;color:var(--admin-text-dim);font-size:12px;">JPG / PNG / WEBP / AVIF，单张建议 5MB 以内</div>
           </div>
         </section>
+        ${r.key === "vehicles" || r.key === "rentals" ? renderPanoramaAsideSection(draft) : ""}
       </aside>`;
 
   const inner = `
@@ -2882,6 +2941,66 @@ function bindEditor() {
         }
         renderEditor();
         showToast("已移除员工照片");
+      } catch (err) {
+        showToast(`操作失败：${err.message}`, "error");
+      }
+    });
+  }
+
+  if (
+    (r.key === "vehicles" || r.key === "rentals") &&
+    typeof r.apiPanorama === "function"
+  ) {
+    document.getElementById("panoramaUpload")?.addEventListener("change", async (event) => {
+      const files = Array.from(event.target.files || []);
+      event.target.value = "";
+      if (files.length === 0) return;
+      const file = files[0];
+      try {
+        showToast("正在上传并压缩全景图…", "success", 12000);
+        const form = new FormData();
+        form.append("file", file);
+        const res = await api(r.apiPanorama(state.editingId), { method: "POST", body: form });
+        const item = res[r.itemKey];
+        state.editingDraft = {
+          ...state.editingDraft,
+          panoramaR2Key: item.panoramaR2Key,
+          panoramaUrl: item.panoramaUrl,
+        };
+        const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
+        if (cached) {
+          cached.panoramaR2Key = item.panoramaR2Key;
+          cached.panoramaUrl = item.panoramaUrl;
+        }
+        renderEditor();
+        showToast(panoramaUploadSuccessMessage(res.panoramaCompress));
+      } catch (err) {
+        const hint =
+          err.code === "panorama_too_large"
+            ? err.message
+            : err.code === "panorama_compress_failed" || err.code === "panorama_compress_unavailable"
+              ? err.message
+              : `上传失败：${err.message}`;
+        showToast(hint, "error");
+      }
+    });
+    document.getElementById("panoramaClear")?.addEventListener("click", async () => {
+      if (!confirm("移除 360° 全景图？详情页将无法拖动环顾。")) return;
+      try {
+        const res = await api(r.apiPanorama(state.editingId), { method: "DELETE" });
+        const item = res[r.itemKey];
+        state.editingDraft = {
+          ...state.editingDraft,
+          panoramaR2Key: item.panoramaR2Key,
+          panoramaUrl: item.panoramaUrl,
+        };
+        const cached = (state.items[r.key] || []).find((v) => v.id === state.editingId);
+        if (cached) {
+          cached.panoramaR2Key = item.panoramaR2Key;
+          cached.panoramaUrl = item.panoramaUrl;
+        }
+        renderEditor();
+        showToast("已移除 360° 全景图");
       } catch (err) {
         showToast(`操作失败：${err.message}`, "error");
       }

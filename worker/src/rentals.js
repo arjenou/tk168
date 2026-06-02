@@ -4,6 +4,7 @@
 // with extra pricing + status columns.
 
 import { coerceForcedInductionFieldsForWrite } from "./forced-induction-write.js";
+import { compressPanoramaFile } from "./panorama-compress.js";
 import { createResource, insertInventoryStubIfMissing } from "./resource.js";
 
 const RENTAL_COLUMNS = [
@@ -16,6 +17,7 @@ const RENTAL_COLUMNS = [
   "overview_zh", "overview_ja", "overview_en",
   "benefits", "features",
   "staff_photo_r2_key", "staff_photo_url", "staff_message", "staff_phone",
+  "panorama_r2_key", "panorama_url",
   "display_order", "is_published",
 ];
 
@@ -67,6 +69,8 @@ const RENTAL_FIELD_MAP = {
   staffPhotoUrl: "staff_photo_url",
   staffMessage: "staff_message",
   staffPhone: "staff_phone",
+  panoramaR2Key: "panorama_r2_key",
+  panoramaUrl: "panorama_url",
   displayOrder: "display_order",
   isPublished: "is_published",
 };
@@ -166,11 +170,69 @@ export async function clearRentalStaffPhoto(env, rentalId) {
 }
 
 export async function deleteRental(env, id) {
-  const row = await env.DB.prepare("SELECT staff_photo_r2_key FROM rentals WHERE id = ?")
+  const row = await env.DB.prepare(
+    "SELECT staff_photo_r2_key, panorama_r2_key FROM rentals WHERE id = ?",
+  )
     .bind(id)
     .first();
   if (row?.staff_photo_r2_key && !String(row.staff_photo_r2_key).startsWith("seed:")) {
     await env.R2.delete(String(row.staff_photo_r2_key)).catch(() => null);
   }
+  if (row?.panorama_r2_key && !String(row.panorama_r2_key).startsWith("seed:")) {
+    await env.R2.delete(String(row.panorama_r2_key)).catch(() => null);
+  }
   return rentalResource.remove(env, id);
+}
+
+/** Replace 360° equirectangular panorama; previous R2 object is removed. */
+export async function uploadRentalPanorama(env, rentalId, file) {
+  await insertInventoryStubIfMissing(env, "rentals", rentalId);
+  const exists = await env.DB.prepare("SELECT id, panorama_r2_key FROM rentals WHERE id = ?")
+    .bind(rentalId)
+    .first();
+  if (!exists) {
+    const err = new Error("rental_not_found");
+    err.status = 404;
+    throw err;
+  }
+  if (exists.panorama_r2_key && !String(exists.panorama_r2_key).startsWith("seed:")) {
+    await env.R2.delete(String(exists.panorama_r2_key)).catch(() => null);
+  }
+  const compressed = await compressPanoramaFile(env, file);
+  const key = `rentals/${rentalId}/panorama-${Date.now()}-${randomHex(4)}.${compressed.ext}`;
+  await env.R2.put(key, compressed.body, {
+    httpMetadata: { contentType: compressed.contentType },
+  });
+  const url = `/api/media/${key}`;
+  await env.DB.prepare(
+    `UPDATE rentals SET panorama_r2_key = ?, panorama_url = ?, updated_at = datetime('now') WHERE id = ?`,
+  )
+    .bind(key, url, rentalId)
+    .run();
+  const rental = await getRental(env, rentalId);
+  rental.panoramaCompress = {
+    originalBytes: compressed.originalBytes,
+    compressedBytes: compressed.compressedBytes,
+  };
+  return rental;
+}
+
+export async function clearRentalPanorama(env, rentalId) {
+  const row = await env.DB.prepare("SELECT panorama_r2_key FROM rentals WHERE id = ?")
+    .bind(rentalId)
+    .first();
+  if (!row) {
+    const err = new Error("rental_not_found");
+    err.status = 404;
+    throw err;
+  }
+  if (row.panorama_r2_key && !String(row.panorama_r2_key).startsWith("seed:")) {
+    await env.R2.delete(String(row.panorama_r2_key)).catch(() => null);
+  }
+  await env.DB.prepare(
+    `UPDATE rentals SET panorama_r2_key = NULL, panorama_url = NULL, updated_at = datetime('now') WHERE id = ?`,
+  )
+    .bind(rentalId)
+    .run();
+  return getRental(env, rentalId);
 }

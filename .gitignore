@@ -1,3 +1,7 @@
 worker/node_modules/
 worker/.wrangler/
 .DS_Store
+# Local 360 originals (upload via admin; too large for git / Workers assets)
+ic250.jpg
+lc250.dng
+*.dng

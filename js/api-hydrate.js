@@ -150,6 +150,7 @@
       staffPhoto: keepMeaningful(toAbsoluteMedia(v.staffPhotoUrl)),
       staffMessage: keepMeaningful(v.staffMessage),
       staffPhone: keepMeaningful(v.staffPhone),
+      panorama: keepMeaningful(toAbsoluteMedia(v.panoramaUrl)),
       // 必须写入 flat：缺省时 merge 后无该键，首页会把 undefined 当成「仍上首页」。
       showOnHome: keepMeaningful(
         typeof v.showOnHome === "boolean"
@@ -244,6 +245,7 @@
       staffPhoto: r.staffPhotoUrl ? str(toAbsoluteMedia(r.staffPhotoUrl)) : "",
       staffMessage: str(r.staffMessage),
       staffPhone: str(r.staffPhone),
+      panorama: r.panoramaUrl ? str(toAbsoluteMedia(r.panoramaUrl)) : "",
     };
   }
 

@@ -5,3 +5,7 @@ worker/**
 admin-notes.md
 *.md
 node_modules/**
+# Local dev originals — not served as static assets (too large for Workers bundle)
+ic250.jpg
+lc250.dng
+*.dng

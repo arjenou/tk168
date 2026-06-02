@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://api.tk168.co.jp" crossorigin>
   <title>車両詳細 — TK168 Premium Automotive</title>
-  <link rel="stylesheet" href="css/detail.css?v=20260527f">
+  <link rel="stylesheet" href="css/detail.css?v=20260602c">
   <link rel="stylesheet" href="css/skeleton.css?v=20260420h">
   <script src="js/skeleton-boot.js?v=20260420h"></script>
 </head>
@@ -339,10 +339,13 @@
           <path d="M6 6l12 12M18 6L6 18"></path>
         </svg>
       </button>
-      <div class="spin-viewer-stage">
+      <div class="spin-viewer-stage" id="spinViewerStage">
+        <div class="spin-viewer-pano" id="spinViewerPano" hidden></div>
+        <p class="spin-viewer-hint" id="spinViewerHint" hidden>拖动或滑动环顾四周</p>
+        <p class="spin-viewer-loading" id="spinViewerLoading" hidden>全景加载中…</p>
         <img class="spin-viewer-poster" id="spinViewerPoster" src="assets/images/placeholder.svg" alt="360° 看车预留位">
-        <div class="spin-viewer-overlay"></div>
-        <div class="gallery-spin-content spin-viewer-content">
+        <div class="spin-viewer-overlay" id="spinViewerOverlay"></div>
+        <div class="gallery-spin-content spin-viewer-content" id="spinViewerPlaceholder">
           <span class="gallery-spin-badge" id="spinViewerBadge">360 LOOK</span>
           <div class="gallery-spin-ring" aria-hidden="true">
             <span>360°</span>
@@ -381,8 +384,9 @@
   <script defer src="js/common-links.js?v=20260419a"></script>
   <script defer src="js/page-chrome.js?v=20260601a"></script>
   <script defer src="js/inventory-context.js?v=20260526a"></script>
-  <script defer src="js/renderers.js?v=20260602a"></script>
-    <script defer src="js/detail.js?v=20260526a"></script>
+  <script defer src="js/renderers.js?v=20260602b"></script>
+    <script defer src="js/panorama-viewer.js?v=20260602a"></script>
+    <script defer src="js/detail.js?v=20260602c"></script>
 </body>
 
 </html>

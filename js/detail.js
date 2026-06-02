@@ -60,6 +60,12 @@ const thumbGrid = document.getElementById('thumbGrid');
 const detailMainImage = document.getElementById('detailMainImage');
 const spinViewerModal = document.getElementById('spinViewerModal');
 const spinViewerClose = document.getElementById('spinViewerClose');
+const spinViewerStage = document.getElementById('spinViewerStage');
+const spinViewerPano = document.getElementById('spinViewerPano');
+const spinViewerHint = document.getElementById('spinViewerHint');
+const spinViewerLoading = document.getElementById('spinViewerLoading');
+const spinViewerPlaceholder = document.getElementById('spinViewerPlaceholder');
+const spinViewerOverlay = document.getElementById('spinViewerOverlay');
 const spinViewerPoster = document.getElementById('spinViewerPoster');
 const spinViewerBadge = document.getElementById('spinViewerBadge');
 const spinViewerTitle = document.getElementById('spinViewerTitle');
@@ -205,26 +211,33 @@ let featuredSliderScrollFrame = 0;
 let featuredSliderResizeFrame = 0;
 let featuredSliderInteractionTimer = 0;
 let lastSpinViewerTrigger = null;
+let activePanoramaViewer = null;
 const advisorPanelMobileMedia = window.matchMedia('(max-width: 760px)');
 
 const GALLERY_SPIN_COPY = {
   zh: {
     badge: '360 LOOK',
-    title: '360° 看车功能区',
-    text: '这里先预留给环拍序列。后续接入素材后，可在主图区域左右拖动查看整车。',
-    aria: '查看 360 看车功能区'
+    title: '360° 全景看车',
+    text: '拖动画面可上下左右环顾四周。',
+    hint: '拖动或滑动环顾四周',
+    loading: '全景加载中…',
+    aria: '打开 360° 全景看车'
   },
   ja: {
     badge: '360 LOOK',
-    title: '360° ビューエリア',
-    text: 'ここは 360° 環拍素材の差し込み枠です。素材接続後は、メインエリアを左右にドラッグして車両全体を確認できます。',
-    aria: '360 ビューエリアを表示'
+    title: '360° パノラマビュー',
+    text: '画面をドラッグして周囲を見渡せます。',
+    hint: 'ドラッグで見渡す',
+    loading: 'パノラマを読み込み中…',
+    aria: '360° パノラマを表示'
   },
   en: {
     badge: '360 LOOK',
-    title: '360° View Area',
-    text: 'This area is reserved for a future 360° image sequence. Once the asset is connected, you will be able to drag left and right to inspect the entire vehicle.',
-    aria: 'Open the 360 view area'
+    title: '360° Panorama',
+    text: 'Drag to look around in every direction.',
+    hint: 'Drag or swipe to look around',
+    loading: 'Loading panorama…',
+    aria: 'Open 360° panorama viewer'
   }
 };
 
@@ -647,6 +660,7 @@ function getGalleryItems() {
     kind: thumb.dataset.kind || 'image',
     src: thumb.dataset.image,
     poster: thumb.dataset.poster || '',
+    panorama: thumb.dataset.panorama || '',
     alt: thumb.dataset.alt || `${getVehicleName(currentVehicle)} ${(window.TK168I18N?.t('gallery.angle') || '视角')} ${index + 1}`
   }));
 }
@@ -794,28 +808,90 @@ function setMainGalleryImage(imageSrc, imageAlt) {
   detailMainImage.alt = imageAlt;
 }
 
+function destroyPanoramaViewer() {
+  if (activePanoramaViewer) {
+    activePanoramaViewer.destroy();
+    activePanoramaViewer = null;
+  }
+  spinViewerPano?.replaceChildren();
+  spinViewerPano?.setAttribute('hidden', '');
+  spinViewerStage?.classList.remove('is-panorama-active');
+  spinViewerPlaceholder?.removeAttribute('hidden');
+  spinViewerOverlay?.removeAttribute('hidden');
+  spinViewerHint?.setAttribute('hidden', '');
+  spinViewerLoading?.setAttribute('hidden', '');
+}
+
 function openSpinViewer(item = getGalleryItems().find((galleryItem) => galleryItem.kind === 'spin')) {
   if (!spinViewerModal) return;
   const copy = getSpinCopy();
   const posterSrc = item?.poster || window.TK168_DATA.resolveVehicleMediaSource(currentVehicle.gallery?.[0] || currentVehicle.photo);
   const posterAlt = item?.alt || `${getVehicleName(currentVehicle)} 360°`;
+  const panoramaSrc = item?.panorama || '';
+  const canShowPanorama = Boolean(panoramaSrc && window.TK168PanoramaViewer && spinViewerPano);
+
+  destroyPanoramaViewer();
+
   if (spinViewerPoster) {
     spinViewerPoster.src = posterSrc;
     spinViewerPoster.alt = posterAlt;
   }
-  if (spinViewerBadge) spinViewerBadge.textContent = copy.badge;
-  if (spinViewerTitle) spinViewerTitle.textContent = copy.title;
-  if (spinViewerText) spinViewerText.textContent = copy.text;
+
+  if (canShowPanorama) {
+    spinViewerStage?.classList.add('is-panorama-active');
+    spinViewerPlaceholder?.setAttribute('hidden', '');
+    spinViewerOverlay?.setAttribute('hidden', '');
+    spinViewerPano?.removeAttribute('hidden');
+    if (spinViewerHint) spinViewerHint.textContent = copy.hint;
+    spinViewerHint?.removeAttribute('hidden');
+    if (spinViewerLoading) spinViewerLoading.textContent = copy.loading;
+    spinViewerLoading?.removeAttribute('hidden');
+
+    try {
+      activePanoramaViewer = window.TK168PanoramaViewer.create(spinViewerPano, {
+        imageSrc: panoramaSrc,
+        ariaLabel: posterAlt,
+        onReady: () => {
+          spinViewerLoading?.setAttribute('hidden', '');
+          window.setTimeout(() => spinViewerHint?.setAttribute('hidden', ''), 2800);
+        },
+        onError: () => {
+          destroyPanoramaViewer();
+          if (spinViewerBadge) spinViewerBadge.textContent = copy.badge;
+          if (spinViewerTitle) spinViewerTitle.textContent = copy.title;
+          if (spinViewerText) spinViewerText.textContent = copy.text;
+        }
+      });
+    } catch {
+      destroyPanoramaViewer();
+      if (spinViewerBadge) spinViewerBadge.textContent = copy.badge;
+      if (spinViewerTitle) spinViewerTitle.textContent = copy.title;
+      if (spinViewerText) spinViewerText.textContent = copy.text;
+    }
+  } else {
+    if (spinViewerBadge) spinViewerBadge.textContent = copy.badge;
+    if (spinViewerTitle) spinViewerTitle.textContent = copy.title;
+    if (spinViewerText) spinViewerText.textContent = copy.text;
+  }
 
   lastSpinViewerTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   spinViewerModal.classList.add('is-open');
   spinViewerModal.setAttribute('aria-hidden', 'false');
   document.body.classList.add('spin-viewer-open');
   spinViewerClose?.focus();
+  if (canShowPanorama) {
+    const syncPanoramaLayout = () => activePanoramaViewer?.resize?.();
+    requestAnimationFrame(() => {
+      syncPanoramaLayout();
+      requestAnimationFrame(syncPanoramaLayout);
+    });
+    window.setTimeout(syncPanoramaLayout, 120);
+  }
 }
 
 function closeSpinViewer() {
   if (!spinViewerModal) return;
+  destroyPanoramaViewer();
   spinViewerModal.classList.remove('is-open');
   spinViewerModal.setAttribute('aria-hidden', 'true');
   document.body.classList.remove('spin-viewer-open');

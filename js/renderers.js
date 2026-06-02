@@ -472,6 +472,12 @@ window.TK168Renderers = (() => {
     return buildVehicleCardMarkup(vehicle, detailUrl, 'featured');
   }
 
+  function resolveVehiclePanoramaSource(vehicle) {
+    const raw = vehicle?.panorama || vehicle?.panorama360 || vehicle?.panoramaUrl;
+    if (!raw) return '';
+    return resolveVehicleMediaSource(raw);
+  }
+
   function buildDetailGalleryHTML(vehicle) {
     const detailGalleryLabels = [
       t('gallery.main'),
@@ -481,10 +487,14 @@ window.TK168Renderers = (() => {
     ];
     const vehicleName = getVehicleName(vehicle);
     const language = window.TK168I18N?.getLanguage?.() || 'ja';
+    const panoramaSrc = resolveVehiclePanoramaSource(vehicle);
     const spinThumbLabel = language === 'en' ? '360° view' : (language === 'ja' ? '360° ビュー' : '360° 看车');
-    const spinThumbHint = language === 'en' ? 'Reserved area' : (language === 'ja' ? '導入準備中' : '预留功能区');
+    const spinThumbHint = panoramaSrc
+      ? (language === 'en' ? 'Drag to look around' : (language === 'ja' ? 'ドラッグで見渡す' : '拖动环顾'))
+      : (language === 'en' ? 'Not uploaded' : (language === 'ja' ? '未アップロード' : '未上传'));
+    const panoramaAttr = panoramaSrc ? ` data-panorama="${panoramaSrc}"` : '';
     const spinThumbMarkup = `
-      <button class="thumb thumb--spin" type="button" data-index="0" data-kind="spin" data-poster="${resolveVehicleMediaSource(vehicle.gallery?.[0] || vehicle.photo)}" data-alt="${vehicleName} ${spinThumbLabel}">
+      <button class="thumb thumb--spin" type="button" data-index="0" data-kind="spin"${panoramaAttr} data-poster="${resolveVehicleMediaSource(vehicle.gallery?.[0] || vehicle.photo)}" data-alt="${vehicleName} ${spinThumbLabel}">
         <span class="thumb-shot thumb-shot--spin" aria-hidden="true">
           <span class="thumb-spin-mark">360°</span>
           <span class="thumb-spin-caption">${spinThumbHint}</span>
