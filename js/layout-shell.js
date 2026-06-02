@@ -82,18 +82,18 @@
           <h4 class="footer-stores-title" data-i18n="footer.storesTitle">店舗ネットワーク</h4>
           <div class="footer-stores-grid">
             <article class="footer-store">
-              <p class="footer-store-eyebrow" data-i18n="footer.stores.tokyo.eyebrow">JAPAN · TOKYO</p>
-              <h5 class="footer-store-name" data-i18n="footer.stores.tokyo.name">亀戸店</h5>
-              <p class="footer-store-address" data-i18n-html="footer.stores.tokyo.address">東京都江東区亀戸<br>住所準備中</p>
+              <p class="footer-store-eyebrow" data-i18n="footer.stores.saitama.eyebrow">JAPAN · TOKYO</p>
+              <h5 class="footer-store-name" data-i18n="footer.stores.saitama.name">さいたま店</h5>
+              <p class="footer-store-address" data-i18n-html="footer.stores.saitama.address">339-0035<br>埼玉県さいたま市岩槻区笹久保新田</p>
               <div class="footer-store-contact">
                 <p data-i18n="footer.storePhoneLine">電話番号：準備中</p>
                 <p data-i18n="footer.storeEmailLine">メール：準備中</p>
               </div>
             </article>
             <article class="footer-store">
-              <p class="footer-store-eyebrow" data-i18n="footer.stores.saitama.eyebrow">JAPAN · TOKYO</p>
-              <h5 class="footer-store-name" data-i18n="footer.stores.saitama.name">さいたま店</h5>
-              <p class="footer-store-address" data-i18n-html="footer.stores.saitama.address">339-0035<br>埼玉県さいたま市岩槻区笹久保新田</p>
+              <p class="footer-store-eyebrow" data-i18n="footer.stores.tokyo.eyebrow">JAPAN · TOKYO</p>
+              <h5 class="footer-store-name" data-i18n="footer.stores.tokyo.name">亀戸店</h5>
+              <p class="footer-store-address" data-i18n-html="footer.stores.tokyo.address">東京都江東区亀戸<br>住所準備中</p>
               <div class="footer-store-contact">
                 <p data-i18n="footer.storePhoneLine">電話番号：準備中</p>
                 <p data-i18n="footer.storeEmailLine">メール：準備中</p>
