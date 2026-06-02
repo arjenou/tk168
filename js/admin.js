@@ -675,6 +675,41 @@ function formatFileSize(bytes) {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+/** 上传前在浏览器内预压缩，避免超大 Insta360 原图触发 Images API 失败 */
+async function compressPanoramaClient(file, maxWidth = 4096, quality = 0.85) {
+  if (!(file instanceof Blob) || !String(file.type || "").startsWith("image/")) return file;
+  let bitmap;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    return file;
+  }
+  const srcW = bitmap.width;
+  const srcH = bitmap.height;
+  const scale = srcW > maxWidth ? maxWidth / srcW : 1;
+  const dstW = Math.max(1, Math.round(srcW * scale));
+  const dstH = Math.max(1, Math.round(srcH * scale));
+  if (scale >= 1 && file.size <= 5 * 1024 * 1024 && /jpe?g/i.test(file.type || "")) {
+    bitmap.close();
+    return file;
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = dstW;
+  canvas.height = dstH;
+  const ctx = canvas.getContext("2d", { alpha: false });
+  if (!ctx) {
+    bitmap.close();
+    return file;
+  }
+  ctx.drawImage(bitmap, 0, 0, dstW, dstH);
+  bitmap.close();
+  const blob = await new Promise((resolve, reject) => {
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("encode_failed"))), "image/jpeg", quality);
+  });
+  const base = (file.name || "panorama").replace(/\.[^.]+$/, "") || "panorama";
+  return new File([blob], `${base}.jpg`, { type: "image/jpeg", lastModified: Date.now() });
+}
+
 function panoramaUploadSuccessMessage(panoramaCompress) {
   if (!panoramaCompress?.originalBytes || !panoramaCompress?.compressedBytes) {
     return "360° 全景图已更新（服务器已自动压缩）";
@@ -2017,7 +2052,7 @@ function renderPanoramaAsideSection(draft) {
         <section class="admin-card admin-card--panorama">
           <h2>360° 全景图</h2>
           <p class="admin-cover-meta" style="margin:0 0 12px;">
-            详情页「360°」缩略图点开后的环顾图。请上传 <strong>2:1</strong> 等距柱状全景（Insta360 导出的 JPG 等）。<strong>原图可直接上传</strong>（最大 48MB），服务器会自动缩放到最长边 6144px 并转为 JPEG。
+            详情页「360°」缩略图点开后的环顾图。请上传 <strong>2:1</strong> 等距柱状全景（Insta360 导出的 JPG 等）。浏览器会先压到最长边 4096px，服务器再转为 JPEG（原图最大 48MB）。
           </p>
           <div class="admin-panorama-preview ${
             hasPanorama ? "" : "admin-cover-empty"
@@ -2955,9 +2990,10 @@ function bindEditor() {
       const files = Array.from(event.target.files || []);
       event.target.value = "";
       if (files.length === 0) return;
-      const file = files[0];
+      const rawFile = files[0];
       try {
-        showToast("正在上传并压缩全景图…", "success", 12000);
+        showToast("正在压缩并上传全景图…", "success", 12000);
+        const file = await compressPanoramaClient(rawFile);
         const form = new FormData();
         form.append("file", file);
         const res = await api(r.apiPanorama(state.editingId), { method: "POST", body: form });
