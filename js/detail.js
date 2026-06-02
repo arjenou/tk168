@@ -113,7 +113,6 @@ const galleryMainNext = document.getElementById('galleryMainNext');
 const thumbPrev = document.getElementById('thumbPrev');
 const thumbNext = document.getElementById('thumbNext');
 const thumbViewport = document.getElementById('thumbViewport');
-const THUMB_STRIP_SCROLL_MEDIA = window.matchMedia('(max-width: 640px)');
 const FEATURED_SLIDER_SHELL_ID = 'detailFeaturedSliderShell';
 const FEATURED_SLIDER_NAV_ID = 'detailFeaturedSliderNav';
 const FAVORITES_STORAGE_KEY = 'tk168_favorites';
@@ -205,7 +204,9 @@ function clearDetailSkeletonUi() {
 installDetailSkeletonUi();
 
 let currentGalleryIndex = 0;
-let currentThumbOffset = 0;
+let thumbStripEventsBound = false;
+let thumbStripSuppressClick = false;
+let thumbStripScrollRaf = 0;
 let activePriceHelp = '';
 let featuredSliderScrollFrame = 0;
 let featuredSliderResizeFrame = 0;
@@ -672,16 +673,57 @@ function clampGalleryIndex(index) {
 }
 
 function getThumbVisibleCount() {
-  if (window.innerWidth <= 640) return 3;
-  return 4;
+  const viewportWidth = thumbViewport?.clientWidth || window.innerWidth;
+  if (viewportWidth <= 320) return 2;
+  if (viewportWidth <= 440) return 3;
+  if (viewportWidth <= 560) return 4;
+  if (viewportWidth <= 720) return 5;
+  return 6;
 }
 
-function getThumbMaxOffset() {
-  return Math.max(0, getGalleryItems().length - getThumbVisibleCount());
+function getThumbLayoutCount(itemCount = getGalleryItems().length) {
+  const total = Math.max(1, itemCount);
+  return Math.min(getThumbVisibleCount(), total);
 }
 
-function isThumbStripScrollMode() {
-  return typeof THUMB_STRIP_SCROLL_MEDIA.matches === 'boolean' && THUMB_STRIP_SCROLL_MEDIA.matches;
+function getThumbGap() {
+  if (!thumbGrid) return 10;
+  const styles = window.getComputedStyle(thumbGrid);
+  return parseFloat(styles.columnGap || styles.gap) || 10;
+}
+
+function getThumbScrollStep() {
+  const thumb = thumbGrid?.querySelector('.thumb:not(.thumb--skeleton)');
+  if (!thumb) return 120;
+  return thumb.offsetWidth + getThumbGap();
+}
+
+function updateThumbSlideWidth() {
+  const vp = thumbViewport;
+  if (!vp || !thumbGrid) return;
+  const layoutCount = getThumbLayoutCount();
+  const gap = getThumbGap();
+  const width = Math.floor((vp.clientWidth - gap * (layoutCount - 1)) / layoutCount);
+  thumbGrid.style.setProperty('--thumb-item-width', `${Math.max(72, width)}px`);
+}
+
+function snapThumbScrollLeft(targetLeft) {
+  const vp = thumbViewport;
+  if (!vp) return 0;
+  const step = getThumbScrollStep();
+  if (step <= 0) return Math.max(0, targetLeft);
+  const maxScroll = Math.max(0, vp.scrollWidth - vp.clientWidth);
+  const snapped = Math.round(targetLeft / step) * step;
+  return Math.max(0, Math.min(maxScroll, snapped));
+}
+
+function scrollThumbStrip(direction) {
+  const vp = thumbViewport;
+  if (!vp) return;
+  const step = getThumbScrollStep();
+  const nextLeft = snapThumbScrollLeft(vp.scrollLeft + direction * step);
+  if (nextLeft === vp.scrollLeft) return;
+  vp.scrollTo({ left: nextLeft, behavior: 'smooth' });
 }
 
 function scrollThumbViewportToIndex(index, behavior = 'smooth') {
@@ -690,49 +732,132 @@ function scrollThumbViewportToIndex(index, behavior = 'smooth') {
   if (!vp || !grid) return;
   const thumb = grid.querySelector(`.thumb[data-index="${index}"]`);
   if (!thumb) return;
-  const thumbCenter = thumb.offsetLeft + thumb.offsetWidth / 2;
-  let left = thumbCenter - vp.clientWidth / 2;
-  const maxLeft = Math.max(0, vp.scrollWidth - vp.clientWidth);
-  left = Math.max(0, Math.min(maxLeft, left));
+
+  const thumbLeft = thumb.offsetLeft;
+  const thumbRight = thumbLeft + thumb.offsetWidth;
+  const viewLeft = vp.scrollLeft;
+  const viewRight = viewLeft + vp.clientWidth;
+  let left = viewLeft;
+
+  if (thumbLeft < viewLeft) {
+    left = thumbLeft;
+  } else if (thumbRight > viewRight) {
+    left = thumbRight - vp.clientWidth;
+  }
+
+  left = snapThumbScrollLeft(left);
   const be = behavior === 'instant' || behavior === 'auto' ? 'auto' : behavior;
   vp.scrollTo({ left, behavior: be });
 }
 
 function updateThumbRail() {
-  const items = getGalleryItems();
-  const hasMultipleImages = getImageGalleryItems(items).length > 1;
-  if (thumbPrev) thumbPrev.disabled = !hasMultipleImages;
-  if (thumbNext) thumbNext.disabled = !hasMultipleImages;
-
-  if (isThumbStripScrollMode()) {
-    thumbGrid?.style.setProperty('--thumb-visible-count', String(getThumbVisibleCount()));
-    thumbGrid?.style.setProperty('--thumb-offset', '0');
+  const vp = thumbViewport;
+  const imageItems = getImageGalleryItems();
+  const hasMultipleImages = imageItems.length > 1;
+  if (!vp || !thumbPrev || !thumbNext) {
+    if (thumbPrev) thumbPrev.disabled = !hasMultipleImages;
+    if (thumbNext) thumbNext.disabled = !hasMultipleImages;
     return;
   }
 
-  const visibleCount = getThumbVisibleCount();
-  const maxOffset = getThumbMaxOffset();
-  currentThumbOffset = Math.min(currentThumbOffset, maxOffset);
-
-  thumbGrid?.style.setProperty('--thumb-visible-count', visibleCount);
-  thumbGrid?.style.setProperty('--thumb-offset', String(currentThumbOffset));
+  const maxScroll = Math.max(0, vp.scrollWidth - vp.clientWidth);
+  const canScroll = maxScroll > 4;
+  const showNav = canScroll && hasMultipleImages;
+  const left = vp.scrollLeft;
+  thumbPrev.disabled = !showNav || left <= 2;
+  thumbNext.disabled = !showNav || left >= maxScroll - 2;
 }
 
 function revealThumb(index, scrollBehavior = 'smooth') {
-  if (isThumbStripScrollMode()) {
-    scrollThumbViewportToIndex(index, scrollBehavior);
-    updateThumbRail();
-    return;
-  }
-
-  const visibleCount = getThumbVisibleCount();
-  const maxOffset = getThumbMaxOffset();
-
-  if (index < currentThumbOffset) currentThumbOffset = index;
-  if (index >= currentThumbOffset + visibleCount) currentThumbOffset = index - visibleCount + 1;
-
-  currentThumbOffset = Math.max(0, Math.min(currentThumbOffset, maxOffset));
+  scrollThumbViewportToIndex(index, scrollBehavior);
   updateThumbRail();
+}
+
+function stepGalleryBounded(direction) {
+  const items = getGalleryItems();
+  const imageItems = getImageGalleryItems(items);
+  if (imageItems.length <= 1) return;
+
+  const position = imageItems.findIndex((item) => item.index === currentGalleryIndex);
+  const basePosition = position >= 0 ? position : 0;
+  const nextPosition = basePosition + direction;
+  if (nextPosition < 0 || nextPosition >= imageItems.length) return;
+
+  syncGallery(imageItems[nextPosition].index, direction);
+}
+
+function bindThumbStripDrag() {
+  const vp = thumbViewport;
+  if (!vp || vp.dataset.dragBound === '1') return;
+  vp.dataset.dragBound = '1';
+
+  let dragState = null;
+  const DRAG_THRESHOLD = 6;
+
+  vp.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0) return;
+    dragState = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startScroll: vp.scrollLeft,
+      moved: false
+    };
+    vp.setPointerCapture(event.pointerId);
+  });
+
+  vp.addEventListener('pointermove', (event) => {
+    if (!dragState || event.pointerId !== dragState.pointerId) return;
+    const deltaX = event.clientX - dragState.startX;
+    if (!dragState.moved && Math.abs(deltaX) <= DRAG_THRESHOLD) return;
+    dragState.moved = true;
+    vp.classList.add('is-dragging');
+    event.preventDefault();
+    vp.scrollLeft = dragState.startScroll - deltaX;
+  });
+
+  const finishDrag = (event) => {
+    if (!dragState || event.pointerId !== dragState.pointerId) return;
+    if (dragState.moved) {
+      thumbStripSuppressClick = true;
+      window.setTimeout(() => {
+        thumbStripSuppressClick = false;
+      }, 0);
+      const snapped = snapThumbScrollLeft(vp.scrollLeft);
+      vp.scrollTo({ left: snapped, behavior: 'smooth' });
+    }
+    vp.classList.remove('is-dragging');
+    if (vp.hasPointerCapture(event.pointerId)) {
+      vp.releasePointerCapture(event.pointerId);
+    }
+    dragState = null;
+    updateThumbRail();
+  };
+
+  vp.addEventListener('pointerup', finishDrag);
+  vp.addEventListener('pointercancel', finishDrag);
+}
+
+function ensureThumbStripEvents() {
+  if (thumbStripEventsBound) return;
+  const vp = thumbViewport;
+  if (!vp || !thumbPrev || !thumbNext) return;
+  thumbStripEventsBound = true;
+
+  bindThumbStripDrag();
+  thumbPrev.addEventListener('click', () => scrollThumbStrip(-1));
+  thumbNext.addEventListener('click', () => scrollThumbStrip(1));
+  vp.addEventListener('scroll', () => {
+    if (thumbStripScrollRaf) cancelAnimationFrame(thumbStripScrollRaf);
+    thumbStripScrollRaf = requestAnimationFrame(() => {
+      thumbStripScrollRaf = 0;
+      updateThumbRail();
+    });
+  }, { passive: true });
+
+  if (typeof ResizeObserver === 'function') {
+    const resizeObserver = new ResizeObserver(() => syncThumbStripOnResize());
+    resizeObserver.observe(vp);
+  }
 }
 
 function getSpinCopy() {
@@ -971,9 +1096,15 @@ function stepLightbox(direction) {
 
 function renderGallery() {
   thumbGrid.innerHTML = window.TK168Renderers.buildDetailGalleryHTML(currentVehicle);
-  currentThumbOffset = 0;
+  if (thumbViewport) thumbViewport.scrollLeft = 0;
+  updateThumbSlideWidth();
   updateThumbRail();
   syncGallery(getDefaultGalleryIndex());
+  requestAnimationFrame(() => {
+    updateThumbSlideWidth();
+    revealThumb(currentGalleryIndex, 'instant');
+    updateThumbRail();
+  });
 }
 
 function renderSpecs() {
@@ -1145,6 +1276,7 @@ function togglePriceHelp(kind, forceOpen = false) {
 }
 
 thumbGrid?.addEventListener('click', event => {
+  if (thumbStripSuppressClick) return;
   const thumb = event.target.closest('.thumb');
   if (!thumb) return;
   const targetIndex = Number(thumb.dataset.index || 0);
@@ -1171,12 +1303,12 @@ galleryMainTrigger?.addEventListener('keydown', (event) => {
 
 galleryMainPrev?.addEventListener('click', (event) => {
   event.stopPropagation();
-  syncGallery(currentGalleryIndex - 1, -1);
+  stepGalleryBounded(-1);
 });
 
 galleryMainNext?.addEventListener('click', (event) => {
   event.stopPropagation();
-  syncGallery(currentGalleryIndex + 1, 1);
+  stepGalleryBounded(1);
 });
 
 galleryLightbox?.addEventListener('click', (event) => {
@@ -1194,13 +1326,6 @@ spinViewerModal?.addEventListener('click', (event) => {
   }
 });
 spinViewerClose?.addEventListener('click', closeSpinViewer);
-thumbPrev?.addEventListener('click', () => {
-  syncGallery(currentGalleryIndex - 1, -1);
-});
-thumbNext?.addEventListener('click', () => {
-  syncGallery(currentGalleryIndex + 1, 1);
-});
-
 detailPriceHelpButtons.forEach((button) => {
   button.addEventListener('click', (event) => {
     event.stopPropagation();
@@ -1268,14 +1393,13 @@ window.addEventListener('keydown', (event) => {
 });
 
 function syncThumbStripOnResize() {
+  updateThumbSlideWidth();
   updateThumbRail();
   revealThumb(currentGalleryIndex, 'instant');
 }
 
+ensureThumbStripEvents();
 window.addEventListener('resize', syncThumbStripOnResize);
-if (typeof THUMB_STRIP_SCROLL_MEDIA.addEventListener === 'function') {
-  THUMB_STRIP_SCROLL_MEDIA.addEventListener('change', syncThumbStripOnResize);
-}
 window.addEventListener('favorites:changed', syncDetailFavoriteButton);
 
 function navigateDetailBackLayer() {

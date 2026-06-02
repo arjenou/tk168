@@ -1303,19 +1303,42 @@ body.price-help-open {
 }
 
 .thumb-viewport {
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  cursor: grab;
+}
+
+.thumb-viewport.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.thumb-viewport::-webkit-scrollbar {
+  display: none;
 }
 
 .thumb-grid {
-  --thumb-visible-count: 4;
   --thumb-gap: 10px;
-  --thumb-offset: 0;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: calc((100% - (var(--thumb-gap) * (var(--thumb-visible-count) - 1))) / var(--thumb-visible-count));
+  --thumb-item-width: 120px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
   gap: var(--thumb-gap);
-  transform: translateX(calc((100% + var(--thumb-gap)) / var(--thumb-visible-count) * var(--thumb-offset) * -1));
-  transition: transform .28s ease;
+  width: max-content;
+}
+
+.thumb-grid > .thumb {
+  flex: 0 0 var(--thumb-item-width);
+  width: var(--thumb-item-width);
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  box-sizing: border-box;
 }
 
 .thumb-nav {
@@ -3659,37 +3682,7 @@ html:lang(en) .footer-newsletter h4 {
   }
 
   .thumb-grid {
-    --thumb-visible-count: 3;
     --thumb-gap: 8px;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    gap: var(--thumb-gap);
-    width: max-content;
-    max-width: none;
-    min-width: 100%;
-    transform: none !important;
-    transition: none;
-  }
-
-  /* Mobile: swipe thumbnails horizontally (native overflow scroll). */
-  .thumb-viewport {
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-    touch-action: pan-x;
-    scrollbar-width: none;
-  }
-
-  .thumb-viewport::-webkit-scrollbar {
-    display: none;
-  }
-
-  .thumb-grid > .thumb {
-    flex: 0 0 auto;
-    width: clamp(90px, 30vw, 130px);
   }
 
   .gallery-main-nav {
