@@ -1443,6 +1443,11 @@ body.price-help-open {
 .gallery-lightbox.is-open {
   opacity: 1;
   pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .gallery-lightbox-backdrop {
@@ -1456,32 +1461,40 @@ body.price-help-open {
 .gallery-lightbox-dialog {
   position: relative;
   z-index: 1;
-  width: min(96vw, 1520px);
-  height: min(92vh, 980px);
-  margin: 4vh auto;
+  width: 100%;
+  max-width: calc(100vw - 20px);
+  height: calc(100vh - 20px);
+  height: calc(100dvh - 20px);
+  margin: 0;
   display: grid;
-  grid-template-columns: 72px minmax(0, 1fr) 72px;
-  align-items: center;
-  gap: 18px;
+  grid-template-columns: 64px minmax(0, 1fr) 64px;
+  align-items: stretch;
+  gap: 12px;
 }
 
 .gallery-lightbox-figure {
   min-width: 0;
+  min-height: 0;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .gallery-lightbox-figure img {
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  height: min(84vh, 860px);
+  height: auto;
+  max-height: 100%;
   object-fit: contain;
-  border-radius: 18px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.04);
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.32);
 }
 
 .gallery-lightbox-caption {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1525,10 +1538,15 @@ body.price-help-open {
   transform: translateY(-2px);
 }
 
+.gallery-lightbox-nav {
+  align-self: center;
+}
+
 .gallery-lightbox-close {
   position: absolute;
-  top: -8px;
-  right: 0;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
 }
 
 .gallery-lightbox-close svg,
@@ -3075,14 +3093,8 @@ html:lang(en) .footer-newsletter h4 {
   }
 
   .gallery-lightbox-dialog {
-    width: min(96vw, 1320px);
-    height: min(90vh, 920px);
     grid-template-columns: 56px minmax(0, 1fr) 56px;
-    gap: 14px;
-  }
-
-  .gallery-lightbox-figure img {
-    height: min(80vh, 780px);
+    gap: 10px;
   }
 
   .gallery-lightbox-close,
@@ -3753,16 +3765,29 @@ html:lang(en) .footer-newsletter h4 {
     gap: 12px;
   }
 
+  .gallery-lightbox.is-open {
+    padding: 0;
+    align-items: flex-start;
+  }
+
   .gallery-lightbox-dialog {
     width: calc(100vw - 24px);
+    max-width: none;
     height: auto;
     margin: 56px auto 24px;
     grid-template-columns: 1fr;
+    align-items: center;
     gap: 12px;
   }
 
+  .gallery-lightbox-figure {
+    height: auto;
+  }
+
   .gallery-lightbox-figure img {
+    flex: none;
     height: min(68vh, 520px);
+    max-height: none;
     border-radius: 14px;
   }
 
