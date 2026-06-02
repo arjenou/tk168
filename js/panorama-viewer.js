@@ -177,8 +177,8 @@
       const dy = event.clientY - this.lastY;
       this.lastX = event.clientX;
       this.lastY = event.clientY;
-      this.yaw -= dx * 0.0045;
-      this.pitch += dy * 0.0045;
+      this.yaw += dx * 0.0045;
+      this.pitch -= dy * 0.0045;
       const limit = PI * 0.47;
       this.pitch = Math.max(-limit, Math.min(limit, this.pitch));
       this.render();
