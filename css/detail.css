@@ -1456,9 +1456,9 @@ body.price-help-open {
 .gallery-lightbox-dialog {
   position: relative;
   z-index: 1;
-  width: min(92vw, 1360px);
-  height: min(88vh, 900px);
-  margin: 6vh auto;
+  width: min(96vw, 1520px);
+  height: min(92vh, 980px);
+  margin: 4vh auto;
   display: grid;
   grid-template-columns: 72px minmax(0, 1fr) 72px;
   align-items: center;
@@ -1474,7 +1474,7 @@ body.price-help-open {
 
 .gallery-lightbox-figure img {
   width: 100%;
-  height: min(78vh, 760px);
+  height: min(84vh, 860px);
   object-fit: contain;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.04);
@@ -3075,9 +3075,14 @@ html:lang(en) .footer-newsletter h4 {
   }
 
   .gallery-lightbox-dialog {
-    width: min(94vw, 1120px);
+    width: min(96vw, 1320px);
+    height: min(90vh, 920px);
     grid-template-columns: 56px minmax(0, 1fr) 56px;
     gap: 14px;
+  }
+
+  .gallery-lightbox-figure img {
+    height: min(80vh, 780px);
   }
 
   .gallery-lightbox-close,
