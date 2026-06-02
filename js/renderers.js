@@ -313,10 +313,10 @@ window.TK168Renderers = (() => {
     const coverMarkup = variant.cover === 'v-card-img'
       ? `<div class="${variant.cover} v-card-img--skeleton-load">
         <span class="v-card-img__skeleton v-skeleton-block" aria-hidden="true"></span>
-        <img src="${coverPhotoSrc}" alt="${coverPhotoAlt}">
+        <img src="${coverPhotoSrc}" alt="${coverPhotoAlt}" loading="lazy" decoding="async">
       </div>`
       : `<div class="${variant.cover}">
-        <img src="${coverPhotoSrc}" alt="${coverPhotoAlt}">
+        <img src="${coverPhotoSrc}" alt="${coverPhotoAlt}" loading="lazy" decoding="async">
       </div>`;
     const primaryPriceLabel = isRentalFleetCard ? t('rental.priceDaily') : getPriceLabel('price.total');
     const secondaryPriceLabel = isRentalFleetCard ? t('rental.priceDeposit') : getPriceLabel('price.base');
