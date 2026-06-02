@@ -294,7 +294,6 @@ const RESOURCES = {
             required: true,
             hint: "自列表选择存库用英文 Key；旧数据若不在列表中会单独出现为一项。",
           },
-          { key: "year", label: "年份", placeholder: "2022", span: 4 },
           {
             key: "icon",
             label: "图标",
@@ -1140,7 +1139,7 @@ function renderList() {
                 <th style="width:84px;">封面</th>
                 <th>名称</th>
                 <th>品牌</th>
-                <th>年份</th>
+                ${r.key === "vehicles" ? "<th>年份</th>" : ""}
                 <th>${escapeHtml(r.priceColumn.label)}</th>
                 ${vehicleHomeHead}
                 ${extraHeadCells}
@@ -1405,7 +1404,7 @@ function itemRow(v, r) {
         <div style="font-weight:600;">${escapeHtml(v.name)}</div>
       </td>
       <td>${escapeHtml(v.brandKey || "")}</td>
-      <td>${escapeHtml(v.year || "")}</td>
+      ${r.key === "vehicles" ? `<td>${escapeHtml(v.year || "")}</td>` : ""}
       <td>${escapeHtml(priceCell)}</td>
       ${vehicleHomeCell}
       ${extraCells}
