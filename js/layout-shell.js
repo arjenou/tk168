@@ -38,6 +38,27 @@
     </nav>
   `;
 
+  const SAITAMA_MAPS_HREF = 'https://www.google.com/maps/search/?api=1&query=339-0035%20%E5%9F%BC%E7%8E%89%E7%9C%8C%E3%81%95%E3%81%84%E3%81%9F%E3%81%BE%E5%B8%82%E5%B2%A9%E6%A7%BB%E5%8C%BA%E7%AC%B9%E4%B9%85%E4%BF%9D%E6%96%B0%E7%94%B0';
+
+  const MOBILE_BOTTOM_BAR_HTML = `
+    <nav class="site-mobile-bottom-bar" id="siteMobileBottomBar" aria-label="Mobile shortcuts">
+      <div class="site-mobile-bottom-bar__inner">
+        <a class="site-mobile-bottom-bar__btn site-mobile-bottom-bar__btn--inquiry" href="contact.html" data-mobile-bar-inquiry>
+          <svg class="site-mobile-bottom-bar__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" d="M5 5h14v10H8l-3 3V5z"></path>
+          </svg>
+          <span data-i18n="mobileBar.inquiry">お問い合わせ</span>
+        </a>
+        <a class="site-mobile-bottom-bar__btn site-mobile-bottom-bar__btn--access" href="${SAITAMA_MAPS_HREF}" target="_blank" rel="noopener noreferrer">
+          <svg class="site-mobile-bottom-bar__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" d="M12 21s7-4.35 7-10a7 7 0 10-14 0c0 5.65 7 10 7 10zm0-10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z"></path>
+          </svg>
+          <span data-i18n="mobileBar.access">アクセス</span>
+        </a>
+      </div>
+    </nav>
+  `;
+
   const FOOTER_HTML = `
     <footer id="footer" class="site-footer">
       <div class="footer-wrap footer-inner">
@@ -105,6 +126,37 @@
     </footer>
   `;
 
+  function getMobileInquiryHref() {
+    const path = (window.location.pathname || '').toLowerCase();
+    if (path.endsWith('/rental.html') || path.endsWith('rental.html')) {
+      return 'contact.html?type=rental';
+    }
+    return 'contact.html';
+  }
+
+  function syncMobileBottomBarLinks() {
+    const inquiryLink = document.querySelector('[data-mobile-bar-inquiry]');
+    if (inquiryLink) {
+      inquiryLink.href = getMobileInquiryHref();
+    }
+  }
+
+  function injectMobileBottomBar() {
+    if (document.body.dataset.mobileBarInjected === '1') return;
+    if (!document.querySelector('[data-layout-nav]')) return;
+    if (document.getElementById('siteMobileBottomBar')) return;
+
+    document.body.dataset.mobileBarInjected = '1';
+    document.body.classList.add('has-site-mobile-bar');
+
+    const mount = document.createElement('div');
+    mount.innerHTML = MOBILE_BOTTOM_BAR_HTML.trim();
+    const bar = mount.firstElementChild;
+    if (bar) document.body.appendChild(bar);
+
+    syncMobileBottomBarLinks();
+  }
+
   function inject() {
     document.querySelectorAll('[data-layout-nav]').forEach((mount) => {
       if (mount.dataset.layoutInjected === '1') return;
@@ -117,6 +169,8 @@
       mount.dataset.layoutInjected = '1';
       mount.innerHTML = FOOTER_HTML;
     });
+
+    injectMobileBottomBar();
   }
 
   inject();
