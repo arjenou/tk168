@@ -205,7 +205,6 @@ installDetailSkeletonUi();
 
 let currentGalleryIndex = 0;
 let thumbStripEventsBound = false;
-let thumbStripSuppressClick = false;
 let thumbStripScrollRaf = 0;
 let activePriceHelp = '';
 let featuredSliderScrollFrame = 0;
@@ -656,13 +655,13 @@ async function copyAdvisorPhone() {
 
 function getGalleryItems() {
   if (!thumbGrid) return [];
-  return [...thumbGrid.querySelectorAll('.thumb:not(.thumb--skeleton)')].map((thumb, index) => ({
-    index,
+  return [...thumbGrid.querySelectorAll('.thumb:not(.thumb--skeleton)')].map((thumb) => ({
+    index: Number(thumb.dataset.index || 0),
     kind: thumb.dataset.kind || 'image',
-    src: thumb.dataset.image,
+    src: thumb.dataset.image || thumb.dataset.poster || '',
     poster: thumb.dataset.poster || '',
     panorama: thumb.dataset.panorama || '',
-    alt: thumb.dataset.alt || `${getVehicleName(currentVehicle)} ${(window.TK168I18N?.t('gallery.angle') || '视角')} ${index + 1}`
+    alt: thumb.dataset.alt || `${getVehicleName(currentVehicle)} ${(window.TK168I18N?.t('gallery.angle') || '视角')}`
   }));
 }
 
@@ -802,15 +801,17 @@ function bindThumbStripDrag() {
       startScroll: vp.scrollLeft,
       moved: false
     };
-    vp.setPointerCapture(event.pointerId);
   });
 
   vp.addEventListener('pointermove', (event) => {
     if (!dragState || event.pointerId !== dragState.pointerId) return;
     const deltaX = event.clientX - dragState.startX;
-    if (!dragState.moved && Math.abs(deltaX) <= DRAG_THRESHOLD) return;
-    dragState.moved = true;
-    vp.classList.add('is-dragging');
+    if (!dragState.moved) {
+      if (Math.abs(deltaX) <= DRAG_THRESHOLD) return;
+      dragState.moved = true;
+      vp.setPointerCapture(event.pointerId);
+      vp.classList.add('is-dragging');
+    }
     event.preventDefault();
     vp.scrollLeft = dragState.startScroll - deltaX;
   });
@@ -818,9 +819,13 @@ function bindThumbStripDrag() {
   const finishDrag = (event) => {
     if (!dragState || event.pointerId !== dragState.pointerId) return;
     if (dragState.moved) {
-      thumbStripSuppressClick = true;
+      const suppressClick = (clickEvent) => {
+        clickEvent.preventDefault();
+        clickEvent.stopPropagation();
+      };
+      vp.addEventListener('click', suppressClick, true);
       window.setTimeout(() => {
-        thumbStripSuppressClick = false;
+        vp.removeEventListener('click', suppressClick, true);
       }, 0);
       const snapped = snapThumbScrollLeft(vp.scrollLeft);
       vp.scrollTo({ left: snapped, behavior: 'smooth' });
@@ -1035,10 +1040,18 @@ function syncGallery(index, direction = index >= currentGalleryIndex ? 1 : -1) {
   const items = getGalleryItems();
   if (items.length === 0) return;
 
-  currentGalleryIndex = findNextImageIndex(index, direction);
-  const currentItem = items[currentGalleryIndex];
-  const activeThumb = thumbGrid.querySelector(`.thumb[data-index="${currentGalleryIndex}"]`);
+  const targetIndex = Number(index);
+  const directItem = items.find((entry) => entry.index === targetIndex);
+  if (directItem?.kind === 'image' && directItem.src) {
+    currentGalleryIndex = directItem.index;
+  } else {
+    currentGalleryIndex = findNextImageIndex(targetIndex, direction);
+  }
 
+  const currentItem = items.find((entry) => entry.index === currentGalleryIndex) || items[currentGalleryIndex];
+  if (!currentItem?.src) return;
+
+  const activeThumb = thumbGrid.querySelector(`.thumb[data-index="${currentGalleryIndex}"]`);
   if (activeThumb) setActiveThumb(activeThumb);
   setMainGalleryImage(currentItem.src, currentItem.alt);
   revealThumb(currentGalleryIndex);
@@ -1074,8 +1087,8 @@ function updateLightbox(index) {
 
 function openLightbox(index = currentGalleryIndex) {
   if (!galleryLightbox) return;
-  const item = getGalleryItems()[clampGalleryIndex(index)];
-  if (item?.kind === 'spin') return;
+  const item = getGalleryItems().find((entry) => entry.index === Number(index));
+  if (!item || item.kind === 'spin' || !item.src) return;
   updateLightbox(index);
   galleryLightbox.classList.add('is-open');
   galleryLightbox.setAttribute('aria-hidden', 'false');
@@ -1275,8 +1288,7 @@ function togglePriceHelp(kind, forceOpen = false) {
   });
 }
 
-thumbGrid?.addEventListener('click', event => {
-  if (thumbStripSuppressClick) return;
+thumbGrid?.addEventListener('click', (event) => {
   const thumb = event.target.closest('.thumb');
   if (!thumb) return;
   const targetIndex = Number(thumb.dataset.index || 0);
@@ -1285,7 +1297,6 @@ thumbGrid?.addEventListener('click', event => {
     return;
   }
   syncGallery(targetIndex, targetIndex >= currentGalleryIndex ? 1 : -1);
-  openLightbox(targetIndex);
 });
 
 galleryMainTrigger?.addEventListener('click', () => {
