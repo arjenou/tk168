@@ -9,15 +9,13 @@ window.TK168CommonLinks?.applyCommonLinks();
 const brandNavNarrowViewport = window.matchMedia('(max-width: 480px)');
 const brandNavTabletViewport = window.matchMedia('(max-width: 1100px)');
 let brandNavSuppressClickUntil = 0;
-const fullBrandNavCatalog = Array.isArray(window.TK168BrandLogoInventory?.items) && window.TK168BrandLogoInventory.items.length
-  ? [...window.TK168BrandLogoInventory.items]
-  : (Array.isArray(brands) ? [...brands] : []);
-const FULL_BRAND_NAV_ORDER = fullBrandNavCatalog.map((brand) => brand.key);
 
 const normalizeBrandToken = (value = '') => String(value || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
 const BRAND_FOCUS_ALIAS_MAP = Object.freeze({
   rollsroyce: 'rolls-royce',
-  mercedesbenz: 'mercedes'
+  mercedesbenz: 'mercedes',
+  astonmartin: 'astonmartin',
+  landrover: 'landrover'
 });
 const BRAND_NAV_THEME_MAP = Object.freeze({
   'rolls-royce': Object.freeze({ bgStart: '#d8d7d2', bgMid: '#ebe9e4', bgEnd: '#d8d5cf' }),
@@ -36,9 +34,18 @@ const BRAND_NAV_THEME_MAP = Object.freeze({
   jaguar: Object.freeze({ bgStart: '#e8dde1', bgMid: '#f7eff2', bgEnd: '#e4d7dc' }),
   cadillac: Object.freeze({ bgStart: '#dce4f2', bgMid: '#eef4fb', bgEnd: '#d7e0ef' })
 });
-const fullBrandKeyByToken = new Map(
-  FULL_BRAND_NAV_ORDER.map((key) => [normalizeBrandToken(key), key])
-);
+const fullBrandKeyByToken = new Map();
+
+function syncBrandNavKeyIndex(catalog = getOrderedBrandNavCatalog()) {
+  fullBrandKeyByToken.clear();
+  catalog.forEach((brand) => {
+    if (!brand?.key) return;
+    fullBrandKeyByToken.set(normalizeBrandToken(brand.key), brand.key);
+    if (brand.assetKey) {
+      fullBrandKeyByToken.set(normalizeBrandToken(brand.assetKey), brand.key);
+    }
+  });
+}
 
 function hexToRgba(hex, alpha) {
   const value = String(hex || '').replace('#', '');
@@ -88,7 +95,7 @@ function inventoryPagesMatch(pathA, pathB) {
 }
 
 const initialUrlParams = new URLSearchParams(window.location.search);
-let focusBrandKey = resolveFocusBrandKey(initialUrlParams.get('focusBrand') || '');
+let focusBrandKey = '';
 
 const BRAND_VEHICLE_BATCH = 30;
 let visibleVehicleLimit = 0;
@@ -98,25 +105,29 @@ function resetBrandVehicleVisibleLimit() {
 }
 const inventoryContext = window.TK168InventoryContext.createInventoryContext(window.location.search, vehicles);
 const currentBrand = inventoryContext.currentBrand;
-if (!focusBrandKey && currentBrand?.key) {
-  focusBrandKey = currentBrand.key;
-}
 let sourceVehicles = [];
 
 let brandHeroPreviewKey = '';
 let brandHeroTitleFxTimer = 0;
 const brandVehicleGrid = document.getElementById('vehicleGrid');
 
-const canonicalInventoryUrl = inventoryContext.canonicalInventoryUrl;
-const canonicalInventoryTarget = new URL(canonicalInventoryUrl, window.location.href);
-if (focusBrandKey) {
-  canonicalInventoryTarget.searchParams.set('focusBrand', focusBrandKey);
-} else {
-  canonicalInventoryTarget.searchParams.delete('focusBrand');
-}
-const canonicalInventoryPathAndQuery = `${canonicalInventoryTarget.pathname.split('/').pop()}${canonicalInventoryTarget.search}`;
-if (`${window.location.pathname.split('/').pop()}${window.location.search}` !== canonicalInventoryPathAndQuery) {
-  window.history.replaceState({}, '', canonicalInventoryPathAndQuery);
+function applyInitialFocusBrandFromUrl() {
+  syncBrandNavKeyIndex();
+  focusBrandKey = resolveFocusBrandKey(initialUrlParams.get('focusBrand') || '');
+  if (!focusBrandKey && currentBrand?.key) {
+    focusBrandKey = currentBrand.key;
+  }
+  const canonicalInventoryUrl = inventoryContext.canonicalInventoryUrl;
+  const canonicalInventoryTarget = new URL(canonicalInventoryUrl, window.location.href);
+  if (focusBrandKey) {
+    canonicalInventoryTarget.searchParams.set('focusBrand', focusBrandKey);
+  } else {
+    canonicalInventoryTarget.searchParams.delete('focusBrand');
+  }
+  const canonicalInventoryPathAndQuery = `${canonicalInventoryTarget.pathname.split('/').pop()}${canonicalInventoryTarget.search}`;
+  if (`${window.location.pathname.split('/').pop()}${window.location.search}` !== canonicalInventoryPathAndQuery) {
+    window.history.replaceState({}, '', canonicalInventoryPathAndQuery);
+  }
 }
 
 function recomputeSourceVehicles() {
@@ -132,6 +143,37 @@ function recomputeSourceVehicles() {
   sourceVehicles = window.TK168_DATA.filterVehicles(vehicles, effectiveFilters);
 }
 
+function getBrandHeroDefaultTitle() {
+  return window.TK168I18N?.t('brand.defaultTitle') || '厳選ブランド';
+}
+
+function getOrderedBrandNavCatalog() {
+  const fromData = window.TK168_DATA?.getInventoryBrandGlyphNavItems?.();
+  if (Array.isArray(fromData) && fromData.length) return fromData;
+  if (Array.isArray(window.TK168BrandLogoInventory?.items) && window.TK168BrandLogoInventory.items.length) {
+    return window.TK168BrandLogoInventory.items.map((item) => ({
+      key: item.key,
+      assetKey: String(item.file || '').replace(/\.svg$/i, ''),
+      iconUrl: item.file ? `assets/images/brands/logos/${item.file}` : '',
+      file: item.file,
+      labelZh: item.labelZh,
+      labelJa: item.labelJa,
+      labelEn: item.labelEn
+    }));
+  }
+  return Array.isArray(brands) ? brands.map((item) => ({
+    ...item,
+    assetKey: String(item.file || '').replace(/\.svg$/i, ''),
+    iconUrl: item.file ? `assets/images/brands/logos/${item.file}` : ''
+  })) : [];
+}
+
+function getBrandNavItemByKey(key) {
+  if (!key) return null;
+  return getOrderedBrandNavCatalog().find((brand) => brand.key === key) || null;
+}
+
+applyInitialFocusBrandFromUrl();
 recomputeSourceVehicles();
 resetBrandVehicleVisibleLimit();
 
@@ -140,15 +182,6 @@ window.TK168PageChrome?.applyPageChrome({
   pageKey: 'inventory',
   inventoryHref: inventoryHrefForChrome
 });
-
-function getBrandHeroDefaultTitle() {
-  return window.TK168I18N?.t('brand.defaultTitle') || '厳選ブランド';
-}
-
-function getBrandNavItemByKey(key) {
-  if (!key) return null;
-  return fullBrandNavCatalog.find((brand) => brand.key === key) || null;
-}
 
 function getPinnedBrandKey() {
   const filters = window.TK168_DATA.parseInventoryFilters(window.location.search);
@@ -189,10 +222,6 @@ function navigateClearBrandFilterWithoutReload() {
   window.history.pushState({}, '', `${u.pathname}${u.search}`);
   recomputeSourceVehicles();
   finishBrandNavClientUpdate();
-}
-
-function getOrderedBrandNavCatalog() {
-  return fullBrandNavCatalog;
 }
 
 function getBrandNavDisplayLabel(brand) {
@@ -290,9 +319,12 @@ function updateBrandNavThumb(node, brand, slotIndex) {
     node.removeAttribute('aria-current');
   }
 
+  const logoSrc = brand.iconUrl
+    || (brand.file ? `assets/images/brands/logos/${brand.file}` : 'assets/images/logo_TK168.svg');
+
   node.innerHTML = `
     <span class="bn-thumb__logo-wrap" aria-hidden="true">
-      <img class="bn-thumb__logo" src="assets/images/brands/logos/${brand.file}" alt="">
+      <img class="bn-thumb__logo" src="${logoSrc}" alt="" loading="eager" decoding="sync">
     </span>
     <span class="bn-thumb__label${getBrandNavLabelSizeClass(brand)}">${getBrandNavDisplayLabel(brand)}</span>
   `;
@@ -340,10 +372,12 @@ function scrollActiveBrandNavIntoView({ smooth = true } = {}) {
   if (!grid) return;
   const active = grid.querySelector('.bn-thumb.is-active');
   if (!active) return;
-  active.scrollIntoView({
-    behavior: smooth ? 'smooth' : 'auto',
-    inline: 'start',
-    block: 'nearest'
+  // 让高亮品牌在导航条中水平居中
+  const targetLeft = active.offsetLeft - (grid.clientWidth - active.clientWidth) / 2;
+  const maxLeft = Math.max(0, grid.scrollWidth - grid.clientWidth);
+  grid.scrollTo({
+    left: Math.max(0, Math.min(maxLeft, targetLeft)),
+    behavior: smooth ? 'smooth' : 'auto'
   });
 }
 
@@ -399,13 +433,14 @@ function bindBrandNavTrackGestures() {
   track.addEventListener('pointercancel', finishPointer);
 }
 
-function buildBrandNav() {
+function buildBrandNav({ centerActive = false } = {}) {
   const grid = document.getElementById('bnGrid');
   const prevButton = document.getElementById('bnPrev');
   const nextButton = document.getElementById('bnNext');
   if (!grid) return;
 
   const orderedCatalog = getOrderedBrandNavCatalog();
+  syncBrandNavKeyIndex(orderedCatalog);
   const total = orderedCatalog.length;
 
   if (prevButton) prevButton.hidden = true;
@@ -426,7 +461,11 @@ function buildBrandNav() {
   });
 
   updateBrandNavLayout();
-  scrollActiveBrandNavIntoView({ smooth: false });
+  // 仅在「首次进入（从首页点击 logo 跳转过来）」时把高亮项滚到中间；
+  // 展厅内点击切换品牌时保持当前滚动位置，不自动居中。
+  if (centerActive) {
+    scrollActiveBrandNavIntoView({ smooth: false });
+  }
 }
 
 function syncBrandHeader() {
@@ -665,7 +704,7 @@ if (typeof brandNavNarrowViewport.addEventListener === 'function') {
 }
 
 syncBrandHeader();
-buildBrandNav();
+buildBrandNav({ centerActive: true });
 (function bindBrandVehicleLoadMore() {
   const btn = document.getElementById('brandVehicleLoadMore');
   if (!btn || btn.dataset.bound === '1') return;
@@ -692,17 +731,9 @@ window.addEventListener('popstate', () => {
   finishBrandNavClientUpdate();
 });
 
-// 当首次进入页面时缓存为空（展示了骨架卡），等到 API 把车辆数据回灌后重新加载
-// 一次以让模块作用域内的 inventoryContext / sourceVehicles 重新构建。仅在确实需要时
-// （没有缓存导致页面初始为空）触发，避免有缓存的访客被打扰。
-(() => {
-  const cameInEmpty = !Array.isArray(vehicles) || vehicles.length === 0;
-  if (!cameInEmpty) return;
-  let consumed = false;
-  document.addEventListener('tk168:data-updated', (event) => {
-    if (consumed) return;
-    if (!event?.detail?.vehicles) return;
-    consumed = true;
-    window.location.reload();
-  });
-})();
+document.addEventListener('tk168:data-updated', (event) => {
+  if (!event?.detail?.vehicles) return;
+  window.TK168_DATA?.refreshVehiclesFromApiHydrate?.();
+  recomputeSourceVehicles();
+  finishBrandNavClientUpdate();
+});

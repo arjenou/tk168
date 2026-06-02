@@ -8,14 +8,15 @@
   --copy-col-w: min(34rem, 37vw);
   --copy-hero-gutter: clamp(1.25rem, 2.2vw, 2.75rem);
   /* 桌面两排品牌格总高度（含 lisboa-bottom / thumbs 内边距与行距），供主视觉区 bottom 避让 */
-  --brands-desktop-thumb-rows-h: calc(1.1rem + 1.35rem + 0.85rem + (2 * 5.45rem) + 0.62rem + 1rem);
+  --brands-desktop-thumb-rows-h: calc(1.85rem + 1.35rem + 0.85rem + (2 * 5.45rem) + 0.62rem + 1rem);
   /* 预留 top/bottom；文案块在可用高度内垂直居中（与右侧主视觉对齐） */
   --copy-top: clamp(3.5rem, 9vh, 6.25rem);
-  --copy-bottom-gap: 2rem;
+  /* 故事/大图与底部品牌 logo 条之间的竖直留白 */
+  --copy-bottom-gap: 4.75rem;
   --hero-shift: min(15vw, 11rem);
   --thumb-height: 5.5rem;
   /* 略小于 0：品牌条整体再下移一点，与大标/文案拉开距离 */
-  --thumb-bottom: -0.45rem;
+  --thumb-bottom: -0.85rem;
   --thumb-gap: 0.82rem;
   --thumb-nav-gap: max(1.12rem, calc(var(--thumb-gap) + 0.35rem));
   --thumb-button-width: 1.62rem;
@@ -121,7 +122,7 @@
   left: calc(var(--content-edge) + var(--copy-col-w) + var(--copy-hero-gutter));
   right: var(--content-edge);
   top: 12%;
-  bottom: calc(var(--brands-desktop-thumb-rows-h) + 1.75rem);
+  bottom: calc(var(--brands-desktop-thumb-rows-h) + 4.25rem);
   z-index: 3;
   display: flex;
   align-items: center;
@@ -290,7 +291,7 @@
   justify-content: flex-start;
   gap: 0;
   /* 为 .lisboa-thumbs 内选中项上移、scale、光晕预留竖直空间，避免被父级裁切 */
-  padding-top: 1.1rem;
+  padding-top: 1.85rem;
   pointer-events: none;
 }
 #brands .lisboa-thumbs {
@@ -351,7 +352,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.48rem;
+  gap: 0.36rem;
   isolation: isolate;
   z-index: 0;
   color: rgba(34, 40, 47, 0.88);
@@ -435,15 +436,15 @@
 }
 #brands .lisboa-thumb__logo {
   flex: 0 0 auto;
-  width: 2.1rem;
-  height: 2.1rem;
+  width: 2.85rem;
+  height: 2.85rem;
   object-fit: contain;
   filter: grayscale(1) contrast(0.95);
   transition: transform 220ms ease, filter 220ms ease;
 }
 #brands .lisboa-thumb__logo.lexus-mark {
-  width: 2.5rem;
-  height: 1.75rem;
+  width: 3.15rem;
+  height: 2.15rem;
   display: block;
   overflow: visible;
   color: rgba(17, 20, 26, 0.88);
@@ -692,7 +693,7 @@
     --copy-hero-gutter: clamp(1rem, 1.85vw, 2rem);
     --thumb-button-width: 1.9rem;
     --copy-top: clamp(3.15rem, 8.25vh, 5.5rem);
-    --copy-bottom-gap: 2.25rem;
+    --copy-bottom-gap: 4rem;
   }
   #brands .lisboa-thumbs {
     --thumb-gap-h: 0.4rem;

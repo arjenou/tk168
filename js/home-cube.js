@@ -55,7 +55,11 @@
       thumbAria: (name) => `Switch to ${name}`
     }
   };
-  const slides = [
+  // Curated brand catalog (rich theme / story / hero artwork). The carousel
+  // that actually renders is derived from the admin brand-vehicle inventory:
+  // see computeDisplaySlides(). Brands present in inventory reuse this catalog;
+  // unknown brands fall back to a neutral, icon-driven slide.
+  const SLIDE_CATALOG = [
     {
       id: 'rolls-royce',
       assetKey: 'rollsroyce',
@@ -313,6 +317,28 @@
     }
   ];
 
+  // Neutral palette / generic story used when an admin brand has no curated
+  // catalog entry (e.g. a newly added brand outside the original 15).
+  const NEUTRAL_THEME = {
+    bgStart: '#e3e6ea',
+    bgMid: '#f4f6f8',
+    bgEnd: '#dee2e7',
+    glowA: 'rgba(214, 221, 232, 0.28)',
+    glowB: 'rgba(255, 255, 255, 0.1)',
+    glowC: 'rgba(255, 255, 255, 0.1)',
+    tileStart: 'rgba(251, 252, 253, 0.92)',
+    tileEnd: 'rgba(220, 226, 233, 0.42)'
+  };
+  const GENERIC_STORY = {
+    zh: '甄选车源，由 TK168 全程把控品质与交付。',
+    ja: '厳選された車両を、TK168 が品質から納車まで責任を持ってご案内します。',
+    en: 'A curated selection, with TK168 overseeing quality through delivery.'
+  };
+
+  // The list the carousel actually renders. Recomputed from the admin
+  // inventory on every render() and whenever vehicle data updates.
+  let slides = SLIDE_CATALOG.slice();
+
   let activeIndex = 0;
   let previousIndex = 0;
   let isAnimating = false;
@@ -358,11 +384,93 @@
   }
 
   function getHeroLogo(item) {
+    if (item.heroLogoUrl) return item.heroLogoUrl;
     return `assets/images/brands/hero-png/${item.assetKey}.png`;
   }
 
   function getThumbLogo(item) {
+    if (item.thumbLogoUrl) return item.thumbLogoUrl;
     return `assets/images/brands/logos/${item.assetKey}.svg`;
+  }
+
+  function buildDynamicSlide(baseKey, info) {
+    const data = window.TK168_DATA;
+    let name = '';
+    if (data?.getBrandLabel && info.brandKey) {
+      name = data.getBrandLabel(info.brandKey, 'en')
+        || data.getBrandLabel(info.brandKey, getLanguage())
+        || '';
+    }
+    if (!name) {
+      name = baseKey
+        ? baseKey.replace(/^[a-z]/, (c) => c.toUpperCase())
+        : (info.brandKey || '');
+    }
+    return {
+      id: `dyn-${baseKey || info.brandKey || 'brand'}`,
+      assetKey: baseKey || '',
+      brandKey: info.brandKey || '',
+      name,
+      isDynamic: true,
+      thumbLogoUrl: info.iconUrl,
+      heroLogoUrl: info.iconUrl,
+      country: { zh: '', ja: '', en: '' },
+      story: GENERIC_STORY,
+      theme: NEUTRAL_THEME
+    };
+  }
+
+  /**
+   * Derive the rendered slide list from the admin brand-vehicle inventory
+   * (same source as brand showroom nav — `getInventoryBrandGlyphNavItems`).
+   */
+  function computeDisplaySlides() {
+    const data = window.TK168_DATA;
+    const navItems = data?.getInventoryBrandGlyphNavItems?.();
+    if (!Array.isArray(navItems) || !navItems.length) {
+      return SLIDE_CATALOG.slice();
+    }
+
+    const catalogByAsset = new Map(
+      SLIDE_CATALOG.map((slide) => [slide.assetKey, slide])
+    );
+
+    const result = navItems.map((nav) => {
+      const slide = catalogByAsset.get(nav.assetKey);
+      if (slide) {
+        return { ...slide, brandKey: nav.key, thumbLogoUrl: nav.iconUrl, heroLogoUrl: nav.iconUrl };
+      }
+      return buildDynamicSlide(nav.assetKey, {
+        iconUrl: nav.iconUrl,
+        brandKey: nav.key
+      });
+    });
+
+    return result.length ? result : SLIDE_CATALOG.slice();
+  }
+
+  function rebuildSlides() {
+    const next = computeDisplaySlides();
+    slides = next.length ? next : SLIDE_CATALOG.slice();
+    if (activeIndex >= slides.length) activeIndex = 0;
+    if (previousIndex >= slides.length) previousIndex = 0;
+  }
+
+  /** 品牌 logo 点击 → 该品牌「所有车」页（brand.html?brand=key）。 */
+  function getBrandHrefForItem(item) {
+    const data = window.TK168_DATA;
+    if (!item || typeof data?.buildBrandUrl !== 'function') return '';
+    const key = item.brandKey || item.id || '';
+    return key ? data.buildBrandUrl(key) : '';
+  }
+
+  function navigateToBrand(item) {
+    const href = getBrandHrefForItem(item);
+    if (href) {
+      window.location.href = href;
+      return true;
+    }
+    return false;
   }
 
   function getFlagLogo(item) {
@@ -456,6 +564,16 @@
     slide.style.setProperty('--tile-end', item.theme.tileEnd);
     slide.style.setProperty('--hero-logo-scale', String(heroAdjust.scale ?? 1));
     slide.style.setProperty('--hero-logo-y', heroAdjust.y ?? '0rem');
+    const countryText = getLocalizedText(item.country, language);
+    const metaHtml = countryText
+      ? `
+        <div class="slide-panel-meta">
+          <span class="slide-panel-flag" aria-hidden="true">
+            <img class="slide-panel-flag-icon" src="${getFlagLogo(item)}" alt="" loading="lazy" decoding="async">
+          </span>
+          <p class="slide-panel-country">${countryText}</p>
+        </div>`
+      : '';
     slide.innerHTML = `
       <div class="lisboa-slide__bg"></div>
       <div class="lisboa-slide__grain"></div>
@@ -470,12 +588,7 @@
         >
       </div>
       <div class="lisboa-slide__copy">
-        <div class="slide-panel-meta">
-          <span class="slide-panel-flag" aria-hidden="true">
-            <img class="slide-panel-flag-icon" src="${getFlagLogo(item)}" alt="" loading="lazy" decoding="async">
-          </span>
-          <p class="slide-panel-country">${getLocalizedText(item.country, language)}</p>
-        </div>
+        ${metaHtml}
         <h2 class="slide-panel-brand">${item.name}</h2>
         <p class="slide-panel-story">${getLocalizedText(item.story, language)}</p>
       </div>
@@ -500,7 +613,10 @@
     button.addEventListener('click', () => {
       if (Date.now() < thumbSwipeState.suppressClickUntil) return;
       const idx = Number(button.dataset.index);
-      if (Number.isFinite(idx)) setActive(idx);
+      if (!Number.isFinite(idx)) return;
+      // 点击品牌 logo → 跳转到该品牌「所有车」页；无法解析品牌时回退为切换轮盘。
+      if (navigateToBrand(slides[idx])) return;
+      setActive(idx);
     });
   }
 
@@ -579,15 +695,30 @@
       return;
     }
 
-    const firstRowCount = slides.length ? Math.max(1, Math.floor(slides.length / 2)) : 0;
-    const secondRowCount = slides.length - firstRowCount;
-
-    thumbs.style.setProperty('--thumb-row1-cols', String(Math.max(1, firstRowCount)));
-    if (secondRowCount > 0) {
-      thumbs.style.setProperty('--thumb-row2-cols', String(secondRowCount));
+    // Row arrangement: up to 8 logos stay on a single centered row; 9+ split
+    // into two rows with the extra card on the (lower) second row. So even
+    // counts give two equal rows, odd counts put one more below — e.g.
+    // 6 → 6 · 5 → 5 · 9 → 4+5 · 15 → 7+8 · 16 → 8+8.
+    const total = slides.length;
+    const SINGLE_ROW_MAX = 8;
+    let firstRowCount;
+    let secondRowCount;
+    if (total <= SINGLE_ROW_MAX) {
+      firstRowCount = total;
+      secondRowCount = 0;
     } else {
-      thumbs.style.removeProperty('--thumb-row2-cols');
+      firstRowCount = Math.floor(total / 2);
+      secondRowCount = total - firstRowCount;
     }
+
+    const row1Cols = Math.max(1, firstRowCount);
+    thumbs.style.setProperty('--thumb-row1-cols', String(row1Cols));
+    // Single row: pin row2-cols to row1 so the uniform cell width matches the
+    // visible row (the stylesheet's static fallback would otherwise force 8).
+    thumbs.style.setProperty(
+      '--thumb-row2-cols',
+      String(secondRowCount > 0 ? secondRowCount : row1Cols)
+    );
 
     const row1 = document.createElement('div');
     row1.className = 'lisboa-thumbs-row lisboa-thumbs-row--first';
@@ -722,6 +853,7 @@
   }
 
   function render(immediate = true) {
+    rebuildSlides();
     applyShellCopy();
     stage.innerHTML = '';
 
@@ -797,7 +929,8 @@
 
   function endHeroDrag(cancelled = false) {
     const deltaX = dragState.deltaX;
-    const shouldStep = !cancelled && dragState.dragging && Math.abs(deltaX) > 42;
+    const wasDragging = dragState.dragging;
+    const shouldStep = !cancelled && wasDragging && Math.abs(deltaX) > 42;
     const direction = deltaX < 0 ? 1 : -1;
 
     dragState.pointerId = null;
@@ -806,6 +939,11 @@
 
     if (shouldStep) {
       step(direction);
+      return;
+    }
+    // 干净的轻点（未触发拖动）落在主视觉 logo 上 → 跳转该品牌「所有车」页。
+    if (!cancelled && !wasDragging && Math.abs(deltaX) < 6) {
+      navigateToBrand(slides[activeIndex]);
     }
   }
 
@@ -1099,9 +1237,16 @@
   thumbs.addEventListener('wheel', handleThumbsWheel, { passive: false });
   thumbs.addEventListener('pointerdown', bumpThumbsAutoplaySnooze, { passive: true });
   window.addEventListener('tk168:languagechange', handleLanguageChange);
+  document.addEventListener('tk168:data-updated', (event) => {
+    if (!event.detail || !event.detail.vehicles) return;
+    window.TK168_DATA?.refreshVehiclesFromApiHydrate?.();
+    resetTransientState();
+    render(true);
+  });
   document.addEventListener('visibilitychange', syncAutoplay);
   prefersReducedMotion.addEventListener?.('change', syncAutoplay);
 
+  rebuildSlides();
   preloadCarouselAssets();
   render(true);
   observeCarouselVisibility();

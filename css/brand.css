@@ -678,11 +678,16 @@ html:lang(ja) .bn-name {
 
 .bn-thumb.is-active {
   z-index: 2;
-  border-color: rgba(23, 23, 23, 0.22);
+  /* 高亮项吸附到居中位置（其余项仍吸附到 start） */
+  scroll-snap-align: center;
+  border-color: rgba(232, 197, 71, 0.6);
   color: rgba(34, 40, 47, 0.95);
-  background: #FFFFFF;
-  transform: translateY(-2px);
-  box-shadow: none;
+  background: #fffef8;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    0 0 0 2px rgba(255, 224, 130, 0.4),
+    0 0 26px rgba(255, 214, 120, 0.22),
+    0 12px 28px rgba(20, 24, 30, 0.1);
 }
 
 .bn-thumb.is-active::before,
@@ -697,12 +702,12 @@ html:lang(ja) .bn-name {
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 58px;
+  min-height: 72px;
 }
 
 .bn-thumb__logo {
-  width: min(86px, 72%);
-  height: 58px;
+  width: min(100px, 78%);
+  height: 72px;
   object-fit: contain;
   filter: drop-shadow(0 6px 10px rgba(24, 24, 28, 0.1));
   transition: transform 220ms ease, filter 220ms ease;
@@ -731,8 +736,10 @@ html:lang(ja) .bn-name {
 }
 
 .bn-thumb.is-active .bn-thumb__logo {
-  transform: translateY(-1px) scale(1.03);
-  filter: drop-shadow(0 6px 12px rgba(24, 24, 28, 0.12));
+  transform: translateY(-1px) scale(1.05);
+  filter:
+    drop-shadow(0 3px 10px rgba(255, 214, 120, 0.3))
+    drop-shadow(0 6px 12px rgba(24, 24, 28, 0.12));
 }
 
 .bn-thumb.is-active .bn-thumb__label {
@@ -970,12 +977,12 @@ html:lang(ja) .bn-name {
   }
 
   .bn-thumb__logo-wrap {
-    min-height: 44px;
+    min-height: 52px;
   }
 
   .bn-thumb__logo {
-    width: min(68px, 74%);
-    height: 42px;
+    width: min(80px, 78%);
+    height: 52px;
   }
 
   .bn-thumb__label {
@@ -1114,12 +1121,12 @@ html:lang(ja) .bn-name {
   }
 
   .bn-thumb__logo-wrap {
-    min-height: 36px;
+    min-height: 44px;
   }
 
   .bn-thumb__logo {
-    width: min(56px, 76%);
-    height: 36px;
+    width: min(68px, 80%);
+    height: 44px;
   }
 
   .bn-thumb__label {

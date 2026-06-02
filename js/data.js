@@ -1738,6 +1738,106 @@ window.TK168_DATA = (() => {
     return 'assets/images/logo_TK168.svg';
   }
 
+  /** `assets/images/brands/logos/ferrari.svg` → `ferrari` */
+  function brandLogoAssetKeyFromUrl(url) {
+    const match = String(url || '').match(/brands\/logos\/([^/?#]+)\.svg/i);
+    return match ? match[1].toLowerCase() : '';
+  }
+
+  function brandLogoAssetKeyFromFile(file) {
+    return String(file || '').replace(/\.svg$/i, '').toLowerCase();
+  }
+
+  function catalogNavItemFromLogoRow(item) {
+    const assetKey = brandLogoAssetKeyFromFile(item.file);
+    return {
+      key: item.key,
+      assetKey,
+      iconUrl: item.file ? `assets/images/brands/logos/${item.file}` : '',
+      file: item.file,
+      labelZh: item.labelZh,
+      labelJa: item.labelJa,
+      labelEn: item.labelEn
+    };
+  }
+
+  /**
+   * 首页轮盘与品牌展厅导航共用的品牌 logo 列表：来自后台品牌车辆「图标」字段，
+   * 按图标去重；已知品牌保持 brand-logo-inventory 顺序，其余按库存出现顺序追加。
+   */
+  function getInventoryBrandGlyphNavItems() {
+    const catalogItems = Array.isArray(brandLogoInventoryApi.items)
+      ? brandLogoInventoryApi.items
+      : [];
+
+    const order = [];
+    const byAsset = new Map();
+    vehicles.forEach((vehicle) => {
+      const iconUrl = resolveVehicleBrandGlyphUrl(vehicle);
+      if (!iconUrl || iconUrl.includes('logo_TK168')) return;
+      const base = brandLogoAssetKeyFromUrl(iconUrl);
+      const mapKey = base || String(iconUrl).trim();
+      if (!mapKey || byAsset.has(mapKey)) return;
+      const canonicalKey = resolveCanonicalBrandKey(vehicle.brandKey) || '';
+      byAsset.set(mapKey, {
+        iconUrl,
+        brandKey: vehicle.brandKey,
+        canonicalKey,
+        base
+      });
+      order.push(mapKey);
+    });
+
+    if (!byAsset.size) {
+      return catalogItems.map(catalogNavItemFromLogoRow);
+    }
+
+    const result = [];
+    const used = new Set();
+
+    catalogItems.forEach((item) => {
+      const assetKey = brandLogoAssetKeyFromFile(item.file);
+      if (!byAsset.has(assetKey)) return;
+      const info = byAsset.get(assetKey);
+      result.push({
+        key: info.canonicalKey || item.key,
+        assetKey,
+        iconUrl: info.iconUrl,
+        file: item.file,
+        labelZh: item.labelZh,
+        labelJa: item.labelJa,
+        labelEn: item.labelEn
+      });
+      used.add(assetKey);
+    });
+
+    order.forEach((mapKey) => {
+      if (used.has(mapKey)) return;
+      const info = byAsset.get(mapKey);
+      const assetKey = info.base || mapKey;
+      const catalogBrand = getBrandByKey(info.canonicalKey || info.brandKey);
+      const key = info.canonicalKey
+        || catalogBrand?.key
+        || resolveCanonicalBrandKey(info.brandKey)
+        || assetKey;
+      const fallbackLabel = assetKey
+        ? assetKey.replace(/(^|[-_])([a-z])/g, (_, sep, c) => (sep ? ' ' : '') + c.toUpperCase())
+        : key;
+      result.push({
+        key,
+        assetKey,
+        iconUrl: info.iconUrl,
+        file: catalogBrand?.file || `${assetKey}.svg`,
+        labelZh: catalogBrand?.labelZh || fallbackLabel,
+        labelJa: catalogBrand?.labelJa || fallbackLabel,
+        labelEn: catalogBrand?.labelEn || fallbackLabel
+      });
+      used.add(mapKey);
+    });
+
+    return result;
+  }
+
   function getBrandAccentColor(key) {
     const canonicalKey = resolveCanonicalBrandKey(key) || String(key || '').trim().toLowerCase();
     return brandAccentMap[canonicalKey] || '#171717';
@@ -2307,6 +2407,7 @@ window.TK168_DATA = (() => {
     getVehicleName,
     resolveVehicleMediaSource,
     resolveVehicleBrandGlyphUrl,
+    getInventoryBrandGlyphNavItems,
     getVehicleTypeLabel,
     getVehicleFieldLabel,
     getVehicleOverview,
