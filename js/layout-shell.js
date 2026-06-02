@@ -134,6 +134,17 @@
     return 'contact.html';
   }
 
+  const MOBILE_BOTTOM_BAR_CSS_HREF = 'css/mobile-bottom-bar.css?v=20260602a';
+
+  function ensureMobileBottomBarStyles() {
+    if (document.getElementById('siteMobileBottomBarStyles')) return;
+    const link = document.createElement('link');
+    link.id = 'siteMobileBottomBarStyles';
+    link.rel = 'stylesheet';
+    link.href = MOBILE_BOTTOM_BAR_CSS_HREF;
+    document.head.appendChild(link);
+  }
+
   function syncMobileBottomBarLinks() {
     const inquiryLink = document.querySelector('[data-mobile-bar-inquiry]');
     if (inquiryLink) {
@@ -142,6 +153,7 @@
   }
 
   function injectMobileBottomBar() {
+    ensureMobileBottomBarStyles();
     if (document.body.dataset.mobileBarInjected === '1') return;
     if (!document.querySelector('[data-layout-nav]')) return;
     if (document.getElementById('siteMobileBottomBar')) return;
@@ -155,6 +167,7 @@
     if (bar) document.body.appendChild(bar);
 
     syncMobileBottomBarLinks();
+    window.TK168I18N?.applyTranslations?.(document);
   }
 
   function inject() {
@@ -173,10 +186,19 @@
     injectMobileBottomBar();
   }
 
-  inject();
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', inject, { once: true });
+  function bootstrap() {
+    inject();
+    syncMobileBottomBarLinks();
   }
+
+  bootstrap();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootstrap, { once: true });
+  }
+  window.addEventListener('pageshow', (event) => {
+    if (!event.persisted) return;
+    bootstrap();
+  });
 
   /* ───────────────────────────────────────────────
      全站统一页面转场（Page Transition）
