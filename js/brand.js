@@ -367,37 +367,61 @@ function updateBrandNavLayout() {
   track.style.setProperty('--bn-visible-count', String(count));
 }
 
-function centerActiveBrandNav(grid, active, smooth) {
-  if (!grid || !active) return;
-  // 用相对 track 的几何位置计算，避免 offsetParent 差异；clientWidth 为 0（尚未布局）时跳过本次
+/** 计算让高亮项居中的目标 scrollLeft；返回 null 表示当前尚不可量（未布局）。 */
+function computeBrandNavCenterLeft(grid, active) {
   const gridWidth = grid.clientWidth;
-  if (gridWidth <= 0) return;
+  if (gridWidth <= 0) return null;
   const trackRect = grid.getBoundingClientRect();
   const activeRect = active.getBoundingClientRect();
+  if (activeRect.width <= 0) return null;
   const activeLeftWithinTrack = (activeRect.left - trackRect.left) + grid.scrollLeft;
   const targetLeft = activeLeftWithinTrack - (gridWidth - activeRect.width) / 2;
   const maxLeft = Math.max(0, grid.scrollWidth - gridWidth);
-  grid.scrollTo({
-    left: Math.max(0, Math.min(maxLeft, targetLeft)),
-    behavior: smooth ? 'smooth' : 'auto'
-  });
+  return Math.max(0, Math.min(maxLeft, targetLeft));
 }
 
-function scrollActiveBrandNavIntoView({ smooth = true } = {}) {
+function centerActiveBrandNav(grid, active, smooth) {
+  if (!grid || !active) return false;
+  const target = computeBrandNavCenterLeft(grid, active);
+  if (target == null) return false;
+  grid.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
+  return true;
+}
+
+/**
+ * 把高亮品牌滚动到导航条中央。
+ * 移动端首屏（从首页点击 logo 跳转进来）布局/图片/滚动恢复存在时序差异，
+ * 单次 scrollTo 常落空，故在多个时间点重试，直到高亮项确实落在中央附近。
+ */
+function scrollActiveBrandNavIntoView({ smooth = true, robust = false } = {}) {
   const grid = document.getElementById('bnGrid');
   if (!grid) return;
   const active = grid.querySelector('.bn-thumb.is-active');
   if (!active) return;
 
-  // 布局/字体可能尚未就绪：等两帧再量一次，确保移动端按当前屏幕宽度与可见卡片数居中
-  const run = () => centerActiveBrandNav(grid, active, smooth);
-  run();
-  requestAnimationFrame(() => requestAnimationFrame(run));
+  if (!robust) {
+    centerActiveBrandNav(grid, active, smooth);
+    requestAnimationFrame(() => requestAnimationFrame(() => centerActiveBrandNav(grid, active, smooth)));
+    return;
+  }
 
-  // 品牌 logo 图片为异步加载，宽度变化会影响居中；加载完成后再校正一次（不使用动画避免抖动）
+  let settled = false;
+  const attempt = () => {
+    if (settled) return;
+    const target = computeBrandNavCenterLeft(grid, active);
+    if (target == null) return; // 尚未可量，等待后续重试
+    grid.scrollTo({ left: target, behavior: 'auto' });
+    // 误差小于 2px 视为已到位，停止后续重试
+    if (Math.abs(grid.scrollLeft - target) <= 2) settled = true;
+  };
+
+  attempt();
+  requestAnimationFrame(() => requestAnimationFrame(attempt));
+  [80, 200, 400, 700].forEach((delay) => window.setTimeout(attempt, delay));
+
   const logo = active.querySelector('.bn-thumb__logo');
   if (logo instanceof HTMLImageElement && !logo.complete) {
-    logo.addEventListener('load', () => centerActiveBrandNav(grid, active, false), { once: true });
+    logo.addEventListener('load', attempt, { once: true });
   }
 }
 
@@ -484,7 +508,7 @@ function buildBrandNav({ centerActive = false } = {}) {
   // 仅在「首次进入（从首页点击 logo 跳转过来）」时把高亮项滚到中间；
   // 展厅内点击切换品牌时保持当前滚动位置，不自动居中。
   if (centerActive) {
-    scrollActiveBrandNavIntoView({ smooth: false });
+    scrollActiveBrandNavIntoView({ smooth: false, robust: true });
   }
 }
 
@@ -728,7 +752,7 @@ buildBrandNav({ centerActive: true });
 // 首次从首页点击 logo 跳转进来：页面与图片完全加载后再校正一次居中，
 // 避免移动端因 hero 大图 / 字体回流导致高亮 logo 未停在正中。
 if (document.readyState !== 'complete') {
-  window.addEventListener('load', () => scrollActiveBrandNavIntoView({ smooth: false }), { once: true });
+  window.addEventListener('load', () => scrollActiveBrandNavIntoView({ smooth: false, robust: true }), { once: true });
 }
 (function bindBrandVehicleLoadMore() {
   const btn = document.getElementById('brandVehicleLoadMore');
