@@ -383,6 +383,28 @@
     return value || '';
   }
 
+  function getSlideBrandName(item, language = getLanguage()) {
+    if (item?.displayName) return getLocalizedText(item.displayName, language);
+    return item?.name || '';
+  }
+
+  /** 首页图标文案库优先（含精选 15 品牌与后台新增图标） */
+  function mergeHomeLogoCopy(slide, nav) {
+    const assetKey = nav?.assetKey || slide.assetKey || '';
+    const copy = window.TK168_DATA?.getBrandLogoHomeCopy?.(assetKey);
+    const story = copy?.story || nav?.homeStory || slide.story;
+    const displayName = copy?.name
+      || ((nav?.labelZh || nav?.labelJa || nav?.labelEn)
+        ? { zh: nav.labelZh || '', ja: nav.labelJa || '', en: nav.labelEn || '' }
+        : null);
+    const merged = { ...slide, story };
+    if (displayName && (displayName.zh || displayName.ja || displayName.en)) {
+      merged.displayName = displayName;
+      merged.name = getLocalizedText(displayName);
+    }
+    return merged;
+  }
+
   function getHeroLogo(item) {
     if (item.heroLogoUrl) return item.heroLogoUrl;
     return `assets/images/brands/hero-png/${item.assetKey}.png`;
@@ -408,21 +430,49 @@
         || '';
     }
     if (!name) {
+      const copy = window.TK168_DATA?.getBrandLogoHomeCopy?.(baseKey);
+      if (copy?.name) {
+        if (lang === 'zh') name = copy.name.zh || '';
+        else if (lang === 'ja') name = copy.name.ja || '';
+        else name = copy.name.en || '';
+      }
+    }
+    if (!name) {
       name = baseKey
         ? baseKey.replace(/^[a-z]/, (c) => c.toUpperCase())
         : (info.brandKey || '');
     }
+    const maker = info.brandKey
+      ? window.TK168_DATA?.getBrandMakerCountry?.(info.brandKey)
+      : null;
+    const homeCopy = window.TK168_DATA?.getBrandLogoHomeCopy?.(baseKey);
+    const story = info.homeStory || homeCopy?.story || GENERIC_STORY;
+    const displayName = homeCopy?.name
+      || ((info.labelZh || info.labelJa || info.labelEn)
+        ? { zh: info.labelZh || '', ja: info.labelJa || '', en: info.labelEn || '' }
+        : null);
     return {
       id: `dyn-${baseKey || info.brandKey || 'brand'}`,
       assetKey: baseKey || '',
       brandKey: info.brandKey || '',
-      name,
+      name: displayName ? getLocalizedText(displayName) : name,
+      displayName: displayName || undefined,
       isDynamic: true,
       thumbLogoUrl: info.iconUrl,
       heroLogoUrl: info.iconUrl,
-      country: { zh: '', ja: '', en: '' },
-      story: GENERIC_STORY,
+      country: info.country || maker?.country || { zh: '', ja: '', en: '' },
+      countryCode: info.countryCode || maker?.code || '',
+      story,
       theme: NEUTRAL_THEME
+    };
+  }
+
+  function applyNavCountryFields(slide, nav) {
+    if (!nav?.countryCode) return slide;
+    return {
+      ...slide,
+      countryCode: nav.countryCode,
+      country: nav.country || slide.country
     };
   }
 
@@ -434,7 +484,7 @@
     const data = window.TK168_DATA;
     const navItems = data?.getInventoryBrandGlyphNavItems?.();
     if (!Array.isArray(navItems) || !navItems.length) {
-      return SLIDE_CATALOG.slice();
+      return SLIDE_CATALOG.map((slide) => mergeHomeLogoCopy(slide, null));
     }
 
     const catalogByAsset = new Map(
@@ -444,24 +494,26 @@
     const result = navItems.map((nav) => {
       const slide = catalogByAsset.get(nav.assetKey);
       if (slide) {
-        const lang = getLanguage();
-        const name = lang === 'zh'
-          ? (nav.labelZh || slide.name)
-          : lang === 'ja'
-            ? (nav.labelJa || slide.name)
-            : (nav.labelEn || slide.name);
-        return { ...slide, brandKey: nav.key, thumbLogoUrl: nav.iconUrl, heroLogoUrl: nav.iconUrl, name: name || slide.name };
+        return applyNavCountryFields(mergeHomeLogoCopy({
+          ...slide,
+          brandKey: nav.key,
+          thumbLogoUrl: nav.iconUrl,
+          heroLogoUrl: nav.iconUrl
+        }, nav), nav);
       }
       return buildDynamicSlide(nav.assetKey, {
         iconUrl: nav.iconUrl,
         brandKey: nav.key,
         labelZh: nav.labelZh,
         labelJa: nav.labelJa,
-        labelEn: nav.labelEn
+        labelEn: nav.labelEn,
+        homeStory: nav.homeStory,
+        countryCode: nav.countryCode,
+        country: nav.country
       });
     });
 
-    return result.length ? result : SLIDE_CATALOG.slice();
+    return result.length ? result : SLIDE_CATALOG.map((slide) => mergeHomeLogoCopy(slide, null));
   }
 
   function rebuildSlides() {
@@ -488,8 +540,28 @@
     return false;
   }
 
+  const FLAG_ASSET_CODES = new Set(['cn', 'de', 'fr', 'gb', 'it', 'jp', 'kr', 'se', 'us']);
+
+  function legacyCountryCodeFromSlideId(id) {
+    if (id === 'rolls-royce' || id === 'bentley' || id === 'land-rover' || id === 'aston-martin' || id === 'mclaren' || id === 'jaguar') return 'gb';
+    if (id === 'mercedes' || id === 'bmw' || id === 'porsche' || id === 'audi') return 'de';
+    if (id === 'ferrari' || id === 'lamborghini' || id === 'maserati') return 'it';
+    if (id === 'lexus') return 'jp';
+    if (id === 'cadillac') return 'us';
+    return '';
+  }
+
+  function getCountryCode(item) {
+    if (item?.countryCode) return item.countryCode;
+    const fromBrand = window.TK168_DATA?.getBrandMakerCountry?.(item?.brandKey);
+    if (fromBrand?.code) return fromBrand.code;
+    return legacyCountryCodeFromSlideId(item?.id);
+  }
+
   function getFlagLogo(item) {
-    return `assets/images/flags/ui/${getCountryCode(item)}.svg`;
+    const code = getCountryCode(item);
+    if (!code || !FLAG_ASSET_CODES.has(code)) return '';
+    return `assets/images/flags/ui/${code}.png`;
   }
 
   function preloadSlideAsset(url) {
@@ -527,14 +599,6 @@
       node.loading = eager ? 'eager' : 'lazy';
       node.decoding = eager ? 'sync' : 'async';
     });
-  }
-
-  function getCountryCode(item) {
-    if (item.id === 'rolls-royce' || item.id === 'bentley' || item.id === 'land-rover' || item.id === 'aston-martin' || item.id === 'mclaren' || item.id === 'jaguar') return 'gb';
-    if (item.id === 'mercedes' || item.id === 'bmw' || item.id === 'porsche' || item.id === 'audi') return 'de';
-    if (item.id === 'ferrari' || item.id === 'lamborghini' || item.id === 'maserati') return 'it';
-    if (item.id === 'lexus') return 'jp';
-    return 'us';
   }
 
   function hexToRgba(hex, alpha) {
@@ -580,12 +644,13 @@
     slide.style.setProperty('--hero-logo-scale', String(heroAdjust.scale ?? 1));
     slide.style.setProperty('--hero-logo-y', heroAdjust.y ?? '0rem');
     const countryText = getLocalizedText(item.country, language);
+    const flagUrl = getFlagLogo(item);
     const metaHtml = countryText
       ? `
         <div class="slide-panel-meta">
-          <span class="slide-panel-flag" aria-hidden="true">
-            <img class="slide-panel-flag-icon" src="${getFlagLogo(item)}" alt="" loading="lazy" decoding="async">
-          </span>
+          ${flagUrl ? `<span class="slide-panel-flag" aria-hidden="true">
+            <img class="slide-panel-flag-icon" src="${flagUrl}" alt="" loading="lazy" decoding="async">
+          </span>` : ''}
           <p class="slide-panel-country">${countryText}</p>
         </div>`
       : '';
@@ -604,7 +669,7 @@
       </div>
       <div class="lisboa-slide__copy">
         ${metaHtml}
-        <h2 class="slide-panel-brand">${item.name}</h2>
+        <h2 class="slide-panel-brand">${getSlideBrandName(item, language)}</h2>
         <p class="slide-panel-story">${getLocalizedText(item.story, language)}</p>
       </div>
     `;
@@ -639,7 +704,7 @@
     const copy = getUiCopy();
     button.dataset.index = String(index);
     button.dataset.brand = item.id;
-    button.setAttribute('aria-label', copy.thumbAria(item.name));
+    button.setAttribute('aria-label', copy.thumbAria(getSlideBrandName(item)));
 
     const first = button.firstElementChild;
     if (item.id === 'lexus') {
@@ -675,11 +740,12 @@
     }
 
     const label = ensureThumbLabel(button);
-    label.textContent = item.name;
+    const thumbName = getSlideBrandName(item);
+    label.textContent = thumbName;
     label.classList.remove('is-tight', 'is-tighter');
-    if (item.name.length >= 13) {
+    if (thumbName.length >= 13) {
       label.classList.add('is-tighter');
-    } else if (item.name.length >= 10) {
+    } else if (thumbName.length >= 10) {
       label.classList.add('is-tight');
     }
   }

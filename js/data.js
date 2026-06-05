@@ -1672,6 +1672,119 @@ window.TK168_DATA = (() => {
     _brandKeyCatalog = { keySet, shortJa };
   }
 
+  /** 与后台 `admin-brand-key-options.js` 分组 / 首页国旗 PNG 一致（`assets/images/flags/ui/*.png`） */
+  const MAKER_GROUP_COUNTRY = Object.freeze({
+    'search.makerGroup.japan': Object.freeze({
+      code: 'jp',
+      country: Object.freeze({ zh: '日本', ja: '日本', en: 'Japan' })
+    }),
+    'search.makerGroup.germany': Object.freeze({
+      code: 'de',
+      country: Object.freeze({ zh: '德国', ja: 'ドイツ', en: 'Germany' })
+    }),
+    'search.makerGroup.usa': Object.freeze({
+      code: 'us',
+      country: Object.freeze({ zh: '美国', ja: 'アメリカ', en: 'United States' })
+    }),
+    'search.makerGroup.uk': Object.freeze({
+      code: 'gb',
+      country: Object.freeze({ zh: '英国', ja: 'イギリス', en: 'United Kingdom' })
+    }),
+    'search.makerGroup.sweden': Object.freeze({
+      code: 'se',
+      country: Object.freeze({ zh: '瑞典', ja: 'スウェーデン', en: 'Sweden' })
+    }),
+    'search.makerGroup.france': Object.freeze({
+      code: 'fr',
+      country: Object.freeze({ zh: '法国', ja: 'フランス', en: 'France' })
+    }),
+    'search.makerGroup.italy': Object.freeze({
+      code: 'it',
+      country: Object.freeze({ zh: '意大利', ja: 'イタリア', en: 'Italy' })
+    })
+  });
+
+  const BRAND_MAKER_COUNTRY_OVERRIDES = Object.freeze({
+    byd: Object.freeze({
+      code: 'cn',
+      country: Object.freeze({ zh: '中国', ja: '中国', en: 'China' })
+    }),
+    hyundai: Object.freeze({
+      code: 'kr',
+      country: Object.freeze({ zh: '韩国', ja: '韓国', en: 'South Korea' })
+    })
+  });
+
+  let _brandKeyMakerCountry = null;
+
+  function ensureBrandKeyMakerCountryMap() {
+    if (_brandKeyMakerCountry) return;
+    _brandKeyMakerCountry = new Map();
+    const groups = (typeof window !== 'undefined' && window.TK168AdminBrandKeyOptionGroups) || [];
+    for (const g of groups) {
+      const groupMeta = MAKER_GROUP_COUNTRY[g.i18nKey];
+      if (!groupMeta) continue;
+      for (const o of g.options || []) {
+        const k = String(o.value || '').trim();
+        if (!k) continue;
+        const override = BRAND_MAKER_COUNTRY_OVERRIDES[k];
+        _brandKeyMakerCountry.set(k, override || groupMeta);
+      }
+    }
+    Object.keys(BRAND_MAKER_COUNTRY_OVERRIDES).forEach((k) => {
+      if (!_brandKeyMakerCountry.has(k)) {
+        _brandKeyMakerCountry.set(k, BRAND_MAKER_COUNTRY_OVERRIDES[k]);
+      }
+    });
+  }
+
+  /** 由后台「品牌 Key」国家分组解析国旗 code 与三国语言国名 */
+  function getBrandMakerCountry(brandKey) {
+    const raw = String(brandKey || '').trim();
+    if (!raw) return null;
+    ensureBrandKeyMakerCountryMap();
+    const resolved = resolveCanonicalBrandKey(raw) || raw.toLowerCase();
+    const candidates = [resolved, raw.toLowerCase()];
+    for (let i = 0; i < candidates.length; i += 1) {
+      const hit = _brandKeyMakerCountry.get(candidates[i]);
+      if (hit) return hit;
+    }
+    return null;
+  }
+
+  function getBrandLogoHomeCopy(assetKey) {
+    const key = String(assetKey || '').trim().toLowerCase();
+    if (!key) return null;
+    const api =
+      typeof window !== 'undefined' && window.TK168BrandLogoHomeCopy
+        ? window.TK168BrandLogoHomeCopy
+        : null;
+    return api && api[key] ? api[key] : null;
+  }
+
+  function withMakerCountryNavFields(navItem) {
+    const assetKey =
+      navItem.assetKey || brandLogoAssetKeyFromFile(navItem.file) || '';
+    const copy = getBrandLogoHomeCopy(assetKey);
+    const meta = getBrandMakerCountry(navItem.key);
+    let next = navItem;
+    if (meta) {
+      next = {
+        ...next,
+        countryCode: meta.code,
+        country: meta.country
+      };
+    }
+    if (!copy) return next;
+    return {
+      ...next,
+      labelZh: copy.name?.zh || next.labelZh,
+      labelJa: copy.name?.ja || next.labelJa,
+      labelEn: copy.name?.en || next.labelEn,
+      homeStory: copy.story || next.homeStory
+    };
+  }
+
   function titleEnFromBrandSlug(s) {
     return String(s)
       .split(/-/)
@@ -1810,7 +1923,7 @@ window.TK168_DATA = (() => {
     });
 
     if (!byAsset.size) {
-      return catalogItems.map(catalogNavItemFromLogoRow);
+      return catalogItems.map((item) => withMakerCountryNavFields(catalogNavItemFromLogoRow(item)));
     }
 
     const result = [];
@@ -1820,7 +1933,7 @@ window.TK168_DATA = (() => {
       const assetKey = brandLogoAssetKeyFromFile(item.file);
       if (!byAsset.has(assetKey)) return;
       const info = byAsset.get(assetKey);
-      result.push(withLogoAssetLabels({
+      result.push(withMakerCountryNavFields(withLogoAssetLabels({
         key: info.canonicalKey || item.key,
         assetKey,
         iconUrl: info.iconUrl,
@@ -1828,7 +1941,7 @@ window.TK168_DATA = (() => {
         labelZh: item.labelZh,
         labelJa: item.labelJa,
         labelEn: item.labelEn
-      }, assetKey));
+      }, assetKey)));
       used.add(assetKey);
     });
 
@@ -1844,7 +1957,7 @@ window.TK168_DATA = (() => {
       const fallbackLabel = assetKey
         ? assetKey.replace(/(^|[-_])([a-z])/g, (_, sep, c) => (sep ? ' ' : '') + c.toUpperCase())
         : key;
-      result.push(withLogoAssetLabels({
+      result.push(withMakerCountryNavFields(withLogoAssetLabels({
         key,
         assetKey,
         iconUrl: info.iconUrl,
@@ -1852,7 +1965,7 @@ window.TK168_DATA = (() => {
         labelZh: catalogBrand?.labelZh || fallbackLabel,
         labelJa: catalogBrand?.labelJa || fallbackLabel,
         labelEn: catalogBrand?.labelEn || fallbackLabel
-      }, assetKey));
+      }, assetKey)));
       used.add(mapKey);
     });
 
@@ -2428,6 +2541,8 @@ window.TK168_DATA = (() => {
     getVehicleName,
     resolveVehicleMediaSource,
     resolveVehicleBrandGlyphUrl,
+    getBrandMakerCountry,
+    getBrandLogoHomeCopy,
     getInventoryBrandGlyphNavItems,
     getVehicleTypeLabel,
     getVehicleFieldLabel,
