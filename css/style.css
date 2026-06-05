@@ -1083,6 +1083,19 @@ body.contact-popover-open {
   padding-top: 0;
 }
 
+#vehicles[data-home-grid=paged] .home-vehicles-header {
+  width: min(var(--vehicles-shell-max, 1332px), 100%);
+  max-width: min(var(--vehicles-shell-max, 1332px), 100%);
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: clamp(32px, 4.5vw, 52px);
+  text-align: center;
+}
+
+#vehicles[data-home-grid=paged] .home-vehicles-header h2 {
+  margin-bottom: 0;
+}
+
 #brands {
   padding: 120px 48px 130px;
   background: #ffffff;
@@ -3619,6 +3632,10 @@ html:lang(en) .footer-newsletter h4 {
   }
   #vehicles[data-home-grid=paged] .home-vehicle-load-more-wrap {
     margin-top: 16px;
+  }
+  #vehicles[data-home-grid=paged] .home-vehicles-header {
+    margin-bottom: clamp(24px, 6vw, 36px);
+    padding: 0 4px;
   }
   #vehicles {
     padding: clamp(72px, 12vw, 88px) var(--page-gutter-mobile) clamp(56px, 10vw, 72px);
