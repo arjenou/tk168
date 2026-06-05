@@ -395,10 +395,16 @@
 
   function buildDynamicSlide(baseKey, info) {
     const data = window.TK168_DATA;
+    const lang = getLanguage();
     let name = '';
-    if (data?.getBrandLabel && info.brandKey) {
+    if (info.labelEn || info.labelZh || info.labelJa) {
+      if (lang === 'zh') name = info.labelZh || '';
+      else if (lang === 'ja') name = info.labelJa || '';
+      else name = info.labelEn || '';
+    }
+    if (!name && data?.getBrandLabel && info.brandKey) {
       name = data.getBrandLabel(info.brandKey, 'en')
-        || data.getBrandLabel(info.brandKey, getLanguage())
+        || data.getBrandLabel(info.brandKey, lang)
         || '';
     }
     if (!name) {
@@ -438,11 +444,20 @@
     const result = navItems.map((nav) => {
       const slide = catalogByAsset.get(nav.assetKey);
       if (slide) {
-        return { ...slide, brandKey: nav.key, thumbLogoUrl: nav.iconUrl, heroLogoUrl: nav.iconUrl };
+        const lang = getLanguage();
+        const name = lang === 'zh'
+          ? (nav.labelZh || slide.name)
+          : lang === 'ja'
+            ? (nav.labelJa || slide.name)
+            : (nav.labelEn || slide.name);
+        return { ...slide, brandKey: nav.key, thumbLogoUrl: nav.iconUrl, heroLogoUrl: nav.iconUrl, name: name || slide.name };
       }
       return buildDynamicSlide(nav.assetKey, {
         iconUrl: nav.iconUrl,
-        brandKey: nav.key
+        brandKey: nav.key,
+        labelZh: nav.labelZh,
+        labelJa: nav.labelJa,
+        labelEn: nav.labelEn
       });
     });
 

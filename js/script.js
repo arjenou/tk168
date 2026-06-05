@@ -452,7 +452,6 @@ const LEGACY_HOME_VEHICLE_PAGE_SIZE = 6;
 const homeVehicleGrid = document.getElementById('vehicleGrid');
 const homeVehicleLoadMoreWrap = document.getElementById('homeVehicleLoadMoreWrap');
 const homeVehicleLoadMoreBtn = document.getElementById('homeVehicleLoadMore');
-const homeVehicleListEnd = document.getElementById('homeVehicleListEnd');
 const homeVehicleMobileViewport = window.matchMedia('(max-width: 760px)');
 const homeVehicleTabletViewport = window.matchMedia('(max-width: 1180px)');
 
@@ -512,17 +511,6 @@ function updateHomeVehicleLoadMoreUi() {
     homeVehicleLoadMoreBtn.textContent = label;
     homeVehicleLoadMoreBtn.setAttribute('aria-label', label);
   }
-
-  if (homeVehicleListEnd) {
-    if (displayed.length > 0 && !canLoadMore) {
-      homeVehicleListEnd.hidden = false;
-      homeVehicleListEnd.textContent = window.TK168I18N?.t('home.inventoryShownAll', { count: displayed.length })
-        || `已显示全部 ${displayed.length} 辆`;
-    } else {
-      homeVehicleListEnd.hidden = true;
-      homeVehicleListEnd.textContent = '';
-    }
-  }
 }
 
 function createHomeVehicleCard(vehicle, index) {
@@ -564,10 +552,6 @@ function renderHomeVehiclePages() {
     window.TK168Renderers?.renderVehicleSkeletons?.(homeVehicleGrid, placeholderCount);
     homeVehicleGrid.removeAttribute('data-home-vehicle-visible');
     if (homeVehicleLoadMoreWrap) homeVehicleLoadMoreWrap.hidden = true;
-    if (homeVehicleListEnd) {
-      homeVehicleListEnd.hidden = true;
-      homeVehicleListEnd.textContent = '';
-    }
     return;
   }
 

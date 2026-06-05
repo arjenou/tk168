@@ -198,12 +198,11 @@ const RESOURCES = {
           },
           { key: "cylinders", label: "发动机缸数", type: "text", span: 3, placeholder: "如 V8、L6、水平对置4缸", hint: "手动填写缸数或气缸布局（如 V8）；可与排量分开维护。" },
           {
-            key: "forcedInductionText",
+            key: "forcedInductionUnit",
             label: "增压系统",
-            type: "forcedInductionCombo",
+            type: "forcedInductionSelect",
             span: 4,
-            placeholder: "如 2.0",
-            hint: "前选 T / S / 其它，后填排量或说明。前台示例：T→「2.0T 涡轮增压」；S→「2.0S 机械增压」；其它→「2.0 -」。未选形式时仅展示正文（兼容旧数据）。日英界面后缀自动翻译。",
+            hint: "选择 T / S / - 即可；前台按选项展示增压类型，日英自动翻译。排量请在上方「排量」字段单独填写。",
           },
           { key: "mileage", label: "里程", type: "mileageWithUnit", span: 3, placeholder: "", hint: "选填。单位「万公里」填小数（如 0.32≈3200km）；单位「公里」填整数公里（可含千分位逗号）。前台按所选单位展示。" },
           { key: "fuel", label: "燃料", type: "select", optionsCatalog: "fuel", span: 3, hint: "动力类型（汽油/柴油/混动等七种），存库中文；前台日/英自动翻译。" },
@@ -341,12 +340,11 @@ const RESOURCES = {
           },
           { key: "cylinders", label: "发动机缸数", type: "text", span: 3, placeholder: "如 V8、L6、水平对置4缸", hint: "手动填写缸数或气缸布局（如 V8）；可与排量分开维护。" },
           {
-            key: "forcedInductionText",
+            key: "forcedInductionUnit",
             label: "增压系统",
-            type: "forcedInductionCombo",
+            type: "forcedInductionSelect",
             span: 4,
-            placeholder: "如 2.0",
-            hint: "前选 T / S / 其它，后填排量或说明。前台示例：T→「2.0T 涡轮增压」；S→「2.0S 机械增压」；其它→「2.0 -」。未选形式时仅展示正文（兼容旧数据）。日英界面后缀自动翻译。",
+            hint: "选择 T / S / - 即可；前台按选项展示增压类型，日英自动翻译。排量请在上方「排量」字段单独填写。",
           },
           { key: "fuel", label: "燃料", type: "select", optionsCatalog: "fuel", span: 3, hint: "动力类型七种；存库中文。" },
           { key: "fuelOilType", label: "油種", type: "select", optionsCatalog: "fuelOilType", span: 3, hint: "レギュラー・ハイオク・軽油・電気（存库中文）。" },
@@ -540,6 +538,14 @@ function applyInventoryPriceFormatLive(input) {
   });
 }
 
+function normalizeForcedInductionUnitForWrite(raw) {
+  const unit = String(raw ?? "").trim();
+  const u = unit.toUpperCase();
+  if (u === "T" || u === "S") return u;
+  if (unit === "-" || unit === "—" || /^other$/i.test(unit) || unit === "其它") return "-";
+  return "";
+}
+
 function normalizeInventoryDraftForEngine(draft) {
   if (!draft || typeof draft !== "object") return draft;
   let displacement = String(draft.displacement ?? "").trim();
@@ -549,26 +555,12 @@ function normalizeInventoryDraftForEngine(draft) {
     displacement = sp.displacement;
     cylinders = sp.cylinders;
   }
-  let forcedInductionText = String(draft.forcedInductionText ?? "").trim();
-  if (!forcedInductionText) {
-    forcedInductionText = String(
-      draft.forcedInductionZh ?? draft.forcedInductionJa ?? draft.forcedInductionEn ?? "",
-    ).trim();
-  }
-  let forcedInductionUnit = String(draft.forcedInductionUnit ?? "").trim();
-  const u = forcedInductionUnit.toUpperCase();
-  if (u === "T" || u === "S") {
-    forcedInductionUnit = u;
-  } else if (/^other$/i.test(forcedInductionUnit) || forcedInductionUnit === "其它") {
-    forcedInductionUnit = "other";
-  } else {
-    forcedInductionUnit = "";
-  }
+  let forcedInductionUnit = normalizeForcedInductionUnitForWrite(draft.forcedInductionUnit);
   const next = {
     ...draft,
     displacement,
     cylinders,
-    forcedInductionText,
+    forcedInductionText: "",
     forcedInductionUnit,
   };
   delete next.forcedInductionZh;
@@ -1631,7 +1623,7 @@ const BRAND_LOGO_FILE_TO_ZH = {
   "chevrolet.svg": "雪佛兰",
   "chrysler.svg": "克莱斯勒",
   "citroen.svg": "雪铁龙",
-  "corvette.svg": "雪佛兰科尔维特",
+  "corvette.svg": "克尔维特",
   "daf.svg": "达夫",
   "dsautomobiles.svg": "DS 汽车",
   "ferrari.svg": "法拉利",
@@ -1821,28 +1813,24 @@ function renderEditorField(field, draft) {
       control = `<select class="admin-input" data-draft="${key}">${opts}</select>`;
     }
     }
-  } else if (field.type === "forcedInductionCombo") {
+  } else if (field.type === "forcedInductionSelect") {
     const uStored = String(draft.forcedInductionUnit ?? "").trim();
     const uLow = uStored.toLowerCase();
     const sel =
-      uLow === "other" || uStored === "其它"
-        ? "other"
-        : uStored.toUpperCase() === "S"
-          ? "S"
-          : uStored.toUpperCase() === "T"
-            ? "T"
+      uStored.toUpperCase() === "S"
+        ? "S"
+        : uStored.toUpperCase() === "T"
+          ? "T"
+          : uStored === "-" || uStored === "—" || uLow === "other" || uStored === "其它"
+            ? "-"
             : "";
-    const textVal = escapeAttr(String(draft.forcedInductionText ?? "").trim());
     control = `
-    <div class="admin-forced-induction-row">
-      <select class="admin-input admin-forced-induction-row__unit" data-draft="forcedInductionUnit">
-        <option value=""${sel === "" ? " selected" : ""}>— 未选择 —</option>
-        <option value="T"${sel === "T" ? " selected" : ""}>T（涡轮）</option>
-        <option value="S"${sel === "S" ? " selected" : ""}>S（机械增压）</option>
-        <option value="other"${sel === "other" ? " selected" : ""}>其它</option>
-      </select>
-      <input class="admin-input admin-forced-induction-row__text" type="text" autocomplete="off" data-draft="forcedInductionText" value="${textVal}" placeholder="${escapeAttr(field.placeholder || "")}">
-    </div>`;
+    <select class="admin-input" data-draft="forcedInductionUnit">
+      <option value=""${sel === "" ? " selected" : ""}>— 未选择 —</option>
+      <option value="T"${sel === "T" ? " selected" : ""}>T（涡轮）</option>
+      <option value="S"${sel === "S" ? " selected" : ""}>S（机械增压）</option>
+      <option value="-"${sel === "-" ? " selected" : ""}>-（无）</option>
+    </select>`;
   } else if (field.type === "mileageWithUnit") {
     const mu = String(draft.mileageUnit ?? "wan").trim() || "wan";
     control = `
@@ -1872,8 +1860,8 @@ function renderEditorField(field, draft) {
       ? " admin-field--brand-key"
       : field.type === "mileageWithUnit"
         ? " admin-field--mileage-unit"
-        : field.type === "forcedInductionCombo"
-          ? " admin-field--forced-induction-combo"
+        : field.type === "forcedInductionSelect"
+          ? " admin-field--forced-induction-select"
           : "";
   return `
     <div class="admin-field admin-col-${span}${wrapClass}">
@@ -2494,13 +2482,11 @@ async function reloadInventoryEditorDraftFromApi(r, submittedPayload) {
 
 /** 增压系统：保存时必须以当前 DOM 为准（草稿可能缺 key，JSON.stringify 会丢字段导致 Worker 不写库）。 */
 function readForcedInductionPairFromDom() {
-  const row = document.querySelector(".admin-forced-induction-row");
-  if (!row) return null;
-  const textEl = row.querySelector('[data-draft="forcedInductionText"]');
-  const unitEl = row.querySelector('[data-draft="forcedInductionUnit"]');
+  const unitEl = document.querySelector('[data-draft="forcedInductionUnit"]');
+  if (!unitEl) return null;
   return {
-    text: textEl ? String(readDataDraftValueFromInput(textEl) ?? "").trim() : "",
-    unit: unitEl ? String(readDataDraftValueFromInput(unitEl) ?? "").trim() : "",
+    text: "",
+    unit: String(readDataDraftValueFromInput(unitEl) ?? "").trim(),
   };
 }
 
@@ -2509,16 +2495,10 @@ function attachForcedInductionToInventoryPayload(payload, draft) {
   delete payload.forcedInductionJa;
   delete payload.forcedInductionEn;
   const domFi = readForcedInductionPairFromDom();
-  const fiText = domFi
-    ? domFi.text
-    : draft.forcedInductionText == null
-      ? ""
-      : String(draft.forcedInductionText).trim();
-  const fiUnit = domFi
-    ? domFi.unit
-    : draft.forcedInductionUnit == null
-      ? ""
-      : String(draft.forcedInductionUnit).trim();
+  const fiText = "";
+  const fiUnit = normalizeForcedInductionUnitForWrite(
+    domFi ? domFi.unit : draft.forcedInductionUnit,
+  );
   // 显式写入 own property，避免 undefined 被 JSON.stringify 丢弃导致 Worker 不更新列
   payload.forcedInductionText = fiText;
   payload.forcedInductionZh = fiText;
@@ -2534,16 +2514,16 @@ function attachForcedInductionToInventoryPayload(payload, draft) {
   }
 }
 
-/** 增压系统组合控件：保存前再从 DOM 取一遍，避免与其它 [data-draft] 遍历顺序或重绘边缘情况导致草稿未同步。 */
+/** 增压系统：保存前再从 DOM 取一遍，避免与其它 [data-draft] 遍历顺序或重绘边缘情况导致草稿未同步。 */
 function applyVehicleForcedInductionFromMountedRow() {
   const key = currentResource().key;
   if (!state.editingDraft || (key !== "vehicles" && key !== "rentals")) return;
-  const row = document.querySelector(".admin-forced-induction-row");
-  if (!row) return;
-  const textEl = row.querySelector('[data-draft="forcedInductionText"]');
-  const unitEl = row.querySelector('[data-draft="forcedInductionUnit"]');
-  if (textEl) state.editingDraft.forcedInductionText = readDataDraftValueFromInput(textEl);
-  if (unitEl) state.editingDraft.forcedInductionUnit = readDataDraftValueFromInput(unitEl);
+  const unitEl = document.querySelector('[data-draft="forcedInductionUnit"]');
+  if (!unitEl) return;
+  state.editingDraft.forcedInductionUnit = normalizeForcedInductionUnitForWrite(
+    readDataDraftValueFromInput(unitEl),
+  );
+  state.editingDraft.forcedInductionText = "";
 }
 
 function readDataDraftValueFromInput(el) {

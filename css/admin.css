@@ -247,7 +247,16 @@ button { font: inherit; cursor: pointer; }
   max-width: 7rem;
 }
 
-/* 增压系统：T/S/其它 + 文案（限制总宽，避免短内容也被拉满半屏） */
+/* 增压系统：T / S / - 单选 */
+.admin-field--forced-induction-select {
+  max-width: min(100%, 16rem);
+}
+
+.admin-field--forced-induction-select .admin-input {
+  width: 100%;
+}
+
+/* 旧版组合控件样式（保留兼容，新表单不再使用） */
 .admin-field--forced-induction-combo {
   max-width: min(100%, 26rem);
 }

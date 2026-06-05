@@ -70,7 +70,8 @@
         deliveryAddressLabel: '送车地址',
         deliveryAddressPlaceholder: '请填写详细地址（都道府县、市区町村、番地、建筑名等）',
         consentNews: '接收档期更新与新车源通知',
-        consentPolicy: '同意使用条款与隐私政策'
+        consentPolicy: '同意使用条款与隐私政策',
+        consentIdpDeposit: '使用 IDP 驾照需缴纳 10 万日元押金'
       },
       summary: {
         empty: '未填写',
@@ -150,7 +151,8 @@
         deliveryAddressLabel: '配達先住所',
         deliveryAddressPlaceholder: '郵便番号、住所、建物名・部屋番号までご記入ください',
         consentNews: '空き状況や新着車両情報を受け取る',
-        consentPolicy: '利用規約とプライバシーポリシーに同意する'
+        consentPolicy: '利用規約とプライバシーポリシーに同意する',
+        consentIdpDeposit: 'IDP国際免許証を利用する場合、10万円の預かり金が必要です'
       },
       summary: {
         empty: '未入力',
@@ -230,7 +232,8 @@
         deliveryAddressLabel: 'Delivery address',
         deliveryAddressPlaceholder: 'Include prefecture, city, street, building name, and room if applicable',
         consentNews: 'Receive availability updates and new vehicle notifications',
-        consentPolicy: 'I agree to the terms of use and privacy policy'
+        consentPolicy: 'I agree to the terms of use and privacy policy',
+        consentIdpDeposit: 'An IDP (International Driving Permit) requires a ¥100,000 deposit'
       },
       summary: {
         empty: 'Not provided',
@@ -371,7 +374,8 @@
     store: '',
     deliveryAddress: '',
     consentNews: false,
-    consentPolicy: false
+    consentPolicy: false,
+    consentIdpDeposit: false
   };
 
   const refs = {
@@ -406,6 +410,7 @@
     deliveryAddress: document.getElementById('riqDeliveryAddress'),
     consentNews: document.getElementById('riqConsentNews'),
     consentPolicy: document.getElementById('riqConsentPolicy'),
+    consentIdpDeposit: document.getElementById('riqConsentIdpDeposit'),
     summaryAppointment: document.getElementById('riqSummaryAppointment'),
     summaryName: document.getElementById('riqSummaryName'),
     summaryContact: document.getElementById('riqSummaryContact'),
@@ -448,7 +453,8 @@
       store: document.getElementById('riqStoreLabel'),
       deliveryAddress: document.getElementById('riqDeliveryAddressLabel'),
       consentNews: document.getElementById('riqConsentNewsLabel'),
-      consentPolicy: document.getElementById('riqConsentPolicyLabel')
+      consentPolicy: document.getElementById('riqConsentPolicyLabel'),
+      consentIdpDeposit: document.getElementById('riqConsentIdpDepositLabel')
     },
     optionLabels: {
       timePlaceholder: document.getElementById('riqTimePlaceholder'),
@@ -525,6 +531,7 @@
     setText(refs.fieldLabels.deliveryAddress, copy.fields.deliveryAddressLabel);
     setText(refs.fieldLabels.consentNews, copy.fields.consentNews);
     setText(refs.fieldLabels.consentPolicy, copy.fields.consentPolicy);
+    setText(refs.fieldLabels.consentIdpDeposit, copy.fields.consentIdpDeposit);
 
     setText(refs.deliveryMethodLabel, copy.fields.deliveryMethodLabel);
     setText(refs.deliveryVisitLabel, copy.fields.deliveryVisit);
@@ -762,6 +769,7 @@
     state.deliveryAddress = refs.deliveryAddress?.value || '';
     state.consentNews = refs.consentNews.checked;
     state.consentPolicy = refs.consentPolicy.checked;
+    state.consentIdpDeposit = refs.consentIdpDeposit?.checked || false;
   }
 
   function renderSummaries() {
@@ -846,7 +854,8 @@
       store: state.store,
       deliveryAddress: state.deliveryAddress,
       consentNews: state.consentNews,
-      consentPolicy: state.consentPolicy
+      consentPolicy: state.consentPolicy,
+      consentIdpDeposit: state.consentIdpDeposit
     };
     try {
       sessionStorage.setItem(RENTAL_INQUIRY_DRAFT_KEY, JSON.stringify(draft));
@@ -868,7 +877,7 @@
   }
 
   function bindInputEvents() {
-    const inputKeys = ['date', 'time', 'days', 'name', 'language', 'email', 'phone', 'wechat', 'whatsapp', 'store', 'deliveryAddress', 'consentNews', 'consentPolicy'];
+    const inputKeys = ['date', 'time', 'days', 'name', 'language', 'email', 'phone', 'wechat', 'whatsapp', 'store', 'deliveryAddress', 'consentNews', 'consentPolicy', 'consentIdpDeposit'];
 
     inputKeys.forEach((key) => {
       const el = refs[key];

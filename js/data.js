@@ -1433,13 +1433,14 @@ window.TK168_DATA = (() => {
         ).trim();
       }
       const uRaw = String(vehicle.forcedInductionUnit || '').trim();
-      const isOther = /^other$/i.test(uRaw) || uRaw === '其它';
+      const isDash = uRaw === '-' || uRaw === '—';
+      const isOther = isDash || /^other$/i.test(uRaw) || uRaw === '其它';
       const u = uRaw.toUpperCase();
       let turboWord = '涡轮增压';
       let scWord = '机械增压';
       if (language === 'en') {
-        turboWord = 'turbocharged';
-        scWord = 'supercharged';
+        turboWord = 'Turbocharged';
+        scWord = 'Supercharged';
       } else if (language === 'ja') {
         turboWord = 'ターボ';
         scWord = 'スーパーチャージャー';
@@ -1449,15 +1450,15 @@ window.TK168_DATA = (() => {
         return text;
       }
       if (isOther) {
-        if (!text) return '';
+        if (!text) return '-';
         return `${text} -`;
       }
       if (u === 'T') {
-        if (!text) return `T ${turboWord}`;
+        if (!text) return turboWord;
         return `${text}T ${turboWord}`;
       }
       if (u === 'S') {
-        if (!text) return `S ${scWord}`;
+        if (!text) return scWord;
         return `${text}S ${scWord}`;
       }
       if (!text) return '';
@@ -1748,6 +1749,26 @@ window.TK168_DATA = (() => {
     return String(file || '').replace(/\.svg$/i, '').toLowerCase();
   }
 
+  /** Logo 文件名（如 corvette）与 canonical brandKey 不同时的展示名 */
+  const BRAND_LOGO_ASSET_LABELS = Object.freeze({
+    corvette: Object.freeze({
+      zh: '克尔维特',
+      ja: 'コルベット',
+      en: 'Chevrolet Corvette'
+    })
+  });
+
+  function withLogoAssetLabels(navItem, assetKey) {
+    const tri = BRAND_LOGO_ASSET_LABELS[String(assetKey || '').trim().toLowerCase()];
+    if (!tri) return navItem;
+    return {
+      ...navItem,
+      labelZh: tri.zh || navItem.labelZh,
+      labelJa: tri.ja || navItem.labelJa,
+      labelEn: tri.en || navItem.labelEn
+    };
+  }
+
   function catalogNavItemFromLogoRow(item) {
     const assetKey = brandLogoAssetKeyFromFile(item.file);
     return {
@@ -1799,7 +1820,7 @@ window.TK168_DATA = (() => {
       const assetKey = brandLogoAssetKeyFromFile(item.file);
       if (!byAsset.has(assetKey)) return;
       const info = byAsset.get(assetKey);
-      result.push({
+      result.push(withLogoAssetLabels({
         key: info.canonicalKey || item.key,
         assetKey,
         iconUrl: info.iconUrl,
@@ -1807,7 +1828,7 @@ window.TK168_DATA = (() => {
         labelZh: item.labelZh,
         labelJa: item.labelJa,
         labelEn: item.labelEn
-      });
+      }, assetKey));
       used.add(assetKey);
     });
 
@@ -1823,7 +1844,7 @@ window.TK168_DATA = (() => {
       const fallbackLabel = assetKey
         ? assetKey.replace(/(^|[-_])([a-z])/g, (_, sep, c) => (sep ? ' ' : '') + c.toUpperCase())
         : key;
-      result.push({
+      result.push(withLogoAssetLabels({
         key,
         assetKey,
         iconUrl: info.iconUrl,
@@ -1831,7 +1852,7 @@ window.TK168_DATA = (() => {
         labelZh: catalogBrand?.labelZh || fallbackLabel,
         labelJa: catalogBrand?.labelJa || fallbackLabel,
         labelEn: catalogBrand?.labelEn || fallbackLabel
-      });
+      }, assetKey));
       used.add(mapKey);
     });
 

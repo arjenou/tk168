@@ -225,7 +225,7 @@ function navigateClearBrandFilterWithoutReload() {
 }
 
 function getBrandNavDisplayLabel(brand) {
-  return brand?.labelEn || getBrandLabel(brand);
+  return getBrandLabel(brand) || brand?.labelEn || '';
 }
 
 function getBrandNavLabelSizeClass(brand) {

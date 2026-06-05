@@ -56,7 +56,8 @@
         wechat: '微信',
         whatsapp: 'WhatsApp',
         consentNews: '接收档期更新与新车源通知',
-        consentPolicy: '同意使用条款与隐私政策'
+        consentPolicy: '同意使用条款与隐私政策',
+        consentIdpDeposit: '使用 IDP 驾照需缴纳 10 万日元押金'
       },
       message: {
         missingDraft: '未找到填写内容，请返回表单重新填写。',
@@ -103,7 +104,8 @@
         wechat: 'WeChat',
         whatsapp: 'WhatsApp',
         consentNews: '空き状況や新着車両情報を受け取る',
-        consentPolicy: '利用規約とプライバシーポリシーに同意する'
+        consentPolicy: '利用規約とプライバシーポリシーに同意する',
+        consentIdpDeposit: 'IDP国際免許証を利用する場合、10万円の預かり金が必要です'
       },
       message: {
         missingDraft: '入力内容が見つかりません。フォームから再度お進みください。',
@@ -150,7 +152,8 @@
         wechat: 'WeChat',
         whatsapp: 'WhatsApp',
         consentNews: 'Receive availability updates and new vehicle notifications',
-        consentPolicy: 'I agree to the terms of use and privacy policy'
+        consentPolicy: 'I agree to the terms of use and privacy policy',
+        consentIdpDeposit: 'An IDP (International Driving Permit) requires a ¥100,000 deposit'
       },
       message: {
         missingDraft: 'We could not find your saved answers. Please return to the form and try again.',
@@ -264,7 +267,8 @@
     const delivery = buildDeliveryBlock(draft, copy);
     const news = draft.consentNews ? copy.consentYes : copy.consentNo;
     const policy = draft.consentPolicy ? copy.consentYes : copy.consentNo;
-    const policyLine = `${copy.fields.consentNews}: ${news}\n${copy.fields.consentPolicy}: ${policy}`;
+    const idpDeposit = draft.consentIdpDeposit ? copy.consentYes : copy.consentNo;
+    const policyLine = `${copy.fields.consentNews}: ${news}\n${copy.fields.consentPolicy}: ${policy}\n${copy.fields.consentIdpDeposit}: ${idpDeposit}`;
 
     const row = (label, value) => `
       <div class="riqc-summary-row">

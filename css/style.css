@@ -2609,17 +2609,6 @@ body.contact-popover-open {
   display: none !important;
 }
 
-#vehicles[data-home-grid=paged] .home-vehicle-list-end {
-  margin: 20px auto 0;
-  max-width: min(var(--vehicles-shell-max, 1332px), 100%);
-  text-align: center;
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(43, 41, 38, 0.44);
-  letter-spacing: 0.03em;
-  line-height: 1.5;
-}
-
 /*    */
 #news {
   padding: 100px var(--page-gutter-desktop);
@@ -3630,10 +3619,6 @@ html:lang(en) .footer-newsletter h4 {
   }
   #vehicles[data-home-grid=paged] .home-vehicle-load-more-wrap {
     margin-top: 16px;
-  }
-  #vehicles[data-home-grid=paged] .home-vehicle-list-end {
-    margin-top: 12px;
-    padding: 0 8px;
   }
   #vehicles {
     padding: clamp(72px, 12vw, 88px) var(--page-gutter-mobile) clamp(56px, 10vw, 72px);
