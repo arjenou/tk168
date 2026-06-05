@@ -7,10 +7,10 @@
           <div class="nav-links">
             <a href="index.html" class="nav-link" data-nav-key="landing" data-i18n="nav.landing">ホーム</a>
             <a href="about.html" class="nav-link" data-nav-key="home" data-i18n="nav.home">会社概要</a>
-            <a href="brand.html" class="nav-link" data-nav-key="inventory" data-i18n="nav.inventory">ブランド展示</a>
-            <a href="auto-export.html" class="nav-link" data-nav-key="export" data-i18n="nav.export">自動車輸出</a>
-            <a href="rental.html" class="nav-link" data-nav-key="rental" data-i18n="nav.rental">レンタル</a>
-            <a href="service.html" class="nav-link" data-nav-key="service" data-i18n="nav.services">サービス</a>
+            <a href="brand.html" class="nav-link" data-nav-key="inventory" data-i18n="nav.inventory">在庫車両</a>
+            <a href="auto-export.html" class="nav-link" data-nav-key="export" data-i18n="nav.export">自動車輸出事業</a>
+            <a href="rental.html" class="nav-link" data-nav-key="rental" data-i18n="nav.rental">レンタカー事業</a>
+            <a href="service.html" class="nav-link" data-nav-key="service" data-i18n="nav.services">サービス案内</a>
             <a href="favorites.html" class="nav-link" data-nav-key="favorite" data-i18n="nav.favorite">お気に入り</a>
           </div>
 
