@@ -235,9 +235,9 @@ window.TK168BrandLogoHomeCopy = Object.freeze({
   mclaren: Object.freeze({
     name: Object.freeze({ en: 'McLaren', zh: '迈凯伦', ja: 'マクラーレン' }),
     story: Object.freeze({
-      ja: '軽量化と空力を核に、未来的なプロポーションを見せるスーパーカーブランド。',
-      zh: '以轻量化与空气动力学为核心，塑造未来感比例的超跑品牌。',
-      en: 'A supercar brand built on lightweight design and aerodynamics.'
+      ja: 'F1の技術を活かした英国の高性能スーパーカーブランド。',
+      zh: '运用 F1 技术的英国高性能超跑品牌。',
+      en: 'A British high-performance supercar brand leveraging Formula 1 technology.'
     })
   }),
   mazda: Object.freeze({
@@ -251,9 +251,9 @@ window.TK168BrandLogoHomeCopy = Object.freeze({
   mercedes: Object.freeze({
     name: Object.freeze({ en: 'Mercedes-Benz', zh: '奔驰', ja: 'メルセデス・ベンツ' }),
     story: Object.freeze({
-      ja: '世界を代表するドイツの高級車ブランド。',
-      zh: '享誉全球的德国豪华汽车品牌。',
-      en: "A world-leading German luxury automobile brand."
+      ja: 'メルセデス・ベンツの高性能ブランドで、力強い走りと優れた運動性能を持ち、ラグジュアリーとスポーツ性能を両立している。',
+      zh: '梅赛德斯-奔驰的高性能品牌，拥有强劲驾驭感与卓越运动性能，兼具豪华与运动性。',
+      en: 'A high-performance Mercedes-Benz brand with powerful driving dynamics and sport capability, balancing luxury and performance.'
     })
   }),
   mitsubishi: Object.freeze({
