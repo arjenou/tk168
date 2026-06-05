@@ -39,11 +39,13 @@
   `;
 
   const SAITAMA_MAPS_HREF = 'https://www.google.com/maps/search/?api=1&query=339-0035%20%E5%9F%BC%E7%8E%89%E7%9C%8C%E3%81%95%E3%81%84%E3%81%9F%E3%81%BE%E5%B8%82%E5%B2%A9%E6%A7%BB%E5%8C%BA%E7%AC%B9%E4%B9%85%E4%BF%9D%E6%96%B0%E7%94%B0';
+  /** 移动端底栏「咨询」一键拨号（さいたま店） */
+  const MOBILE_INQUIRY_TEL_HREF = 'tel:+81487964907';
 
   const MOBILE_BOTTOM_BAR_HTML = `
     <nav class="site-mobile-bottom-bar" id="siteMobileBottomBar" aria-label="Mobile shortcuts">
       <div class="site-mobile-bottom-bar__inner">
-        <a class="site-mobile-bottom-bar__btn site-mobile-bottom-bar__btn--inquiry" href="contact.html" data-mobile-bar-inquiry>
+        <a class="site-mobile-bottom-bar__btn site-mobile-bottom-bar__btn--inquiry" href="${MOBILE_INQUIRY_TEL_HREF}" data-mobile-bar-inquiry>
           <svg class="site-mobile-bottom-bar__icon" viewBox="0 0 24 24" aria-hidden="true">
             <path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" d="M5 5h14v10H8l-3 3V5z"></path>
           </svg>
@@ -126,14 +128,6 @@
     </footer>
   `;
 
-  function getMobileInquiryHref() {
-    const path = (window.location.pathname || '').toLowerCase();
-    if (path.endsWith('/rental.html') || path.endsWith('rental.html')) {
-      return 'contact.html?type=rental';
-    }
-    return 'contact.html';
-  }
-
   const MOBILE_BOTTOM_BAR_CSS_HREF = 'css/mobile-bottom-bar.css?v=20260602a';
 
   function ensureMobileBottomBarStyles() {
@@ -148,7 +142,7 @@
   function syncMobileBottomBarLinks() {
     const inquiryLink = document.querySelector('[data-mobile-bar-inquiry]');
     if (inquiryLink) {
-      inquiryLink.href = getMobileInquiryHref();
+      inquiryLink.href = MOBILE_INQUIRY_TEL_HREF;
     }
   }
 
