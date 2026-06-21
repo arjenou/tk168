@@ -289,8 +289,9 @@
 
 .inq-vehicle-meta {
   margin-top: 5px;
-  color: rgba(43, 41, 38, 0.58);
-  font-size: 11px;
+  color: rgba(43, 41, 38, 0.62);
+  font-size: 14px;
+  line-height: 1.45;
 }
 
 .inq-table {
