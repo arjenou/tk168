@@ -494,6 +494,14 @@
   color: rgba(23, 23, 23, 0.72);
 }
 
+.inq-footnote {
+  width: 88%;
+  margin: 12px auto 0;
+  font-size: 11px;
+  line-height: 1.7;
+  color: rgba(43, 41, 38, 0.62);
+}
+
 .inq-message {
   min-height: 24px;
   margin: 8px 14px 0;
@@ -557,6 +565,10 @@
   }
 
   .inq-table {
+    width: 100%;
+  }
+
+  .inq-footnote {
     width: 100%;
   }
 
