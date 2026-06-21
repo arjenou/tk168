@@ -599,11 +599,12 @@
 
   function clearMessage() {
     refs.message.textContent = '';
+    refs.message.classList.remove('is-success');
   }
 
   function setMessage(text, ok) {
     refs.message.textContent = text || '';
-    refs.message.style.color = ok ? '#1f8f5f' : '#c6472f';
+    refs.message.classList.toggle('is-success', Boolean(ok));
   }
 
   function validateSection(sectionKey) {
