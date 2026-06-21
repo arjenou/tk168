@@ -35,7 +35,7 @@
       steps: {
         appointment: { tab: '用车时间', row: '希望用车时间', lead: '先确认希望用车日期、取车时间和预计租期。' },
         name: { tab: '联系人', row: '联系人信息', lead: '填写联系人姓名和偏好语言。' },
-        contact: { tab: '联系方式', row: '联系方式（四选二）', lead: '请从电话、邮箱、微信、WhatsApp 中恰好填写两项，便于我们与您联系。' },
+        contact: { tab: '联系方式', row: '联系方式（至少两项）', lead: '请从电话、邮箱、微信、WhatsApp 中至少填写两项，便于我们与您联系。' },
         confirm: { tab: '交车', row: '车辆交付方式', lead: '选择来店或送车，填写门店或送车地址，并同意条款后完成确认。' }
       },
       required: '必填',
@@ -88,7 +88,7 @@
       message: {
         appointmentRequired: '请填写日期、取车时间和预计租期。',
         nameRequired: '请输入联系人姓名。',
-        contactNeedExactlyTwo: '请在「电话、邮箱、微信、WhatsApp」中填写两项',
+        contactNeedAtLeastTwo: '请在「电话、邮箱、微信、WhatsApp」中至少填写两项',
         contactEmailInvalid: '填写的邮箱格式不正确。',
         deliveryMethodRequired: '请选择车辆交付方式。',
         storeRequired: '请选择门店。',
@@ -115,7 +115,7 @@
       steps: {
         appointment: { tab: '利用日時', row: '希望利用日時', lead: '希望利用日、受取時間、予定日数を入力してください。' },
         name: { tab: '運転者', row: '運転者氏名', lead: '運転者の氏名と希望言語を入力してください。' },
-        contact: { tab: '連絡先', row: '連絡先（4つから2つ）', lead: '電話・メール・WeChat・WhatsApp のうち、必ず2項目だけご入力ください。' },
+        contact: { tab: '連絡先', row: '連絡先（2項目以上）', lead: '電話・メール・WeChat・WhatsApp のうち、2項目以上ご入力ください。' },
         confirm: { tab: '貸渡', row: '貸渡方法', lead: '来店または配達を選び、店舗またはお届け先を入力のうえ、規約に同意してください。' }
       },
       required: '必須',
@@ -138,7 +138,7 @@
         whatsapp: 'WhatsApp',
         wechatPlaceholder: 'WeChat ID',
         whatsappPlaceholder: '電話番号またはアカウント',
-        contactHint: '以下4項目のうち、必ず2項目のみご入力ください（1項目のみ・3項目以上は送信できません）。',
+        contactHint: '以下4項目のうち、2項目以上ご入力ください。',
         deliveryMethodLabel: '貸渡方法',
         deliveryVisit: '来店',
         deliveryShip: '配達',
@@ -168,7 +168,7 @@
       message: {
         appointmentRequired: '利用日、受取時間、予定日数を入力してください。',
         nameRequired: '運転者の氏名を入力してください。',
-        contactNeedExactlyTwo: '電話・メール・WeChat・WhatsApp のうち、必ず2項目だけ入力してください。',
+        contactNeedAtLeastTwo: '電話・メール・WeChat・WhatsApp のうち、2項目以上入力してください。',
         contactEmailInvalid: 'メールアドレスの形式が正しくありません。',
         deliveryMethodRequired: '貸渡方法を選択してください。',
         storeRequired: '店舗を選択してください。',
@@ -195,7 +195,7 @@
       steps: {
         appointment: { tab: 'Schedule', row: 'Preferred rental time', lead: 'Enter your preferred rental date, pickup time, and expected rental length.' },
         name: { tab: 'Contact person', row: 'Contact details', lead: 'Enter your name and preferred language.' },
-        contact: { tab: 'Contact', row: 'Contact (pick any two)', lead: 'Enter exactly two of: phone, email, WeChat, or WhatsApp so we can reach you.' },
+        contact: { tab: 'Contact', row: 'Contact (at least two)', lead: 'Enter at least two of: phone, email, WeChat, or WhatsApp so we can reach you.' },
         confirm: { tab: 'Handover', row: 'Vehicle delivery method', lead: 'Choose visit or delivery, enter the store or address, then agree to the policies.' }
       },
       required: 'Required',
@@ -218,7 +218,7 @@
         whatsapp: 'WhatsApp',
         wechatPlaceholder: 'WeChat ID',
         whatsappPlaceholder: 'Number or WhatsApp ID',
-        contactHint: 'Enter exactly two of the four fields below (not one, not three).',
+        contactHint: 'Enter at least two of the four fields below.',
         deliveryMethodLabel: 'Vehicle delivery method',
         deliveryVisit: 'Visit showroom',
         deliveryShip: 'Delivery to you',
@@ -248,7 +248,7 @@
       message: {
         appointmentRequired: 'Please enter the date, pickup time, and expected rental length.',
         nameRequired: 'Please enter the contact person name.',
-        contactNeedExactlyTwo: 'Enter exactly two of: phone, email, WeChat, and WhatsApp (not more, not fewer).',
+        contactNeedAtLeastTwo: 'Enter at least two of: phone, email, WeChat, and WhatsApp.',
         contactEmailInvalid: 'The email address format is not valid.',
         deliveryMethodRequired: 'Please choose a vehicle delivery method.',
         storeRequired: 'Please select a store.',
@@ -805,7 +805,7 @@
       return '';
     }
     if (stepKey === 'contact') {
-      if (countFilledContactChannelsFromState() !== 2) return msg.contactNeedExactlyTwo;
+      if (countFilledContactChannelsFromState() < 2) return msg.contactNeedAtLeastTwo;
       if (sanitize(state.email) && !isValidEmail(state.email)) return msg.contactEmailInvalid;
       return '';
     }
@@ -879,7 +879,7 @@
         meta: buildSubmitMeta()
       });
       window.TK168FormSubmit.markSubmitSuccess(refs.confirmBtn);
-      setMessage(currentCopy().message.submitSuccess, true);
+      clearMessage();
       try {
         sessionStorage.removeItem(RENTAL_INQUIRY_DRAFT_KEY);
       } catch {

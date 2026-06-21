@@ -570,7 +570,7 @@
           meta: buildSubmitMeta()
         });
         window.TK168FormSubmit.markSubmitSuccess(refs.nextBtn);
-        setMessage(currentCopy().message.submitSuccess, true);
+        clearMessage();
       } catch (submitError) {
         console.error('[inquiry] submit failed', submitError);
         setMessage(window.TK168FormSubmit.networkErrorMessage(), false);

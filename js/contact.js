@@ -148,7 +148,7 @@
       });
 
       window.TK168FormSubmit.markSubmitSuccess(submitBtn);
-      setMessage(form, t('contact.success', '送信が完了しました。担当者よりご連絡いたします。'), 'success');
+      setMessage(form, '', 'success');
       form.reset();
     } catch (err) {
       console.error('[contact] submit failed', err);

@@ -142,7 +142,6 @@
     pageSubtitle: document.getElementById('scPageSubtitle'),
     message: document.getElementById('scMessage'),
     confirmBtn: document.getElementById('scConfirmBtn'),
-    backBtn: document.getElementById('scBackBtn'),
     rows: Array.from(document.querySelectorAll('.inq-row')),
     vehicleThumb: document.getElementById('scVehicleThumb'),
     vehicleBrand: document.getElementById('scVehicleBrand'),
@@ -273,7 +272,6 @@
       button.textContent = text.buttons.edit;
     });
 
-    refs.backBtn.textContent = text.buttons.prev;
     refs.confirmBtn.textContent = window.TK168FormSubmit?.submitLabel?.() || text.buttons.submit;
     refs.consentNewsText.textContent = text.consentNews;
     window.TK168LegalConsentLabel?.init?.(document, getLanguage());
@@ -450,7 +448,7 @@
         meta: buildSubmitMeta()
       });
       window.TK168FormSubmit.markSubmitSuccess(refs.confirmBtn);
-      setMessage(getText().messages.success, true);
+      clearMessage();
       clearDraft();
     } catch (submitError) {
       console.error('[stock-confirm] submit failed', submitError);
@@ -474,8 +472,6 @@
   }
 
   function bindActions() {
-    refs.backBtn.addEventListener('click', navigateStockConfirmBack);
-
     refs.confirmBtn.addEventListener('click', submitStockConfirm);
   }
 

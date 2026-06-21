@@ -273,7 +273,6 @@
           }
         });
         window.TK168FormSubmit.markSubmitSuccess(refs.submitBtn);
-        setMessage(getText().messages.success, true);
         clearDraft();
       } catch (submitError) {
         console.error('[stock-confirm-review] submit failed', submitError);

@@ -711,7 +711,7 @@
           }
         });
         window.TK168FormSubmit.markSubmitSuccess(refs.nextBtn);
-        setMessage(currentCopy().message.submitSuccess, true);
+        clearMessage();
       } catch (submitError) {
         console.error('[service-appointment] submit failed', submitError);
         setMessage(window.TK168FormSubmit.networkErrorMessage(), false);

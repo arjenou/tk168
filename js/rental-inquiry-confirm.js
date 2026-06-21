@@ -24,7 +24,7 @@
       rows: {
         appointment: '希望用车时间',
         name: '联系人信息',
-        contact: '联系方式（四选二）',
+        contact: '联系方式（至少两项）',
         confirm: '车辆交付与条款'
       },
       actions: {
@@ -72,7 +72,7 @@
       rows: {
         appointment: '希望利用日時',
         name: '運転者情報',
-        contact: '連絡先（4つから2つ）',
+        contact: '連絡先（2項目以上）',
         confirm: '貸渡方法・規約'
       },
       actions: {
@@ -120,7 +120,7 @@
       rows: {
         appointment: 'Preferred rental time',
         name: 'Contact details',
-        contact: 'Contact (pick two)',
+        contact: 'Contact (at least two)',
         confirm: 'Delivery & policies'
       },
       actions: {
@@ -565,7 +565,6 @@
         } catch {
           /* ignore */
         }
-        setMessage(copy.message.submitSuccess, true);
       } catch (submitError) {
         console.error('[rental-inquiry-confirm] submit failed', submitError);
         setMessage(window.TK168FormSubmit.networkErrorMessage(), false);
