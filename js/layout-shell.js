@@ -88,8 +88,9 @@
               <h5 class="footer-store-name" data-i18n="footer.stores.saitama.name">さいたま店</h5>
               <p class="footer-store-address" data-i18n-html="footer.stores.saitama.address">339-0035<br>埼玉県さいたま市岩槻区笹久保新田</p>
               <div class="footer-store-contact">
-                <p data-i18n="footer.storePhoneLine">電話番号：準備中</p>
-                <p data-i18n="footer.storeEmailLine">メール：準備中</p>
+                <p data-i18n="footer.stores.saitama.phoneLine">TEL：048-796-4907</p>
+                <p data-i18n="footer.stores.saitama.faxLine">FAX：048-796-4946</p>
+                <p data-i18n="footer.stores.saitama.emailLine">EMAIL：AUTO@tk168.co.jp</p>
               </div>
             </article>
             <article class="footer-store">
@@ -104,10 +105,11 @@
             <article class="footer-store">
               <p class="footer-store-eyebrow" data-i18n="footer.stores.osaka.eyebrow">JAPAN · OSAKA</p>
               <h5 class="footer-store-name" data-i18n="footer.stores.osaka.name">大阪店</h5>
-              <p class="footer-store-address" data-i18n-html="footer.stores.osaka.address">大阪府<br>住所準備中</p>
+              <p class="footer-store-address" data-i18n-html="footer.stores.osaka.address">〒595-0042<br>大阪府泉大津市高津町１２−１１</p>
               <div class="footer-store-contact">
-                <p data-i18n="footer.storePhoneLine">電話番号：準備中</p>
-                <p data-i18n="footer.storeEmailLine">メール：準備中</p>
+                <p data-i18n="footer.stores.osaka.phoneLine">TEL：072-592-9577</p>
+                <p data-i18n="footer.stores.osaka.faxLine">FAX：072-592-9631</p>
+                <p data-i18n="footer.stores.osaka.emailLine">EMAIL：OSAKA@tk168.co.jp</p>
               </div>
             </article>
             <article class="footer-store">
