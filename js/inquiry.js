@@ -60,7 +60,8 @@
         consentRequired: '请先同意使用条款与隐私政策。',
         submitSuccess: '预约内容已整理完成，请按填写的联系方式继续与顾问沟通。'
       },
-      footnote: '若您希望的来店时间无法安排，我们可能会通过电话与您另行协调。您提供的个人信息将用于车辆收购、销售等本公司服务的介绍（电话、邮件等）及相关服务提供。'
+      footnoteLine1: '若您希望的来店时间无法安排，我们可能会通过电话与您另行协调。',
+      footnoteLine2: '您提供的个人信息将用于车辆收购、销售等本公司服务的介绍（电话、邮件等）及相关服务提供。'
     },
     ja: {
       pageTitle: '来店予約 — TK168 Premium Automotive',
@@ -109,7 +110,8 @@
         consentRequired: '利用規約とプライバシーポリシーへの同意が必要です。',
         submitSuccess: '予約内容の整理が完了しました。入力した連絡先をもとに担当窓口との確認を進めてください。'
       },
-      footnote: 'ご希望の日時で承れない場合は、お電話にてご調整させていただく場合がございます。お客様からご提供頂いた個人情報は、お車の買取、販売など当社サービスのご案内（電話・メール等）及びご提供のために利用いたします。'
+      footnoteLine1: 'ご希望の日時で承れない場合は、お電話にてご調整させていただく場合がございます。',
+      footnoteLine2: 'お客様からご提供頂いた個人情報は、お車の買取、販売など当社サービスのご案内（電話・メール等）及びご提供のために利用いたします。'
     },
     en: {
       pageTitle: 'Visit Booking — TK168 Premium Automotive',
@@ -158,7 +160,8 @@
         consentRequired: 'You must agree to the terms of use and privacy policy first.',
         submitSuccess: 'The booking details are organized. Please continue the confirmation using the contact details you entered.'
       },
-      footnote: 'If your preferred visit time cannot be accommodated, we may contact you by phone to arrange an alternative. Personal information you provide will be used to introduce and deliver our services, including vehicle purchase and sales (by phone, email, and other means).'
+      footnoteLine1: 'If your preferred visit time cannot be accommodated, we may contact you by phone to arrange an alternative.',
+      footnoteLine2: 'Personal information you provide will be used to introduce and deliver our services, including vehicle purchase and sales (by phone, email, and other means).'
     }
   };
 
@@ -247,7 +250,8 @@
     title: document.getElementById('inqTitle'),
     subtitle: document.getElementById('inqSubtitle'),
     lead: document.getElementById('inqLeadText'),
-    footnote: document.getElementById('inqFootnote'),
+    footnoteLine1: document.getElementById('inqFootnoteLine1'),
+    footnoteLine2: document.getElementById('inqFootnoteLine2'),
     message: document.getElementById('inqMessage'),
     nextBtn: document.getElementById('inqNextBtn'),
     board: document.getElementById('inqBoard'),
@@ -319,7 +323,8 @@
     setText(refs.eyebrow, copy.eyebrow);
     setText(refs.title, copy.title);
     setText(refs.subtitle, copy.subtitle);
-    setText(refs.footnote, copy.footnote);
+    setText(refs.footnoteLine1, copy.footnoteLine1);
+    setText(refs.footnoteLine2, copy.footnoteLine2);
 
     SECTION_KEYS.forEach((key) => {
       setText(refs.rowLabels[key], copy.steps[key].row);

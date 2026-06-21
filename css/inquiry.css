@@ -503,6 +503,14 @@
   color: rgba(43, 41, 38, 0.62);
 }
 
+.inq-footnote p {
+  margin: 0;
+}
+
+.inq-footnote p + p {
+  margin-top: 8px;
+}
+
 .inq-message {
   min-height: 24px;
   margin: 8px 14px 0;
