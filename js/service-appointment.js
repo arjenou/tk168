@@ -695,7 +695,7 @@
       moveStep(currentStep - 1);
     });
 
-    refs.nextBtn.addEventListener('click', () => {
+    refs.nextBtn.addEventListener('click', async () => {
       syncStateFromInputs();
       if (currentStep === 0) {
         const error = validateAllSections();
@@ -712,7 +712,22 @@
         setMessage(error, false);
         return;
       }
-      setMessage(currentCopy().message.submitSuccess, true);
+
+      refs.nextBtn.disabled = true;
+      try {
+        await window.TK168FormSubmit.send({
+          form: 'service-appointment',
+          data: { ...state },
+          meta: {
+            serviceTitle: refs.cardTitle?.textContent || ''
+          }
+        });
+        setMessage(currentCopy().message.submitSuccess, true);
+      } catch (submitError) {
+        console.error('[service-appointment] submit failed', submitError);
+        setMessage(window.TK168FormSubmit.networkErrorMessage(), false);
+        refs.nextBtn.disabled = false;
+      }
     });
 
     refs.jumpStepButtons.forEach((button) => {

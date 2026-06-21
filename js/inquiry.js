@@ -524,8 +524,35 @@
     });
   }
 
+  function buildSubmitPayload() {
+    syncStateFromInputs();
+    return {
+      appointment: {
+        date: state.date,
+        time: state.time,
+        note: state.note
+      },
+      name: state.name,
+      kana: state.kana,
+      email: state.email,
+      phone: state.phone,
+      consentNews: state.consentNews,
+      consentPolicy: state.consentPolicy
+    };
+  }
+
+  function buildSubmitMeta() {
+    const vehicle = inquiryVehicleContext.currentVehicle;
+    const language = currentLanguage();
+    return {
+      vehicleId: vehicle?.id || currentInquiryVehicleId(),
+      vehicleName: vehicle ? getVehicleName(vehicle, language) : '',
+      vehicleBrand: vehicle ? getBrandLabel(vehicle.brandKey, language) : ''
+    };
+  }
+
   function bindStepEvents() {
-    refs.nextBtn.addEventListener('click', () => {
+    refs.nextBtn.addEventListener('click', async () => {
       syncStateFromInputs();
       if (currentStep === 0) {
         const error = validateAllSections();
@@ -542,7 +569,20 @@
         setMessage(error, false);
         return;
       }
-      setMessage(currentCopy().message.submitSuccess, true);
+
+      refs.nextBtn.disabled = true;
+      try {
+        await window.TK168FormSubmit.send({
+          form: 'inquiry',
+          data: buildSubmitPayload(),
+          meta: buildSubmitMeta()
+        });
+        setMessage(currentCopy().message.submitSuccess, true);
+      } catch (submitError) {
+        console.error('[inquiry] submit failed', submitError);
+        setMessage(window.TK168FormSubmit.networkErrorMessage(), false);
+        refs.nextBtn.disabled = false;
+      }
     });
   }
 

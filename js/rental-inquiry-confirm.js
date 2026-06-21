@@ -547,14 +547,29 @@
 
     setText(refs.submitBtn, copy.actions.submit);
 
-    refs.submitBtn?.addEventListener('click', () => {
-      try {
-        sessionStorage.removeItem(RENTAL_INQUIRY_DRAFT_KEY);
-      } catch {
-        /* ignore */
-      }
-      setMessage(copy.message.submitSuccess, true);
+    refs.submitBtn?.addEventListener('click', async () => {
       if (refs.submitBtn) refs.submitBtn.disabled = true;
+      try {
+        await window.TK168FormSubmit.send({
+          form: 'rental-inquiry',
+          data: { ...draft },
+          meta: {
+            vehicleId: draft.vehicleId || '',
+            vehicleName: refs.vehicleName?.textContent || '',
+            vehicleBrand: refs.vehicleBrand?.textContent || ''
+          }
+        });
+        try {
+          sessionStorage.removeItem(RENTAL_INQUIRY_DRAFT_KEY);
+        } catch {
+          /* ignore */
+        }
+        setMessage(copy.message.submitSuccess, true);
+      } catch (submitError) {
+        console.error('[rental-inquiry-confirm] submit failed', submitError);
+        setMessage(window.TK168FormSubmit.networkErrorMessage(), false);
+        if (refs.submitBtn) refs.submitBtn.disabled = false;
+      }
     });
 
     bindHeaderBack(draft);

@@ -259,10 +259,26 @@
     document.getElementById('scrBackNavBtn')?.addEventListener('click', () => {
       window.location.assign(editPageHref());
     });
-    refs.submitBtn.addEventListener('click', () => {
-      setMessage(getText().messages.success, true);
+    refs.submitBtn.addEventListener('click', async () => {
       refs.submitBtn.disabled = true;
-      clearDraft();
+      try {
+        await window.TK168FormSubmit.send({
+          form: 'stock-confirm',
+          data: { ...draft },
+          meta: {
+            vehicleId: draft.vehicleId || '',
+            vehicleName: refs.vehicleName?.textContent || '',
+            vehicleBrand: refs.vehicleBrand?.textContent || '',
+            isRentalDetail: Boolean(draft.isRentalDetail)
+          }
+        });
+        setMessage(getText().messages.success, true);
+        clearDraft();
+      } catch (submitError) {
+        console.error('[stock-confirm-review] submit failed', submitError);
+        setMessage(window.TK168FormSubmit.networkErrorMessage(), false);
+        refs.submitBtn.disabled = false;
+      }
     });
   }
 

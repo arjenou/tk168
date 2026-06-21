@@ -3,7 +3,7 @@
    - 3 タブ（sell-general / sell-specific / rental）の切替
    - URL クエリ（?type=sell-general 等）で初期タブを指定可
    - メールアドレス必須バリデーション
-   - 送信は現状フロント完結のスタブ（TODO: バックエンド連携）
+   - 送信は Vercel `/api/form-submit` 経由で Gmail SMTP へ通知
    ============================================================ */
 (() => {
   'use strict';
@@ -142,15 +142,20 @@
     persistDraft(payload);
 
     try {
-      // TODO: 後ほど Cloudflare Worker (worker/) に POST するエンドポイントを追加
-      //       例: await fetch('/api/contact', { method: 'POST', body: JSON.stringify(payload) })
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      await window.TK168FormSubmit.send({
+        form: 'contact',
+        data: payload,
+        meta: {
+          contactType: payload.type,
+          source: payload.source
+        }
+      });
 
       setMessage(form, t('contact.success', '送信が完了しました。担当者よりご連絡いたします。'), 'success');
       form.reset();
     } catch (err) {
       console.error('[contact] submit failed', err);
-      setMessage(form, t('contact.error.network', '送信に失敗しました。時間をおいて再度お試しください。'), 'error');
+      setMessage(form, t('contact.error.network', window.TK168FormSubmit?.networkErrorMessage?.() || '送信に失敗しました。時間をおいて再度お試しください。'), 'error');
     } finally {
       if (submitBtn) {
         submitBtn.disabled = false;

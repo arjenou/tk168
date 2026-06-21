@@ -1,0 +1,7 @@
+{
+  "name": "tk168-site",
+  "private": true,
+  "dependencies": {
+    "nodemailer": "^6.10.0"
+  }
+}

@@ -1,4 +1,5 @@
 worker/node_modules/
+node_modules/
 worker/.wrangler/
 .DS_Store
 # Local 360 originals (upload via admin; too large for git / Workers assets)
