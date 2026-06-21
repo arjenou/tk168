@@ -70,13 +70,6 @@
             <img src="assets/images/logo_TK168.svg" alt="TK168" class="footer-logo">
             <p class="footer-slogan" data-i18n-html="footer.slogan">上質な一台との出会いを、<br>越境サービスとともに丁寧にサポートします。</p>
           </div>
-          <div class="footer-newsletter">
-            <h4 data-i18n="footer.newsletterTitle">ニュースレター</h4>
-            <div class="newsletter-form">
-              <input type="email" class="footer-input" placeholder="メールアドレスを入力" data-i18n-placeholder="footer.newsletterPlaceholder">
-              <button class="footer-btn" data-i18n="footer.newsletterButton">登録する</button>
-            </div>
-          </div>
         </div>
 
         <div class="footer-divider"></div>
