@@ -274,6 +274,7 @@
       ...j,
       imageUrl: j?.imageUrl ? toAbsoluteMedia(j.imageUrl) : j?.imageUrl,
     }));
+    window.__TK168_JOURNAL_HYDRATED__ = true;
   }
 
   // Synchronously expose whatever we have cached.
@@ -322,6 +323,13 @@
     refresh("journal", "journal", cachedJournal, JOURNAL_KEY, installJournal),
   ]).then((flags) => {
     const diverged = flags.some(Boolean);
+    if (window.__TK168_JOURNAL_HYDRATED__) {
+      document.dispatchEvent(
+        new CustomEvent("tk168:data-updated", {
+          detail: { journal: window.TK168_API_JOURNAL },
+        }),
+      );
+    }
     if (!diverged) return;
     if (window.__TK168_HYDRATED_ONCE__) return;
     window.__TK168_HYDRATED_ONCE__ = true;

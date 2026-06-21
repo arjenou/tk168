@@ -1517,11 +1517,14 @@ window.TK168_DATA = (() => {
     return s;
   }
 
-  /** 后台 /api/journal 拉取后的条目；无或空数组时回退到内置 `news` */
+  /** 后台 /api/journal 拉取后的条目；仅 API 未就绪时回退到内置 `news` */
   function buildNewsListFromApi() {
+    if (!window.__TK168_JOURNAL_HYDRATED__) return null;
     const raw = window.TK168_API_JOURNAL;
-    if (!Array.isArray(raw) || raw.length === 0) return null;
-    return raw.map((j) => ({
+    if (!Array.isArray(raw)) return null;
+    return raw
+      .filter((j) => j.isPublished !== false)
+      .map((j) => ({
       id: j.id || '',
       title: j.titleZh || '',
       titleJa: j.titleJa || '',
@@ -1542,7 +1545,7 @@ window.TK168_DATA = (() => {
 
   function getNewsItems(language = getCurrentLanguage()) {
     const fromApi = buildNewsListFromApi();
-    const source = fromApi && fromApi.length ? fromApi : news;
+    const source = fromApi !== null ? fromApi : news;
     return source.map((item) => ({
       ...item,
       title: language === 'en'
@@ -1570,7 +1573,7 @@ window.TK168_DATA = (() => {
   /** 与 `getNewsItems` 同一数据源，用于独立详情页 */
   function getNewsDetailRecord({ id, index, language = getCurrentLanguage() } = {}) {
     const fromApi = buildNewsListFromApi();
-    const useApi = fromApi && fromApi.length;
+    const useApi = fromApi !== null;
     const rows = useApi
       ? fromApi.map((r) => ({
           id: r.id,
