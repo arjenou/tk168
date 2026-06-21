@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="css/style.css?v=20260527f">
   <link rel="stylesheet" href="css/skeleton.css?v=20260420h">
   <script src="js/skeleton-boot.js?v=20260420h"></script>
-  <link rel="stylesheet" href="css/inquiry.css?v=20260622b">
+  <link rel="stylesheet" href="css/inquiry.css?v=20260622c">
 </head>
 
 <body class="inquiry-page no-hero-page">
@@ -154,10 +154,11 @@
         </div>
 
         <div class="inq-actions">
-          <button type="button" class="inq-btn inq-btn--primary" id="inqNextBtn">送信する</button>
+          <div class="inq-submit-col">
+            <button type="button" class="inq-btn inq-btn--primary" id="inqNextBtn">送信する</button>
+            <p class="inq-message" id="inqMessage" aria-live="polite"></p>
+          </div>
         </div>
-
-        <p class="inq-message" id="inqMessage" aria-live="polite"></p>
       </div>
     </section>
   </main>

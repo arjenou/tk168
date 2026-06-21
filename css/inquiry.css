@@ -511,6 +511,33 @@
   margin-top: 8px;
 }
 
+.inq-submit-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.inq-submit-col .inq-message,
+.inq-submit-col .contact-message {
+  width: 100%;
+  max-width: 420px;
+  margin: 0;
+  padding: 0 0 18px;
+  font-size: 12px;
+  line-height: 1.75;
+  text-align: center;
+  color: #c6472f;
+  font-weight: 700;
+}
+
+.inq-submit-col .inq-message.is-success,
+.inq-submit-col .contact-message.is-success {
+  color: #1f8f5f;
+  font-weight: 600;
+}
+
 .inq-message {
   width: 88%;
   margin: 10px auto 0;
@@ -531,6 +558,7 @@
   padding: 9px 14px 0;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
   gap: 8px;
 }
 
@@ -648,7 +676,13 @@
 
   .inq-actions {
     flex-direction: column;
+    align-items: center;
     padding-bottom: 22px;
+  }
+
+  .inq-submit-col {
+    width: 100%;
+    max-width: 320px;
   }
 
   .inq-btn {

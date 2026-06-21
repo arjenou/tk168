@@ -223,10 +223,11 @@
 
         <div class="inq-actions">
           <button type="button" class="inq-btn inq-btn--ghost" id="svcPrevBtn">上一步</button>
-          <button type="button" class="inq-btn inq-btn--primary" id="svcNextBtn">送信する</button>
+          <div class="inq-submit-col">
+            <button type="button" class="inq-btn inq-btn--primary" id="svcNextBtn">送信する</button>
+            <p class="inq-message" id="svcMessage" aria-live="polite"></p>
+          </div>
         </div>
-
-        <p class="inq-message" id="svcMessage" aria-live="polite"></p>
         <p class="inq-counter" id="svcCounter">1 / 2</p>
       </div>
     </section>
