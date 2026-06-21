@@ -132,11 +132,7 @@
     }
 
     const submitBtn = form.querySelector('.contact-submit');
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.dataset.originalText = submitBtn.textContent;
-      submitBtn.textContent = t('contact.submitting', '送信中…');
-    }
+    window.TK168FormSubmit.beginSubmit(submitBtn);
 
     const payload = collectPayload(form);
     persistDraft(payload);
@@ -151,19 +147,13 @@
         }
       });
 
+      window.TK168FormSubmit.markSubmitSuccess(submitBtn);
       setMessage(form, t('contact.success', '送信が完了しました。担当者よりご連絡いたします。'), 'success');
       form.reset();
     } catch (err) {
       console.error('[contact] submit failed', err);
       setMessage(form, t('contact.error.network', window.TK168FormSubmit?.networkErrorMessage?.() || '送信に失敗しました。時間をおいて再度お試しください。'), 'error');
-    } finally {
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        if (submitBtn.dataset.originalText) {
-          submitBtn.textContent = submitBtn.dataset.originalText;
-          delete submitBtn.dataset.originalText;
-        }
-      }
+      window.TK168FormSubmit.resetSubmitButton(submitBtn);
     }
   }
 

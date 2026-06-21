@@ -76,7 +76,7 @@
         confirm: '貸渡方法・規約'
       },
       actions: {
-        submit: '送信'
+        submit: '送信する'
       },
       gallery: {
         prev: '前の画像',
@@ -545,10 +545,10 @@
     applyChromeForVehicle(vehicle);
     if (vehicle) renderVehicleCard(vehicle, lang);
 
-    setText(refs.submitBtn, copy.actions.submit);
+    setText(refs.submitBtn, window.TK168FormSubmit?.submitLabel?.() || copy.actions.submit);
 
     refs.submitBtn?.addEventListener('click', async () => {
-      if (refs.submitBtn) refs.submitBtn.disabled = true;
+      window.TK168FormSubmit.beginSubmit(refs.submitBtn);
       try {
         await window.TK168FormSubmit.send({
           form: 'rental-inquiry',
@@ -559,6 +559,7 @@
             vehicleBrand: refs.vehicleBrand?.textContent || ''
           }
         });
+        window.TK168FormSubmit.markSubmitSuccess(refs.submitBtn);
         try {
           sessionStorage.removeItem(RENTAL_INQUIRY_DRAFT_KEY);
         } catch {
@@ -568,7 +569,7 @@
       } catch (submitError) {
         console.error('[rental-inquiry-confirm] submit failed', submitError);
         setMessage(window.TK168FormSubmit.networkErrorMessage(), false);
-        if (refs.submitBtn) refs.submitBtn.disabled = false;
+        window.TK168FormSubmit.resetSubmitButton(refs.submitBtn);
       }
     });
 
@@ -584,7 +585,7 @@
     setText(refs.title, copy.title);
     setText(refs.lead, copy.lead);
     refs.summary.innerHTML = buildSummaryHtml(draft);
-    setText(refs.submitBtn, copy.actions.submit);
+    setText(refs.submitBtn, window.TK168FormSubmit?.submitLabel?.() || copy.actions.submit);
     const vehicle = resolveInquiryVehicle(draft.vehicleId);
     if (vehicle) renderVehicleCard(vehicle, draftLanguage(draft));
     if (refs.rateLabel) refs.rateLabel.textContent = copy.metrics.rate;

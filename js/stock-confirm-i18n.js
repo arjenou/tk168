@@ -2,7 +2,7 @@
   const COPY = {
     zh: {
       title: '在库确认内容填写',
-      subtitle: '请在一页内填写下列信息，核对无误后点击「确认」进入确认页。',
+      subtitle: '请在一页内填写下列信息，核对后点击「提交」发送。',
       review: {
         title: '在库确认 — 信息核对',
         subtitle: '请确认下列内容与您的意向一致。',
@@ -61,7 +61,7 @@
     },
     ja: {
       title: '在庫確認内容の入力',
-      subtitle: '必要事項をこのページで入力し、内容を確認したら「確認」で次の画面へ進みます。',
+      subtitle: '必要事項をこのページで入力し、「送信する」を押して送信してください。',
       review: {
         title: '在庫確認 — 内容の確認',
         subtitle: '入力内容をご確認のうえ、お間違いがなければ送信してください。',
@@ -97,7 +97,7 @@
         edit: '修正する',
         prev: '戻る',
         confirm: '確認',
-        submit: '送信'
+        submit: '送信する'
       },
       summary: {
         empty: '未入力',
@@ -120,7 +120,7 @@
     },
     en: {
       title: 'Complete Your Stock Check Request',
-      subtitle: 'Fill in everything on this page, then tap Confirm to open the summary page.',
+      subtitle: 'Fill in all required fields on this page, then tap Send to submit.',
       review: {
         title: 'Stock check — Review',
         subtitle: 'Please verify your details before submitting.',
@@ -156,7 +156,7 @@
         edit: 'Edit',
         prev: 'Back',
         confirm: 'Confirm',
-        submit: 'Submit'
+        submit: 'Send'
       },
       summary: {
         empty: 'Not provided',

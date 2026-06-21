@@ -1,15 +1,6 @@
 window.TK168CommonLinks = (() => {
   const FAVORITES_BASE = 'favorites.html';
 
-  function buildStoreVisitHrefFromContext() {
-    const params = new URLSearchParams(window.location.search);
-    const vehicleId = (params.get('id') || '').trim();
-    if (!vehicleId) return 'inquiry.html';
-    const nextParams = new URLSearchParams();
-    nextParams.set('id', vehicleId);
-    return `inquiry.html?${nextParams.toString()}`;
-  }
-
   function getPhoneHref(phone = '') {
     return `tel:${String(phone).replace(/\s+/g, '')}`;
   }
@@ -27,23 +18,6 @@ window.TK168CommonLinks = (() => {
     if (language === 'en') return 'Back to home';
     if (language === 'zh') return '返回首页';
     return 'トップへ戻る';
-  }
-
-  function getStoreVisitLabel() {
-    return window.TK168I18N?.t?.('detail.storeVisit')
-      || (getLanguage() === 'en' ? 'Book a visit' : (getLanguage() === 'zh' ? '来店预约' : '来店予約'));
-  }
-
-  function syncNavCtas() {
-    const storeVisitHref = buildStoreVisitHrefFromContext();
-    const storeVisitLabel = getStoreVisitLabel();
-    document.querySelectorAll('.nav-cta, .nav-cta-mobile').forEach((link) => {
-      link.href = storeVisitHref;
-      link.dataset.linkKey = 'store-visit';
-      link.dataset.i18n = 'detail.storeVisit';
-      link.textContent = storeVisitLabel;
-      link.removeAttribute('data-contact-trigger');
-    });
   }
 
   function syncFooterLinks(site) {
@@ -131,7 +105,6 @@ window.TK168CommonLinks = (() => {
 
   function applyCommonLinks() {
     const { site } = window.TK168_DATA;
-    syncNavCtas();
     syncFooterLinks(site);
     wireHomeLogos();
     updateFavoriteLinks();
@@ -140,13 +113,11 @@ window.TK168CommonLinks = (() => {
     if (document.documentElement.dataset.commonLinksLangBound !== '1') {
       document.documentElement.dataset.commonLinksLangBound = '1';
       window.addEventListener('tk168:languagechange', () => {
-        syncNavCtas();
         wireHomeLogos();
         updateFavoriteLinks();
       });
       window.addEventListener('favorites:changed', updateFavoriteLinks);
     } else {
-      syncNavCtas();
       wireHomeLogos();
       updateFavoriteLinks();
     }

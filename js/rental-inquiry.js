@@ -22,7 +22,7 @@
       pageTitle: '租车咨询 — TK168 Premium Automotive',
       eyebrow: 'TK168 RENTAL CONSULT',
       title: '租车咨询单',
-      subtitle: '在本页填写全部项目，点「确认」后在下一页核对并提交。',
+      subtitle: '请在一页内填写下列信息，核对后点击「提交」发送。',
       vehicleStatus: '当前可租',
       flow: {
         fillLead: '请在本页填写下列全部项目。'
@@ -79,7 +79,7 @@
         readyToSend: '{detail} / 内容已确认'
       },
       actions: {
-        confirm: '确认'
+        submit: '提交'
       },
       gallery: {
         prev: '上一张',
@@ -102,7 +102,7 @@
       pageTitle: 'レンタル相談 — TK168 Premium Automotive',
       eyebrow: 'TK168 RENTAL CONSULT',
       title: 'レンタル相談フォーム',
-      subtitle: 'このページですべて入力し、「確認」で次のページに進み、内容を確認して送信します。',
+      subtitle: '必要事項をこのページで入力し、「送信する」を押して送信してください。',
       vehicleStatus: '相談可能',
       flow: {
         fillLead: '以下の項目をこのページですべて入力してください。'
@@ -159,7 +159,7 @@
         readyToSend: '{detail} / 内容確認済み'
       },
       actions: {
-        confirm: '確認'
+        submit: '送信する'
       },
       gallery: {
         prev: '前の画像',
@@ -182,7 +182,7 @@
       pageTitle: 'Rental Inquiry — TK168 Premium Automotive',
       eyebrow: 'TK168 RENTAL CONSULT',
       title: 'Rental Inquiry Form',
-      subtitle: 'Fill in everything on this page, tap Confirm to review on the next page, then submit.',
+      subtitle: 'Fill in all required fields on this page, then tap Send to submit.',
       vehicleStatus: 'Available for inquiry',
       flow: {
         fillLead: 'Enter all required information on this page.'
@@ -239,7 +239,7 @@
         readyToSend: '{detail} / details confirmed'
       },
       actions: {
-        confirm: 'Confirm'
+        submit: 'Send'
       },
       gallery: {
         prev: 'Previous image',
@@ -549,7 +549,7 @@
     setPlaceholder(refs.whatsapp, copy.fields.whatsappPlaceholder);
     setPlaceholder(refs.deliveryAddress, copy.fields.deliveryAddressPlaceholder);
 
-    setText(refs.confirmBtn, copy.actions.confirm);
+    setText(refs.confirmBtn, window.TK168FormSubmit?.submitLabel?.() || copy.actions.submit);
     if (refs.galleryPrev) refs.galleryPrev.setAttribute('aria-label', copy.gallery.prev);
     if (refs.galleryNext) refs.galleryNext.setAttribute('aria-label', copy.gallery.next);
     renderVehicleCard();
@@ -829,14 +829,8 @@
     return '';
   }
 
-  function goToConfirmPage() {
-    syncStateFromInputs();
-    const error = validateAllSections();
-    if (error) {
-      setMessage(error, false);
-      return;
-    }
-    const draft = {
+  function buildSubmitPayload() {
+    return {
       v: 2,
       lang: currentLanguage(),
       vehicleId: vehicleContext.currentVehicle?.id || vehicleContext.requestedVehicleId || '',
@@ -856,17 +850,45 @@
       consentPolicy: state.consentPolicy,
       consentIdpDeposit: state.consentIdpDeposit
     };
-    try {
-      sessionStorage.setItem(RENTAL_INQUIRY_DRAFT_KEY, JSON.stringify(draft));
-    } catch {
-      setMessage(currentCopy().message.storageError, false);
+  }
+
+  function buildSubmitMeta() {
+    const vehicle = vehicleContext.currentVehicle;
+    const language = currentLanguage();
+    return {
+      vehicleId: vehicle?.id || vehicleContext.requestedVehicleId || '',
+      vehicleName: vehicle ? getVehicleName(vehicle, language) : '',
+      vehicleBrand: vehicle ? getBrandLabel(vehicle.brandKey, language) : ''
+    };
+  }
+
+  async function submitInquiry() {
+    syncStateFromInputs();
+    const error = validateAllSections();
+    if (error) {
+      setMessage(error, false);
       return;
     }
-    const id = sanitize(draft.vehicleId);
-    const target = id
-      ? `rental-inquiry-confirm.html?id=${encodeURIComponent(id)}`
-      : 'rental-inquiry-confirm.html';
-    window.location.assign(target);
+
+    window.TK168FormSubmit.beginSubmit(refs.confirmBtn);
+    try {
+      await window.TK168FormSubmit.send({
+        form: 'rental-inquiry',
+        data: buildSubmitPayload(),
+        meta: buildSubmitMeta()
+      });
+      window.TK168FormSubmit.markSubmitSuccess(refs.confirmBtn);
+      setMessage(currentCopy().message.submitSuccess, true);
+      try {
+        sessionStorage.removeItem(RENTAL_INQUIRY_DRAFT_KEY);
+      } catch {
+        /* ignore */
+      }
+    } catch (submitError) {
+      console.error('[rental-inquiry] submit failed', submitError);
+      setMessage(window.TK168FormSubmit.networkErrorMessage(), false);
+      window.TK168FormSubmit.resetSubmitButton(refs.confirmBtn);
+    }
   }
 
   function render() {
@@ -902,7 +924,7 @@
   }
 
   function bindStepEvents() {
-    refs.confirmBtn?.addEventListener('click', goToConfirmPage);
+    refs.confirmBtn?.addEventListener('click', submitInquiry);
   }
 
   function initDefaultDate() {

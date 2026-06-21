@@ -556,6 +556,20 @@
   transform: translateY(1px);
 }
 
+.inq-btn--primary.is-submit-success,
+.contact-submit.is-submit-success {
+  border-color: rgba(31, 143, 95, 0.45);
+  background: linear-gradient(180deg, #e8f7ef, #d4efdf);
+  color: #1f6f4d;
+  box-shadow: none;
+}
+
+.inq-btn--primary.is-submit-success:disabled,
+.contact-submit.is-submit-success:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
 .inq-counter {
   margin: 7px 0 14px;
   text-align: center;

@@ -17,9 +17,9 @@
       pageTitle: '来店预约 — TK168 Premium Automotive',
       eyebrow: 'TK168 CONTACT FLOW',
       title: '来店预约信息填写',
-      subtitle: '先在一页填完信息，再在确认页核对后提交。',
+      subtitle: '请在一页内填写下列信息，核对后点击「提交」发送。',
       flow: {
-        reviewLead: '请核对下列摘要，确认无误后提交。'
+        editLead: ''
       },
       steps: {
         appointment: { tab: '来店时间', row: '来店希望时间', lead: '请选择希望到店时间。' },
@@ -49,8 +49,7 @@
         policyConfirmed: '条款已同意'
       },
       actions: {
-        toReview: '确认',
-        submit: '确认提交'
+        submit: '提交'
       },
       message: {
         appointmentRequired: '请填写来店希望日期和时间。',
@@ -67,9 +66,9 @@
       pageTitle: '来店予約 — TK168 Premium Automotive',
       eyebrow: 'TK168 CONTACT FLOW',
       title: '来店予約内容の入力',
-      subtitle: '必要事項を1ページにまとめて入力し、確認ページで内容を確認してから送信します。',
+      subtitle: '必要事項をこのページで入力し、「送信する」を押して送信してください。',
       flow: {
-        reviewLead: '入力内容をご確認のうえ、問題なければ送信してください。'
+        editLead: ''
       },
       steps: {
         appointment: { tab: '来店希望', row: '来店希望日時', lead: '来店希望日時を選択してください。' },
@@ -99,8 +98,7 @@
         policyConfirmed: '規約同意済み'
       },
       actions: {
-        toReview: '確認',
-        submit: 'この内容で送信'
+        submit: '送信する'
       },
       message: {
         appointmentRequired: '来店希望日時を入力してください。',
@@ -117,9 +115,9 @@
       pageTitle: 'Visit Booking — TK168 Premium Automotive',
       eyebrow: 'TK168 CONTACT FLOW',
       title: 'Complete Your Visit Booking',
-      subtitle: 'Fill everything on one page, review the summary, then submit.',
+      subtitle: 'Fill in all required fields on this page, then tap Send to submit.',
       flow: {
-        reviewLead: 'Review your answers below, then submit if everything looks correct.'
+        editLead: ''
       },
       steps: {
         appointment: { tab: 'Visit time', row: 'Preferred visit time', lead: 'Select your preferred visit date and time.' },
@@ -149,8 +147,7 @@
         policyConfirmed: 'Terms agreed'
       },
       actions: {
-        toReview: 'Confirm',
-        submit: 'Submit booking'
+        submit: 'Send'
       },
       message: {
         appointmentRequired: 'Please enter your preferred visit date and time.',
@@ -425,8 +422,8 @@
 
   function applyBoardStep() {
     if (!refs.board) return;
-    refs.board.classList.toggle('is-step-edit', currentStep === 0);
-    refs.board.classList.toggle('is-step-review', currentStep === 1);
+    refs.board.classList.add('is-step-edit');
+    refs.board.classList.remove('is-step-review');
     refs.rows.forEach((row) => row.classList.remove('is-active'));
   }
 
@@ -436,13 +433,12 @@
 
   function renderActions() {
     const copy = currentCopy();
-    refs.nextBtn.textContent = currentStep === 0 ? copy.actions.toReview : copy.actions.submit;
+    refs.nextBtn.textContent = window.TK168FormSubmit?.submitLabel?.() || copy.actions.submit;
   }
 
   function renderHead() {
     const copy = currentCopy();
-    const raw = currentStep === 0 ? copy.flow.editLead : copy.flow.reviewLead;
-    const trimmed = String(raw || '').trim();
+    const trimmed = String(copy.flow.editLead || '').trim();
     if (!refs.lead) return;
     refs.lead.textContent = trimmed;
     refs.lead.hidden = !trimmed;
@@ -559,34 +555,25 @@
   function bindStepEvents() {
     refs.nextBtn.addEventListener('click', async () => {
       syncStateFromInputs();
-      if (currentStep === 0) {
-        const error = validateAllSections();
-        if (error) {
-          setMessage(error, false);
-          return;
-        }
-        moveStep(1);
-        return;
-      }
-
       const error = validateAllSections();
       if (error) {
         setMessage(error, false);
         return;
       }
 
-      refs.nextBtn.disabled = true;
+      window.TK168FormSubmit.beginSubmit(refs.nextBtn);
       try {
         await window.TK168FormSubmit.send({
           form: 'inquiry',
           data: buildSubmitPayload(),
           meta: buildSubmitMeta()
         });
+        window.TK168FormSubmit.markSubmitSuccess(refs.nextBtn);
         setMessage(currentCopy().message.submitSuccess, true);
       } catch (submitError) {
         console.error('[inquiry] submit failed', submitError);
         setMessage(window.TK168FormSubmit.networkErrorMessage(), false);
-        refs.nextBtn.disabled = false;
+        window.TK168FormSubmit.resetSubmitButton(refs.nextBtn);
       }
     });
   }
@@ -603,10 +590,6 @@
   }
 
   function navigateInquiryBack() {
-    if (currentStep === 1) {
-      moveStep(0);
-      return;
-    }
     try {
       const ref = document.referrer || '';
       if (ref.startsWith(window.location.origin)) {

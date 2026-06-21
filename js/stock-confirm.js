@@ -274,7 +274,7 @@
     });
 
     refs.backBtn.textContent = text.buttons.prev;
-    refs.confirmBtn.textContent = text.buttons.confirm;
+    refs.confirmBtn.textContent = window.TK168FormSubmit?.submitLabel?.() || text.buttons.submit;
     refs.consentNewsText.textContent = text.consentNews;
     window.TK168LegalConsentLabel?.init?.(document, getLanguage());
 
@@ -398,9 +398,64 @@
     }
   }
 
-  function goToReview() {
-    const q = window.location.search || '';
-    window.location.assign(`stock-confirm-review.html${q}`);
+  function clearDraft() {
+    try {
+      sessionStorage.removeItem(STOCK_CONFIRM_DRAFT_KEY);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function buildSubmitPayload() {
+    syncStateFromInputs();
+    return {
+      requestType: state.requestType,
+      requestNote: state.requestNote,
+      name: state.name,
+      kana: state.kana,
+      email: state.email,
+      phone: state.phone,
+      consentNews: state.consentNews,
+      consentPolicy: state.consentPolicy,
+      vehicleId: currentPersistedVehicleId(),
+      isRentalDetail: vehicleContext.isRentalDetail
+    };
+  }
+
+  function buildSubmitMeta() {
+    const language = getLanguage();
+    const vehicle = vehicleContext.currentVehicle;
+    return {
+      vehicleId: currentPersistedVehicleId(),
+      vehicleName: vehicle ? getVehicleName(vehicle, language) : (refs.vehicleName?.textContent || ''),
+      vehicleBrand: vehicle ? getBrandLabel(vehicle.brandKey, language) : (refs.vehicleBrand?.textContent || ''),
+      isRentalDetail: Boolean(vehicleContext.isRentalDetail)
+    };
+  }
+
+  async function submitStockConfirm() {
+    syncStateFromInputs();
+    const error = validateAll();
+    if (error) {
+      setMessage(error, false);
+      return;
+    }
+
+    window.TK168FormSubmit.beginSubmit(refs.confirmBtn);
+    try {
+      await window.TK168FormSubmit.send({
+        form: 'stock-confirm',
+        data: buildSubmitPayload(),
+        meta: buildSubmitMeta()
+      });
+      window.TK168FormSubmit.markSubmitSuccess(refs.confirmBtn);
+      setMessage(getText().messages.success, true);
+      clearDraft();
+    } catch (submitError) {
+      console.error('[stock-confirm] submit failed', submitError);
+      setMessage(window.TK168FormSubmit.networkErrorMessage(), false);
+      window.TK168FormSubmit.resetSubmitButton(refs.confirmBtn);
+    }
   }
 
   function bindInputEvents() {
@@ -420,16 +475,7 @@
   function bindActions() {
     refs.backBtn.addEventListener('click', navigateStockConfirmBack);
 
-    refs.confirmBtn.addEventListener('click', () => {
-      syncStateFromInputs();
-      const error = validateAll();
-      if (error) {
-        setMessage(error, false);
-        return;
-      }
-      persistDraft();
-      goToReview();
-    });
+    refs.confirmBtn.addEventListener('click', submitStockConfirm);
   }
 
   function init() {

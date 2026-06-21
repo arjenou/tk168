@@ -239,7 +239,7 @@
     refs.labelKana.textContent = text.labels.kana;
     refs.labelContact.textContent = text.labels.contact;
     refs.labelConsent.textContent = text.labels.consentAggregate;
-    refs.submitBtn.textContent = text.buttons.submit;
+    refs.submitBtn.textContent = window.TK168FormSubmit?.submitLabel?.() || text.buttons.submit;
   }
 
   function setMessage(message, ok) {
@@ -260,7 +260,7 @@
       window.location.assign(editPageHref());
     });
     refs.submitBtn.addEventListener('click', async () => {
-      refs.submitBtn.disabled = true;
+      window.TK168FormSubmit.beginSubmit(refs.submitBtn);
       try {
         await window.TK168FormSubmit.send({
           form: 'stock-confirm',
@@ -272,12 +272,13 @@
             isRentalDetail: Boolean(draft.isRentalDetail)
           }
         });
+        window.TK168FormSubmit.markSubmitSuccess(refs.submitBtn);
         setMessage(getText().messages.success, true);
         clearDraft();
       } catch (submitError) {
         console.error('[stock-confirm-review] submit failed', submitError);
         setMessage(window.TK168FormSubmit.networkErrorMessage(), false);
-        refs.submitBtn.disabled = false;
+        window.TK168FormSubmit.resetSubmitButton(refs.submitBtn);
       }
     });
   }

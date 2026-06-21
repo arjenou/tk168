@@ -7,7 +7,7 @@
       pageTitle: '增值服务预约 — TK168 Premium Automotive',
       eyebrow: 'VALUE-ADDED SERVICE DESK',
       title: '增值服务预约单',
-      subtitle: '先在一页填完需求，再在确认页核对后提交。',
+      subtitle: '请在一页内填写下列信息，核对后点击「提交」发送。',
       cardLabel: 'Service Coordination',
       cardTitle: 'TK168 增值服务协同台',
       cardMeta: '购前评估 / 手续资料 / 交付协同 / 维修保养 / 年检续保',
@@ -77,8 +77,7 @@
       },
       actions: {
         prev: '返回修改',
-        toReview: '前往确认',
-        submit: '确认提交'
+        submit: '提交'
       },
       message: {
         appointmentRequired: '请填写希望联系日期、时间和沟通方式。',
@@ -94,7 +93,7 @@
       pageTitle: '付加サービス予約 — TK168 Premium Automotive',
       eyebrow: 'VALUE-ADDED SERVICE DESK',
       title: '付加サービス予約フォーム',
-      subtitle: '必要事項を1ページにまとめて入力し、確認ページで内容を確認してから送信します。',
+      subtitle: '必要事項をこのページで入力し、「送信する」を押して送信してください。',
       cardLabel: 'Service Coordination',
       cardTitle: 'TK168 付加サービス窓口',
       cardMeta: '購入前評価 / 書類連携 / 納車調整 / 整備メンテナンス / 車検更新',
@@ -164,8 +163,7 @@
       },
       actions: {
         prev: '入力に戻る',
-        toReview: '内容を確認する',
-        submit: 'この内容で送信'
+        submit: '送信する'
       },
       message: {
         appointmentRequired: '希望する連絡日時と相談方法を入力してください。',
@@ -181,7 +179,7 @@
       pageTitle: 'Service Booking — TK168 Premium Automotive',
       eyebrow: 'VALUE-ADDED SERVICE DESK',
       title: 'Value-added Service Booking',
-      subtitle: 'Fill everything on one page, review the summary, then submit.',
+      subtitle: 'Fill in all required fields on this page, then tap Send to submit.',
       cardLabel: 'Service Coordination',
       cardTitle: 'TK168 Service Coordination Desk',
       cardMeta: 'Pre-purchase review / documents / delivery coordination / maintenance / inspection renewal',
@@ -251,8 +249,7 @@
       },
       actions: {
         prev: 'Back to edit',
-        toReview: 'Continue to review',
-        submit: 'Submit request'
+        submit: 'Send'
       },
       message: {
         appointmentRequired: 'Please enter the preferred contact date, time, and consultation method.',
@@ -572,15 +569,15 @@
 
   function renderProgress() {
     refs.progress.forEach((item, idx) => {
-      item.classList.toggle('is-active', idx === currentStep);
-      item.classList.toggle('is-done', idx < currentStep);
+      item.classList.toggle('is-active', idx === 0);
+      item.classList.toggle('is-done', false);
     });
   }
 
   function applyBoardStep() {
     if (!refs.board) return;
-    refs.board.classList.toggle('is-step-edit', currentStep === 0);
-    refs.board.classList.toggle('is-step-review', currentStep === 1);
+    refs.board.classList.add('is-step-edit');
+    refs.board.classList.remove('is-step-review');
     refs.rows.forEach((row) => row.classList.remove('is-active'));
   }
 
@@ -590,14 +587,14 @@
 
   function renderActions() {
     const copy = currentCopy();
-    refs.prevBtn.disabled = currentStep === 0;
-    refs.nextBtn.textContent = currentStep === 0 ? copy.actions.toReview : copy.actions.submit;
-    refs.counter.textContent = `${currentStep + 1} / ${FLOW_KEYS.length}`;
+    refs.prevBtn.disabled = true;
+    refs.nextBtn.textContent = window.TK168FormSubmit?.submitLabel?.() || copy.actions.submit;
+    refs.counter.textContent = `1 / 1`;
   }
 
   function renderHead() {
     const copy = currentCopy();
-    refs.lead.textContent = currentStep === 0 ? copy.flow.editLead : copy.flow.reviewLead;
+    refs.lead.textContent = copy.flow.editLead;
   }
 
   function clearMessage() {
@@ -692,28 +689,18 @@
 
   function bindStepEvents() {
     refs.prevBtn.addEventListener('click', () => {
-      moveStep(currentStep - 1);
+      moveStep(0);
     });
 
     refs.nextBtn.addEventListener('click', async () => {
       syncStateFromInputs();
-      if (currentStep === 0) {
-        const error = validateAllSections();
-        if (error) {
-          setMessage(error, false);
-          return;
-        }
-        moveStep(1);
-        return;
-      }
-
       const error = validateAllSections();
       if (error) {
         setMessage(error, false);
         return;
       }
 
-      refs.nextBtn.disabled = true;
+      window.TK168FormSubmit.beginSubmit(refs.nextBtn);
       try {
         await window.TK168FormSubmit.send({
           form: 'service-appointment',
@@ -722,43 +709,13 @@
             serviceTitle: refs.cardTitle?.textContent || ''
           }
         });
+        window.TK168FormSubmit.markSubmitSuccess(refs.nextBtn);
         setMessage(currentCopy().message.submitSuccess, true);
       } catch (submitError) {
         console.error('[service-appointment] submit failed', submitError);
         setMessage(window.TK168FormSubmit.networkErrorMessage(), false);
-        refs.nextBtn.disabled = false;
+        window.TK168FormSubmit.resetSubmitButton(refs.nextBtn);
       }
-    });
-
-    refs.jumpStepButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        const value = Number(button.dataset.jumpStep || 0);
-        if (value === 1 && currentStep === 0) {
-          syncStateFromInputs();
-          const err = validateAllSections();
-          if (err) {
-            setMessage(err, false);
-            return;
-          }
-        }
-        moveStep(value);
-      });
-    });
-
-    refs.jumpRowButtons.forEach((button) => {
-      button.addEventListener('click', (event) => {
-        event.stopPropagation();
-        if (currentStep !== 1) return;
-        moveStep(0);
-      });
-    });
-
-    refs.rows.forEach((row) => {
-      row.addEventListener('click', (event) => {
-        if (event.target.closest('.inq-editor')) return;
-        if (currentStep !== 1) return;
-        moveStep(0);
-      });
     });
   }
 
