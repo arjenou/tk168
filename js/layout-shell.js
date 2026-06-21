@@ -12,6 +12,7 @@
             <a href="rental.html" class="nav-link" data-nav-key="rental" data-i18n="nav.rental">レンタカー事業</a>
             <a href="service.html" class="nav-link" data-nav-key="service" data-i18n="nav.services">サービス案内</a>
             <a href="favorites.html" class="nav-link" data-nav-key="favorite" data-i18n="nav.favorite">お気に入り</a>
+            <a href="https://moon.tk168.co.jp" class="nav-link" data-nav-key="spacekart" data-i18n="nav.spacekart" target="_blank" rel="noopener noreferrer">Spacekart</a>
           </div>
 
           <div class="nav-lang" data-lang-switcher>
