@@ -114,6 +114,71 @@ const STEERING_OPTIONS = [
   { label: "— / ― / —", zh: "—", ja: "―", en: "—" },
 ];
 
+/** 车检：有则填写年月日，没有则仅标记无车检。存库仍为 { zh, ja, en } 预设 JSON。 */
+function parseInspectionDateString(str) {
+  const s = String(str || "").trim();
+  if (!s) return { year: "", month: "", day: "" };
+  let m = s.match(/(\d{4})[（(]?[^）)]*[）)]?年\s*(\d{1,2})月(?:\s*(\d{1,2})日)?/);
+  if (m) return { year: m[1], month: m[2], day: m[3] || "" };
+  m = s.match(/(\d{4})\s*[/.\-]\s*(\d{1,2})(?:\s*[/.\-]\s*(\d{1,2}))?/);
+  if (m) return { year: m[1], month: m[2], day: m[3] || "" };
+  return { year: "", month: "", day: "" };
+}
+
+function parseInspectionStoredValue(stored) {
+  const v = stored || {};
+  const zh = String(v.zh ?? "").trim();
+  const ja = String(v.ja ?? "").trim();
+  const en = String(v.en ?? "").trim();
+  if (!zh && !ja && !en) return { mode: "", year: "", month: "", day: "" };
+  if (["没有", "なし", "无", "否"].includes(zh) || ["没有", "なし", "无", "否"].includes(ja)) {
+    return { mode: "no", year: "", month: "", day: "" };
+  }
+  if (/^none$/i.test(en) || en === "No") return { mode: "no", year: "", month: "", day: "" };
+  if (["有", "あり", "Yes", "是"].includes(zh) || ["有", "あり"].includes(ja)) {
+    const parsed = parseInspectionDateString(zh) || parseInspectionDateString(ja) || parseInspectionDateString(en);
+    return { mode: "yes", year: parsed.year, month: parsed.month, day: parsed.day };
+  }
+  const parsed = parseInspectionDateString(zh || ja || en);
+  if (parsed.year) return { mode: "yes", ...parsed };
+  return { mode: "", year: "", month: "", day: "" };
+}
+
+function buildInspectionPresetFromInputs(mode, year, month, day) {
+  if (!mode) return { zh: "", ja: "", en: "" };
+  if (mode === "no") return { zh: "没有", ja: "なし", en: "None" };
+  const y = String(year ?? "").trim();
+  const mo = String(month ?? "").trim();
+  const d = String(day ?? "").trim();
+  if (!y && !mo && !d) return { zh: "有", ja: "あり", en: "Yes" };
+  const moNum = mo ? String(Number(mo)) : "";
+  const dNum = d ? String(Number(d)) : "";
+  let zh = y ? `${y}年` : "";
+  if (moNum) zh += `${moNum}月`;
+  if (dNum) zh += `${dNum}日`;
+  const ja = zh.replace(/（/g, "(").replace(/）/g, ")");
+  const enParts = [y, moNum, dNum].filter(Boolean);
+  const en = enParts.length ? enParts.join(" / ") : "Yes";
+  return { zh, ja: ja || zh, en };
+}
+
+function syncInspectionPresetFromDom(key) {
+  const modeEl = document.querySelector(`[data-inspection-mode="${key}"]`);
+  if (!modeEl) return;
+  const mode = modeEl.value;
+  const year = document.querySelector(`[data-inspection-year="${key}"]`)?.value ?? "";
+  const month = document.querySelector(`[data-inspection-month="${key}"]`)?.value ?? "";
+  const day = document.querySelector(`[data-inspection-day="${key}"]`)?.value ?? "";
+  state.editingDraft[key] = buildInspectionPresetFromInputs(mode, year, month, day);
+}
+
+function toggleInspectionDateFields(key) {
+  const modeEl = document.querySelector(`[data-inspection-mode="${key}"]`);
+  const wrap = document.querySelector(`[data-inspection-date="${key}"]`);
+  if (!modeEl || !wrap) return;
+  wrap.hidden = modeEl.value !== "yes";
+}
+
 // Resource descriptors drive the list + editor UIs so we keep a single
 // code path for the two inventories.
 const RESOURCES = {
@@ -222,7 +287,7 @@ const RESOURCES = {
       ["condDealerWarranty", "店铺质保", "select", YES_NO_DASH],
       ["condOneOwner", "一手车主", "select", YES_NO_DASH],
       ["listingRepairHistory", "修复历", "select", YES_NO_DASH],
-      ["listingVehicleInspection", "车检", "select", YES_NO_DASH],
+      ["listingVehicleInspection", "车检", "inspectionWithDate"],
       ["listingLegalMaintenance", "法定整备", "select", YES_NO_DASH],
       ["listingFuelGrade", "挂牌油种", "select", FUEL_GRADE_OPTIONS],
       ["highlightSteering", "方向盘", "select", STEERING_OPTIONS],
@@ -2175,9 +2240,38 @@ function adminPresetOptionMatchesStored(opt, stored) {
   return vj === String(opt.ja ?? "").trim();
 }
 
+function renderInspectionWithDateField(key, label, draft) {
+  const parsed = parseInspectionStoredValue(draft[key]);
+  const mode = parsed.mode;
+  const showDate = mode === "yes";
+  return `
+    <div class="admin-field admin-col-6">
+      <label>${escapeHtml(label)}</label>
+      <select class="admin-input" data-inspection-mode="${key}">
+        <option value="" ${!mode ? "selected" : ""}>未填</option>
+        <option value="yes" ${mode === "yes" ? "selected" : ""}>有 / あり / Yes</option>
+        <option value="no" ${mode === "no" ? "selected" : ""}>没有 / なし / None</option>
+      </select>
+      <div class="admin-inspection-date" data-inspection-date="${key}" ${showDate ? "" : "hidden"}>
+        <div class="admin-inspection-date-row">
+          <input class="admin-input" type="number" inputmode="numeric" min="1900" max="2100" placeholder="年" data-inspection-year="${key}" value="${escapeAttr(parsed.year)}">
+          <span class="admin-inspection-date-sep">/</span>
+          <input class="admin-input" type="number" inputmode="numeric" min="1" max="12" placeholder="月" data-inspection-month="${key}" value="${escapeAttr(parsed.month)}">
+          <span class="admin-inspection-date-sep">/</span>
+          <input class="admin-input" type="number" inputmode="numeric" min="1" max="31" placeholder="日" data-inspection-day="${key}" value="${escapeAttr(parsed.day)}">
+        </div>
+      </div>
+    </div>`;
+}
+
 function renderSpecsTab(r, draft) {
   const selectRows = r.presets.filter((p) => p[2] === "select");
-  const textRows = r.presets.filter((p) => p[2] !== "select");
+  const inspectionRows = r.presets.filter((p) => p[2] === "inspectionWithDate");
+  const textRows = r.presets.filter((p) => p[2] !== "select" && p[2] !== "inspectionWithDate");
+
+  const inspectionHtml = inspectionRows
+    .map(([key, label]) => renderInspectionWithDateField(key, label, draft))
+    .join("");
 
   const selectHtml = selectRows.map(([key, label, _kind, options]) => {
     const v = draft[key] || {};
@@ -2224,7 +2318,7 @@ function renderSpecsTab(r, draft) {
         <h3>状态选项</h3>
         <p>下拉选择预设好的中 / 日 / 英文案，不会手误。</p>
       </div>
-      <div class="admin-grid-12">${selectHtml}</div>
+      <div class="admin-grid-12">${inspectionHtml}${selectHtml}</div>
     </section>
 
     ${textRows.length ? `
@@ -2683,6 +2777,20 @@ function bindEditor() {
     });
   });
 
+  document.querySelectorAll("[data-inspection-mode]").forEach((select) => {
+    const key = select.dataset.inspectionMode;
+    const sync = () => {
+      toggleInspectionDateFields(key);
+      syncInspectionPresetFromDom(key);
+    };
+    select.addEventListener("change", sync);
+    toggleInspectionDateFields(key);
+  });
+  document.querySelectorAll("[data-inspection-year], [data-inspection-month], [data-inspection-day]").forEach((input) => {
+    const key = input.dataset.inspectionYear || input.dataset.inspectionMonth || input.dataset.inspectionDay;
+    input.addEventListener("input", () => syncInspectionPresetFromDom(key));
+  });
+
   document.querySelectorAll("[data-overview]").forEach((textarea) => {
     textarea.addEventListener("input", () => {
       const lang = textarea.dataset.overview;
@@ -3005,6 +3113,9 @@ async function saveItem() {
 
   // Strip empty preset objects so they persist as NULL instead of {zh:"",ja:""}
   const payload = { ...draft };
+  (r.presets || []).forEach(([key, , kind]) => {
+    if (kind === "inspectionWithDate") syncInspectionPresetFromDom(key);
+  });
   (r.presets || []).forEach(([key]) => {
     const v = payload[key];
     if (v && typeof v === "object" && !v.zh && !v.ja && !v.en) payload[key] = null;

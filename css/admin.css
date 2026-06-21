@@ -683,6 +683,23 @@ button { font: inherit; cursor: pointer; }
   line-height: 1.45;
 }
 
+.admin-inspection-date {
+  margin-top: 8px;
+}
+
+.admin-inspection-date-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-inspection-date-sep {
+  color: var(--admin-text-muted);
+  font-size: 13px;
+  user-select: none;
+}
+
 /* Language tabs for overview textareas */
 .admin-lang-tabs {
   display: inline-flex;

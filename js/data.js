@@ -1319,6 +1319,8 @@ window.TK168_DATA = (() => {
     const basicMap = {
       是: 'Yes',
       否: 'No',
+      有: 'Yes',
+      没有: 'None',
       无: 'None',
       附: 'Included',
       整备付: 'Service included',
