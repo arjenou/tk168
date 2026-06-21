@@ -105,7 +105,7 @@
         whatsapp: 'WhatsApp',
         consentNews: '空き状況や新着車両情報を受け取る',
         consentPolicy: '利用規約とプライバシーポリシーに同意する',
-        consentIdpDeposit: 'IDP国際免許証を利用する場合、10万円の預かり金が必要です'
+        consentIdpDeposit: 'IDP（国際運転免許証）利用時、保証金10万円を預けることに同意する'
       },
       message: {
         missingDraft: '入力内容が見つかりません。フォームから再度お進みください。',

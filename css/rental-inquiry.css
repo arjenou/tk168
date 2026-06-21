@@ -187,12 +187,35 @@
 
 .riq-delivery-radios {
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
-  gap: 14px 20px;
+  align-items: center;
+  gap: 14px 24px;
 }
 
-.riq-radio-label {
+.inq-editor label.riq-radio-label {
+  display: inline-flex !important;
+  flex-direction: row;
   align-items: center;
+  gap: 8px;
+  margin-top: 0;
+  width: auto;
+  min-width: max-content;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.riq-radio-label input[type='radio'] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex: 0 0 16px;
+}
+
+.riq-radio-label span {
+  white-space: nowrap;
+  line-height: 1.2;
+  writing-mode: horizontal-tb;
 }
 
 .riq-conditional-block {

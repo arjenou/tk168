@@ -96,7 +96,9 @@
         consentRequired: '请先同意使用条款与隐私政策。',
         submitSuccess: '租车咨询内容已整理完成，请按填写的联系方式继续与顾问沟通。',
         storageError: '无法暂存表单，请检查浏览器是否禁用本地存储后重试。'
-      }
+      },
+      footnoteLine1: '若您希望的来店时间无法安排，我们可能会通过电话与您另行协调。',
+      footnoteLine2: '您提供的个人信息将用于车辆收购、销售等本公司服务的介绍（电话、邮件等）及相关服务提供。'
     },
     ja: {
       pageTitle: 'レンタル相談 — TK168 Premium Automotive',
@@ -150,7 +152,7 @@
         deliveryAddressLabel: '配達先住所',
         deliveryAddressPlaceholder: '郵便番号、住所、建物名・部屋番号までご記入ください',
         consentNews: '空き状況や新着車両情報を受け取る',
-        consentIdpDeposit: 'IDP国際免許証を利用する場合、10万円の預かり金が必要です'
+        consentIdpDeposit: 'IDP（国際運転免許証）利用時、保証金10万円を預けることに同意する'
       },
       summary: {
         empty: '未入力',
@@ -176,7 +178,9 @@
         consentRequired: '利用規約とプライバシーポリシーへの同意が必要です。',
         submitSuccess: 'レンタル相談内容の整理が完了しました。入力した連絡先をもとに担当窓口との確認を進めてください。',
         storageError: '入力内容を一時保存できませんでした。ブラウザの設定をご確認のうえ、再度お試しください。'
-      }
+      },
+      footnoteLine1: 'ご希望の日時で承れない場合は、お電話にてご調整させていただく場合がございます。',
+      footnoteLine2: 'お客様からご提供頂いた個人情報は、お車の買取、販売など当社サービスのご案内（電話・メール等）及びご提供のために利用いたします。'
     },
     en: {
       pageTitle: 'Rental Inquiry — TK168 Premium Automotive',
@@ -256,7 +260,9 @@
         consentRequired: 'You must agree to the terms of use and privacy policy first.',
         submitSuccess: 'The rental inquiry details are organized. Please continue the confirmation using the contact details you entered.',
         storageError: 'Could not save your answers locally. Please check browser storage settings and try again.'
-      }
+      },
+      footnoteLine1: 'If your preferred visit time cannot be accommodated, we may contact you by phone to arrange an alternative.',
+      footnoteLine2: 'Personal information you provide will be used to introduce and deliver our services, including vehicle purchase and sales (by phone, email, and other means).'
     }
   };
 
@@ -383,6 +389,8 @@
     board: document.getElementById('riqBoard'),
     lead: document.getElementById('riqLeadText'),
     message: document.getElementById('riqMessage'),
+    footnoteLine1: document.getElementById('riqFootnoteLine1'),
+    footnoteLine2: document.getElementById('riqFootnoteLine2'),
     contactHint: document.getElementById('riqContactHint'),
     confirmBtn: document.getElementById('riqConfirmBtn'),
     rows: Array.from(document.querySelectorAll('.inq-row')),
@@ -533,6 +541,9 @@
     setText(refs.deliveryMethodLabel, copy.fields.deliveryMethodLabel);
     setText(refs.deliveryVisitLabel, copy.fields.deliveryVisit);
     setText(refs.deliveryShipLabel, copy.fields.deliveryShip);
+
+    setText(refs.footnoteLine1, copy.footnoteLine1);
+    setText(refs.footnoteLine2, copy.footnoteLine2);
 
     setText(refs.optionLabels.timePlaceholder, copy.fields.timePlaceholder);
     setText(refs.optionLabels.storePlaceholder, copy.fields.storePlaceholder);
