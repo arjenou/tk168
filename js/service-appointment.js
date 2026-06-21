@@ -67,8 +67,7 @@
         phone: '电话号码',
         region: '所在城市 / 地区',
         regionPlaceholder: '例如：东京 / 大阪 / 香港',
-        consentNews: '接收服务进度与新到库存资讯',
-        consentPolicy: '同意使用条款与隐私政策'
+        consentNews: '接收服务进度与新到库存资讯'
       },
       summary: {
         empty: '未填写',
@@ -155,8 +154,7 @@
         phone: '電話番号',
         region: '所在都市 / 地域',
         regionPlaceholder: '例：東京 / 大阪 / 香港',
-        consentNews: '進行案内や新着在庫情報を受け取る',
-        consentPolicy: '利用規約とプライバシーポリシーに同意する'
+        consentNews: '進行案内や新着在庫情報を受け取る'
       },
       summary: {
         empty: '未入力',
@@ -243,8 +241,7 @@
         phone: 'Phone number',
         region: 'City / region',
         regionPlaceholder: 'For example: Tokyo / Osaka / Hong Kong',
-        consentNews: 'Receive service progress updates and new stock notifications',
-        consentPolicy: 'I agree to the terms of use and privacy policy'
+        consentNews: 'Receive service progress updates and new stock notifications'
       },
       summary: {
         empty: 'Not provided',
@@ -379,8 +376,7 @@
       email: document.getElementById('svcEmailLabel'),
       phone: document.getElementById('svcPhoneLabel'),
       region: document.getElementById('svcRegionLabel'),
-      consentNews: document.getElementById('svcConsentNewsLabel'),
-      consentPolicy: document.getElementById('svcConsentPolicyLabel')
+      consentNews: document.getElementById('svcConsentNewsLabel')
     },
     optionLabels: {
       timePlaceholder: document.getElementById('svcTimePlaceholder'),
@@ -469,7 +465,8 @@
     setText(refs.fieldLabels.phone, copy.fields.phone);
     setText(refs.fieldLabels.region, copy.fields.region);
     setText(refs.fieldLabels.consentNews, copy.fields.consentNews);
-    setText(refs.fieldLabels.consentPolicy, copy.fields.consentPolicy);
+
+    window.TK168LegalConsentLabel?.init?.(document, currentLanguage());
 
     setText(refs.optionLabels.timePlaceholder, copy.fields.timePlaceholder);
     setText(refs.optionLabels.modePlaceholder, copy.fields.modePlaceholder);
@@ -633,7 +630,9 @@
     }
     if (sectionKey === 'confirm') {
       if (!sanitize(state.region)) return msg.regionRequired;
-      if (!state.consentPolicy) return msg.consentRequired;
+      if (!state.consentPolicy) {
+        return window.TK168LegalConsentLabel?.getConsentRequiredMessage?.(currentLanguage()) || msg.consentRequired;
+      }
       return '';
     }
     return '';
@@ -755,7 +754,7 @@
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const dd = String(now.getDate()).padStart(2, '0');
     refs.date.value = `${yyyy}-${mm}-${dd}`;
-    refs.time.value = '13:00';
+    refs.time.value = window.TK168FormTimeSlots?.DEFAULT_TIME || '13:00';
     syncStateFromInputs();
   }
 

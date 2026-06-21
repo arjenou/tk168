@@ -149,7 +149,9 @@
                 </label>
                 <label class="inq-check">
                   <input type="checkbox" id="scConsentPolicy">
-                  <span id="scConsentPolicyText">利用規約とプライバシーポリシーに同意する</span>
+                  <span class="inq-check-text" data-legal-consent-label>
+                    <span data-legal-consent-prefix></span><a href="terms-of-use.html" class="inq-policy-link" data-legal-consent-terms target="_blank" rel="noopener noreferrer">利用規約</a><span data-legal-consent-middle">と</span><a href="privacy-policy.html" class="inq-policy-link" data-legal-consent-privacy target="_blank" rel="noopener noreferrer">プライバシーポリシー</a><span data-legal-consent-suffix">に同意する</span>
+                  </span>
                 </label>
               </div>
             </div>
@@ -175,6 +177,7 @@
   <script defer src="js/i18n.js?v=20260621b"></script>
   <script defer src="js/common-links.js?v=20260419a"></script>
   <script defer src="js/page-chrome.js?v=20260601a"></script>
+  <script defer src="js/legal-consent-label.js?v=20260621a"></script>
   <script defer src="js/stock-confirm-i18n.js?v=20260620p"></script>
   <script defer src="js/stock-confirm.js?v=20260620o"></script>
 </body>

@@ -180,8 +180,7 @@
       document.getElementById('scEditContact'),
       document.getElementById('scEditConfirm')
     ],
-    consentNewsText: document.getElementById('scConsentNewsText'),
-    consentPolicyText: document.getElementById('scConsentPolicyText')
+    consentNewsText: document.getElementById('scConsentNewsText')
   };
 
   function requestTypeLabel(value) {
@@ -277,7 +276,7 @@
     refs.backBtn.textContent = text.buttons.prev;
     refs.confirmBtn.textContent = text.buttons.confirm;
     refs.consentNewsText.textContent = text.consentNews;
-    refs.consentPolicyText.textContent = text.consentPolicy;
+    window.TK168LegalConsentLabel?.init?.(document, getLanguage());
 
     const prevType = state.requestType;
     refs.requestType.innerHTML = `
@@ -334,7 +333,9 @@
       return '';
     }
     if (stepKey === 'confirm') {
-      if (!state.consentPolicy) return text.messages.policy;
+      if (!state.consentPolicy) {
+        return window.TK168LegalConsentLabel?.getConsentRequiredMessage?.(getLanguage()) || text.messages.policy;
+      }
       return '';
     }
     return '';

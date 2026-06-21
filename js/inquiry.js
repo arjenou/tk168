@@ -10,7 +10,7 @@
   } = window.TK168_DATA;
 
   const FLOW_KEYS = ['edit', 'review'];
-  const SECTION_KEYS = ['appointment', 'name', 'kana', 'contact', 'confirm'];
+  const SECTION_KEYS = ['appointment', 'name', 'kana', 'contact'];
 
   const COPY = {
     zh: {
@@ -25,8 +25,7 @@
         appointment: { tab: '来店时间', row: '来店希望时间', lead: '请选择希望到店时间。' },
         name: { tab: '姓名', row: '姓名', lead: '请输入你的姓名。' },
         kana: { tab: '读音', row: '姓名读音', lead: '请输入姓名读音（片假名）。' },
-        contact: { tab: '联系方式', row: '邮箱 / 电话', lead: '请输入可联系到你的邮箱和电话。' },
-        confirm: { tab: '确认', row: '内容确认', lead: '确认信息无误后完成预约内容整理。' }
+        contact: { tab: '联系方式', row: '邮箱 / 电话', lead: '请输入可联系到你的邮箱和电话。' }
       },
       required: '必填',
       edit: '修改',
@@ -42,15 +41,12 @@
         kanaPlaceholder: 'チョウ サン',
         email: '邮箱地址',
         phone: '电话号码',
-        postal: '邮编',
-        consentNews: '接收新到库存和活动资讯',
-        consentPolicy: '同意使用条款与隐私政策'
+        consentNews: '接收新到库存和活动资讯'
       },
       summary: {
         empty: '未填写',
-        unconfirmed: '未确认',
-        pendingPolicy: '邮编 {postal} / 待同意条款',
-        readyToSend: '邮编 {postal} / 内容已确认'
+        policyPending: '待同意条款',
+        policyConfirmed: '条款已同意'
       },
       actions: {
         toReview: '确认',
@@ -61,11 +57,9 @@
         nameRequired: '请输入姓名。',
         kanaRequired: '请输入姓名读音。',
         contactRequired: '请填写邮箱和电话号码。',
-        postalRequired: '请输入邮编。',
         consentRequired: '请先同意使用条款与隐私政策。',
         submitSuccess: '预约内容已整理完成，请按填写的联系方式继续与顾问沟通。'
-      },
-      vehicleStatus: '现车'
+      }
     },
     ja: {
       pageTitle: '来店予約 — TK168 Premium Automotive',
@@ -79,8 +73,7 @@
         appointment: { tab: '来店希望', row: '来店希望日時', lead: '来店希望日時を選択してください。' },
         name: { tab: '氏名', row: '氏名', lead: 'お名前を入力してください。' },
         kana: { tab: 'フリガナ', row: 'フリガナ', lead: 'フリガナを入力してください。' },
-        contact: { tab: '連絡先', row: 'メール / 電話', lead: 'ご連絡先を入力してください。' },
-        confirm: { tab: '確認', row: '内容確認', lead: '最終確認のうえ内容整理を完了してください。' }
+        contact: { tab: '連絡先', row: 'メール / 電話', lead: 'ご連絡先を入力してください。' }
       },
       required: '必須',
       edit: '修正する',
@@ -96,15 +89,12 @@
         kanaPlaceholder: 'ヤマダ タロウ',
         email: 'メールアドレス',
         phone: '電話番号',
-        postal: '郵便番号',
-        consentNews: '新着在庫やキャンペーン情報を受け取る',
-        consentPolicy: '利用規約とプライバシーポリシーに同意する'
+        consentNews: '新着在庫やキャンペーン情報を受け取る'
       },
       summary: {
         empty: '未入力',
-        unconfirmed: '未確認',
-        pendingPolicy: '〒{postal} / 規約同意待ち',
-        readyToSend: '〒{postal} / 内容確認済み'
+        policyPending: '規約同意待ち',
+        policyConfirmed: '規約同意済み'
       },
       actions: {
         toReview: '確認',
@@ -115,11 +105,9 @@
         nameRequired: '氏名を入力してください。',
         kanaRequired: 'フリガナを入力してください。',
         contactRequired: 'メールアドレスと電話番号を入力してください。',
-        postalRequired: '郵便番号を入力してください。',
         consentRequired: '利用規約とプライバシーポリシーへの同意が必要です。',
         submitSuccess: '予約内容の整理が完了しました。入力した連絡先をもとに担当窓口との確認を進めてください。'
-      },
-      vehicleStatus: '在庫あり'
+      }
     },
     en: {
       pageTitle: 'Visit Booking — TK168 Premium Automotive',
@@ -133,8 +121,7 @@
         appointment: { tab: 'Visit time', row: 'Preferred visit time', lead: 'Select your preferred visit date and time.' },
         name: { tab: 'Name', row: 'Full name', lead: 'Enter your name.' },
         kana: { tab: 'Name reading', row: 'Name reading', lead: 'Enter the phonetic reading of your name.' },
-        contact: { tab: 'Contact', row: 'Email / phone', lead: 'Enter the contact details we can use to reach you.' },
-        confirm: { tab: 'Confirm', row: 'Content review', lead: 'Review everything and complete the booking summary.' }
+        contact: { tab: 'Contact', row: 'Email / phone', lead: 'Enter the contact details we can use to reach you.' }
       },
       required: 'Required',
       edit: 'Edit',
@@ -150,15 +137,12 @@
         kanaPlaceholder: 'Taro Yamada',
         email: 'Email address',
         phone: 'Phone number',
-        postal: 'Postal code',
-        consentNews: 'Receive stock updates and event news',
-        consentPolicy: 'I agree to the terms of use and privacy policy'
+        consentNews: 'Receive stock updates and event news'
       },
       summary: {
         empty: 'Not provided',
-        unconfirmed: 'Not confirmed',
-        pendingPolicy: 'Postal code {postal} / policy consent pending',
-        readyToSend: 'Postal code {postal} / details confirmed'
+        policyPending: 'Terms consent pending',
+        policyConfirmed: 'Terms agreed'
       },
       actions: {
         toReview: 'Confirm',
@@ -169,11 +153,9 @@
         nameRequired: 'Please enter your name.',
         kanaRequired: 'Please enter the phonetic reading of your name.',
         contactRequired: 'Please enter your email address and phone number.',
-        postalRequired: 'Please enter your postal code.',
         consentRequired: 'You must agree to the terms of use and privacy policy first.',
         submitSuccess: 'The booking details are organized. Please continue the confirmation using the contact details you entered.'
-      },
-      vehicleStatus: 'In stock'
+      }
     }
   };
 
@@ -183,10 +165,6 @@
 
   function currentCopy() {
     return COPY[currentLanguage()] || COPY.ja || COPY.zh;
-  }
-
-  function formatTemplate(template, params) {
-    return String(template || '').replace(/\{(\w+)\}/g, (_, key) => params?.[key] ?? '');
   }
 
   const INQUIRY_VEHICLE_ID_KEY = 'tk168:inquiryVehicleId';
@@ -254,7 +232,6 @@
     kana: '',
     email: '',
     phone: '',
-    postal: '',
     consentNews: false,
     consentPolicy: false
   };
@@ -279,14 +256,12 @@
     kana: document.getElementById('inqKana'),
     email: document.getElementById('inqEmail'),
     phone: document.getElementById('inqPhone'),
-    postal: document.getElementById('inqPostal'),
     consentNews: document.getElementById('inqConsentNews'),
     consentPolicy: document.getElementById('inqConsentPolicy'),
     summaryAppointment: document.getElementById('inqSummaryAppointment'),
     summaryName: document.getElementById('inqSummaryName'),
     summaryKana: document.getElementById('inqSummaryKana'),
     summaryContact: document.getElementById('inqSummaryContact'),
-    summaryConfirm: document.getElementById('inqSummaryConfirm'),
     vehicleThumb: document.getElementById('inqVehicleThumb'),
     vehicleBrand: document.getElementById('inqVehicleBrand'),
     vehicleName: document.getElementById('inqVehicleName'),
@@ -295,15 +270,13 @@
       appointment: document.getElementById('inqRowAppointment'),
       name: document.getElementById('inqRowName'),
       kana: document.getElementById('inqRowKana'),
-      contact: document.getElementById('inqRowContact'),
-      confirm: document.getElementById('inqRowConfirm')
+      contact: document.getElementById('inqRowContact')
     },
     editLabels: {
       appointment: document.getElementById('inqEditAppointment'),
       name: document.getElementById('inqEditName'),
       kana: document.getElementById('inqEditKana'),
-      contact: document.getElementById('inqEditContact'),
-      confirm: document.getElementById('inqEditConfirm')
+      contact: document.getElementById('inqEditContact')
     },
     fieldLabels: {
       date: document.getElementById('inqDateLabel'),
@@ -313,9 +286,7 @@
       kana: document.getElementById('inqKanaLabel'),
       email: document.getElementById('inqEmailLabel'),
       phone: document.getElementById('inqPhoneLabel'),
-      postal: document.getElementById('inqPostalLabel'),
-      consentNews: document.getElementById('inqConsentNewsLabel'),
-      consentPolicy: document.getElementById('inqConsentPolicyLabel')
+      consentNews: document.getElementById('inqConsentNewsLabel')
     },
     timePlaceholder: document.getElementById('inqTimePlaceholder')
   };
@@ -361,9 +332,9 @@
     setText(refs.fieldLabels.kana, copy.fields.kana);
     setText(refs.fieldLabels.email, copy.fields.email);
     setText(refs.fieldLabels.phone, copy.fields.phone);
-    setText(refs.fieldLabels.postal, copy.fields.postal);
     setText(refs.fieldLabels.consentNews, copy.fields.consentNews);
-    setText(refs.fieldLabels.consentPolicy, copy.fields.consentPolicy);
+
+    window.TK168LegalConsentLabel?.init?.(document, currentLanguage());
 
     setText(refs.timePlaceholder, copy.fields.timePlaceholder);
     setPlaceholder(refs.note, copy.fields.notePlaceholder);
@@ -382,7 +353,6 @@
     const engineLine = window.TK168_DATA?.formatVehicleEngineLine?.(vehicle) || sanitize(vehicle.engine);
     const mileageDisplay =
       window.TK168_DATA?.formatVehicleMileageDisplay?.(vehicle.mileage, language, vehicle.mileageUnit) || '';
-    const statusText = currentCopy().vehicleStatus;
 
     if (refs.vehicleThumb) {
       refs.vehicleThumb.src = image;
@@ -395,7 +365,7 @@
       refs.vehicleName.textContent = getVehicleName(vehicle, language);
     }
     if (refs.vehicleMeta) {
-      refs.vehicleMeta.textContent = [year, typeLabel, engineLine, mileageDisplay, statusText]
+      refs.vehicleMeta.textContent = [year, typeLabel, engineLine, mileageDisplay]
         .filter(Boolean)
         .join(' / ');
     }
@@ -411,20 +381,16 @@
   function buildContactSummary() {
     const email = sanitize(state.email);
     const phone = sanitize(state.phone);
-    if (!email && !phone) return currentCopy().summary.empty;
-    if (!email) return phone;
-    if (!phone) return email;
-    return `${email} / ${phone}`;
-  }
-
-  function buildConfirmSummary() {
-    const postal = sanitize(state.postal);
     const copy = currentCopy();
-    if (!postal) return copy.summary.unconfirmed;
-    if (!state.consentPolicy) {
-      return formatTemplate(copy.summary.pendingPolicy, { postal });
-    }
-    return formatTemplate(copy.summary.readyToSend, { postal });
+    const contactParts = [];
+    if (email && phone) contactParts.push(`${email} / ${phone}`);
+    else if (email) contactParts.push(email);
+    else if (phone) contactParts.push(phone);
+
+    if (!contactParts.length) return copy.summary.empty;
+
+    const policyLabel = state.consentPolicy ? copy.summary.policyConfirmed : copy.summary.policyPending;
+    return `${contactParts.join('')} / ${policyLabel}`;
   }
 
   function syncStateFromInputs() {
@@ -435,7 +401,6 @@
     state.kana = refs.kana.value;
     state.email = refs.email.value;
     state.phone = refs.phone.value;
-    state.postal = refs.postal.value;
     state.consentNews = refs.consentNews.checked;
     state.consentPolicy = refs.consentPolicy.checked;
   }
@@ -446,7 +411,6 @@
     refs.summaryName.textContent = sanitize(state.name) || copy.summary.empty;
     refs.summaryKana.textContent = sanitize(state.kana) || copy.summary.empty;
     refs.summaryContact.textContent = buildContactSummary();
-    refs.summaryConfirm.textContent = buildConfirmSummary();
   }
 
   function applyBoardStep() {
@@ -500,11 +464,9 @@
     }
     if (sectionKey === 'contact') {
       if (!sanitize(state.email) || !sanitize(state.phone)) return msg.contactRequired;
-      return '';
-    }
-    if (sectionKey === 'confirm') {
-      if (!sanitize(state.postal)) return msg.postalRequired;
-      if (!state.consentPolicy) return msg.consentRequired;
+      if (!state.consentPolicy) {
+        return window.TK168LegalConsentLabel?.getConsentRequiredMessage?.(currentLanguage()) || msg.consentRequired;
+      }
       return '';
     }
     return '';
@@ -541,7 +503,6 @@
       'kana',
       'email',
       'phone',
-      'postal',
       'consentNews',
       'consentPolicy'
     ];
@@ -587,7 +548,7 @@
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const dd = String(now.getDate()).padStart(2, '0');
     refs.date.value = `${yyyy}-${mm}-${dd}`;
-    setValue(refs.time, '13:00');
+    setValue(refs.time, window.TK168FormTimeSlots?.DEFAULT_TIME || '13:00');
     syncStateFromInputs();
   }
 

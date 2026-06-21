@@ -70,7 +70,6 @@
         deliveryAddressLabel: '送车地址',
         deliveryAddressPlaceholder: '请填写详细地址（都道府县、市区町村、番地、建筑名等）',
         consentNews: '接收档期更新与新车源通知',
-        consentPolicy: '同意使用条款与隐私政策',
         consentIdpDeposit: '使用 IDP 驾照需缴纳 10 万日元押金'
       },
       summary: {
@@ -151,7 +150,6 @@
         deliveryAddressLabel: '配達先住所',
         deliveryAddressPlaceholder: '郵便番号、住所、建物名・部屋番号までご記入ください',
         consentNews: '空き状況や新着車両情報を受け取る',
-        consentPolicy: '利用規約とプライバシーポリシーに同意する',
         consentIdpDeposit: 'IDP国際免許証を利用する場合、10万円の預かり金が必要です'
       },
       summary: {
@@ -232,7 +230,6 @@
         deliveryAddressLabel: 'Delivery address',
         deliveryAddressPlaceholder: 'Include prefecture, city, street, building name, and room if applicable',
         consentNews: 'Receive availability updates and new vehicle notifications',
-        consentPolicy: 'I agree to the terms of use and privacy policy',
         consentIdpDeposit: 'An IDP (International Driving Permit) requires a ¥100,000 deposit'
       },
       summary: {
@@ -453,7 +450,6 @@
       store: document.getElementById('riqStoreLabel'),
       deliveryAddress: document.getElementById('riqDeliveryAddressLabel'),
       consentNews: document.getElementById('riqConsentNewsLabel'),
-      consentPolicy: document.getElementById('riqConsentPolicyLabel'),
       consentIdpDeposit: document.getElementById('riqConsentIdpDepositLabel')
     },
     optionLabels: {
@@ -530,8 +526,9 @@
     setText(refs.fieldLabels.store, copy.fields.storeLabel);
     setText(refs.fieldLabels.deliveryAddress, copy.fields.deliveryAddressLabel);
     setText(refs.fieldLabels.consentNews, copy.fields.consentNews);
-    setText(refs.fieldLabels.consentPolicy, copy.fields.consentPolicy);
     setText(refs.fieldLabels.consentIdpDeposit, copy.fields.consentIdpDeposit);
+
+    window.TK168LegalConsentLabel?.init?.(document, currentLanguage());
 
     setText(refs.deliveryMethodLabel, copy.fields.deliveryMethodLabel);
     setText(refs.deliveryVisitLabel, copy.fields.deliveryVisit);
@@ -816,7 +813,9 @@
       if (state.deliveryMethod === 'visit') {
         if (!sanitize(state.store)) return msg.storeRequired;
       } else if (!sanitize(state.deliveryAddress)) return msg.addressRequired;
-      if (!state.consentPolicy) return msg.consentRequired;
+      if (!state.consentPolicy) {
+        return window.TK168LegalConsentLabel?.getConsentRequiredMessage?.(currentLanguage()) || msg.consentRequired;
+      }
       return '';
     }
     return '';
@@ -913,7 +912,7 @@
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const dd = String(now.getDate()).padStart(2, '0');
     refs.date.value = `${yyyy}-${mm}-${dd}`;
-    refs.time.value = '13:00';
+    refs.time.value = window.TK168FormTimeSlots?.DEFAULT_TIME || '13:00';
     syncStateFromInputs();
   }
 

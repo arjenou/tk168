@@ -70,13 +70,8 @@
                   </label>
                   <label>
                     <span id="svcTimeLabel">时间</span>
-                    <select id="svcTime">
+                    <select id="svcTime" data-time-slot-select>
                       <option value="" id="svcTimePlaceholder">请选择</option>
-                      <option>10:00</option>
-                      <option>11:00</option>
-                      <option>13:00</option>
-                      <option>15:00</option>
-                      <option>17:00</option>
                     </select>
                   </label>
                   <label>
@@ -217,7 +212,9 @@
                 </label>
                 <label class="inq-check">
                   <input type="checkbox" id="svcConsentPolicy">
-                  <span id="svcConsentPolicyLabel">同意使用条款与隐私政策</span>
+                  <span class="inq-check-text" data-legal-consent-label>
+                    <span data-legal-consent-prefix></span><a href="terms-of-use.html" class="inq-policy-link" data-legal-consent-terms target="_blank" rel="noopener noreferrer">利用規約</a><span data-legal-consent-middle">と</span><a href="privacy-policy.html" class="inq-policy-link" data-legal-consent-privacy target="_blank" rel="noopener noreferrer">プライバシーポリシー</a><span data-legal-consent-suffix">に同意する</span>
+                  </span>
                 </label>
               </div>
             </div>
@@ -243,7 +240,9 @@
   <script defer src="js/i18n.js?v=20260621b"></script>
   <script defer src="js/common-links.js?v=20260419a"></script>
   <script defer src="js/page-chrome.js?v=20260601a"></script>
-  <script defer src="js/service-appointment.js?v=20260619c"></script>
+  <script defer src="js/legal-consent-label.js?v=20260621a"></script>
+  <script defer src="js/form-time-slots.js?v=20260621a"></script>
+  <script defer src="js/service-appointment.js?v=20260621a"></script>
 </body>
 
 </html>
