@@ -43,6 +43,16 @@ window.TK168Renderers = (() => {
     return rawPath.startsWith('assets/') ? rawPath : `assets/images/${rawPath}`;
   }
 
+  /**
+   * 卡片封面专用：给 `/api/media/...` 图片追加宽度参数，让 Worker 返回缩略图，
+   * 避免列表/首页一次性下载多张原图。本地 assets / data: 等保持原样。
+   */
+  function resolveCardCoverSource(path, width = 720) {
+    const src = resolveVehicleMediaSource(path);
+    if (!src || !/\/api\/media\//.test(src)) return src;
+    return `${src}${src.includes('?') ? '&' : '?'}w=${width}`;
+  }
+
   function getPaginationDotIndices(totalCount, activeIndex, maxVisible = 3, isCompact = true) {
     const safeTotal = Math.max(0, Number(totalCount) || 0);
     if (!safeTotal) return [];
@@ -308,7 +318,7 @@ window.TK168Renderers = (() => {
     const brandUrl = window.TK168_DATA?.buildBrandUrl
       ? window.TK168_DATA.buildBrandUrl(vehicle.brandKey)
       : 'brand.html';
-    const coverPhotoSrc = resolveVehicleMediaSource(vehicle.photo);
+    const coverPhotoSrc = resolveCardCoverSource(vehicle.photo, 720);
     const coverPhotoAlt = escapeHtmlText(vehicleName).replace(/"/g, '&quot;');
     const coverMarkup = variant.cover === 'v-card-img'
       ? `<div class="${variant.cover} v-card-img--skeleton-load">

@@ -80,6 +80,16 @@ function resolveMediaUrlForImg(url) {
   return s;
 }
 
+/**
+ * 列表/缩略图用：给 `/api/media/...` 资源追加宽度参数，让 Worker 返回缩略图，
+ * 避免列表里每张封面都下载原图。非 media 资源（assets/data: 等）保持原样。
+ */
+function resolveThumbUrlForImg(url, width) {
+  const full = resolveMediaUrlForImg(url);
+  if (!full || !/\/api\/media\//.test(full)) return full;
+  return `${full}${full.includes("?") ? "&" : "?"}w=${width}`;
+}
+
 /** Internal vehicle/rental primary key; not shown in admin UI. Prefix v / r + random a-z0-9. */
 function generateInventoryId(resourceKey) {
   const prefix = resourceKey === "rentals" ? "r" : resourceKey === "journal" ? "n" : "v";
@@ -1426,11 +1436,11 @@ function journalItemRow(v, r) {
         <span class="admin-drag-handle" draggable="true" title="拖拽调整资讯顺序" aria-label="拖拽排序">⋮⋮</span>
       </td>`
     : "";
-  const cover = resolveMediaUrlForImg(v.imageUrl || v.images?.[0]?.url || "");
+  const cover = resolveThumbUrlForImg(v.imageUrl || v.images?.[0]?.url || "", 160);
   return `
     <tr data-item-id="${escapeAttr(v.id)}">
       ${dragCell}
-      <td>${cover ? `<img class="admin-thumb" src="${escapeAttr(cover)}" alt="">` : '<div class="admin-thumb"></div>'}</td>
+      <td>${cover ? `<img class="admin-thumb" src="${escapeAttr(cover)}" alt="" loading="lazy" decoding="async" width="64" height="44">` : '<div class="admin-thumb"></div>'}</td>
       <td>
         <div style="font-weight:600;">${escapeHtml(v.titleZh || v.titleJa || v.titleEn || "—")}</div>
         <div style="color:var(--admin-text-dim);font-size:12px;">${escapeHtml(v.id || "")}</div>
@@ -1459,7 +1469,7 @@ function itemRow(v, r) {
         <span class="admin-drag-handle" draggable="true" title="拖拽调整列表展示顺序" aria-label="拖拽排序">⋮⋮</span>
       </td>`
     : "";
-  const cover = resolveMediaUrlForImg(v.images?.[0]?.url || "");
+  const cover = resolveThumbUrlForImg(v.images?.[0]?.url || "", 160);
   const extraCells = (r.extraColumns || [])
     .map((c) => `<td>${escapeHtml(c.render ? c.render(v[c.key]) : v[c.key] ?? "")}</td>`)
     .join("");
@@ -1481,7 +1491,7 @@ function itemRow(v, r) {
   return `
     <tr data-item-id="${escapeAttr(v.id)}">
       ${dragCell}
-      <td>${cover ? `<img class="admin-thumb" src="${escapeAttr(cover)}" alt="">` : '<div class="admin-thumb"></div>'}</td>
+      <td>${cover ? `<img class="admin-thumb" src="${escapeAttr(cover)}" alt="" loading="lazy" decoding="async" width="64" height="44">` : '<div class="admin-thumb"></div>'}</td>
       <td>
         <div style="font-weight:600;">${escapeHtml(v.name)}</div>
       </td>
@@ -2651,7 +2661,7 @@ function imageTile(img, selectedPreviewId, reorderable) {
   const tileTitle = reorderable ? "拖拽排序 · 点击在上方预览" : "点击在上方预览";
   return `
     <div class="admin-image-tile${isSel ? " is-selected" : ""}${reorderCls}" data-image="${img.id}" role="button" tabindex="0" title="${escapeAttr(tileTitle)}"${dragAttr}>
-      <img src="${escapeAttr(resolveMediaUrlForImg(img.url))}" alt="${escapeAttr(img.alt || "")}" loading="lazy" decoding="async" ${reorderable ? 'draggable="false"' : ""}>
+      <img src="${escapeAttr(resolveThumbUrlForImg(img.url, 240))}" alt="${escapeAttr(img.alt || "")}" loading="lazy" decoding="async" ${reorderable ? 'draggable="false"' : ""}>
       ${img.isPrimary ? '<span class="primary-flag">封面</span>' : ""}
       <button type="button" class="remove" title="删除图片" data-remove-image="${img.id}" draggable="false">×</button>
     </div>

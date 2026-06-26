@@ -200,6 +200,55 @@ async function getR2MediaObject(env, key) {
   return env.R2.get(flatKey);
 }
 
+// Allowed widths for on-the-fly thumbnails. Clamping to a small set keeps the
+// number of distinct Cloudflare Images transformations (and the edge cache
+// footprint) bounded no matter what width the client asks for.
+const MEDIA_THUMB_WIDTHS = [96, 160, 240, 360, 480, 640, 720, 960, 1280];
+
+function clampThumbWidth(raw) {
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  for (const w of MEDIA_THUMB_WIDTHS) {
+    if (n <= w) return w;
+  }
+  return MEDIA_THUMB_WIDTHS[MEDIA_THUMB_WIDTHS.length - 1];
+}
+
+// Resizable only for raster photos. SVG (vector) and GIF (often animated)
+// are served as-is so we never rasterize logos or drop animation frames.
+function isResizableImageType(contentType) {
+  const ct = String(contentType || "").toLowerCase();
+  if (!ct.startsWith("image/")) return false;
+  return !ct.includes("svg") && !ct.includes("gif");
+}
+
+function rawMediaResponse(object) {
+  const headers = new Headers();
+  object.writeHttpMetadata(headers);
+  headers.set("etag", object.httpEtag);
+  headers.set("cache-control", "public, max-age=31536000, immutable");
+  headers.set("access-control-allow-origin", "*");
+  return new Response(object.body, { headers });
+}
+
+// Stream the R2 object through the Images binding to produce a width-bound
+// WebP thumbnail. Consumes object.body, so the caller must re-fetch the
+// object if this throws and a fallback to the original is desired.
+async function resizedMediaResponse(env, object, width) {
+  const out = await env.IMAGES.input(object.body)
+    .transform({ width, fit: "scale-down" })
+    .output({ format: "image/webp", quality: 78 });
+  const res = out.response();
+  if (!res.ok) throw new Error(`images_http_${res.status}`);
+  const headers = new Headers(res.headers);
+  headers.set("cache-control", "public, max-age=31536000, immutable");
+  headers.set("access-control-allow-origin", "*");
+  if (object.httpEtag) {
+    headers.set("etag", `${object.httpEtag.replace(/"+$/, "")}-w${width}"`);
+  }
+  return new Response(res.body, { headers });
+}
+
 async function handleApi(request, env, url) {
   let path = url.pathname.replace(/^\/api\/?/, "/");
   if (path.length > 1) path = path.replace(/\/+$/, "") || "/";
@@ -239,12 +288,24 @@ async function handleApi(request, env, url) {
     if (!key) return error(400, "missing_key");
     const object = await getR2MediaObject(env, key);
     if (!object) return error(404, "not_found");
-    const headers = new Headers();
-    object.writeHttpMetadata(headers);
-    headers.set("etag", object.httpEtag);
-    headers.set("cache-control", "public, max-age=31536000, immutable");
-    headers.set("access-control-allow-origin", "*");
-    return new Response(object.body, { headers });
+
+    // Optional thumbnail: /api/media/<key>?w=160 → width-bound WebP. Used by the
+    // admin list and public cards so large galleries don't pull full-res photos.
+    const thumbWidth = clampThumbWidth(url.searchParams.get("w"));
+    const contentType = object.httpMetadata?.contentType || "";
+    if (thumbWidth && env.IMAGES?.input && isResizableImageType(contentType)) {
+      try {
+        return await resizedMediaResponse(env, object, thumbWidth);
+      } catch (err) {
+        console.warn("media_resize_failed", err);
+        // object.body was consumed by the Images pipeline; re-fetch the original.
+        const fresh = await getR2MediaObject(env, key);
+        if (!fresh) return error(404, "not_found");
+        return rawMediaResponse(fresh);
+      }
+    }
+
+    return rawMediaResponse(object);
   }
 
   // ---------- Auth ----------
