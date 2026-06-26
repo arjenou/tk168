@@ -50,8 +50,15 @@ window.TK168Renderers = (() => {
   function resolveCardCoverSource(path, width = 720) {
     const src = resolveVehicleMediaSource(path);
     if (!src || !/\/api\/media\//.test(src)) return src;
+    // Scale the requested width by the device pixel ratio so covers stay sharp
+    // on Retina / HiDPI screens. A ~430px card shown at 2x needs ~860 real
+    // pixels, so a flat 720px source gets upscaled and looks blurry. Cap the
+    // multiplier at 2 — the Worker clamps the final width to its largest bucket
+    // (1280) anyway, which is plenty for any card.
+    const dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+    const effectiveWidth = Math.ceil(width * dpr);
     // `tv` (thumb version) busts any browser/edge entry cached mid-deploy.
-    return `${src}${src.includes('?') ? '&' : '?'}w=${width}&tv=2`;
+    return `${src}${src.includes('?') ? '&' : '?'}w=${effectiveWidth}&tv=2`;
   }
 
   function getPaginationDotIndices(totalCount, activeIndex, maxVisible = 3, isCompact = true) {
