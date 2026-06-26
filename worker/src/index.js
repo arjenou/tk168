@@ -45,6 +45,7 @@ import {
   uploadJournalCover,
 } from "./journal.js";
 import { getPublicRentalContacts, patchAdminRentalContacts } from "./site-settings.js";
+import { clampThumbWidth, thumbCacheKey } from "./media-thumbs.js";
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
 
@@ -200,20 +201,6 @@ async function getR2MediaObject(env, key) {
   return env.R2.get(flatKey);
 }
 
-// Allowed widths for on-the-fly thumbnails. Clamping to a small set keeps the
-// number of distinct Cloudflare Images transformations (and the edge cache
-// footprint) bounded no matter what width the client asks for.
-const MEDIA_THUMB_WIDTHS = [96, 160, 240, 360, 480, 640, 720, 960, 1280];
-
-function clampThumbWidth(raw) {
-  const n = Number(raw);
-  if (!Number.isFinite(n) || n <= 0) return null;
-  for (const w of MEDIA_THUMB_WIDTHS) {
-    if (n <= w) return w;
-  }
-  return MEDIA_THUMB_WIDTHS[MEDIA_THUMB_WIDTHS.length - 1];
-}
-
 // Resizable only for raster photos. SVG (vector) and GIF (often animated)
 // are served as-is so we never rasterize logos or drop animation frames.
 function isResizableImageType(contentType) {
@@ -232,24 +219,41 @@ function rawMediaResponse(object) {
 }
 
 // Stream the R2 object through the Images binding to produce a width-bound
-// WebP thumbnail. Consumes object.body, so the caller must re-fetch the
-// object if this throws and a fallback to the original is desired.
-async function resizedMediaResponse(env, object, width) {
+// WebP thumbnail, cache it back to R2 (so the next request skips the Images
+// binding entirely), and return it. Consumes object.body, so the caller must
+// re-fetch the object if this throws and a fallback to the original is desired.
+async function resizedMediaResponse(env, ctx, object, width, cacheKey) {
   const out = await env.IMAGES.input(object.body)
     .transform({ width, fit: "scale-down" })
     .output({ format: "image/webp", quality: 78 });
   const res = out.response();
   if (!res.ok) throw new Error(`images_http_${res.status}`);
-  const headers = new Headers(res.headers);
+  // Buffer the bytes so we can both store and serve them without consuming a
+  // single-use stream twice.
+  const bytes = await res.arrayBuffer();
+
+  if (cacheKey) {
+    const put = env.R2.put(cacheKey, bytes, {
+      httpMetadata: {
+        contentType: "image/webp",
+        cacheControl: "public, max-age=31536000, immutable",
+      },
+    }).catch((err) => console.warn("thumb_cache_put_failed", err));
+    // Don't block the response on the cache write.
+    if (ctx?.waitUntil) ctx.waitUntil(put);
+  }
+
+  const headers = new Headers();
+  headers.set("content-type", "image/webp");
   headers.set("cache-control", "public, max-age=31536000, immutable");
   headers.set("access-control-allow-origin", "*");
   if (object.httpEtag) {
     headers.set("etag", `${object.httpEtag.replace(/"+$/, "")}-w${width}"`);
   }
-  return new Response(res.body, { headers });
+  return new Response(bytes, { headers });
 }
 
-async function handleApi(request, env, url) {
+async function handleApi(request, env, url, ctx) {
   let path = url.pathname.replace(/^\/api\/?/, "/");
   if (path.length > 1) path = path.replace(/\/+$/, "") || "/";
   const method = request.method.toUpperCase();
@@ -286,25 +290,40 @@ async function handleApi(request, env, url) {
   if (path.startsWith("/media/") && method === "GET") {
     const key = decodeURIComponent(path.slice("/media/".length));
     if (!key) return error(400, "missing_key");
-    const object = await getR2MediaObject(env, key);
-    if (!object) return error(404, "not_found");
 
     // Optional thumbnail: /api/media/<key>?w=160 → width-bound WebP. Used by the
     // admin list and public cards so large galleries don't pull full-res photos.
     const thumbWidth = clampThumbWidth(url.searchParams.get("w"));
-    const contentType = object.httpMetadata?.contentType || "";
-    if (thumbWidth && env.IMAGES?.input && isResizableImageType(contentType)) {
-      try {
-        return await resizedMediaResponse(env, object, thumbWidth);
-      } catch (err) {
-        console.warn("media_resize_failed", err);
-        // object.body was consumed by the Images pipeline; re-fetch the original.
-        const fresh = await getR2MediaObject(env, key);
-        if (!fresh) return error(404, "not_found");
-        return rawMediaResponse(fresh);
+    if (thumbWidth && env.IMAGES?.input) {
+      // Serve a previously cached resized copy first. Once a list has been
+      // viewed once this is the common path, and it never touches the Images
+      // binding — so bursts of covers can no longer trigger 503s.
+      const cacheKey = thumbCacheKey(key, thumbWidth);
+      const cached = await env.R2.get(cacheKey);
+      if (cached) return rawMediaResponse(cached);
+
+      const object = await getR2MediaObject(env, key);
+      if (!object) return error(404, "not_found");
+      const contentType = object.httpMetadata?.contentType || "";
+      if (isResizableImageType(contentType)) {
+        try {
+          return await resizedMediaResponse(env, ctx, object, thumbWidth, cacheKey);
+        } catch (err) {
+          console.warn("media_resize_failed", err);
+          // Resize failed (e.g. Images binding overloaded). Never surface a
+          // broken image — fall back to the full-res original. object.body was
+          // consumed by the Images pipeline, so re-fetch a fresh copy.
+          const fresh = await getR2MediaObject(env, key);
+          if (!fresh) return error(404, "not_found");
+          return rawMediaResponse(fresh);
+        }
       }
+      // Non-resizable (SVG/GIF) — serve as-is.
+      return rawMediaResponse(object);
     }
 
+    const object = await getR2MediaObject(env, key);
+    if (!object) return error(404, "not_found");
     return rawMediaResponse(object);
   }
 
@@ -627,7 +646,7 @@ export default {
     if (isApi) {
       let response;
       try {
-        response = await handleApi(request, env, url);
+        response = await handleApi(request, env, url, ctx);
       } catch (err) {
         const status = err?.status && Number.isInteger(err.status) ? err.status : 500;
         const code = err?.message || "internal_error";

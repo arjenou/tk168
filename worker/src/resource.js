@@ -1,3 +1,5 @@
+import { deleteThumbCache } from "./media-thumbs.js";
+
 // Generic D1 + R2 resource helpers shared by vehicles/rentals modules.
 //
 // A `resource` descriptor bundles the table layout (columns, field mapping,
@@ -192,7 +194,11 @@ export function createResource({
     await Promise.all(
       (results || [])
         .filter((row) => row.r2_key && !row.r2_key.startsWith("seed:"))
-        .map((row) => env.R2.delete(row.r2_key).catch(() => null)),
+        .flatMap((row) => [
+          env.R2.delete(row.r2_key).catch(() => null),
+          // Drop any cached thumbnails derived from this original.
+          deleteThumbCache(env, row.r2_key),
+        ]),
     );
     const res = await env.DB.prepare(`DELETE FROM ${table} WHERE id = ?`).bind(id).run();
     return res.meta?.changes > 0;
@@ -257,6 +263,7 @@ export function createResource({
     }
     if (row.r2_key && !row.r2_key.startsWith("seed:")) {
       await env.R2.delete(row.r2_key).catch(() => null);
+      await deleteThumbCache(env, row.r2_key);
     }
     await env.DB.prepare(`DELETE FROM ${imagesTable} WHERE id = ?`).bind(imageId).run();
     return true;

@@ -1,5 +1,7 @@
 // Journal (LATEST JOURNAL / 最新情報) — single cover image, trilingual text.
 
+import { deleteThumbCache } from "./media-thumbs.js";
+
 const JOURNAL_SELECT = `SELECT id, title_zh, title_ja, title_en,
   category_zh, category_ja, category_en,
   summary_zh, summary_ja, summary_en,
@@ -192,6 +194,7 @@ export async function deleteJournalEntry(env, id) {
   if (!row) return false;
   if (row.image_r2_key && !String(row.image_r2_key).startsWith("seed:")) {
     await env.R2.delete(String(row.image_r2_key)).catch(() => null);
+    await deleteThumbCache(env, String(row.image_r2_key));
   }
   const res = await env.DB.prepare("DELETE FROM journal_entries WHERE id = ?").bind(id).run();
   return res.meta?.changes > 0;
@@ -231,6 +234,7 @@ export async function clearJournalCover(env, journalId) {
   }
   if (row.image_r2_key && !String(row.image_r2_key).startsWith("seed:")) {
     await env.R2.delete(String(row.image_r2_key)).catch(() => null);
+    await deleteThumbCache(env, String(row.image_r2_key));
   }
   await env.DB.prepare(
     `UPDATE journal_entries SET image_r2_key = NULL, image_url = NULL, updated_at = datetime('now') WHERE id = ?`,
@@ -266,6 +270,7 @@ export async function uploadJournalCover(env, journalId, file) {
   }
   if (exists.image_r2_key && !String(exists.image_r2_key).startsWith("seed:")) {
     await env.R2.delete(String(exists.image_r2_key)).catch(() => null);
+    await deleteThumbCache(env, String(exists.image_r2_key));
   }
   const ext = safeExt(file.type, file.name);
   const key = `journal/${journalId}/${Date.now()}-${randomHex(4)}.${ext}`;
