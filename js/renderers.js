@@ -50,7 +50,8 @@ window.TK168Renderers = (() => {
   function resolveCardCoverSource(path, width = 720) {
     const src = resolveVehicleMediaSource(path);
     if (!src || !/\/api\/media\//.test(src)) return src;
-    return `${src}${src.includes('?') ? '&' : '?'}w=${width}`;
+    // `tv` (thumb version) busts any browser/edge entry cached mid-deploy.
+    return `${src}${src.includes('?') ? '&' : '?'}w=${width}&tv=2`;
   }
 
   function getPaginationDotIndices(totalCount, activeIndex, maxVisible = 3, isCompact = true) {

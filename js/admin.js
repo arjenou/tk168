@@ -87,7 +87,8 @@ function resolveMediaUrlForImg(url) {
 function resolveThumbUrlForImg(url, width) {
   const full = resolveMediaUrlForImg(url);
   if (!full || !/\/api\/media\//.test(full)) return full;
-  return `${full}${full.includes("?") ? "&" : "?"}w=${width}`;
+  // `tv` (thumb version) busts any browser/edge entry cached mid-deploy.
+  return `${full}${full.includes("?") ? "&" : "?"}w=${width}&tv=2`;
 }
 
 /** Internal vehicle/rental primary key; not shown in admin UI. Prefix v / r + random a-z0-9. */
