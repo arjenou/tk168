@@ -88,6 +88,14 @@ window.TK168BrandLogoHomeCopy = Object.freeze({
       en: 'A historic American automobile manufacturer.'
     })
   }),
+  dodge: Object.freeze({
+    name: Object.freeze({ en: 'Dodge', zh: '道奇', ja: 'ダッジ' }),
+    story: Object.freeze({
+      ja: 'パワフルなパフォーマンスで知られるアメリカのブランド。',
+      zh: '以强劲性能著称的美国汽车品牌。',
+      en: 'An American brand known for powerful performance.'
+    })
+  }),
   citroen: Object.freeze({
     name: Object.freeze({ en: 'Citroën', zh: '雪铁龙', ja: 'シトロエン' }),
     story: Object.freeze({

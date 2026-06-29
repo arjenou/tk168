@@ -365,6 +365,74 @@ function updateBrandNavLayout() {
   if (width <= 0) return;
   const count = Math.max(2, Math.floor((width + gap) / (minCard + gap)));
   track.style.setProperty('--bn-visible-count', String(count));
+  updateBrandNavControls();
+}
+
+function getBrandNavScrollStep(track) {
+  const thumb = track?.querySelector('.bn-thumb');
+  if (!thumb) return track?.clientWidth || 0;
+  const styles = getComputedStyle(track);
+  const gap = parseFloat(styles.columnGap || styles.gap) || 12;
+  return thumb.offsetWidth + gap;
+}
+
+function updateBrandNavControls() {
+  const track = document.getElementById('bnGrid');
+  const prevButton = document.getElementById('bnPrev');
+  const nextButton = document.getElementById('bnNext');
+  if (!track || !prevButton || !nextButton) return;
+
+  const maxLeft = Math.max(0, track.scrollWidth - track.clientWidth);
+  const canScroll = maxLeft > 2;
+  const atStart = track.scrollLeft <= 2;
+  const atEnd = track.scrollLeft >= maxLeft - 2;
+
+  prevButton.hidden = !canScroll;
+  nextButton.hidden = !canScroll;
+  prevButton.disabled = !canScroll || atStart;
+  nextButton.disabled = !canScroll || atEnd;
+}
+
+function scrollBrandNavBy(direction) {
+  const track = document.getElementById('bnGrid');
+  if (!track) return;
+  const step = getBrandNavScrollStep(track);
+  if (step <= 0) return;
+  const visibleCount = parseInt(getComputedStyle(track).getPropertyValue('--bn-visible-count'), 10) || 4;
+  track.scrollBy({ left: step * visibleCount * direction, behavior: 'smooth' });
+}
+
+function syncBrandNavControlLabels() {
+  const lang = getCompareLanguage();
+  const prevButton = document.getElementById('bnPrev');
+  const nextButton = document.getElementById('bnNext');
+  if (!prevButton || !nextButton) return;
+  if (lang === 'en') {
+    prevButton.setAttribute('aria-label', 'Previous brands');
+    nextButton.setAttribute('aria-label', 'Next brands');
+    return;
+  }
+  if (lang === 'zh') {
+    prevButton.setAttribute('aria-label', '上一组品牌');
+    nextButton.setAttribute('aria-label', '下一组品牌');
+    return;
+  }
+  prevButton.setAttribute('aria-label', '前のブランドグループ');
+  nextButton.setAttribute('aria-label', '次のブランドグループ');
+}
+
+function bindBrandNavControls() {
+  const track = document.getElementById('bnGrid');
+  const prevButton = document.getElementById('bnPrev');
+  const nextButton = document.getElementById('bnNext');
+  if (!track || !prevButton || !nextButton || track.dataset.controlsBound === '1') return;
+  track.dataset.controlsBound = '1';
+
+  prevButton.addEventListener('click', () => scrollBrandNavBy(-1));
+  nextButton.addEventListener('click', () => scrollBrandNavBy(1));
+  track.addEventListener('scroll', updateBrandNavControls, { passive: true });
+  syncBrandNavControlLabels();
+  updateBrandNavControls();
 }
 
 /** 计算让高亮项居中的目标 scrollLeft；返回 null 表示当前尚不可量（未布局）。 */
@@ -479,16 +547,11 @@ function bindBrandNavTrackGestures() {
 
 function buildBrandNav({ centerActive = false } = {}) {
   const grid = document.getElementById('bnGrid');
-  const prevButton = document.getElementById('bnPrev');
-  const nextButton = document.getElementById('bnNext');
   if (!grid) return;
 
   const orderedCatalog = getOrderedBrandNavCatalog();
   syncBrandNavKeyIndex(orderedCatalog);
   const total = orderedCatalog.length;
-
-  if (prevButton) prevButton.hidden = true;
-  if (nextButton) nextButton.hidden = true;
 
   while (grid.children.length < total) {
     const thumb = document.createElement('a');
@@ -505,10 +568,12 @@ function buildBrandNav({ centerActive = false } = {}) {
   });
 
   updateBrandNavLayout();
+  updateBrandNavControls();
   // 仅在「首次进入（从首页点击 logo 跳转过来）」时把高亮项滚到中间；
   // 展厅内点击切换品牌时保持当前滚动位置，不自动居中。
   if (centerActive) {
     scrollActiveBrandNavIntoView({ smooth: false, robust: true });
+    window.setTimeout(updateBrandNavControls, 0);
   }
 }
 
@@ -735,6 +800,7 @@ function bindBrandNavLayoutObserver() {
 }
 
 bindBrandNavTrackGestures();
+bindBrandNavControls();
 bindBrandNavLayoutObserver();
 updateBrandNavLayout();
 
@@ -752,7 +818,10 @@ buildBrandNav({ centerActive: true });
 // 首次从首页点击 logo 跳转进来：页面与图片完全加载后再校正一次居中，
 // 避免移动端因 hero 大图 / 字体回流导致高亮 logo 未停在正中。
 if (document.readyState !== 'complete') {
-  window.addEventListener('load', () => scrollActiveBrandNavIntoView({ smooth: false, robust: true }), { once: true });
+  window.addEventListener('load', () => {
+    scrollActiveBrandNavIntoView({ smooth: false, robust: true });
+    updateBrandNavControls();
+  }, { once: true });
 }
 (function bindBrandVehicleLoadMore() {
   const btn = document.getElementById('brandVehicleLoadMore');
@@ -771,6 +840,7 @@ renderPage();
 window.addEventListener('tk168:languagechange', () => {
   setBrandHeroPreview('');
   syncBrandHeader();
+  syncBrandNavControlLabels();
   buildBrandNav();
   renderPage();
 });
