@@ -89,7 +89,7 @@
             </article>
             <article class="footer-store">
               <p class="footer-store-eyebrow" data-i18n="footer.stores.tokyo.eyebrow">JAPAN · TOKYO</p>
-              <h5 class="footer-store-name" data-i18n="footer.stores.tokyo.name">亀戸店</h5>
+              <h5 class="footer-store-name" data-i18n="footer.stores.tokyo.name">新大久保店</h5>
               <p class="footer-store-address" data-i18n-html="footer.stores.tokyo.address">〒169-0073<br>東京都新宿区百人町３丁目９−６ 101</p>
               <div class="footer-store-contact">
                 <p data-i18n="footer.stores.tokyo.phoneLine">TEL：070-4286-2253</p>
