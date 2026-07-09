@@ -2940,7 +2940,8 @@ html:lang(en) .footer-newsletter h4 {
 }
 
 .footer-store-address {
-  display: inline-block;
+  display: grid;
+  gap: 2px;
   margin: 0;
   font-size: 12.5px;
   line-height: 1.62;
@@ -2949,9 +2950,35 @@ html:lang(en) .footer-newsletter h4 {
   transition: color 0.2s ease;
 }
 
+.footer-store-address__postal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-store-postal-icon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.footer-store-address__street {
+  display: block;
+  padding-left: 20px;
+}
+
+.footer-store-address--no-postal-icon .footer-store-address__street {
+  padding-left: 0;
+}
+
 .footer-store-address:hover,
 .footer-store-address:focus-visible {
   color: rgba(255, 255, 255, 0.9);
+}
+
+.footer-store-address:hover .footer-store-address__street,
+.footer-store-address:focus-visible .footer-store-address__street {
   text-decoration: underline;
   text-underline-offset: 0.14em;
 }

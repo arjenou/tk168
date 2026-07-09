@@ -50,6 +50,28 @@
   /** 移动端底栏「咨询」一键拨号（さいたま店） */
   const MOBILE_INQUIRY_TEL_HREF = 'tel:+81487964907';
 
+  const FOOTER_POSTAL_ICON_SVG = `
+    <svg class="footer-store-postal-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+      <rect x="3.25" y="4.25" width="13.5" height="11.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.25"></rect>
+      <text x="10" y="13.1" text-anchor="middle" font-size="8.5" font-weight="700" fill="currentColor" font-family="system-ui, -apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">〒</text>
+    </svg>`;
+
+  function renderFooterStoreAddress({
+    href,
+    postalKey,
+    streetKey,
+    postalText,
+    streetText,
+    showPostalIcon = true
+  }) {
+    const icon = showPostalIcon ? FOOTER_POSTAL_ICON_SVG : '';
+    const modifier = showPostalIcon ? '' : ' footer-store-address--no-postal-icon';
+    return `<a class="footer-store-address${modifier}" href="${href}" target="_blank" rel="noopener noreferrer">
+      <span class="footer-store-address__postal">${icon}<span data-i18n="${postalKey}">${postalText}</span></span>
+      <span class="footer-store-address__street" data-i18n="${streetKey}">${streetText}</span>
+    </a>`;
+  }
+
   const MOBILE_BOTTOM_BAR_HTML = `
     <nav class="site-mobile-bottom-bar" id="siteMobileBottomBar" aria-label="Mobile shortcuts">
       <div class="site-mobile-bottom-bar__inner">
@@ -87,7 +109,13 @@
             <article class="footer-store">
               <p class="footer-store-eyebrow" data-i18n="footer.stores.saitama.eyebrow">JAPAN · TOKYO</p>
               <h5 class="footer-store-name" data-i18n="footer.stores.saitama.name">さいたま店</h5>
-              <a class="footer-store-address" href="${FOOTER_STORE_MAP_URLS.saitama}" target="_blank" rel="noopener noreferrer" data-i18n-html="footer.stores.saitama.address">339-0035<br>埼玉県さいたま市岩槻区笹久保新田</a>
+              ${renderFooterStoreAddress({
+                href: FOOTER_STORE_MAP_URLS.saitama,
+                postalKey: 'footer.stores.saitama.postal',
+                streetKey: 'footer.stores.saitama.street',
+                postalText: '339-0035',
+                streetText: '埼玉県さいたま市岩槻区笹久保新田'
+              })}
               <div class="footer-store-contact">
                 <p data-i18n="footer.stores.saitama.phoneLine">TEL：048-796-4907</p>
                 <p data-i18n="footer.stores.saitama.faxLine">FAX：048-796-4946</p>
@@ -97,7 +125,13 @@
             <article class="footer-store">
               <p class="footer-store-eyebrow" data-i18n="footer.stores.tokyo.eyebrow">JAPAN · TOKYO</p>
               <h5 class="footer-store-name" data-i18n="footer.stores.tokyo.name">新大久保店</h5>
-              <a class="footer-store-address" href="${FOOTER_STORE_MAP_URLS.tokyo}" target="_blank" rel="noopener noreferrer" data-i18n-html="footer.stores.tokyo.address">〒169-0073<br>東京都新宿区百人町３丁目９−６ 101</a>
+              ${renderFooterStoreAddress({
+                href: FOOTER_STORE_MAP_URLS.tokyo,
+                postalKey: 'footer.stores.tokyo.postal',
+                streetKey: 'footer.stores.tokyo.street',
+                postalText: '169-0073',
+                streetText: '東京都新宿区百人町３丁目９−６ 101'
+              })}
               <div class="footer-store-contact">
                 <p data-i18n="footer.stores.tokyo.phoneLine">TEL：070-4286-2253</p>
                 <p data-i18n="footer.stores.tokyo.emailLine">EMAIL：spacekart@tk168.co.jp</p>
@@ -106,7 +140,13 @@
             <article class="footer-store">
               <p class="footer-store-eyebrow" data-i18n="footer.stores.osaka.eyebrow">JAPAN · OSAKA</p>
               <h5 class="footer-store-name" data-i18n="footer.stores.osaka.name">大阪店</h5>
-              <a class="footer-store-address" href="${FOOTER_STORE_MAP_URLS.osaka}" target="_blank" rel="noopener noreferrer" data-i18n-html="footer.stores.osaka.address">〒595-0042<br>大阪府泉大津市高津町１２−１１</a>
+              ${renderFooterStoreAddress({
+                href: FOOTER_STORE_MAP_URLS.osaka,
+                postalKey: 'footer.stores.osaka.postal',
+                streetKey: 'footer.stores.osaka.street',
+                postalText: '595-0042',
+                streetText: '大阪府泉大津市高津町１２−１１'
+              })}
               <div class="footer-store-contact">
                 <p data-i18n="footer.stores.osaka.phoneLine">TEL：072-592-9577</p>
                 <p data-i18n="footer.stores.osaka.faxLine">FAX：072-592-9631</p>
@@ -116,7 +156,14 @@
             <article class="footer-store">
               <p class="footer-store-eyebrow" data-i18n="footer.stores.malaysia.eyebrow">MALAYSIA</p>
               <h5 class="footer-store-name" data-i18n="footer.stores.malaysia.name">マレーシア支店</h5>
-              <a class="footer-store-address" href="${FOOTER_STORE_MAP_URLS.malaysia}" target="_blank" rel="noopener noreferrer" data-i18n-html="footer.stores.malaysia.address">Kuala Lumpur, Malaysia<br>住所準備中</a>
+              ${renderFooterStoreAddress({
+                href: FOOTER_STORE_MAP_URLS.malaysia,
+                postalKey: 'footer.stores.malaysia.postal',
+                streetKey: 'footer.stores.malaysia.street',
+                postalText: 'Kuala Lumpur, Malaysia',
+                streetText: '住所準備中',
+                showPostalIcon: false
+              })}
               <div class="footer-store-contact">
                 <p data-i18n="footer.storePhoneLine">電話番号：準備中</p>
                 <p data-i18n="footer.storeEmailLine">メール：準備中</p>
