@@ -52,7 +52,10 @@ function apiOrigin() {
 function iconFieldPreviewUrl(stored) {
   const raw = String(stored == null ? "" : stored).trim();
   if (!raw) return "";
-  let p = raw.replace(/^\/+/, "");
+  const normalized = raw.replace(/([^/?#]+)$/, (filename) => (
+    filename === "dodge.svg" ? "dodge.png" : filename
+  ));
+  let p = normalized.replace(/^\/+/, "");
   if (/^https?:\/\//i.test(p)) return p;
   if (p.startsWith("assets/images/")) {
     // ok

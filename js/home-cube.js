@@ -412,7 +412,9 @@
 
   function getThumbLogo(item) {
     if (item.thumbLogoUrl) return item.thumbLogoUrl;
-    return `assets/images/brands/logos/${item.assetKey}.svg`;
+    if (item.file) return `assets/images/brands/logos/${item.file}`;
+    const canonical = window.TK168_DATA?.getCanonicalBrandLogoFile?.(item.assetKey);
+    return `assets/images/brands/logos/${canonical || `${item.assetKey}.svg`}`;
   }
 
   function buildDynamicSlide(baseKey, info) {

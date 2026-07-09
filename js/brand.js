@@ -320,7 +320,8 @@ function updateBrandNavThumb(node, brand, slotIndex) {
   }
 
   const logoSrc = brand.iconUrl
-    || (brand.file ? `assets/images/brands/logos/${brand.file}` : 'assets/images/logo_TK168.svg');
+    || (brand.file ? (window.TK168_DATA?.resolveBrandLogoPublicUrl?.(brand.file)
+      || `assets/images/brands/logos/${brand.file}`) : 'assets/images/logo_TK168.svg');
 
   node.innerHTML = `
     <span class="bn-thumb__logo-wrap" aria-hidden="true">

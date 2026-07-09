@@ -1857,11 +1857,11 @@ window.TK168_DATA = (() => {
     if (!vehicle) return 'assets/images/logo_TK168.svg';
     const icon = String(vehicle.icon || '').trim();
     if (icon) {
-      const url = resolveVehicleMediaSource(icon);
-      if (url) return url;
+      const url = resolveVehicleMediaSource(normalizeBrandLogoStoredPath(icon));
+      if (url) return normalizeBrandLogoStoredPath(url);
     }
     const brand = getBrandByKey(vehicle.brandKey);
-    if (brand?.file) return `assets/images/brands/logos/${brand.file}`;
+    if (brand?.file) return resolveBrandLogoPublicUrl(brand.file);
     return 'assets/images/logo_TK168.svg';
   }
 
@@ -1873,6 +1873,42 @@ window.TK168_DATA = (() => {
 
   function brandLogoAssetKeyFromFile(file) {
     return String(file || '').replace(/\.(svg|png|jpe?g|webp)$/i, '').toLowerCase();
+  }
+
+  /** 旧存库文件名 → 当前静态资源文件名（换格式后兼容历史 icon 字段） */
+  const BRAND_LOGO_FILE_ALIASES = Object.freeze({
+    'dodge.svg': 'dodge.png'
+  });
+
+  /** assetKey → 当前规范 logo 文件名（无历史别名时默认 .svg） */
+  const BRAND_LOGO_CANONICAL_FILES = Object.freeze({
+    dodge: 'dodge.png'
+  });
+
+  function normalizeBrandLogoFileName(file) {
+    const name = String(file || '').trim();
+    if (!name) return name;
+    return BRAND_LOGO_FILE_ALIASES[name] || name;
+  }
+
+  function normalizeBrandLogoStoredPath(path) {
+    const raw = String(path || '').trim();
+    if (!raw) return raw;
+    return raw.replace(/([^/?#]+)$/, (filename) => normalizeBrandLogoFileName(filename));
+  }
+
+  function getCanonicalBrandLogoFile(assetKey) {
+    const key = String(assetKey || '').trim().toLowerCase();
+    if (!key) return '';
+    return BRAND_LOGO_CANONICAL_FILES[key] || `${key}.svg`;
+  }
+
+  function resolveBrandLogoPublicUrl(fileOrPath) {
+    const raw = normalizeBrandLogoStoredPath(String(fileOrPath || '').trim());
+    if (!raw) return '';
+    if (raw.startsWith('assets/')) return raw;
+    if (raw.includes('/')) return normalizeBrandLogoStoredPath(resolveVehicleMediaSource(raw));
+    return `assets/images/brands/logos/${normalizeBrandLogoFileName(raw)}`;
   }
 
   /** Logo 文件名（如 corvette）与 canonical brandKey 不同时的展示名 */
@@ -1896,12 +1932,13 @@ window.TK168_DATA = (() => {
   }
 
   function catalogNavItemFromLogoRow(item) {
-    const assetKey = brandLogoAssetKeyFromFile(item.file);
+    const file = normalizeBrandLogoFileName(item.file);
+    const assetKey = brandLogoAssetKeyFromFile(file);
     return {
       key: item.key,
       assetKey,
-      iconUrl: item.file ? `assets/images/brands/logos/${item.file}` : '',
-      file: item.file,
+      iconUrl: file ? resolveBrandLogoPublicUrl(file) : '',
+      file,
       labelZh: item.labelZh,
       labelJa: item.labelJa,
       labelEn: item.labelEn
@@ -1973,8 +2010,10 @@ window.TK168_DATA = (() => {
       result.push(withMakerCountryNavFields(withLogoAssetLabels({
         key,
         assetKey,
-        iconUrl: info.iconUrl,
-        file: catalogBrand?.file || `${assetKey}.svg`,
+        iconUrl: normalizeBrandLogoStoredPath(info.iconUrl),
+        file: catalogBrand?.file
+          ? normalizeBrandLogoFileName(catalogBrand.file)
+          : getCanonicalBrandLogoFile(assetKey),
         labelZh: catalogBrand?.labelZh || fallbackLabel,
         labelJa: catalogBrand?.labelJa || fallbackLabel,
         labelEn: catalogBrand?.labelEn || fallbackLabel
@@ -2554,6 +2593,8 @@ window.TK168_DATA = (() => {
     getVehicleName,
     resolveVehicleMediaSource,
     resolveVehicleBrandGlyphUrl,
+    getCanonicalBrandLogoFile,
+    resolveBrandLogoPublicUrl,
     getBrandMakerCountry,
     getBrandLogoHomeCopy,
     getInventoryBrandGlyphNavItems,
