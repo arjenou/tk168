@@ -2940,10 +2940,20 @@ html:lang(en) .footer-newsletter h4 {
 }
 
 .footer-store-address {
+  display: inline-block;
   margin: 0;
   font-size: 12.5px;
   line-height: 1.62;
   color: rgba(255, 255, 255, 0.62);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-store-address:hover,
+.footer-store-address:focus-visible {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: underline;
+  text-underline-offset: 0.14em;
 }
 
 .footer-store-contact {

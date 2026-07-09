@@ -39,7 +39,14 @@
     </nav>
   `;
 
-  const SAITAMA_MAPS_HREF = 'https://www.google.com/maps/search/?api=1&query=339-0035%20%E5%9F%BC%E7%8E%89%E7%9C%8C%E3%81%95%E3%81%84%E3%81%9F%E3%81%BE%E5%B8%82%E5%B2%A9%E6%A7%BB%E5%8C%BA%E7%AC%B9%E4%B9%85%E4%BF%9D%E6%96%B0%E7%94%B0';
+  const FOOTER_STORE_MAP_URLS = Object.freeze({
+    saitama: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('339-0035 埼玉県さいたま市岩槻区笹久保新田')}`,
+    tokyo: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('〒169-0073 東京都新宿区百人町3丁目9-6 101')}`,
+    osaka: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('〒595-0042 大阪府泉大津市高津町12-11')}`,
+    malaysia: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Kuala Lumpur, Malaysia')}`
+  });
+
+  const SAITAMA_MAPS_HREF = FOOTER_STORE_MAP_URLS.saitama;
   /** 移动端底栏「咨询」一键拨号（さいたま店） */
   const MOBILE_INQUIRY_TEL_HREF = 'tel:+81487964907';
 
@@ -80,7 +87,7 @@
             <article class="footer-store">
               <p class="footer-store-eyebrow" data-i18n="footer.stores.saitama.eyebrow">JAPAN · TOKYO</p>
               <h5 class="footer-store-name" data-i18n="footer.stores.saitama.name">さいたま店</h5>
-              <p class="footer-store-address" data-i18n-html="footer.stores.saitama.address">339-0035<br>埼玉県さいたま市岩槻区笹久保新田</p>
+              <a class="footer-store-address" href="${FOOTER_STORE_MAP_URLS.saitama}" target="_blank" rel="noopener noreferrer" data-i18n-html="footer.stores.saitama.address">339-0035<br>埼玉県さいたま市岩槻区笹久保新田</a>
               <div class="footer-store-contact">
                 <p data-i18n="footer.stores.saitama.phoneLine">TEL：048-796-4907</p>
                 <p data-i18n="footer.stores.saitama.faxLine">FAX：048-796-4946</p>
@@ -90,7 +97,7 @@
             <article class="footer-store">
               <p class="footer-store-eyebrow" data-i18n="footer.stores.tokyo.eyebrow">JAPAN · TOKYO</p>
               <h5 class="footer-store-name" data-i18n="footer.stores.tokyo.name">新大久保店</h5>
-              <p class="footer-store-address" data-i18n-html="footer.stores.tokyo.address">〒169-0073<br>東京都新宿区百人町３丁目９−６ 101</p>
+              <a class="footer-store-address" href="${FOOTER_STORE_MAP_URLS.tokyo}" target="_blank" rel="noopener noreferrer" data-i18n-html="footer.stores.tokyo.address">〒169-0073<br>東京都新宿区百人町３丁目９−６ 101</a>
               <div class="footer-store-contact">
                 <p data-i18n="footer.stores.tokyo.phoneLine">TEL：070-4286-2253</p>
                 <p data-i18n="footer.stores.tokyo.emailLine">EMAIL：spacekart@tk168.co.jp</p>
@@ -99,7 +106,7 @@
             <article class="footer-store">
               <p class="footer-store-eyebrow" data-i18n="footer.stores.osaka.eyebrow">JAPAN · OSAKA</p>
               <h5 class="footer-store-name" data-i18n="footer.stores.osaka.name">大阪店</h5>
-              <p class="footer-store-address" data-i18n-html="footer.stores.osaka.address">〒595-0042<br>大阪府泉大津市高津町１２−１１</p>
+              <a class="footer-store-address" href="${FOOTER_STORE_MAP_URLS.osaka}" target="_blank" rel="noopener noreferrer" data-i18n-html="footer.stores.osaka.address">〒595-0042<br>大阪府泉大津市高津町１２−１１</a>
               <div class="footer-store-contact">
                 <p data-i18n="footer.stores.osaka.phoneLine">TEL：072-592-9577</p>
                 <p data-i18n="footer.stores.osaka.faxLine">FAX：072-592-9631</p>
@@ -109,7 +116,7 @@
             <article class="footer-store">
               <p class="footer-store-eyebrow" data-i18n="footer.stores.malaysia.eyebrow">MALAYSIA</p>
               <h5 class="footer-store-name" data-i18n="footer.stores.malaysia.name">マレーシア支店</h5>
-              <p class="footer-store-address" data-i18n-html="footer.stores.malaysia.address">Kuala Lumpur, Malaysia<br>住所準備中</p>
+              <a class="footer-store-address" href="${FOOTER_STORE_MAP_URLS.malaysia}" target="_blank" rel="noopener noreferrer" data-i18n-html="footer.stores.malaysia.address">Kuala Lumpur, Malaysia<br>住所準備中</a>
               <div class="footer-store-contact">
                 <p data-i18n="footer.storePhoneLine">電話番号：準備中</p>
                 <p data-i18n="footer.storeEmailLine">メール：準備中</p>
