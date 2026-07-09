@@ -42,7 +42,7 @@
 
       float lon = atan(world.x, world.z);
       float lat = asin(clamp(world.y, -1.0, 1.0));
-      vec2 texCoord = vec2(lon / (2.0 * PI) + 0.5, 0.5 - lat / PI);
+      vec2 texCoord = vec2(0.5 - lon / (2.0 * PI), 0.5 - lat / PI);
       gl_FragColor = texture2D(u_texture, texCoord);
     }
   `;
@@ -177,7 +177,7 @@
       const dy = event.clientY - this.lastY;
       this.lastX = event.clientX;
       this.lastY = event.clientY;
-      this.yaw += dx * 0.0045;
+      this.yaw -= dx * 0.0045;
       this.pitch -= dy * 0.0045;
       const limit = PI * 0.47;
       this.pitch = Math.max(-limit, Math.min(limit, this.pitch));

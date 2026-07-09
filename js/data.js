@@ -204,6 +204,8 @@ window.TK168_DATA = (() => {
     'SUV',
     'MPV',
     '轿车',
+    '掀背车',
+    '紧凑型车',
     '跑车',
     '超跑',
     '敞篷车',
@@ -696,6 +698,8 @@ window.TK168_DATA = (() => {
         SUV: 'SUV',
         MPV: 'MPV',
         轿车: '轿车',
+        掀背车: '掀背车',
+        紧凑型车: '紧凑型车',
         跑车: '跑车',
         超跑: '超跑',
         敞篷车: '敞篷车',
@@ -742,6 +746,8 @@ window.TK168_DATA = (() => {
         SUV: 'SUV',
         MPV: 'MPV',
         轿车: 'セダン',
+        掀背车: 'ハッチバック',
+        紧凑型车: 'コンパクトカー',
         跑车: 'スポーツカー',
         超跑: 'スーパーカー',
         敞篷车: 'コンバーチブル',
@@ -788,6 +794,8 @@ window.TK168_DATA = (() => {
         SUV: 'SUV',
         MPV: 'MPV',
         轿车: 'Sedan',
+        掀背车: 'Hatchback',
+        紧凑型车: 'Compact car',
         跑车: 'Sports car',
         超跑: 'Supercar',
         敞篷车: 'Convertible',
@@ -1859,12 +1867,12 @@ window.TK168_DATA = (() => {
 
   /** `assets/images/brands/logos/ferrari.svg` → `ferrari` */
   function brandLogoAssetKeyFromUrl(url) {
-    const match = String(url || '').match(/brands\/logos\/([^/?#]+)\.svg/i);
+    const match = String(url || '').match(/brands\/logos\/([^/?#]+)\.(?:svg|png|jpe?g|webp)/i);
     return match ? match[1].toLowerCase() : '';
   }
 
   function brandLogoAssetKeyFromFile(file) {
-    return String(file || '').replace(/\.svg$/i, '').toLowerCase();
+    return String(file || '').replace(/\.(svg|png|jpe?g|webp)$/i, '').toLowerCase();
   }
 
   /** Logo 文件名（如 corvette）与 canonical brandKey 不同时的展示名 */

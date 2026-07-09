@@ -153,7 +153,7 @@ function getOrderedBrandNavCatalog() {
   if (Array.isArray(window.TK168BrandLogoInventory?.items) && window.TK168BrandLogoInventory.items.length) {
     return window.TK168BrandLogoInventory.items.map((item) => ({
       key: item.key,
-      assetKey: String(item.file || '').replace(/\.svg$/i, ''),
+      assetKey: String(item.file || '').replace(/\.(svg|png|jpe?g|webp)$/i, ''),
       iconUrl: item.file ? `assets/images/brands/logos/${item.file}` : '',
       file: item.file,
       labelZh: item.labelZh,
@@ -163,7 +163,7 @@ function getOrderedBrandNavCatalog() {
   }
   return Array.isArray(brands) ? brands.map((item) => ({
     ...item,
-    assetKey: String(item.file || '').replace(/\.svg$/i, ''),
+    assetKey: String(item.file || '').replace(/\.(svg|png|jpe?g|webp)$/i, ''),
     iconUrl: item.file ? `assets/images/brands/logos/${item.file}` : ''
   })) : [];
 }

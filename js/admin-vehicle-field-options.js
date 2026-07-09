@@ -92,6 +92,8 @@
     { value: "SUV", label: "SUV" },
     { value: "MPV", label: "MPV" },
     { value: "轿车", label: "轿车" },
+    { value: "掀背车", label: "掀背车" },
+    { value: "紧凑型车", label: "紧凑型车" },
     { value: "跑车", label: "跑车" },
     { value: "超跑", label: "超跑" },
     { value: "敞篷车", label: "敞篷车" },
