@@ -2,7 +2,7 @@ const RENTAL_COPY = {
   zh: {
     'meta.title': '租车 — TK168 Premium Automotive',
     'hero.eyebrow': 'TK168 RENTAL',
-    'hero.title': '在库现车租赁',
+    'hero.title': '车辆租赁',
     'hero.subtitle': '',
     'overview.kicker': 'RENTAL DESK',
     'overview.title': '车辆租赁服务',
@@ -15,7 +15,7 @@ const RENTAL_COPY = {
     'overview.metric2.value': '人工跟进',
     'overview.metric3.label': '交付方式',
     'overview.metric3.value': '到店取车｜协调交付',
-    'overview.metric4.label': '更适合',
+    'overview.metric4.label': '服务类型',
     'overview.metric4.value': '预约制',
     'overview.note': '车辆库存、租赁费用及预约时间将根据实际情况确认，请以工作人员最终回复为准。',
     'fleet.kicker': 'RENTABLE STOCK',
