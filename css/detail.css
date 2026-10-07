@@ -3625,32 +3625,58 @@ html:lang(en) .footer-newsletter h4 {
     grid-template-columns: 1fr;
     gap: 10px;
     padding: 0;
+    align-items: start;
+    justify-items: stretch;
+  }
+
+  .detail-title-col {
+    align-items: flex-start;
+    width: 100%;
   }
 
   .detail-title-row {
-    gap: 12px;
+    gap: 10px;
+    align-items: flex-start;
+    padding-right: 0;
+    width: 100%;
+  }
+
+  .detail-title {
+    text-align: left;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .detail-title-brand,
+  .detail-title-model,
+  .detail-title-grade,
+  .detail-title-model-row {
+    text-align: left;
+    justify-content: flex-start;
+    width: 100%;
   }
 
   .detail-back-btn {
-    width: 50px;
-    height: 50px;
-    border-radius: 14px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    margin: 0;
   }
 
   .detail-back-icon {
-    width: 26px;
-    height: 26px;
+    width: 18px;
+    height: 18px;
   }
 
   .detail-title-favorite {
-    width: 50px;
-    height: 50px;
-    border-radius: 14px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
   }
 
   .detail-title-favorite-icon {
-    width: 30px;
-    height: 30px;
+    width: 26px;
+    height: 26px;
   }
 
   .detail-price {
@@ -3658,10 +3684,33 @@ html:lang(en) .footer-newsletter h4 {
     gap: 14px;
     text-align: left;
     padding-right: 0;
+    justify-items: start;
+    width: 100%;
   }
 
-  .detail-price-main {
+  .detail-shell:not(.detail-shell--rental) .detail-price {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .detail-price-main,
+  .detail-price-sub {
     padding-left: 0;
+    justify-items: start;
+    text-align: left;
+    width: 100%;
+  }
+
+  .detail-price-label-row {
+    padding-left: 0;
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .detail-price-value,
+  .detail-price-sub-value {
+    justify-content: flex-start;
+    text-align: left;
+    width: 100%;
   }
 
   .spec-table {
