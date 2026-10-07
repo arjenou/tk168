@@ -15,7 +15,7 @@
 // data.js falls back to its built-in defaults.
 
 (() => {
-  const VEHICLE_KEY = "tk168:vehicles:v2"; // v2: 缓存含 show_on_home / 与首页筛选一致
+  const VEHICLE_KEY = "tk168:vehicles:v3"; // v3: 缓存含 is_sold
   const RENTAL_KEY = "tk168:rentals:v1";
   const JOURNAL_KEY = "tk168:journal:v1";
   const MAX_AGE_MS = 5 * 60 * 1000;
@@ -157,6 +157,13 @@
           ? v.showOnHome
           : v.show_on_home != null && String(v.show_on_home).trim() !== ""
             ? Number(v.show_on_home) === 1
+            : undefined,
+      ),
+      isSold: keepMeaningful(
+        typeof v.isSold === "boolean"
+          ? v.isSold
+          : v.is_sold != null && String(v.is_sold).trim() !== ""
+            ? Number(v.is_sold) === 1
             : undefined,
       ),
     };

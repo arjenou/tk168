@@ -334,7 +334,7 @@ const RESOURCES = {
       staffPhone: "",
       panoramaR2Key: null,
       panoramaUrl: null,
-      displayOrder: 0, isPublished: true, showOnHome: true, images: [],
+      displayOrder: 0, isPublished: true, showOnHome: true, isSold: false, images: [],
     }),
   },
 
@@ -1193,7 +1193,7 @@ function renderList() {
   const extraHeadCells = (r.extraColumns || [])
     .map((c) => `<th>${escapeHtml(c.label)}</th>`)
     .join("");
-  const vehicleHomeHead = r.key === "vehicles" ? `<th scope="col">首页</th>` : "";
+  const vehicleHomeHead = r.key === "vehicles" ? `<th scope="col">首页</th><th scope="col">售出</th>` : "";
 
   const dragHint =
     r.homeDragSort && !state.filter.trim()
@@ -1490,6 +1490,11 @@ function itemRow(v, r) {
         <button type="button" class="admin-badge ${v.showOnHome !== false ? "is-on" : "is-off"}" data-toggle-show-on-home="${escapeAttr(v.id)}" title="点击切换是否在首页车辆网格展示">
           ${v.showOnHome !== false ? "显示" : "隐藏"}
         </button>
+      </td>
+      <td>
+        <button type="button" class="admin-badge ${v.isSold ? "is-off" : "is-on"}" data-toggle-is-sold="${escapeAttr(v.id)}" title="点击切换售出状态">
+          ${v.isSold ? "已售出" : "在售"}
+        </button>
       </td>`
       : "";
   return `
@@ -1619,6 +1624,28 @@ function bindRowActions() {
         const up = data && data[r.itemKey];
         const on = up && up.showOnHome !== false;
         showToast(on ? "已设为首页显示" : "已设为仅品牌页（首页隐藏）");
+      } catch (err) {
+        showToast(`切换失败：${err.message}`, "error");
+      }
+    });
+  });
+  document.querySelectorAll("[data-toggle-is-sold]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      if (r.key !== "vehicles") return;
+      const id = btn.dataset.toggleIsSold;
+      const v = (state.items[r.key] || []).find((x) => x.id === id);
+      if (!v) return;
+      try {
+        const data = await api(r.apiItem(id), {
+          method: "PATCH",
+          body: { isSold: !v.isSold },
+        });
+        mergeListItemFromApiPayload(data);
+        if (!rerenderCurrentListTbody()) {
+          await refreshItems();
+        }
+        const up = data && data[r.itemKey];
+        showToast(up?.isSold ? "已标记为售出" : "已恢复为在售");
       } catch (err) {
         showToast(`切换失败：${err.message}`, "error");
       }
@@ -2373,6 +2400,14 @@ function renderPublishTab(r, draft) {
             <span>${draft.showOnHome !== false ? "在首页展示" : "仅品牌页"}</span>
           </label>
           <div class="admin-field-hint">关闭后该车仍会在品牌页（brand.html）列表展示；仅首页（index.html）车辆网格隐藏。</div>
+        </div>
+        <div class="admin-field admin-col-6">
+          <label>售出状态</label>
+          <label class="admin-switch">
+            <input type="checkbox" data-draft="isSold" ${draft.isSold ? "checked" : ""}>
+            <span>${draft.isSold ? "已售出" : "在售"}</span>
+          </label>
+          <div class="admin-field-hint">标记为已售出后，前台车辆卡片与详情页会显示「已售出」标签。</div>
         </div>`
       : "";
   return `
@@ -2747,7 +2782,7 @@ function bindEditor() {
     const onDraftField = () => {
       applyDraftInput(input);
       if (input.dataset.draft === "icon") syncAdminIconPreview();
-      if (input.dataset.draft === "isPublished" || input.dataset.draft === "showOnHome") {
+      if (input.dataset.draft === "isPublished" || input.dataset.draft === "showOnHome" || input.dataset.draft === "isSold") {
         // Re-render so the header badge + switch label stay in sync.
         renderEditor();
       }

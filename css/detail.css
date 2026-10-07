@@ -2654,6 +2654,7 @@ body.price-help-open {
   border-radius: 10px;
   overflow: hidden;
   flex-shrink: 0;
+  position: relative;
 }
 
 .featured-cover img {

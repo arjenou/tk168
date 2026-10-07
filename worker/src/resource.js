@@ -67,6 +67,7 @@ export function createResource({
     }
     if ("isPublished" in out) out.isPublished = Number(out.isPublished ?? 1) === 1;
     if ("showOnHome" in out) out.showOnHome = Number(out.showOnHome ?? 1) === 1;
+    if ("isSold" in out) out.isSold = Number(out.isSold ?? 0) === 1;
     if ("displayOrder" in out) out.displayOrder = Number(out.displayOrder ?? 0);
     return out;
   }
@@ -78,7 +79,7 @@ export function createResource({
       let value = body[camel];
       if (value === undefined) continue;
       if (value === "") value = null;
-      if (snake === "is_published" || snake === "show_on_home") {
+      if (snake === "is_published" || snake === "show_on_home" || snake === "is_sold") {
         value = value === true || value === 1 || value === "1" ? 1 : 0;
       } else if (snake === "display_order" || (numericFields && numericFields.includes(snake))) {
         value = Number(value) || 0;

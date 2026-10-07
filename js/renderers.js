@@ -328,12 +328,17 @@ window.TK168Renderers = (() => {
       : 'brand.html';
     const coverPhotoSrc = resolveCardCoverSource(vehicle.photo, 720);
     const coverPhotoAlt = escapeHtmlText(vehicleName).replace(/"/g, '&quot;');
+    const soldTagMarkup = vehicle.isSold
+      ? `<span class="vehicle-sold-tag">${t('inventory.sold')}</span>`
+      : '';
     const coverMarkup = variant.cover === 'v-card-img'
       ? `<div class="${variant.cover} v-card-img--skeleton-load">
+        ${soldTagMarkup}
         <span class="v-card-img__skeleton v-skeleton-block" aria-hidden="true"></span>
         <img src="${coverPhotoSrc}" alt="${coverPhotoAlt}" loading="lazy" decoding="async">
       </div>`
       : `<div class="${variant.cover}">
+        ${soldTagMarkup}
         <img src="${coverPhotoSrc}" alt="${coverPhotoAlt}" loading="lazy" decoding="async">
       </div>`;
     const primaryPriceLabel = isRentalFleetCard ? t('rental.priceDaily') : getPriceLabel('price.total');

@@ -24,7 +24,7 @@ const VEHICLE_COLUMNS = [
   "highlight_steering", "highlight_chassis_tail",
   "staff_photo_r2_key", "staff_photo_url", "staff_message", "staff_phone",
   "panorama_r2_key", "panorama_url",
-  "display_order", "is_published", "show_on_home",
+  "display_order", "is_published", "show_on_home", "is_sold",
 ];
 
 const VEHICLE_JSON_COLUMNS = new Set([
@@ -90,6 +90,7 @@ const VEHICLE_FIELD_MAP = {
   displayOrder: "display_order",
   isPublished: "is_published",
   showOnHome: "show_on_home",
+  isSold: "is_sold",
 };
 
 const vehicleResource = createResource({

@@ -101,6 +101,7 @@ const priceHelpModalTitle = document.getElementById('priceHelpModalTitle');
 const priceHelpModalBody = document.getElementById('priceHelpModalBody');
 const priceHelpModalClose = document.getElementById('priceHelpModalClose');
 const galleryMainTrigger = document.getElementById('galleryMainTrigger');
+const detailSoldTag = document.getElementById('detailSoldTag');
 const galleryLightbox = document.getElementById('galleryLightbox');
 const galleryLightboxImage = document.getElementById('galleryLightboxImage');
 const galleryLightboxTitle = document.getElementById('galleryLightboxTitle');
@@ -909,6 +910,14 @@ function renderVehicleHeader() {
   if (detailTitleGrade) {
     detailTitleGrade.textContent = gradeLine;
     detailTitleGrade.hidden = !gradeLine;
+  }
+
+  if (detailSoldTag) {
+    const sold = Boolean(currentVehicle?.isSold) && !isRentalDetail;
+    detailSoldTag.hidden = !sold;
+    if (sold) {
+      detailSoldTag.textContent = window.TK168I18N?.t('inventory.sold') || '已售出';
+    }
   }
 
   if (isRentalDetail) {
