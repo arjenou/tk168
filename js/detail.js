@@ -932,10 +932,20 @@ function renderVehicleHeader() {
   syncDetailFavoriteButton();
 }
 
+function syncGalleryMainAspectRatio(img) {
+  if (!galleryMainTrigger || !img) return;
+  const { naturalWidth, naturalHeight } = img;
+  if (naturalWidth > 0 && naturalHeight > 0) {
+    galleryMainTrigger.style.aspectRatio = `${naturalWidth} / ${naturalHeight}`;
+  }
+}
+
 function setMainGalleryImage(imageSrc, imageAlt) {
   galleryMainTrigger?.setAttribute('aria-label', window.TK168I18N?.t('gallery.open') || '查看车辆大图');
-  detailMainImage.src = imageSrc;
   detailMainImage.alt = imageAlt;
+  detailMainImage.onload = () => syncGalleryMainAspectRatio(detailMainImage);
+  detailMainImage.src = imageSrc;
+  if (detailMainImage.complete) syncGalleryMainAspectRatio(detailMainImage);
 }
 
 function destroyPanoramaViewer() {
