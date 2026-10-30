@@ -1,3 +1,4 @@
+import { createSpacekartBookings } from "./admin-spacekart.js?v=20261030a";
 // TK168 admin SPA — talks to /api/* endpoints served by the worker.
 // No framework; vanilla DOM + fetch.  All endpoints use cookie-based auth
 // (the server sets an HttpOnly `tk168_admin` cookie on login).
@@ -939,7 +940,10 @@ async function boot() {
     const res = await api("/auth/me");
     state.user = res.user;
     const saved = loadPersistedAdminRoute(state.user);
-    if (saved?.view === "users") {
+    if (saved?.view === "spacekart") {
+      state.view = "spacekart";
+      await spacekartBookings.load();
+    } else if (saved?.view === "users") {
       state.view = "users";
       state.resource = saved.resource && RESOURCES[saved.resource] ? saved.resource : "vehicles";
       state.editorTab = "content";
@@ -1021,7 +1025,7 @@ function renderLogin() {
     <div class="admin-login">
       <div class="admin-login-card">
         <div class="admin-brand">TK168 Admin</div>
-        <div class="admin-brand-sub">车辆内容后台</div>
+        <div class="admin-brand-sub">内容与预约管理</div>
         <form id="loginForm">
           <div class="admin-field">
             <label for="loginUser">用户名</label>
@@ -1064,6 +1068,7 @@ function renderLogin() {
 function navHtml() {
   const onList = state.view === "list" || state.view === "editor";
   const items = [
+    { id: "nav-spacekart", label: "SpaceKart 预约", active: state.view === "spacekart", onClick: "spacekart" },
     {
       id: "nav-vehicles",
       label: RESOURCES.vehicles.label,
@@ -1110,7 +1115,7 @@ function appShell(inner) {
     <div class="admin-app">
       <aside class="admin-sidebar">
         <div class="admin-brand">TK168 Admin</div>
-        <div class="admin-brand-sub">车辆内容后台</div>
+        <div class="admin-brand-sub">内容与预约管理</div>
         ${navHtml()}
         <div class="admin-sidebar-footer">
           <div>登录：<strong>${escapeHtml(state.user?.username || "")}</strong></div>
@@ -1130,7 +1135,10 @@ function bindShell() {
       state.editingIsNew = false;
       state.editingDraft = null;
       state.filter = "";
-      if (target === "vehicles-list") {
+      if (target === "spacekart") {
+        state.view = "spacekart";
+        await spacekartBookings.load();
+      } else if (target === "vehicles-list") {
         state.resource = "vehicles";
         state.view = "list";
         await refreshItems();
@@ -3428,6 +3436,8 @@ function render() {
   }
   if (state.view === "editor" && state.editingDraft) {
     renderEditor();
+  } else if (state.view === "spacekart") {
+    spacekartBookings.render();
   } else if (state.view === "users") {
     renderUsers();
   } else if (state.view === "rental-contacts") {
@@ -3452,5 +3462,7 @@ function escapeHtml(value) {
 function escapeAttr(value) {
   return escapeHtml(value);
 }
+
+const spacekartBookings = createSpacekartBookings({ api, root: ROOT, appShell, bindShell, escapeHtml, isActive: () => Boolean(state.user) && state.view === "spacekart" });
 
 boot();
