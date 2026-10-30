@@ -1,3 +1,4 @@
+import { listSpacekartBookings, getSpacekartBooking } from "./spacekart.js";
 import {
   login,
   logout,
@@ -352,6 +353,16 @@ async function handleApi(request, env, url, ctx) {
 
   // ---------- Admin-only ----------
   const me = await requireAuth(env, request);
+
+  if (path === "/admin/spacekart-bookings" || path.startsWith("/admin/spacekart-bookings/")) {
+    if (me.role !== "admin") return error(403, "forbidden");
+    if (method !== "GET") return error(405, "method_not_allowed");
+    const result = path === "/admin/spacekart-bookings"
+      ? await listSpacekartBookings(env, url.searchParams)
+      : await getSpacekartBooking(env, path.slice("/admin/spacekart-bookings/".length));
+    return json(result, 200, { "cache-control": "no-store" });
+  }
+
 
   if (path === "/admin/rental-contacts" && method === "GET") {
     const contacts = await getPublicRentalContacts(env);
