@@ -1,3 +1,4 @@
+import { secretMatches, refundRpc, requestBookingRefund, requireRefundOrigin } from "./spacekart-refunds.js";
 import { listSpacekartBookings, getSpacekartBooking } from "./spacekart.js";
 import {
   login,
@@ -259,6 +260,14 @@ async function handleApi(request, env, url, ctx) {
   if (path.length > 1) path = path.replace(/\/+$/, "") || "/";
   const method = request.method.toUpperCase();
 
+  if (path === "/internal/spacekart-refunds" && method === "POST") {
+    if (!await secretMatches(request.headers.get("authorization")?.replace(/^Bearer /,""),env.SPACEKART_REFUND_SECRET)) return error(401,"unauthorized");
+    const raw=await request.text();
+    if(raw.length>96000)return error(413,"request_too_large");
+    const result=await refundRpc(env,JSON.parse(raw));
+    return json({result},200,{"cache-control":"no-store"});
+  }
+
   // ---------- Public ----------
   if (path === "/vehicles" && method === "GET") {
     const vehicles = await listVehicles(env, { includeUnpublished: false });
@@ -353,6 +362,15 @@ async function handleApi(request, env, url, ctx) {
 
   // ---------- Admin-only ----------
   const me = await requireAuth(env, request);
+
+  const refundMatch=/^\/admin\/spacekart-bookings\/([a-f0-9-]{36})\/refund(\/sync)?$/i.exec(path);
+  if(refundMatch){
+    if(me.role!=="admin")return error(403,"forbidden");
+    if(method!=="POST")return error(405,"method_not_allowed");
+    requireRefundOrigin(request);
+    const result=await requestBookingRefund(env,refundMatch[1],await readJson(request),me,Boolean(refundMatch[2]));
+    return json(result,200,{"cache-control":"no-store"});
+  }
 
   if (path === "/admin/spacekart-bookings" || path.startsWith("/admin/spacekart-bookings/")) {
     if (me.role !== "admin") return error(403, "forbidden");

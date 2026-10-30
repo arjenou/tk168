@@ -10,6 +10,7 @@ before(async()=>{
   db=await mf.getD1Database('DB');
   await db.exec("CREATE TABLE users(id INTEGER PRIMARY KEY,username TEXT,role TEXT); CREATE TABLE sessions(token TEXT PRIMARY KEY,user_id INTEGER,expires_at INTEGER); INSERT INTO users VALUES(1,'testadmin','admin'),(2,'viewer','viewer'); INSERT INTO sessions VALUES('test-admin-session',1,9999999999),('test-viewer-session',2,9999999999);");
   await db.exec((await readFile('schema/migrations/20261030_spacekart.sql','utf8')).replace(/\n/g,' '));
+  await db.exec((await readFile('schema/migrations/20261030_spacekart_refunds.sql','utf8')).replace(/\n/g,' '));
   const insert=db.prepare(`INSERT INTO spacekart_bookings(id,input_hash,name,email,phone,tour,tour_name,tour_duration,tour_date,tour_time,riders,notes,unit_amount,total_amount,currency,status,stripe_livemode,checkout_expires_at) VALUES(?,?,?,?,?,'grand','Grand Neon Orbit','90min',?,'18:30',2,'<script>literal note</script>',20000,40000,'jpy',?,?,9999999999)`);
   await db.batch([
     insert.bind(paidId,'hash','Paid Customer','paid@example.com','00000000','2035-11-20','paid',1),
@@ -37,7 +38,7 @@ test('date/status/customer filters and bound search cannot escape the selected e
   const data=await(await request('?status=paid&from=2035-11-20&to=2035-11-20&q=paid%40example.com')).json();assert.equal(data.summary.total,1);
   const injection=await(await request("?q="+encodeURIComponent("' OR 1=1 --"))).json();assert.equal(injection.summary.total,0);
   const wildcard=await(await request('?q=%25')).json();assert.equal(wildcard.summary.total,0);
-  for(const q of ['?status=refunded','?mode=all','?page=0','?from=2035-02-30','?from=2035-99-99','?from=2035-12-01&to=2035-11-01']) assert.equal((await request(q)).status,400,q);
+  for(const q of ['?status=wrong','?mode=all','?page=0','?from=2035-02-30','?from=2035-99-99','?from=2035-12-01&to=2035-11-01']) assert.equal((await request(q)).status,400,q);
 });
 test('details include per-recipient results and missing bookings return 404',async()=>{
   const detail=await(await request('/'+paidId)).json();assert.equal(detail.booking.notes,'<script>literal note</script>');assert.equal(detail.emails[0].attempts,1);assert.equal('lease_id' in detail.emails[0],false);
