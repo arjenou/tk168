@@ -1119,6 +1119,14 @@ window.TK168_DATA = (() => {
     return Math.round(n);
   }
 
+  /** 万公里字段：整数和小数都按万公里解析。 */
+  function parseMileageWan(value) {
+    const raw = String(value ?? '').trim();
+    const compact = /万/.test(raw) ? raw.replace(/[^\d.]/g, '') : raw.replace(/[,，\s]/g, '');
+    if (!/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(compact)) return NaN;
+    return Number(compact);
+  }
+
   /** 换算为公里整数；尊重 vehicle.mileageUnit（wan|km） */
   function parseVehicleMileageKm(vehicle) {
     const raw = String(vehicle?.mileage ?? '').trim();
@@ -1129,12 +1137,14 @@ window.TK168_DATA = (() => {
       const n = parseFloat(compact);
       return Number.isFinite(n) ? Math.round(n) : 0;
     }
-    return parseMileage(raw);
+    const wan = parseMileageWan(raw);
+    return Number.isFinite(wan) ? Math.round(wan * 10000) : 0;
   }
 
   /**
    * 展示里程。第三参 mileageUnit：wan=万公里小数存库；km=公里整数存库。
    * 英文统一「N km」；中文 wan→「X万公里」、km→「N 公里」；日文 km→「N km」、wan→「X万公里」（与历史文案一致）。
+   * 万公里至少显示一位小数，已有小数不截断。
    */
   function formatVehicleMileageDisplay(value, language = getCurrentLanguage(), mileageUnit) {
     const raw = String(value ?? '').trim();
@@ -1150,14 +1160,13 @@ window.TK168_DATA = (() => {
       if (language === 'ja') return `${km.toLocaleString('ja-JP')} km`;
       return `${km.toLocaleString('zh-CN')} 公里`;
     }
-    const km = parseMileage(raw);
-    if (!km) return raw;
+    const wan = parseMileageWan(raw);
+    if (!Number.isFinite(wan)) return raw;
     if (language === 'en') {
+      const km = Math.round(wan * 10000);
       return `${km.toLocaleString('en-US')} km`;
     }
-    const wan = km / 10000;
-    let s = wan.toFixed(2);
-    s = s.replace(/(\.\d*?[1-9])0+$/g, '$1').replace(/\.$/, '');
+    const s = Number.isInteger(wan) ? wan.toFixed(1) : String(wan);
     return `${s}万公里`;
   }
 
